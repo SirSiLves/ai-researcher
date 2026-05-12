@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Reactive trigger: fires whenever a file in daily/ changes.
+  When the orchestrator drops daily/{YYYY-MM-DD}.md (regardless of how
+  long it actually took), launchd runs add_to_notes.applescript within
+  seconds. ThrottleInterval=10 collapses bursty writes into one fire.
+
+  Belt-and-suspenders: a calendar trigger at 22:00 catches anything
+  missed (e.g. if you weren't logged in when the file landed). The
+  AppleScript dedupes by title, so multiple fires won't create dupes.
+
+  Install:
+    cp scripts/com.yves.ai-digest-to-notes.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.yves.ai-digest-to-notes.plist
+
+  Uninstall:
+    launchctl unload ~/Library/LaunchAgents/com.yves.ai-digest-to-notes.plist
+    rm ~/Library/LaunchAgents/com.yves.ai-digest-to-notes.plist
+
+  Manual fire:
+    launchctl start com.yves.ai-digest-to-notes
+    # logs go to /tmp/ai-digest-to-notes.{out,err}
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.yves.ai-digest-to-notes</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/osascript</string>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/scripts/add_to_notes.applescript</string>
+    </array>
+
+    <!-- React to any change in the four cadence locations.
+         The AppleScript itself rebuilds all four notes regardless of which
+         path fired, so any single change is enough to refresh everything. -->
+    <key>WatchPaths</key>
+    <array>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/daily</string>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/weekly</string>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/monthly</string>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/trends.md</string>
+    </array>
+
+    <!-- Don't fire faster than once every 10s if the orchestrator writes in bursts -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <!-- Belt-and-suspenders: also fire at 22:00 in case the watcher missed it
+         (e.g. system was asleep when the file landed). Dedupe is in the script. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>22</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/ai-digest-to-notes.out</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/ai-digest-to-notes.err</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

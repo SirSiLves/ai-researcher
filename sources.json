@@ -1,0 +1,289 @@
+{
+  "topic": "LLM / Generative AI / RAG / AI platforms / Agent protocols (MCP, A2A) / AI governance",
+  "owner_email": "register@ruosch.me",
+  "language_preference": "English digest; German/Swiss sources included as inputs.",
+  "focus_areas": [
+    "Frontier LLMs and generative AI (releases, capabilities, evals)",
+    "RAG techniques and retrieval / vector / embedding infrastructure",
+    "AI platforms and their capabilities — agent frameworks, multi-agent / agentic systems, orchestration, eval/observability tooling, agent SDKs",
+    "Agent interoperability protocols and standards — MCP (Model Context Protocol), A2A (Agent-to-Agent), tool-use / function-calling standards, OpenTelemetry for AI, agent runtime standards",
+    "AI governance, policy, safety, regulation (EU AI Act, NIST AI RMF, ISO 42001, AI Safety Institutes)"
+  ],
+
+  "news_collector": {
+    "_priority_vendors_comment": "Frontier labs whose announcements must NEVER be missed. The news skill treats these as mandatory coverage: every URL fetched, fallback_search invoked if the index page is egress-blocked, vendor permalink preferred over aggregator coverage in synthesis. Edit freely — this is just a list, no other config depends on the keys.",
+    "priority_vendors": {
+      "openai": {
+        "blog_urls": ["https://openai.com/blog", "https://openai.com/index"],
+        "research_urls": ["https://openai.com/research"],
+        "fallback_search": "site:openai.com 2026 announcement OR release OR launch"
+      },
+      "anthropic": {
+        "blog_urls": ["https://www.anthropic.com/news"],
+        "research_urls": ["https://www.anthropic.com/research", "https://www.anthropic.com/engineering"],
+        "fallback_search": "site:anthropic.com 2026 (announcement OR release OR launch OR enterprise OR agents)"
+      },
+      "google_deepmind": {
+        "blog_urls": ["https://blog.google/technology/ai/", "https://deepmind.google/blog/"],
+        "research_urls": ["https://research.google/blog/"],
+        "fallback_search": "(site:deepmind.google OR site:blog.google) Gemini 2026 announcement"
+      },
+      "meta": {
+        "blog_urls": ["https://ai.meta.com/blog/"],
+        "research_urls": ["https://ai.meta.com/research/publications/"],
+        "fallback_search": "site:ai.meta.com 2026 (Llama OR announcement OR release)"
+      },
+      "mistral": {
+        "blog_urls": ["https://mistral.ai/news"],
+        "research_urls": [],
+        "fallback_search": "site:mistral.ai 2026 (announcement OR release OR launch)"
+      },
+      "deepseek": {
+        "blog_urls": ["https://api-docs.deepseek.com/news"],
+        "research_urls": ["https://huggingface.co/deepseek-ai"],
+        "fallback_search": "DeepSeek 2026 (V4 OR R2 OR release OR announcement) site:huggingface.co OR site:x.com"
+      }
+    },
+
+    "_enterprise_vendors_comment": "Enterprise AI platforms — the layer ABOVE frontier-lab announcements. These are the vendors who package frontier models for the enterprise market (SAP, Salesforce, ServiceNow), the ones who own enterprise infra (Red Hat, IBM, NVIDIA, Snowflake, Databricks), and the workflow/automation layer that's becoming AI-native (n8n, Workday). Same coverage discipline as priority_vendors: every URL fetched, fallback_search invoked if egress-blocked, vendor permalink preferred over aggregator. Without this section the digest skewed toward frontier-lab MCP/A2A chatter and missed major business news (n8n becoming Germany's most valuable AI co via SAP deal, Red Hat AI 3.4 release, etc.).",
+    "enterprise_vendors": {
+      "redhat_ibm": {
+        "blog_urls": ["https://www.redhat.com/en/blog", "https://research.ibm.com/blog", "https://www.ibm.com/think/topics/artificial-intelligence"],
+        "research_urls": [],
+        "fallback_search": "(site:redhat.com OR site:ibm.com) 2026 (AI OR agent OR OpenShift OR Granite OR Watsonx)"
+      },
+      "sap": {
+        "blog_urls": ["https://news.sap.com/topics/artificial-intelligence/", "https://www.sap.com/products/artificial-intelligence/news.html"],
+        "research_urls": [],
+        "fallback_search": "site:sap.com 2026 (Joule OR generative-AI OR agent OR partnership)"
+      },
+      "salesforce": {
+        "blog_urls": ["https://www.salesforce.com/news/category/products/ai-features/", "https://www.salesforce.com/blog/category/artificial-intelligence/"],
+        "research_urls": [],
+        "fallback_search": "site:salesforce.com 2026 (Agentforce OR Einstein OR agent OR release)"
+      },
+      "nvidia": {
+        "blog_urls": ["https://blogs.nvidia.com/blog/category/generative-ai/", "https://developer.nvidia.com/blog/category/generative-ai/"],
+        "research_urls": [],
+        "fallback_search": "site:nvidia.com 2026 (NIM OR AI-Enterprise OR Blackwell OR Rubin OR announcement)"
+      },
+      "snowflake": {
+        "blog_urls": ["https://www.snowflake.com/en/blog/?_categories=ai-ml"],
+        "research_urls": [],
+        "fallback_search": "site:snowflake.com 2026 (Cortex OR AI OR agent OR release)"
+      },
+      "servicenow": {
+        "blog_urls": ["https://www.servicenow.com/company/media/press-room.html", "https://www.servicenow.com/blogs/category/now-on-now/ai.html"],
+        "research_urls": [],
+        "fallback_search": "site:servicenow.com 2026 (Now-Assist OR agent OR release OR partnership)"
+      },
+      "n8n": {
+        "blog_urls": ["https://n8n.io/blog/", "https://blog.n8n.io"],
+        "research_urls": [],
+        "fallback_search": "n8n 2026 (funding OR SAP OR agent OR valuation OR release) site:n8n.io OR site:handelsblatt.com OR site:techcrunch.com"
+      },
+      "workday_oracle": {
+        "blog_urls": ["https://blog.workday.com/en-us/topics/artificial-intelligence.html", "https://blogs.oracle.com/ai-and-datascience/"],
+        "research_urls": [],
+        "fallback_search": "(site:workday.com OR site:oracle.com) 2026 (AI OR agent OR Illuminate OR generative)"
+      }
+    },
+
+    "vendor_blogs": [
+      "https://openai.com/blog",
+      "https://cookbook.openai.com",
+      "https://www.anthropic.com/news",
+      "https://www.anthropic.com/engineering",
+      "https://huggingface.co/blog",
+      "https://ai.googleblog.com",
+      "https://deepmind.google/blog/",
+      "https://www.deeplearning.ai/the-batch/",
+      "https://ai.meta.com/blog",
+      "https://www.microsoft.com/en-us/research/blog",
+      "https://blog.langchain.dev",
+      "https://www.llamaindex.ai/blog",
+      "https://www.pinecone.io/blog/",
+      "https://weaviate.io/blog",
+      "https://www.databricks.com/blog/category/generative-ai"
+    ],
+    "tech_news_sites": [
+      "https://www.golem.de",
+      "https://www.heise.de/thema/Kuenstliche-Intelligenz",
+      "https://www.heise.de/newsticker",
+      "https://www.handelsblatt.com/technik/ki/",
+      "https://www.handelsblatt.com/technik/it-internet/",
+      "https://t3n.de/news/category/ki/",
+      "https://www.theverge.com/ai-artificial-intelligence",
+      "https://techcrunch.com/category/artificial-intelligence",
+      "https://arstechnica.com/ai",
+      "https://www.infoq.com/ai-ml-data-eng",
+      "https://venturebeat.com/ai",
+      "https://www.marktechpost.com",
+      "https://www.zdnet.com/topic/artificial-intelligence/"
+    ],
+    "swiss_sources": [
+      "https://www.nzz.ch/technologie",
+      "https://www.swissinfo.ch/eng/sci-tech"
+    ],
+    "governance_sources": [
+      "https://hai.stanford.edu/news",
+      "https://oecd.ai/en/wonk",
+      "https://artificialintelligenceact.eu/news/",
+      "https://www.aisi.gov.uk/work",
+      "https://www.nist.gov/itl/ai-risk-management-framework",
+      "https://metr.org",
+      "https://www.apolloresearch.ai/blog",
+      "https://www.governance.ai",
+      "https://safe.ai"
+    ],
+    "web_search_queries": [
+      "LLM news this week",
+      "generative AI announcements past 24 hours",
+      "new open source LLM release",
+      "AI agent framework launch",
+      "OpenAI Anthropic Google DeepMind Mistral announcement",
+      "RAG retrieval augmented generation announcement",
+      "vector database embedding launch",
+      "agent platform launch enterprise",
+      "MCP Model Context Protocol new server",
+      "A2A Agent-to-Agent protocol",
+      "AI governance EU AI Act enforcement update",
+      "ISO 42001 NIST AI RMF news",
+      "enterprise AI platform release SAP OR Salesforce OR ServiceNow OR Snowflake OR Workday OR Oracle",
+      "Red Hat AI OpenShift release announcement",
+      "NVIDIA enterprise AI NIM Blackwell announcement",
+      "n8n funding valuation enterprise AI workflow",
+      "AI company funding round valuation 2026",
+      "KI Deutschland Schweiz Unternehmen neue Investition",
+      "enterprise AI agent deployment customer announcement"
+    ]
+  },
+
+  "papers_collector": {
+    "arxiv_categories": ["cs.CL", "cs.AI", "cs.LG", "cs.MA", "stat.ML", "cs.IR"],
+    "additional_sources": [
+      "https://huggingface.co/papers",
+      "https://papers.cool/arxiv/cs.CL"
+    ],
+    "max_papers_per_category": 5
+  },
+
+  "blogs_collector": {
+    "medium_tags": [
+      "llm",
+      "generative-ai",
+      "large-language-models",
+      "ai-agents",
+      "prompt-engineering",
+      "rag",
+      "retrieval-augmented-generation",
+      "vector-database",
+      "ai-governance",
+      "ai-safety",
+      "responsible-ai",
+      "agentic-ai",
+      "ai-engineering",
+      "model-context-protocol",
+      "mcp",
+      "agent-protocols",
+      "tool-use"
+    ],
+    "long_form_blogs": [
+      "https://simonwillison.net",
+      "https://latent.space",
+      "https://ai.engineer",
+      "https://jack-clark.net",
+      "https://stratechery.com",
+      "https://www.semianalysis.com",
+      "https://every.to/p/chain-of-thought",
+      "https://eugeneyan.com",
+      "https://lilianweng.github.io",
+      "https://www.interconnects.ai",
+      "https://www.pragmaticengineer.com",
+      "https://blog.langchain.dev",
+      "https://www.llamaindex.ai/blog",
+      "https://hai.stanford.edu/news",
+      "https://www.lawfaremedia.org/topics/artificial-intelligence",
+      "https://www.aisnakeoil.com",
+      "https://karpathy.github.io",
+      "https://www.youtube.com/@AndrejKarpathy",
+      "https://huyenchip.com",
+      "https://magazine.sebastianraschka.com",
+      "https://hamel.dev",
+      "https://cognition.ai/blog",
+      "https://news.smol.ai",
+      "https://lastweekin.ai"
+    ]
+  },
+
+  "jobs_ch_collector": {
+    "roles": [
+      "AI Engineer",
+      "LLM Engineer",
+      "Machine Learning Engineer",
+      "Generative AI Engineer",
+      "Applied AI Engineer",
+      "RAG Engineer",
+      "AI Platform Engineer",
+      "Agent Engineer",
+      "AI Governance",
+      "Responsible AI",
+      "AI Risk",
+      "AI Compliance"
+    ],
+    "locations": ["Switzerland", "Zurich", "Geneva", "Basel", "Remote (Europe)"],
+    "boards": [
+      "linkedin.com/jobs",
+      "wellfound.com",
+      "indeed.ch",
+      "jobs.ch",
+      "ycombinator.com/jobs",
+      "swissdevjobs.ch",
+      "datacareer.ch",
+      "careers.cern",
+      "ethz.ch",
+      "epfl.ch"
+    ]
+  },
+
+  "linkedin_collector": {
+    "enabled_via_chrome": true,
+    "min_substance_chars": 600,
+    "languages_allowed": ["en", "de", "de-CH", "fr"],
+    "comment_priority": "topic_over_author — substantive content wins regardless of poster's follower count or title",
+    "pulse_topic_queries": [
+      "Anthropic Claude agents enterprise",
+      "OpenAI agents Responses API",
+      "Model Context Protocol MCP server",
+      "Agent-to-Agent A2A protocol",
+      "RAG retrieval-augmented generation",
+      "agentic AI enterprise",
+      "EU AI Act compliance",
+      "AI governance ISO 42001",
+      "Anthropic zehn Dinge",
+      "LLM Schweiz Banken",
+      "Generative AI Schweiz Unternehmen"
+    ],
+    "feeds_to_scan": [
+      "Home feed (top posts last 24h)",
+      "Pulse search via Google: site:linkedin.com/pulse {topic} (one query per pulse_topic_queries entry, last 14 days)",
+      "Pulse search via LinkedIn content search (sortBy=date_posted, datePosted=past-week) for each focus_areas topic",
+      "Search: #LLM (filter: substantive only)",
+      "Search: #GenerativeAI (filter: substantive only)",
+      "Search: #RAG (filter: substantive only)",
+      "Search: #AIagents (filter: substantive only)",
+      "Search: #MCP (filter: substantive only)",
+      "Search: #AIGovernance (filter: substantive only)",
+      "Saved jobs page",
+      "Job alerts"
+    ],
+    "url_capture_rule": "Captured link must match /pulse/, /posts/, or /feed/update/{urn}. Search-result URLs and bare /feed/ URLs are NOT acceptable — drop the item if you cannot extract a canonical post URL.",
+    "note": "Auto-enabled when Chrome is reachable; silent skip otherwise. Topic-driven Pulse search is the priority layer; hashtag and home-feed scans are secondary."
+  },
+
+  "weekly_digest": {
+    "input_folders": ["news", "papers", "blogs", "jobs", "linkedin"],
+    "lookback_days": 7,
+    "output_format": "tight summary with links into source dailies"
+  }
+}
