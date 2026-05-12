@@ -19,9 +19,10 @@
         "fallback_search": "site:openai.com 2026 announcement OR release OR launch"
       },
       "anthropic": {
-        "blog_urls": ["https://www.anthropic.com/news"],
+        "_comment": "Anthropic publishes across TWO domains: anthropic.com/news (corporate/policy/partnerships) and claude.com/blog (product announcements — Claude apps, Claude Code, MCP server features). Both must be watched. Gap noticed 2026-05-12 when Claude Code agent-view announcement was cited via root index instead of canonical claude.com/blog/agent-view-in-claude-code URL.",
+        "blog_urls": ["https://www.anthropic.com/news", "https://claude.com/blog"],
         "research_urls": ["https://www.anthropic.com/research", "https://www.anthropic.com/engineering"],
-        "fallback_search": "site:anthropic.com 2026 (announcement OR release OR launch OR enterprise OR agents)"
+        "fallback_search": "(site:anthropic.com OR site:claude.com) 2026 (announcement OR release OR launch OR enterprise OR agents OR Claude-Code)"
       },
       "google_deepmind": {
         "blog_urls": ["https://blog.google/technology/ai/", "https://deepmind.google/blog/"],
@@ -285,5 +286,93 @@
     "input_folders": ["news", "papers", "blogs", "jobs", "linkedin"],
     "lookback_days": 7,
     "output_format": "tight summary with links into source dailies"
+  },
+
+  "radar_config": {
+    "_comment": "Trend radar — fired daily by orchestrator after daily synthesis. Scores topics by source-weighted convergence over a rolling window; smooths via EMA to avoid daily jumps. Outputs radar/{date}.md (human-read) + radar/{date}.json (structured data for future web app). Tune the constants here; the SKILL reads them at runtime.",
+
+    "rolling_window_days": 30,
+    "ema_alpha": 0.3,
+
+    "source_weights": {
+      "_comment": "Per-mention contribution. Higher = stronger signal. Tune by raising weights for sources you trust more.",
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
+      "job_posting_skill_mention": 0.5
+    },
+
+    "convergence_multiplier": {
+      "_comment": "When a topic appears in N or more DIFFERENT source types, score is multiplied. Counters monoculture (single-source loud day) and rewards cross-source agreement.",
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
+
+    "max_mentions_per_source_type": {
+      "_comment": "Per-source cap on counted mentions per topic per run. Prevents one chatty source (LinkedIn hashtags, Medium aggregators) from dominating the score just by volume. Beyond the cap, additional mentions are recorded in source_mentions for transparency but stop adding to raw_score. Tune up/down based on what dominates the radar — added 2026-05-12 after LinkedIn accounted for 46% of a topic's score.",
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
+    },
+
+    "stages": {
+      "_comment": "Each topic falls into one stage based on score AND sustained signal. Tuning these thresholds shifts how aggressively the radar promotes/demotes themes.",
+      "emerging": {
+        "score_range": [10, 30],
+        "max_age_days": 21,
+        "min_source_types": 2,
+        "description": "Early signal. 1-2 weak sources or one strong novel source. Worth watching."
+      },
+      "consolidating": {
+        "score_range": [30, 70],
+        "min_sustained_days": 7,
+        "min_source_types": 3,
+        "description": "Multiple independent sources are converging on the same take. Pattern is forming."
+      },
+      "mainstream": {
+        "score_range": [70, 999],
+        "min_sustained_days": 30,
+        "description": "Consensus. Most credible sources reference this; further coverage is incremental."
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50",
+        "description": "Was hot, now declining. Useful to know — don't bet here, expect coverage to dry up."
+      }
+    },
+
+    "topic_taxonomy_seed": {
+      "_comment": "Seed list of known topics so the radar has stable IDs across days. Agent may add new topics it discovers, but should reuse these IDs when applicable to keep timelines coherent.",
+      "frontier_models": ["GPT-5.x", "Claude Opus 4.x", "Claude Sonnet 4.x", "Gemini 2.x", "Llama 4.x", "Mistral Medium 3.x", "DeepSeek V4", "Kimi K2.x", "Qwen 3.x"],
+      "agent_protocols": ["mcp-adoption", "a2a-protocol", "agent-sdks", "tool-use-standards", "opentelemetry-for-ai"],
+      "retrieval": ["agentic-retrieval", "vector-db-market", "long-context-vs-rag", "rag-eval", "knowledge-graphs"],
+      "enterprise_distribution": ["frontier-lab-jvs", "vertical-agents-finance", "vertical-agents-healthcare", "agent-platforms-enterprise", "implementation-revenue"],
+      "governance": ["eu-ai-act", "iso-42001", "nist-ai-rmf", "ai-safety-institute", "pentagon-anthropic", "vendor-governance-business-line"],
+      "infra": ["disaggregated-serving", "co-packaged-optics", "kv-cache-handoff", "edge-inference"],
+      "evals": ["clawbench", "swe-bench", "real-world-agentic-evals", "evaluation-gap"],
+      "coding": ["agentic-ides", "autonomous-pr-agents", "compound-engineering", "ai-research-agents"],
+      "open_weight": ["open-vs-closed", "open-coding-parity", "open-weight-wave"],
+      "labor_market": ["ai-engineer-hiring", "rag-engineer-postings", "agent-engineer-postings", "prompt-engineer-decline", "ai-governance-roles", "ml-platform-engineer"]
+    },
+
+    "output_format": {
+      "primary_view": "radar.md — human read, narrative with stage groupings",
+      "machine_view": "radar.json — structured data for future visualization (Angular / HTML / Streamlit / etc.)",
+      "max_topics_per_run": 25,
+      "min_topics_per_stage": 0,
+      "max_topics_per_stage": 8
+    }
   }
 }

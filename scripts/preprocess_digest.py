@@ -39,12 +39,17 @@ from pathlib import Path
 from urllib.parse import quote
 
 WORKSPACE = Path("/Users/yruosch/Documents/Claude/Projects/AI Researcher")
-DAILY_DIR = WORKSPACE / "daily"
 
 
-def rel_to_file_url(rel_path: str) -> str:
-    """Convert a relative path (relative to daily/) to an absolute file:// URL."""
-    abs_path = (DAILY_DIR / rel_path).resolve()
+def rel_to_file_url(rel_path: str, base_dir: Path) -> str:
+    """Convert a path relative to base_dir into an absolute file:// URL.
+
+    Cadence files now live in nested `{cadence}/{YYYY}/{MM}/` subfolders, so
+    relative cross-references like `../../../news/2026/05/2026-05-08.md` from
+    inside `daily/2026/05/2026-05-08.md` need to resolve against the SOURCE
+    file's directory — not a fixed DAILY_DIR.
+    """
+    abs_path = (base_dir / rel_path).resolve()
     return f"file://{quote(str(abs_path))}"
 
 
@@ -145,12 +150,17 @@ def bulletize_item_sections(text: str) -> str:
     return text
 
 
-def rewrite_relative_links(text: str) -> str:
-    """[label](../news/x.md) -> [label](file:///abs/path/news/x.md)."""
+def rewrite_relative_links(text: str, base_dir: Path) -> str:
+    """[label](../news/x.md) -> [label](file:///abs/path/news/x.md).
+
+    base_dir is the directory of the source markdown file — relative paths
+    inside the file resolve against it. Cadence files live at
+    `{cadence}/{YYYY}/{MM}/`, so their links use `../../../{cadence}/...`.
+    """
 
     def replace(match: re.Match) -> str:
         label, target = match.group(1), match.group(2)
-        return f"[{label}]({rel_to_file_url(target)})"
+        return f"[{label}]({rel_to_file_url(target, base_dir)})"
 
     return re.sub(r"\[([^\]]+)\]\((\.\./[^)]+)\)", replace, text)
 
@@ -228,7 +238,7 @@ def main() -> int:
     # bulletize folds Source: as a continuation of the previous item.
     text = italicize_source_lines(text)
     text = bulletize_item_sections(text)
-    text = rewrite_relative_links(text)
+    text = rewrite_relative_links(text, src.parent)
     text = pipeline_to_checklist(text)
     text = append_date_footer(text, date_str)
 

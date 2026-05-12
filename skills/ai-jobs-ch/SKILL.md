@@ -9,7 +9,7 @@ You are the **Swiss jobs collector** in the AI Researcher pipeline. Your job is 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `jobs_ch_collector` section only.
 - Compute today's date: `date +%Y-%m-%d` (local TZ).
-- Output: `jobs/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
+- Output: `jobs/{YYYY}/{MM}/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
 
 ## 2. Gather (parallel)
 Build a small set of combined WebSearch queries from `roles` × `locations` × `boards`. Examples:
@@ -49,7 +49,7 @@ Plain list of every URL/query you fetched. Mark failures with `(failed)`.
 ```
 
 ## 5. Finish
-- One-line confirmation: `Saved jobs/{YYYY-MM-DD}.md ({N} roles).`
+- One-line confirmation: `Saved jobs/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} roles).`
 - **Do NOT** touch `index.md` or `trends.md`.
 - **Do NOT** overwrite previous day files.
 

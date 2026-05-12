@@ -13,7 +13,7 @@ You are the **LinkedIn collector** in the AI Researcher pipeline. Your job is to
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `linkedin_collector` section. Note `pulse_topic_queries`, `min_substance_chars`, `languages_allowed`, `url_capture_rule`.
 - Compute today's date: `date +%Y-%m-%d` (local TZ).
-- Output: `linkedin/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
+- Output: `linkedin/{YYYY}/{MM}/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
 
 ## 2. Probe Chrome
 1. Call `mcp__Claude_in_Chrome__list_connected_browsers`.
@@ -118,7 +118,7 @@ A captured link of `linkedin.com/feed/`, `linkedin.com/search/...`, or `linkedin
 **Engagement-bait drop list.** Drop posts that are: congratulations on a promotion / new job, "I'm so excited to share…", AI-tool sales pitches with no substance, listicles ("10 ways…"), pure quote-screenshot-of-Andrej-Karpathy posts.
 
 ## 7. Finish
-- One-line confirmation: `Saved linkedin/{YYYY-MM-DD}.md ({N} pulse, {M} hashtag, {J} home, {K} jobs).` — or `skipped: {reason}` if stub.
+- One-line confirmation: `Saved linkedin/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} pulse, {M} hashtag, {J} home, {K} jobs).` — or `skipped: {reason}` if stub.
 - Do NOT touch `index.md`, `trends.md`, or `daily/`.
 - Do NOT overwrite previous day files.
 - Never attempt sign-in or any account-modifying actions.

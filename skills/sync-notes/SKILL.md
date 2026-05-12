@@ -21,9 +21,9 @@ Run a single bash check from the workspace folder:
 
 ```bash
 cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher" && \
-  echo "--- daily/" && ls -1 daily/*.md 2>/dev/null && \
-  echo "--- weekly/" && ls -1 weekly/*.md 2>/dev/null && \
-  echo "--- monthly/" && ls -1 monthly/*.md 2>/dev/null && \
+  echo "--- daily/" && find daily -type f -name '*.md' 2>/dev/null && \
+  echo "--- weekly/" && find weekly -type f -name '*.md' 2>/dev/null && \
+  echo "--- monthly/" && find monthly -type f -name '*.md' 2>/dev/null && \
   echo "--- trends.md" && ls -1 trends.md 2>/dev/null
 ```
 
@@ -46,7 +46,7 @@ Invoke the wrapper. Pick the mode:
 ```bash
 "/Users/yruosch/Documents/Claude/Projects/AI Researcher/scripts/sync_notes.sh"            # refresh
 "/Users/yruosch/Documents/Claude/Projects/AI Researcher/scripts/sync_notes.sh" --all      # sync-all
-"/Users/yruosch/Documents/Claude/Projects/AI Researcher/scripts/sync_notes.sh" daily/2026-05-05.md   # backfill
+"/Users/yruosch/Documents/Claude/Projects/AI Researcher/scripts/sync_notes.sh" daily/2026/05/2026-05-05.md   # backfill
 ```
 
 Report the script's stdout to the user (it prints `→ doing X…` then `✓ done`). If the first run prompts macOS for "osascript wants access to control Notes," tell the user to click Allow — that's a one-time grant.

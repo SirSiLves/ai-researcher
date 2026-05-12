@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Trend Radar</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --panel: #181b25;
+      --panel-2: #1f2330;
+      --border: #2a2f3d;
+      --text: #e6e8ee;
+      --muted: #8a91a3;
+      --accent: #6aa9ff;
+      --emerging: #ffb84d;
+      --consolidating: #6aa9ff;
+      --mainstream: #58c97f;
+      --fading: #8a91a3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    header select {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font: inherit;
+    }
+    main {
+      padding: 18px 24px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+    }
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .stages {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 1100px) { .stages { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px)  { .stages { grid-template-columns: 1fr; } }
+    .stage {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      min-height: 240px;
+    }
+    .stage.emerging      { border-top-color: var(--emerging); }
+    .stage.consolidating { border-top-color: var(--consolidating); }
+    .stage.mainstream    { border-top-color: var(--mainstream); }
+    .stage.fading        { border-top-color: var(--fading); }
+    .stage h3 {
+      margin: 0 0 4px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .stage h3 .count {
+      color: var(--muted);
+      font-weight: 400;
+      margin-left: 6px;
+    }
+    .stage .stage-hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .topic {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.1s;
+    }
+    .topic:hover { background: #262b3a; }
+    .topic.selected { background: #303756; border-color: var(--accent); }
+    .topic .topic-label { font-weight: 500; }
+    .topic .topic-meta {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+    .momentum-up   { color: #58c97f; }
+    .momentum-down { color: #ff8a8a; }
+    .momentum-flat { color: var(--muted); }
+
+    .movements {
+      grid-column: 1 / -1;
+    }
+    .movement-item {
+      display: flex;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .movement-item:last-child { border-bottom: none; }
+    .movement-arrow {
+      color: var(--accent);
+    }
+    .empty-state {
+      color: var(--muted);
+      font-style: italic;
+      padding: 12px 0;
+      font-size: 13px;
+    }
+
+    .detail-empty {
+      color: var(--muted);
+      font-style: italic;
+      padding: 20px 0;
+      text-align: center;
+    }
+    .detail-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .detail-stage {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .detail-stage.emerging      { background: #4a3a1a; color: var(--emerging); }
+    .detail-stage.consolidating { background: #1a2a4a; color: var(--consolidating); }
+    .detail-stage.mainstream    { background: #1a3a25; color: var(--mainstream); }
+    .detail-stage.fading        { background: #2a2e3a; color: var(--fading); }
+
+    .detail-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .stat {
+      background: var(--panel-2);
+      padding: 8px 10px;
+      border-radius: 4px;
+    }
+    .stat-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .stat-value { font-size: 16px; font-weight: 600; margin-top: 2px; }
+
+    .detail-section {
+      margin-top: 14px;
+    }
+    .detail-section h4 {
+      margin: 0 0 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .source-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+    .source-bar .src-name { color: var(--muted); min-width: 160px; }
+    .source-bar .src-val {
+      background: var(--accent);
+      height: 8px;
+      border-radius: 2px;
+    }
+    .source-bar .src-count { color: var(--text); min-width: 24px; text-align: right; }
+
+    .link-list { padding-left: 14px; margin: 4px 0; }
+    .link-list li { margin: 2px 0; word-break: break-all; }
+    .link-list a { color: var(--accent); text-decoration: none; font-size: 12px; }
+    .link-list a:hover { text-decoration: underline; }
+
+    .chart-wrap { position: relative; height: 220px; }
+    .footer {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 8px 0 0;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    code { background: var(--panel-2); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+    .err {
+      background: #2a1a1a;
+      color: #ff8a8a;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛰️ AI Trend Radar</h1>
+    <span class="subtitle">Source-weighted convergence, EMA-smoothed daily</span>
+    <span style="flex:1"></span>
+    <label>Snapshot:
+      <select id="date-select"></select>
+    </label>
+    <span class="subtitle" id="meta-line"></span>
+  </header>
+
+  <main>
+    <section class="stages" id="stages"></section>
+
+    <section class="panel movements">
+      <h2>Stage movements this run</h2>
+      <div id="movements"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Topic detail</h2>
+      <div id="detail">
+        <div class="detail-empty">Click any topic above to see its history, source breakdown, and supporting links.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Score history (top 8 by current score)</h2>
+      <div class="chart-wrap"><canvas id="topchart"></canvas></div>
+    </section>
+
+    <section class="footer">
+      Open from <code>file://</code> won't work — the page needs to fetch JSON. Run a local server: <code>cd "~/Documents/Claude/Projects/AI Researcher" &amp;&amp; python3 -m http.server 8000</code>, then open <code>http://localhost:8000/radar.html</code>.
+      <span style="float:right">Data: <code>radar/index.json</code> → <code>radar/{date}.json</code></span>
+    </section>
+  </main>
+
+  <script>
+    const STAGES = ['emerging', 'consolidating', 'mainstream', 'fading'];
+    const STAGE_LABEL = {
+      emerging:      'Emerging',
+      consolidating: 'Consolidating',
+      mainstream:    'Mainstream',
+      fading:        'Fading',
+    };
+    const STAGE_HINT = {
+      emerging:      'Early signal — watch',
+      consolidating: 'Multiple sources converging',
+      mainstream:    'Consensus',
+      fading:        'Was hot, now declining',
+    };
+    const SOURCE_LABEL = {
+      priority_vendor_blog:    'Priority vendor blog',
+      enterprise_vendor_blog:  'Enterprise vendor blog',
+      paper:                   'Paper',
+      long_form_blog:          'Long-form blog',
+      linkedin_network_post:   'LinkedIn (network)',
+      linkedin_hashtag_post:   'LinkedIn (hashtag)',
+      tech_news:               'Tech news',
+      governance_source:       'Governance source',
+      medium_aggregator:       'Medium / aggregator',
+      job_posting_skill_mention: 'Job postings',
+    };
+
+    const state = {
+      manifest: null,
+      cache: new Map(), // date_id → JSON
+      currentEntry: null,
+      currentData: null,
+      selectedTopicId: null,
+      chart: null,
+    };
+
+    async function init() {
+      try {
+        const r = await fetch('radar/index.json');
+        if (!r.ok) throw new Error(`radar/index.json HTTP ${r.status}`);
+        state.manifest = await r.json();
+      } catch (e) {
+        showError(`Could not load radar/index.json: ${e.message}.\n\nLikely cause: you opened radar.html via file://, which blocks fetch(). Serve over localhost: cd to the project root, run "python3 -m http.server 8000", open http://localhost:8000/radar.html`);
+        return;
+      }
+
+      const select = document.getElementById('date-select');
+      state.manifest.entries.forEach(entry => {
+        const opt = document.createElement('option');
+        opt.value = entry.date_id;
+        opt.textContent = `${entry.date_id} — ${entry.topic_count} topics, ${entry.stage_movement_count} movements`;
+        select.appendChild(opt);
+      });
+      select.addEventListener('change', () => loadDate(select.value));
+
+      // Load the newest entry by default
+      if (state.manifest.entries.length === 0) {
+        showError('radar/index.json has no entries.');
+        return;
+      }
+      await loadDate(state.manifest.entries[0].date_id);
+      // Preload nearby dates so the history chart has something
+      await preloadAll();
+      renderTopChart();
+    }
+
+    async function loadJson(date_id) {
+      if (state.cache.has(date_id)) return state.cache.get(date_id);
+      // Look up the manifest entry to get the actual JSON path. Cadence files
+      // moved to nested {YYYY}/{MM}/ layout on 2026-05-12, so we can't assume
+      // a flat radar/{date_id}.json anymore.
+      const entry = state.manifest.entries.find(e => e.date_id === date_id);
+      if (!entry) throw new Error(`date ${date_id} not in radar/index.json`);
+      const r = await fetch(entry.json_path);
+      if (!r.ok) throw new Error(`${entry.json_path} HTTP ${r.status}`);
+      const data = await r.json();
+      state.cache.set(date_id, data);
+      return data;
+    }
+
+    async function preloadAll() {
+      // Best-effort preload of all entries so the chart can show history.
+      await Promise.allSettled(state.manifest.entries.map(e => loadJson(e.date_id)));
+    }
+
+    async function loadDate(date_id) {
+      try {
+        state.currentEntry = state.manifest.entries.find(e => e.date_id === date_id);
+        state.currentData = await loadJson(date_id);
+        state.selectedTopicId = null;
+        renderStages();
+        renderMovements();
+        renderDetailEmpty();
+        renderMeta();
+      } catch (e) {
+        showError(e.message);
+      }
+    }
+
+    function renderMeta() {
+      const d = state.currentData;
+      const stages = {};
+      STAGES.forEach(s => stages[s] = 0);
+      d.topics.forEach(t => { stages[t.stage] = (stages[t.stage] || 0) + 1; });
+      const parts = STAGES
+        .filter(s => stages[s] > 0)
+        .map(s => `${STAGE_LABEL[s]}: ${stages[s]}`);
+      const prior = d.prior_radar ? `prior: ${d.prior_radar}` : 'first radar — no EMA baseline';
+      document.getElementById('meta-line').textContent = parts.join(' · ') + ' · ' + prior;
+    }
+
+    function renderStages() {
+      const container = document.getElementById('stages');
+      container.innerHTML = '';
+      const byStage = {};
+      STAGES.forEach(s => byStage[s] = []);
+      state.currentData.topics.forEach(t => {
+        if (byStage[t.stage]) byStage[t.stage].push(t);
+      });
+      // Sort each stage by score desc
+      Object.keys(byStage).forEach(s => byStage[s].sort((a, b) => b.score - a.score));
+
+      STAGES.forEach(stage => {
+        const col = document.createElement('div');
+        col.className = `stage ${stage}`;
+        col.innerHTML = `
+          <h3>${STAGE_LABEL[stage]} <span class="count">${byStage[stage].length}</span></h3>
+          <div class="stage-hint">${STAGE_HINT[stage]}</div>
+          <div class="topics"></div>
+        `;
+        const topicsEl = col.querySelector('.topics');
+        if (byStage[stage].length === 0) {
+          topicsEl.innerHTML = '<div class="empty-state">No topics yet.</div>';
+        } else {
+          byStage[stage].forEach(t => {
+            const chip = document.createElement('div');
+            chip.className = 'topic';
+            if (t.id === state.selectedTopicId) chip.classList.add('selected');
+            chip.dataset.id = t.id;
+            const m = t.momentum_7d_pct;
+            const mClass = m == null ? 'momentum-flat' : m > 5 ? 'momentum-up' : m < -5 ? 'momentum-down' : 'momentum-flat';
+            const mText = m == null ? 'new' : (m > 0 ? '↑' : '↓') + ' ' + Math.abs(m).toFixed(0) + '%';
+            chip.innerHTML = `
+              <div class="topic-label">${escapeHtml(t.label || t.id)}</div>
+              <div class="topic-meta">score ${t.score.toFixed(1)} · <span class="${mClass}">${mText}</span> 7d · ${t.source_type_count} src types</div>
+            `;
+            chip.addEventListener('click', () => selectTopic(t.id));
+            topicsEl.appendChild(chip);
+          });
+        }
+        container.appendChild(col);
+      });
+    }
+
+    function renderMovements() {
+      const el = document.getElementById('movements');
+      const moves = state.currentData.stage_movements || [];
+      if (moves.length === 0) {
+        el.innerHTML = '<div class="empty-state">No stage transitions this run — signals are steady.</div>';
+        return;
+      }
+      el.innerHTML = moves.map(m => {
+        const t = state.currentData.topics.find(t => t.id === m.topic);
+        const label = t ? t.label : m.topic;
+        const from = m.from ? STAGE_LABEL[m.from] || m.from : '—';
+        const to = m.to ? STAGE_LABEL[m.to] || m.to : '—';
+        return `
+          <div class="movement-item">
+            <span>${escapeHtml(label)}</span>
+            <span class="movement-arrow">${from} → ${to}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderDetailEmpty() {
+      document.getElementById('detail').innerHTML =
+        '<div class="detail-empty">Click any topic above to see its history, source breakdown, and supporting links.</div>';
+    }
+
+    function selectTopic(topicId) {
+      state.selectedTopicId = topicId;
+      // Rerender stage chips to update selection highlight
+      document.querySelectorAll('.topic').forEach(el => el.classList.toggle('selected', el.dataset.id === topicId));
+      const t = state.currentData.topics.find(t => t.id === topicId);
+      if (!t) return;
+      renderDetail(t);
+    }
+
+    function renderDetail(t) {
+      const el = document.getElementById('detail');
+      const m = t.momentum_7d_pct;
+      const mText = m == null ? '—' : (m > 0 ? '↑' : '↓') + ' ' + Math.abs(m).toFixed(1) + '%';
+
+      // History across all loaded dates
+      const history = [];
+      for (const entry of state.manifest.entries) {
+        const data = state.cache.get(entry.date_id);
+        if (!data) continue;
+        const item = data.topics.find(x => x.id === t.id);
+        if (item) history.push({ date: data.date, score: item.score, stage: item.stage });
+      }
+      history.sort((a, b) => a.date.localeCompare(b.date));
+
+      // Source mention bars
+      const totalMentions = Object.values(t.source_mentions || {}).reduce((a, b) => a + b, 0) || 1;
+      const sourceBars = Object.entries(t.source_mentions || {})
+        .filter(([, v]) => v > 0)
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, v]) => `
+          <div class="source-bar">
+            <span class="src-name">${SOURCE_LABEL[k] || k}</span>
+            <span class="src-val" style="width:${(v / totalMentions * 200).toFixed(0)}px"></span>
+            <span class="src-count">${v}</span>
+          </div>
+        `).join('');
+
+      const supportingLinks = (t.supporting_links || []).slice(0, 12).map(l =>
+        `<li><a href="${escapeAttr(l)}" target="_blank" rel="noopener">${escapeHtml(l)}</a></li>`).join('');
+      const supportingFiles = (t.supporting_files || []).map(f => `<code>${escapeHtml(f)}</code>`).join('  ');
+
+      el.innerHTML = `
+        <div class="detail-title">${escapeHtml(t.label || t.id)}</div>
+        <span class="detail-stage ${t.stage}">${STAGE_LABEL[t.stage] || t.stage}</span>
+
+        <div class="detail-stats">
+          <div class="stat"><div class="stat-label">Score</div><div class="stat-value">${t.score.toFixed(1)}</div></div>
+          <div class="stat"><div class="stat-label">7d momentum</div><div class="stat-value">${mText}</div></div>
+          <div class="stat"><div class="stat-label">Sustained</div><div class="stat-value">${t.sustained_days || 0} days</div></div>
+        </div>
+
+        <div class="detail-section">
+          <h4>Score history</h4>
+          <div class="chart-wrap"><canvas id="detail-chart"></canvas></div>
+        </div>
+
+        <div class="detail-section">
+          <h4>Source mentions</h4>
+          ${sourceBars || '<div class="empty-state">No source mentions recorded.</div>'}
+        </div>
+
+        ${supportingFiles ? `
+        <div class="detail-section">
+          <h4>Supporting files</h4>
+          <div style="font-size:12px; line-height:1.8">${supportingFiles}</div>
+        </div>` : ''}
+
+        ${supportingLinks ? `
+        <div class="detail-section">
+          <h4>Supporting links (${(t.supporting_links || []).length})</h4>
+          <ul class="link-list">${supportingLinks}</ul>
+        </div>` : ''}
+      `;
+
+      // Draw detail history chart
+      const ctx = document.getElementById('detail-chart');
+      if (history.length >= 1) {
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: history.map(h => h.date),
+            datasets: [{
+              data: history.map(h => h.score),
+              borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#6aa9ff',
+              backgroundColor: 'rgba(106, 169, 255, 0.1)',
+              tension: 0.25,
+              pointRadius: 4,
+              fill: true,
+            }],
+          },
+          options: chartOpts(),
+        });
+      } else {
+        ctx.parentElement.innerHTML = '<div class="empty-state">No history available yet (single data point).</div>';
+      }
+    }
+
+    function renderTopChart() {
+      const ctx = document.getElementById('topchart');
+      // Get top 8 topics by current score
+      const topTopics = [...state.currentData.topics].sort((a, b) => b.score - a.score).slice(0, 8);
+      // Collect all dates across the cache
+      const allDates = [...new Set(
+        [...state.cache.values()].flatMap(d => [d.date])
+      )].sort();
+      // For each top topic, build a series
+      const colors = ['#6aa9ff', '#ffb84d', '#58c97f', '#ff8a8a', '#b48aff', '#5cd0d0', '#ffc8a8', '#a0a0a0'];
+      const datasets = topTopics.map((tt, idx) => {
+        const series = allDates.map(d => {
+          // Find the radar entry by date string
+          for (const data of state.cache.values()) {
+            if (data.date === d) {
+              const item = data.topics.find(x => x.id === tt.id);
+              return item ? item.score : null;
+            }
+          }
+          return null;
+        });
+        return {
+          label: tt.label || tt.id,
+          data: series,
+          borderColor: colors[idx % colors.length],
+          backgroundColor: colors[idx % colors.length] + '20',
+          tension: 0.25,
+          pointRadius: 3,
+          spanGaps: true,
+        };
+      });
+      if (state.chart) state.chart.destroy();
+      state.chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: allDates, datasets },
+        options: chartOpts({ legend: true }),
+      });
+    }
+
+    function chartOpts({ legend = false } = {}) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: legend ? { position: 'bottom', labels: { color: '#8a91a3', font: { size: 11 }, boxWidth: 12 } } : { display: false },
+          tooltip: { mode: 'index', intersect: false },
+        },
+        scales: {
+          x: { ticks: { color: '#8a91a3', font: { size: 11 } }, grid: { color: '#2a2f3d' } },
+          y: { ticks: { color: '#8a91a3', font: { size: 11 } }, grid: { color: '#2a2f3d' } },
+        },
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      };
+    }
+
+    function showError(msg) {
+      document.querySelector('main').innerHTML = `<div class="err">${escapeHtml(msg)}</div>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function escapeAttr(s) { return escapeHtml(s); }
+
+    init();
+  </script>
+</body>
+</html>

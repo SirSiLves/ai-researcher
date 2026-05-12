@@ -9,7 +9,7 @@ You are the **news collector** in the AI Researcher pipeline. Your job is to cap
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `news_collector` section only.
 - Compute today's date: `date +%Y-%m-%d` (local TZ).
-- Output: `news/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
+- Output: `news/{YYYY}/{MM}/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
 
 ## 2. Gather (parallel)
 
@@ -18,7 +18,14 @@ For each entry in `priority_vendors` (frontier model labs: openai, anthropic, go
 
 1. WebFetch every URL in `blog_urls` and `research_urls` with prompt: "List the 5 newest posts: title, date, 1-line summary, canonical permalink."
 2. **If the combined fetch returns 0 items for that vendor** (egress-blocked, layout change, or empty index), invoke `fallback_search` via WebSearch to recover at least the most recent vendor-domain permalinks. Note `(fallback used)` for that vendor under "Sources scanned."
-3. Each retained item MUST link to a vendor-domain canonical permalink. If you only have an aggregator URL (TechCrunch, CNBC, llm-stats.com), keep the item but flag `(vendor permalink not found)` and try once more via WebSearch with `site:{vendor.com}`.
+3. Each retained item MUST link to a vendor-domain canonical permalink. Acceptable canonical patterns per vendor:
+   - **anthropic** → `anthropic.com/news/*`, `anthropic.com/research/*`, `anthropic.com/engineering/*`, OR `claude.com/blog/*` (Anthropic publishes product announcements at claude.com/blog and corporate/policy at anthropic.com/news — both are canonical)
+   - **openai** → `openai.com/blog/*`, `openai.com/index/*`, `openai.com/research/*`
+   - **google_deepmind** → `deepmind.google/blog/*`, `blog.google/technology/ai/*`, `research.google/blog/*`
+   - **meta** → `ai.meta.com/blog/*`, `ai.meta.com/research/*`
+   - **mistral** → `mistral.ai/news/*`
+   - **deepseek** → `api-docs.deepseek.com/news/*`, `huggingface.co/deepseek-ai/*`
+   - If you only have an aggregator URL (TechCrunch, CNBC, llm-stats.com), keep the item but flag `(vendor permalink not found)` and try once more via WebSearch with `site:{vendor-domain}`. The Anthropic fallback search now covers BOTH anthropic.com and claude.com.
 4. Record per-vendor coverage state in "Sources scanned" — one line per vendor: `vendor_X: N items (blog OK / fallback used / failed)`.
 
 ### 2a-bis. Enterprise vendors — MANDATORY coverage (platforms)
@@ -97,7 +104,7 @@ Plain list of every URL/query you fetched. Mark failures with `(failed)`.
 ```
 
 ## 5. Finish
-- One-line confirmation: `Saved news/{YYYY-MM-DD}.md ({N} items).`
+- One-line confirmation: `Saved news/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} items).`
 - **Do NOT** touch `index.md` or `trends.md`. The weekly digest owns those.
 - **Do NOT** overwrite previous day files.
 

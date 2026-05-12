@@ -1,0 +1,354 @@
+{
+  "date": "2026-05-06",
+  "rolling_window_days": 30,
+  "ema_alpha": 0.3,
+  "prior_radar": "radar/2026/05/2026-05-05.json",
+  "notes": "Two days of data in window. Capped-score math applied per max_mentions_per_source_type.",
+  "topics": [
+    {
+      "id": "agent-platforms-enterprise",
+      "label": "Enterprise agent platforms (Microsoft Agent 365, OpenAI Responses API, AWS Strands, Anthropic Cowork)",
+      "stage": "emerging",
+      "score": 27.0,
+      "raw_score_today": 27.0,
+      "score_yesterday": null,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 2,
+      "source_type_count": 5,
+      "source_mentions": {
+        "priority_vendor_blog": 2,
+        "enterprise_vendor_blog": 3,
+        "paper": 0,
+        "long_form_blog": 2,
+        "linkedin_network_post": 3,
+        "linkedin_hashtag_post": 3,
+        "tech_news": 2,
+        "governance_source": 0,
+        "medium_aggregator": 4,
+        "job_posting_skill_mention": 1
+      },
+      "source_mentions_capped": {
+        "priority_vendor_blog": 2,
+        "enterprise_vendor_blog": 3,
+        "long_form_blog": 2,
+        "linkedin_network_post": 3,
+        "linkedin_hashtag_post": 3,
+        "tech_news": 2,
+        "medium_aggregator": 3,
+        "job_posting_skill_mention": 1
+      },
+      "supporting_files": [
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-06.md"
+      ],
+      "supporting_links": [
+        "https://techcommunity.microsoft.com/blog/agent-365-blog/what%E2%80%99s-new-in-agent-365-may-2026/4516340",
+        "https://llm-stats.com/llm-updates",
+        "https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents"
+      ]
+    },
+    {
+      "id": "agentic-retrieval",
+      "label": "Agentic retrieval / RAG-as-decision-loop",
+      "stage": "emerging",
+      "score": 21.0,
+      "raw_score_today": 21.0,
+      "score_yesterday": null,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 1,
+      "source_type_count": 4,
+      "source_mentions": {
+        "priority_vendor_blog": 0,
+        "enterprise_vendor_blog": 0,
+        "paper": 4,
+        "long_form_blog": 1,
+        "linkedin_network_post": 0,
+        "linkedin_hashtag_post": 1,
+        "tech_news": 1,
+        "governance_source": 0,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "paper": 4,
+        "long_form_blog": 1,
+        "tech_news": 1,
+        "linkedin_hashtag_post": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "papers/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-06.md",
+        "news/2026/05/2026-05-06.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2605.03344",
+        "https://arxiv.org/abs/2605.03534",
+        "https://arxiv.org/abs/2605.03275",
+        "https://arxiv.org/abs/2605.04018",
+        "https://squirro.com/squirro-blog/state-of-rag-genai"
+      ]
+    },
+    {
+      "id": "mcp-adoption",
+      "label": "MCP (Model Context Protocol) adoption — hyperscaler + enterprise SaaS",
+      "stage": "emerging",
+      "score": 19.5,
+      "raw_score_today": 19.5,
+      "score_yesterday": null,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 1,
+      "source_type_count": 5,
+      "source_mentions": {
+        "priority_vendor_blog": 0,
+        "enterprise_vendor_blog": 1,
+        "paper": 0,
+        "long_form_blog": 1,
+        "linkedin_network_post": 0,
+        "linkedin_hashtag_post": 1,
+        "tech_news": 2,
+        "governance_source": 0,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "enterprise_vendor_blog": 1,
+        "long_form_blog": 1,
+        "tech_news": 2,
+        "linkedin_hashtag_post": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "news/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-06.md"
+      ],
+      "supporting_links": [
+        "https://aws.amazon.com/blogs/aws/the-aws-mcp-server-is-now-generally-available/",
+        "https://www.globenewswire.com/news-release/2026/05/04/3286889/0/en/Jama-Software-Launches-Model-Context-Protocol-MCP-Server.html",
+        "https://tedt.org/MCPs-2026-Roadmap/"
+      ]
+    },
+    {
+      "id": "coordination-multi-agent",
+      "label": "Coordination as architectural layer (multi-agent failure mode)",
+      "stage": "emerging",
+      "score": 18.0,
+      "raw_score_today": 18.0,
+      "score_yesterday": null,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "source_mentions": {
+        "priority_vendor_blog": 0,
+        "enterprise_vendor_blog": 0,
+        "paper": 5,
+        "long_form_blog": 1,
+        "linkedin_network_post": 0,
+        "linkedin_hashtag_post": 0,
+        "tech_news": 0,
+        "governance_source": 0,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "paper": 5,
+        "long_form_blog": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "papers/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-06.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2605.03310",
+        "https://arxiv.org/abs/2605.03312",
+        "https://arxiv.org/abs/2605.04003",
+        "https://arxiv.org/abs/2605.03884",
+        "https://arxiv.org/abs/2605.01147"
+      ]
+    },
+    {
+      "id": "open-weight-wave",
+      "label": "Open-weight frontier wave (DeepSeek V4, Kimi K2.6, Qwen 3.5, Gemma 4, Llama 4)",
+      "stage": "emerging",
+      "score": 17.55,
+      "raw_score_today": 15.0,
+      "score_yesterday": 22.5,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 2,
+      "source_type_count": 3,
+      "source_mentions": {
+        "priority_vendor_blog": 0,
+        "enterprise_vendor_blog": 0,
+        "paper": 0,
+        "long_form_blog": 3,
+        "linkedin_network_post": 0,
+        "linkedin_hashtag_post": 0,
+        "tech_news": 2,
+        "governance_source": 0,
+        "medium_aggregator": 2,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "long_form_blog": 3,
+        "tech_news": 2,
+        "medium_aggregator": 2
+      },
+      "supporting_files": [
+        "news/2026/05/2026-05-05.md",
+        "blogs/2026/05/2026-05-05.md",
+        "blogs/2026/05/2026-05-06.md"
+      ],
+      "supporting_links": [
+        "https://www.interconnects.ai/p/my-bets-on-open-models-mid-2026",
+        "https://codersera.com/blog/best-open-source-llm-2026-llama-4-qwen-3-5-deepseek-v4-gemma-4-mistral/"
+      ]
+    },
+    {
+      "id": "eu-ai-act",
+      "label": "EU AI Act enforcement / compliance countdown",
+      "stage": "emerging",
+      "score": 12.0,
+      "raw_score_today": 12.0,
+      "score_yesterday": null,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "source_mentions": {
+        "priority_vendor_blog": 0,
+        "enterprise_vendor_blog": 0,
+        "paper": 0,
+        "long_form_blog": 0,
+        "linkedin_network_post": 1,
+        "linkedin_hashtag_post": 0,
+        "tech_news": 1,
+        "governance_source": 1,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "linkedin_network_post": 1,
+        "tech_news": 1,
+        "governance_source": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "news/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-06.md"
+      ],
+      "supporting_links": [
+        "https://www.legalnodes.com/article/eu-ai-act-2026-updates-compliance-requirements-and-business-risks",
+        "https://www.isaca.org/resources/news-and-trends/isaca-now-blog/2026/navigating-global-ai-governance-privacy-implications-in-eu-and-china-frameworks"
+      ]
+    },
+    {
+      "id": "vertical-agents-finance",
+      "label": "Vertical agents — finance (Anthropic 10 finance agents + Blackstone/Goldman JV)",
+      "stage": "emerging",
+      "score": 11.45,
+      "raw_score_today": 13.5,
+      "score_yesterday": 5.0,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 2,
+      "source_type_count": 3,
+      "source_mentions": {
+        "priority_vendor_blog": 1,
+        "enterprise_vendor_blog": 0,
+        "paper": 0,
+        "long_form_blog": 0,
+        "linkedin_network_post": 1,
+        "linkedin_hashtag_post": 0,
+        "tech_news": 2,
+        "governance_source": 0,
+        "medium_aggregator": 0,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "priority_vendor_blog": 1,
+        "linkedin_network_post": 1,
+        "tech_news": 2
+      },
+      "supporting_files": [
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-06.md"
+      ],
+      "supporting_links": [
+        "https://llm-stats.com/ai-news",
+        "https://techcrunch.com/2026/04/24/google-to-invest-up-to-40b-in-anthropic-in-cash-and-compute/"
+      ]
+    },
+    {
+      "id": "international-ai-safety",
+      "label": "International AI Safety Report 2026 — evaluation gap",
+      "stage": "emerging",
+      "score": 10.5,
+      "raw_score_today": 10.5,
+      "score_yesterday": null,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "source_mentions": {
+        "priority_vendor_blog": 0,
+        "enterprise_vendor_blog": 0,
+        "paper": 0,
+        "long_form_blog": 1,
+        "linkedin_network_post": 0,
+        "linkedin_hashtag_post": 0,
+        "tech_news": 1,
+        "governance_source": 1,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "long_form_blog": 1,
+        "tech_news": 1,
+        "governance_source": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "news/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-06.md"
+      ],
+      "supporting_links": [
+        "https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026",
+        "https://www.aigl.blog/international-ai-safety-report-2026-2/"
+      ]
+    }
+  ],
+  "stage_movements": [
+    {"topic": "agent-platforms-enterprise", "from": null, "to": "emerging", "first_observed_today": true},
+    {"topic": "agentic-retrieval", "from": null, "to": "emerging", "first_observed_today": true},
+    {"topic": "mcp-adoption", "from": null, "to": "emerging", "first_observed_today": true},
+    {"topic": "coordination-multi-agent", "from": null, "to": "emerging", "first_observed_today": true},
+    {"topic": "eu-ai-act", "from": null, "to": "emerging", "first_observed_today": true},
+    {"topic": "international-ai-safety", "from": null, "to": "emerging", "first_observed_today": true}
+  ],
+  "background_topics_count": 12,
+  "config_snapshot": {
+    "source_weights": {"priority_vendor_blog": 5, "enterprise_vendor_blog": 4, "paper": 3, "long_form_blog": 3, "linkedin_network_post": 3, "tech_news": 2, "governance_source": 2, "medium_aggregator": 1, "linkedin_hashtag_post": 1, "job_posting_skill_mention": 0.5},
+    "max_mentions_per_source_type": {"priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5, "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5, "governance_source": 5, "medium_aggregator": 3, "linkedin_hashtag_post": 3, "job_posting_skill_mention": 5},
+    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "ema_alpha": 0.3
+  }
+}

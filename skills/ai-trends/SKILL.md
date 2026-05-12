@@ -18,16 +18,16 @@ Active, bounded confidence, no hype. Write the way a senior team member briefs a
 ## Pipeline position
 
 ```
-collectors → daily orchestrator → daily/{date}.md
-daily/{date}.md (×7) → ai-weekly-digest → weekly/{Www}.md
-weekly/{Www}.md (×4-5) → ai-monthly-rollup → monthly/{YYYY-MM}.md
-weekly/{Www}.md OR monthly/{YYYY-MM}.md → ai-trends (this skill) → trends.md
+collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md
+daily/{YYYY}/{MM}/{date}.md (×7) → ai-weekly-digest → weekly/{YYYY}/{Www}.md
+weekly/{YYYY}/{Www}.md (×4-5) → ai-monthly-rollup → monthly/{YYYY}/{YYYY-MM}.md
+weekly/{YYYY}/{Www}.md OR monthly/{YYYY}/{YYYY-MM}.md → ai-trends (this skill) → trends.md
 ```
 
 ## 1. Setup
 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
-- Your invocation footer tells you the source file as `SOURCE: weekly/{YYYY-Www}.md` (after weekly rollup) or `SOURCE: monthly/{YYYY-MM}.md` (after monthly rollup).
+- Your invocation footer tells you the source file as `SOURCE: weekly/{YYYY}/{YYYY-Www}.md` (after weekly rollup) or `SOURCE: monthly/{YYYY}/{YYYY-MM}.md` (after monthly rollup).
 - Compute today's date: `date +%Y-%m-%d`.
 - Determine invocation type from the SOURCE path (`weekly/` vs `monthly/`).
 
@@ -102,7 +102,7 @@ Do NOT touch the file's intro / format-spec / themes-list paragraphs at the top 
 ## 5. Finish
 
 One-line confirmation. Examples:
-- `Appended 2 entries to trends.md per-month log (weekly run, source: weekly/2026-W19.md).`
+- `Appended 2 entries to trends.md per-month log (weekly run, source: weekly/2026/2026-W19.md).`
 - `No durable shifts this week — trends.md unchanged.`
 - `Updated trends.md (monthly run): 3 log entries, 2 timeline waypoints (Coding, Open-weight), Now snapshot refreshed for 2026-06.`
 

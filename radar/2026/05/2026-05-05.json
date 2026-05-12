@@ -1,0 +1,119 @@
+{
+  "date": "2026-05-05",
+  "rolling_window_days": 30,
+  "ema_alpha": 0.3,
+  "prior_radar": null,
+  "first_run_flag": true,
+  "notes": "Single-day rolling window — pipeline warming up; no EMA baseline. Capped-score math (max_mentions_per_source_type) applied throughout.",
+  "topics": [
+    {
+      "id": "open-weight-wave",
+      "label": "Open-weight frontier wave (DeepSeek V4, Kimi K2.6, Qwen 3.5, Gemma 4, Llama 4)",
+      "stage": "emerging",
+      "score": 22.5,
+      "raw_score_today": 22.5,
+      "score_yesterday": null,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency.",
+        "priority_vendor_blog": 0,
+        "enterprise_vendor_blog": 0,
+        "paper": 0,
+        "long_form_blog": 2,
+        "linkedin_network_post": 0,
+        "linkedin_hashtag_post": 0,
+        "tech_news": 2,
+        "governance_source": 0,
+        "medium_aggregator": 2,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "_note": "min(count, cap_for_type) applied.",
+        "long_form_blog": 2,
+        "tech_news": 2,
+        "medium_aggregator": 2
+      },
+      "supporting_files": [
+        "news/2026/05/2026-05-05.md",
+        "blogs/2026/05/2026-05-05.md",
+        "daily/2026/05/2026-05-05.md"
+      ],
+      "supporting_links": [
+        "https://codersera.com/blog/best-open-source-llm-2026-llama-4-qwen-3-5-deepseek-v4-gemma-4-mistral/",
+        "https://www.interconnects.ai/p/my-bets-on-open-models-mid-2026",
+        "https://www.interconnects.ai/p/gemma-4-and-what-makes-an-open-model"
+      ]
+    },
+    {
+      "id": "automating-ai-research",
+      "label": "Automating AI research (lab-internal coding agents doing AI R&D)",
+      "stage": "emerging",
+      "score": 13.5,
+      "raw_score_today": 13.5,
+      "score_yesterday": null,
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "source_mentions": {
+        "priority_vendor_blog": 0,
+        "enterprise_vendor_blog": 0,
+        "paper": 1,
+        "long_form_blog": 1,
+        "linkedin_network_post": 0,
+        "linkedin_hashtag_post": 0,
+        "tech_news": 1,
+        "governance_source": 0,
+        "medium_aggregator": 0,
+        "job_posting_skill_mention": 0
+      },
+      "source_mentions_capped": {
+        "paper": 1,
+        "long_form_blog": 1,
+        "tech_news": 1
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-05.md",
+        "papers/2026/05/2026-05-05.md",
+        "daily/2026/05/2026-05-05.md"
+      ],
+      "supporting_links": [
+        "https://jack-clark.net/2026/05/04/import-ai-455-automating-ai-research/",
+        "https://arxiv.org/html/2603.08640v2"
+      ]
+    }
+  ],
+  "stage_movements": [
+    {"topic": "open-weight-wave", "from": null, "to": "emerging", "first_observed_today": true},
+    {"topic": "automating-ai-research", "from": null, "to": "emerging", "first_observed_today": true}
+  ],
+  "background_topics_count": 14,
+  "background_topics_sample": [
+    "frontier-lab-jvs", "agentic-retrieval", "real-world-agentic-evals", "mcp-adoption",
+    "compound-engineering", "prompt-engineer-decline", "disaggregated-serving", "world-models",
+    "vertical-agents-finance", "ai-engineer-hiring", "vendor-governance-business-line",
+    "agentic-ides", "agent-platforms-enterprise", "long-context-vs-rag"
+  ],
+  "config_snapshot": {
+    "_purpose": "exact tuning constants in effect this run (cap-aware backfill)",
+    "source_weights": {
+      "priority_vendor_blog": 5, "enterprise_vendor_blog": 4, "paper": 3,
+      "long_form_blog": 3, "linkedin_network_post": 3, "tech_news": 2,
+      "governance_source": 2, "medium_aggregator": 1, "linkedin_hashtag_post": 1,
+      "job_posting_skill_mention": 0.5
+    },
+    "max_mentions_per_source_type": {
+      "priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5,
+      "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5,
+      "governance_source": 5, "medium_aggregator": 3, "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
+    },
+    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "ema_alpha": 0.3
+  }
+}

@@ -9,7 +9,7 @@ You are the **papers collector** in the AI Researcher pipeline. Your job is to s
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `papers_collector` section only.
 - Compute today's date: `date +%Y-%m-%d` (local TZ).
-- Output: `papers/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
+- Output: `papers/{YYYY}/{MM}/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
 
 ## 2. Gather (parallel)
 - For each `arxiv_categories` entry → WebFetch `https://export.arxiv.org/rss/{cat}` with prompt: "List the 5 most relevant new papers about LLMs / generative AI / agents: title, authors, abstract one-liner, arxiv link." Use `max_papers_per_category` from config.
@@ -46,7 +46,7 @@ Plain list of every URL/query you fetched. Mark failures with `(failed)`.
 ```
 
 ## 5. Finish
-- One-line confirmation: `Saved papers/{YYYY-MM-DD}.md ({N} papers).`
+- One-line confirmation: `Saved papers/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} papers).`
 - **Do NOT** touch `index.md` or `trends.md`.
 - **Do NOT** overwrite previous day files.
 

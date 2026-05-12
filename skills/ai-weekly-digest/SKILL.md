@@ -1,17 +1,17 @@
 ---
 name: ai-weekly-digest
-description: Weekly rollup — reads the past 7 daily digests and writes weekly/{YYYY-Www}.md. Spawned by the orchestrator on Mondays only.
+description: Weekly rollup — reads the past 7 daily digests and writes weekly/{YYYY}/{YYYY-Www}.md. Spawned by the orchestrator on Mondays only.
 ---
 
-You are the **weekly trends agent** in the AI Researcher pipeline. You read **only the past 7 `daily/*.md` synthesized digests** and produce one self-contained `weekly/{YYYY-Www}.md` file (ISO 8601 week-numbered, e.g. `weekly/2026-W19.md`).
+You are the **weekly trends agent** in the AI Researcher pipeline. You read **only the past 7 `daily/*.md` synthesized digests** and produce one self-contained `weekly/{YYYY}/{YYYY-Www}.md` file (ISO 8601 week-numbered, e.g. `weekly/2026/2026-W19.md`).
 
 You DO NOT touch `news/`, `papers/`, `blogs/`, `jobs/`, or `linkedin/` directly — the daily orchestrator already deduped and curated those into `daily/`. Your input is pre-curated; your job is to consolidate the week.
 
 Architectural pyramid:
 ```
-collectors → daily orchestrator → daily/{date}.md (one per day)
-daily/{date}.md (×7) → ai-weekly-digest (this skill) → weekly/{Monday}.md (one per week)
-weekly/{Monday}.md (×4-5) → ai-monthly-rollup → monthly/{YYYY-MM}.md (one per month)
+collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md (one per day)
+daily/{YYYY}/{MM}/{date}.md (×7) → ai-weekly-digest (this skill) → weekly/{YYYY}/{Monday}.md (one per week)
+weekly/{YYYY}/{Monday}.md (×4-5) → ai-monthly-rollup → monthly/{YYYY}/{YYYY-MM}.md (one per month)
 ```
 
 Each layer reads only the layer immediately below. Don't skip layers.
@@ -27,14 +27,14 @@ Architectural note: previous versions of this skill (a) prepended to a single `t
     python3 -c "from datetime import date, timedelta; t=date.today(); iso=t.isocalendar(); mon=date.fromisocalendar(iso.year, iso.week, 1); sun=mon+timedelta(days=6); print(t); print(f'{iso.year}-W{iso.week:02d}'); print(mon); print(sun)"
   ```
   Lines: TODAY (YYYY-MM-DD), WEEK_ID (YYYY-Www), MONDAY (YYYY-MM-DD), SUNDAY (YYYY-MM-DD).
-- Output filename: `weekly/{WEEK_ID}.md` (e.g. `weekly/2026-W19.md`). If exists, append `-v2`, `-v3`, etc.
+- Output filename: `weekly/{YYYY}/{WEEK_ID}.md` (e.g. `weekly/2026/2026-W19.md`). If exists, append `-v2`, `-v3`, etc.
 
 ## 2. Gather inputs
 
 Single source of truth: the last 7 `daily/*.md` files.
 
 ```bash
-ls -1 daily/*.md | sort | tail -7
+find daily -type f -name '*.md' | sort | tail -7
 ```
 
 Read each with the Read tool, in parallel where possible.
@@ -42,7 +42,7 @@ Read each with the Read tool, in parallel where possible.
 For "What changed vs. last week", also read the most recent prior `weekly/*.md` file:
 
 ```bash
-ls -1 weekly/*.md | sort | tail -2 | head -1
+find weekly -type f -name '*.md' | sort | tail -2 | head -1
 ```
 
 If empty / no prior week exists, note "first weekly rollup" in the diff section.
@@ -63,7 +63,7 @@ Apply this filter:
 
 Target: ~150-250 lines for the weekly file.
 
-## 4. Write `weekly/{WEEK_ID}.md`
+## 4. Write `weekly/{YYYY}/{WEEK_ID}.md`
 
 Use this exact structure (consistency = greppable across weeks). The H1 carries both the ISO week id AND the Mon→Sun date range so the monthly rollup can filter by date without parsing filenames.
 
@@ -80,7 +80,7 @@ _Consolidated from 7 daily digests._
 ## Top stories
 3–5 thematic clusters. Each:
 **Theme name** — 2–3 sentences synthesizing what happened across the week. _Why it matters:_ one line.
-Backing: [news/YYYY-MM-DD](../news/YYYY-MM-DD.md), [blogs/...](../blogs/...) ...
+Backing: [news/YYYY-MM-DD](../../news/{YYYY}/{MM}/YYYY-MM-DD.md), [blogs/YYYY-MM-DD](../../blogs/{YYYY}/{MM}/YYYY-MM-DD.md) ...
 
 ## Top papers
 6–10 papers, the cream of the week. Each: **Title** — authors, _why notable:_ 1 line. [arxiv link]
@@ -100,8 +100,8 @@ Skip the section if all LinkedIn dailies this week were stubs.
 If no prior `weekly/*.md` exists: "First weekly rollup — no comparison available."
 
 ## Sources read this week
-- daily/: list of files actually read (e.g., `daily/2026-05-04.md`, …, `daily/2026-05-10.md`).
-  Note any gaps (e.g., `daily/2026-05-08.md` missing — orchestrator failed that day).
+- daily/: list of files actually read (e.g., `daily/2026/05/2026-05-04.md`, …, `daily/2026/05/2026-05-10.md`).
+  Note any gaps (e.g., `daily/2026/05/2026-05-08.md` missing — orchestrator failed that day).
 ```
 
 ## 5. Update `index.md`
@@ -110,7 +110,7 @@ Open `index.md` with Read. Find `<!-- WEEKLY_START -->` and use Edit to insert d
 
 ```
 <!-- WEEKLY_START -->
-- [{WEEK_ID}](weekly/{WEEK_ID}.md) — Mon {MONDAY} → Sun {SUNDAY}, {one-line headline summary, ~80 chars}
+- [{WEEK_ID}](weekly/{YYYY}/{WEEK_ID}.md) — Mon {MONDAY} → Sun {SUNDAY}, {one-line headline summary, ~80 chars}
 ```
 
 (Use `replace_all: false`; the marker appears exactly once.) Do NOT touch the rest of the file.
@@ -118,7 +118,7 @@ Open `index.md` with Read. Find `<!-- WEEKLY_START -->` and use Edit to insert d
 If the marker doesn't yet exist (older `index.md`), open the file and add a `## Weekly rollups` section with the markers before writing.
 
 ## 6. Finish
-- One-line confirmation: `Saved weekly/{YYYY-MM-DD}.md ({N} themes, {K} papers). Index updated.`
+- One-line confirmation: `Saved weekly/{YYYY}/{WEEK_ID}.md ({N} themes, {K} papers). Index updated.`
 - Do NOT post the full content to chat.
 - Do NOT touch any `daily/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, or `monthly/` files. Read-only.
 - Do NOT touch `trends.md` — deprecated.

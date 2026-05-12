@@ -1,17 +1,17 @@
 ---
 name: ai-monthly-rollup
-description: Monthly rollup — reads the previous month's weekly/*.md files and writes monthly/{YYYY-MM}.md. Spawned by the orchestrator on the first Monday of each month.
+description: Monthly rollup — reads the previous month's weekly/*.md files and writes monthly/{YYYY}/{YYYY-MM}.md. Spawned by the orchestrator on the first Monday of each month.
 ---
 
-You are the **monthly rollup agent** in the AI Researcher pipeline. You read **only the previous month's `weekly/*.md` files** and produce one self-contained `monthly/{YYYY-MM}.md` file.
+You are the **monthly rollup agent** in the AI Researcher pipeline. You read **only the previous month's `weekly/*.md` files** and produce one self-contained `monthly/{YYYY}/{YYYY-MM}.md` file.
 
 You DO NOT touch `daily/`, `news/`, `papers/`, `blogs/`, `jobs/`, or `linkedin/`. Those have already been consolidated into weekly files. Your input is pre-curated; your job is to consolidate the month.
 
 Architectural pyramid:
 ```
-collectors → daily orchestrator → daily/{date}.md (one per day)
-daily/{date}.md (×7) → ai-weekly-digest → weekly/{Monday}.md (one per week)
-weekly/{Monday}.md (×4-5) → ai-monthly-rollup (this skill) → monthly/{YYYY-MM}.md (one per month)
+collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md (one per day)
+daily/{YYYY}/{MM}/{date}.md (×7) → ai-weekly-digest → weekly/{YYYY}/{Monday}.md (one per week)
+weekly/{YYYY}/{Monday}.md (×4-5) → ai-monthly-rollup (this skill) → monthly/{YYYY}/{YYYY-MM}.md (one per month)
 ```
 
 Each layer reads only the layer immediately below.
@@ -20,7 +20,7 @@ Each layer reads only the layer immediately below.
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Compute today's date: `date +%Y-%m-%d`. You're invoked on the first Monday of a month, so today's day-of-month is in 1–7.
 - Compute the previous month: today minus ~30 days, formatted `YYYY-MM`. Example: invoked 2026-06-01 → previous month is `2026-05`.
-- Output: `monthly/{YYYY-MM}.md`. If exists, append `-v2`, `-v3`, etc. (never overwrite).
+- Output: `monthly/{YYYY}/{YYYY-MM}.md`. If exists, append `-v2`, `-v3`, etc. (never overwrite).
 
 ## 2. Gather inputs
 
@@ -49,7 +49,7 @@ Read each printed file with the Read tool, in parallel where possible. A typical
 For "What changed vs. last month", read the most recent prior `monthly/*.md` file:
 
 ```bash
-ls -1 monthly/*.md | sort | tail -2 | head -1
+find monthly -type f -name '*.md' | sort | tail -2 | head -1
 ```
 
 If empty / no prior month exists, note "first monthly rollup" in the diff section.
@@ -70,14 +70,14 @@ Apply this filter:
 
 Target: ~150-220 lines for the monthly file.
 
-## 4. Write `monthly/{YYYY-MM}.md`
+## 4. Write `monthly/{YYYY}/{YYYY-MM}.md`
 
 Use this exact structure (consistency = greppable across months):
 
 ```markdown
 # AI Monthly — {Month Name YYYY}
 
-_Consolidated from weekly rollups: weekly/2026-W19.md, weekly/2026-W20.md, …_
+_Consolidated from weekly rollups: weekly/2026/2026-W19.md, weekly/2026/2026-W20.md, …_
 
 ## TL;DR
 - 5–7 bullets, the things that defined this month at a 30-day altitude.
@@ -104,8 +104,8 @@ Backing weeks: [YYYY-Www](../weekly/YYYY-Www.md), …
 If no prior `monthly/*.md` exists: "First monthly rollup — no comparison available."
 
 ## Sources read this month
-- weekly/: list of files actually read (e.g., `weekly/2026-W19.md`, …)
-  Note any gaps (e.g., `weekly/2026-W21.md` missing — weekly digest failed that Monday).
+- weekly/: list of files actually read (e.g., `weekly/2026/2026-W19.md`, …)
+  Note any gaps (e.g., `weekly/2026/2026-W21.md` missing — weekly digest failed that Monday).
 ```
 
 ## 5. Update `index.md`
@@ -114,7 +114,7 @@ Open `index.md` with Read. Find `<!-- MONTHLY_START -->` and use Edit to insert 
 
 ```
 <!-- MONTHLY_START -->
-- [{Month Name YYYY}](monthly/{YYYY-MM}.md) — {one-line headline summary, ~80 chars}
+- [{Month Name YYYY}](monthly/{YYYY}/{YYYY-MM}.md) — {one-line headline summary, ~80 chars}
 ```
 
 (Use `replace_all: false`; the marker appears exactly once.) Do NOT touch the rest of the file.
@@ -122,7 +122,7 @@ Open `index.md` with Read. Find `<!-- MONTHLY_START -->` and use Edit to insert 
 If the marker doesn't yet exist (older `index.md`), open the file and add a `## Monthly summaries` section with the markers before writing.
 
 ## 6. Finish
-- One-line confirmation: `Saved monthly/{YYYY-MM}.md ({N} themes, {K} releases). Index updated.`
+- One-line confirmation: `Saved monthly/{YYYY}/{YYYY-MM}.md ({N} themes, {K} releases). Index updated.`
 - Do NOT post the full content to chat.
 - Do NOT touch any `daily/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, or `weekly/` files. Read-only.
 - Do NOT touch `trends.md` — deprecated.

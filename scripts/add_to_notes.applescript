@@ -89,32 +89,31 @@ end backfillFromArg
 
 on refreshFromFolder(workspaceFolder, renderScript, folderName, titlePrefix)
 	set folderPath to workspaceFolder & folderName & "/"
-	-- Find the newest *.md, ignoring missing folders gracefully.
-	set latestFile to ""
+	-- Find the newest *.md across the nested {YYYY}/{MM}/ subfolders.
+	-- Layout post-2026-05-12 migration: daily/, news/, papers/, blogs/,
+	-- jobs/, linkedin/, radar/ nest by year+month; weekly/, monthly/ by year.
+	set fullPath to ""
 	try
-		set latestFile to do shell script "ls -t " & quoted form of folderPath & " 2>/dev/null | grep '\\.md$' | head -1"
+		set fullPath to do shell script "find " & quoted form of folderPath & " -type f -name '*.md' 2>/dev/null | sort | tail -1"
 	end try
-	if latestFile is "" then return -- folder empty / missing, nothing to do
+	if fullPath is "" then return -- folder empty / missing, nothing to do
 
-	set fullPath to folderPath & latestFile
-	-- Strip -v2/-v3 suffix so re-renders replace the same note.
-	set baseName to do shell script "basename " & quoted form of latestFile & " .md | sed 's/-v[0-9]*$//'"
+	-- baseName from the leaf file name, strip -v2/-v3
+	set baseName to do shell script "basename " & quoted form of fullPath & " .md | sed 's/-v[0-9]*$//'"
 	set noteTitle to titlePrefix & baseName
 
 	my writeNote(renderScript, fullPath, noteTitle)
 end refreshFromFolder
 
 on syncAllInFolder(workspaceFolder, renderScript, folderName, titlePrefix)
-	-- Iterate every *.md in the folder and write/refresh its corresponding
-	-- note. Skips -v2/-v3 versioned files since the AppleScript dedupes
-	-- titles after stripping the suffix anyway — we only render the
-	-- canonical (un-versioned) file when it exists.
+	-- Iterate every *.md in the folder (nested {YYYY}/{MM}/ subfolders) and
+	-- write/refresh its corresponding note. Skips -v2/-v3 versioned files
+	-- since the AppleScript dedupes titles after stripping the suffix anyway.
 	set folderPath to workspaceFolder & folderName & "/"
 	set fileList to ""
 	try
-		-- List newline-separated. Drop -v2-style siblings; those are
-		-- redundant once the canonical file has been rendered.
-		set fileList to do shell script "ls " & quoted form of folderPath & " 2>/dev/null | grep '\\.md$' | grep -v -- '-v[0-9][0-9]*\\.md$'"
+		-- Find newline-separated absolute paths. Drop -v2-style siblings.
+		set fileList to do shell script "find " & quoted form of folderPath & " -type f -name '*.md' 2>/dev/null | grep -v -- '-v[0-9][0-9]*\\.md$' | sort"
 	end try
 	if fileList is "" then return
 
@@ -124,10 +123,10 @@ on syncAllInFolder(workspaceFolder, renderScript, folderName, titlePrefix)
 	set AppleScript's text item delimiters to ""
 
 	repeat with f in fileItems
-		set fileName to f as text
-		if fileName is not "" then
-			set fullPath to folderPath & fileName
-			set baseName to do shell script "basename " & quoted form of fileName & " .md"
+		set fullPath to f as text
+		if fullPath is not "" then
+			-- fullPath is now absolute (find returns full paths). Derive note title from leaf basename.
+			set baseName to do shell script "basename " & quoted form of fullPath & " .md"
 			set noteTitle to titlePrefix & baseName
 			my writeNote(renderScript, fullPath, noteTitle)
 		end if
