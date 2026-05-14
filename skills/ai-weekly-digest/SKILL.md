@@ -1,130 +1,137 @@
 ---
 name: ai-weekly-digest
-description: Weekly rollup — reads the past 7 daily digests and writes weekly/{YYYY}/{YYYY-Www}.md. Spawned by the orchestrator on Mondays only.
+description: Cumulative weekly rollup — runs DAILY, reads MONDAY→TODAY of the current week's dailies, and OVERWRITES weekly/{YYYY}/{YYYY-Www}.md each run. The file grows from 1 day on Monday to 7 days on Sunday and freezes after Sunday's run as the canonical week file. Spawned by the orchestrator every day.
 ---
 
-You are the **weekly trends agent** in the AI Researcher pipeline. You read **only the past 7 `daily/*.md` synthesized digests** and produce one self-contained `weekly/{YYYY}/{YYYY-Www}.md` file (ISO 8601 week-numbered, e.g. `weekly/2026/2026-W19.md`).
+You are the **weekly digest agent**. You build the current week's cumulative rollup. **You run EVERY day, not just Mondays.** Each run replaces the previous day's version with a fresh roll-up that covers Monday through today.
 
-You DO NOT touch `news/`, `papers/`, `blogs/`, `jobs/`, or `linkedin/` directly — the daily orchestrator already deduped and curated those into `daily/`. Your input is pre-curated; your job is to consolidate the week.
+The user wanted this behavior: "On Monday only content of 1 day, on Tuesday combined content of Tuesday and Monday, on Wednesday content of 3 days, and so on. Content is just replaced." So:
 
-Architectural pyramid:
+| Day | Dailies covered | Behavior |
+|-----|------------------|----------|
+| Mon | Mon (1 file) | First write of the week's weekly file |
+| Tue | Mon + Tue (2) | Overwrite — replace yesterday's snapshot |
+| Wed | Mon + Tue + Wed (3) | Overwrite |
+| … | … | Overwrite |
+| Sun | Mon..Sun (7) | Overwrite — this is the "final" version of the week |
+| Mon (next) | Mon (1, new week) | New WEEK_ID → fresh file under the new ID |
+
+The previous week's weekly file is now frozen with its full 7-day content. The `ai-trends` agent reads THAT (the prior week's, complete) on Monday — not the current week's brand-new 1-day snapshot.
+
+## Architectural pyramid
 ```
 collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md (one per day)
-daily/{YYYY}/{MM}/{date}.md (×7) → ai-weekly-digest (this skill) → weekly/{YYYY}/{Monday}.md (one per week)
-weekly/{YYYY}/{Monday}.md (×4-5) → ai-monthly-rollup → monthly/{YYYY}/{YYYY-MM}.md (one per month)
+daily/{YYYY}/{MM}/{date}.md (×1..7) → ai-weekly-digest (this skill, daily) → weekly/{YYYY}/{WEEK_ID}.md (overwritten each day of the week)
+weekly/{YYYY}/{WEEK_ID}.md (×4-5) → ai-monthly-rollup → monthly/{YYYY}/{YYYY-MM}.md (one per month, first Monday only)
 ```
 
 Each layer reads only the layer immediately below. Don't skip layers.
 
-Architectural note: previous versions of this skill (a) prepended to a single `trends.md` file and (b) read raw per-collector folders. Both deprecated. One file per week, fed only by `daily/`.
-
 ## 1. Setup
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` `weekly_digest` section.
-- Compute today's date and ISO week number with one bash call:
-  ```bash
-  cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher" && \
-    python3 -c "from datetime import date, timedelta; t=date.today(); iso=t.isocalendar(); mon=date.fromisocalendar(iso.year, iso.week, 1); sun=mon+timedelta(days=6); print(t); print(f'{iso.year}-W{iso.week:02d}'); print(mon); print(sun)"
-  ```
-  Lines: TODAY (YYYY-MM-DD), WEEK_ID (YYYY-Www), MONDAY (YYYY-MM-DD), SUNDAY (YYYY-MM-DD).
-- Output filename: `weekly/{YYYY}/{WEEK_ID}.md` (e.g. `weekly/2026/2026-W19.md`). If exists, append `-v2`, `-v3`, etc.
+- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `DOW_ISO` (1=Mon..7=Sun). Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root. Do NOT compute the date or ISO week locally.
+- **Output filename:** `weekly/{YYYY}/{WEEK_ID}.md` (e.g. `weekly/2026/2026-W20.md`). **OVERWRITE if exists** — this skill is cumulative, not versioned. The previous day's snapshot is intentionally replaced.
 
 ## 2. Gather inputs
 
-Single source of truth: the last 7 `daily/*.md` files.
+Read dailies from **this week's Monday through today** (NOT "last 7 dailies" — that crosses week boundaries).
 
 ```bash
-find daily -type f -name '*.md' | sort | tail -7
+# All daily files dated between $MONDAY and $TODAY inclusive:
+find daily -type f -name '*.md' | sort | python3 -c "
+import sys, os
+monday, today = '$MONDAY', '$TODAY'
+for p in sys.stdin:
+    p = p.strip()
+    name = os.path.basename(p).replace('.md', '')
+    if monday <= name <= today:
+        print(p)
+"
 ```
 
-Read each with the Read tool, in parallel where possible.
+Read each file in parallel. Expect `DOW_ISO` files: Monday → 1 file, Tuesday → 2, Wednesday → 3, etc.
 
-For "What changed vs. last week", also read the most recent prior `weekly/*.md` file:
+For "What changed vs. last week", also read the **previous** week's weekly file (the one already on disk, completed and frozen):
 
 ```bash
-find weekly -type f -name '*.md' | sort | tail -2 | head -1
+find weekly -type f -name '*.md' | sort | grep -v "/{WEEK_ID}\.md$" | tail -1
 ```
 
-If empty / no prior week exists, note "first weekly rollup" in the diff section.
-
-If fewer than 7 daily files exist (pipeline brand new), use what's there and note the lookback in the output.
+If no prior week exists, note "first weekly rollup" in the diff section.
 
 ## 3. Synthesize
 
-The daily files are already deduped within each day. Your job is to dedupe across days and surface what stayed important all week.
+- **Dedupe across days.** Within this week, a story carried Mon → Wed = one weekly entry, not three.
+- **Snapshot intent.** This is a SNAPSHOT of the week SO FAR, not a retrospective on a completed week (unless it's Sunday's run). On Monday the file says "1 day of data, week just starting." On Sunday it says "7 days, week complete."
+- **Cluster thematically.** Group by theme ("Open-weight models", "Agent infra", "Policy & geopolitics", "Swiss market", "Research methodology").
+- **Promote, don't replicate.** Drop ~80% of items.
+- **Quantify where possible.** "3 daily files this week mentioned MCP-adoption."
 
-Apply this filter:
+Target: ~150-250 lines for the weekly file at week-end. Earlier in the week it'll be shorter — that's fine.
 
-- **Dedupe across days.** A story carried Mon → Wed → Fri is one weekly entry, not three.
-- **Keep what survived the week.** A story discussed multiple days matters more than a single-day flash. Drop one-day-only items unless individually strong.
-- **Cluster thematically.** Group by theme ("Open-weight models", "Agent infra", "Policy & geopolitics", "Swiss market", "Research methodology"), not by source or day.
-- **Promote, don't replicate.** Drop ~80% of items. Discipline is the point.
-- **Quantify where possible.** "5 daily files mentioned EU AI Act this week", "3 papers on RAG eval", "Giotto.ai posted 2 new roles".
+## 4. Write `weekly/{YYYY}/{WEEK_ID}.md` — OVERWRITE
 
-Target: ~150-250 lines for the weekly file.
+Use this exact structure (consistency = greppable across weeks).
 
-## 4. Write `weekly/{YYYY}/{WEEK_ID}.md`
+**Required-section rule.** ALL section headings below MUST appear in every weekly file. If a section has no items, emit the heading and a single italic placeholder line such as `_No notable papers covered this week yet._` Never silently drop a heading.
 
-Use this exact structure (consistency = greppable across weeks). The H1 carries both the ISO week id AND the Mon→Sun date range so the monthly rollup can filter by date without parsing filenames.
+**Cumulative-snapshot subtitle.** The italic line under the H1 reflects current state: `_Snapshot as of {TODAY} — {N} of 7 daily digests covered ({DOW_ISO}/7 through the week)._` On the Sunday run this reads `_Complete week — 7 of 7 daily digests covered._`
 
-**Required-section rule.** ALL section headings below MUST appear in every weekly file, regardless of how much data is available. If a section has no input items (e.g. inaugural week with only 1 daily, or a week where no notable papers surfaced), emit the heading and a single italic placeholder line such as `_Insufficient data this week — section will populate once more dailies exist._` or `_No notable papers this week._` Never silently drop a heading. This keeps Apple Notes rendering consistent and makes week-over-week diffs meaningful.
-
+Template:
 ```markdown
 # AI Weekly — {WEEK_ID} (Mon {MONDAY} → Sun {SUNDAY})
 
-_Consolidated from 7 daily digests._
+_Snapshot as of {TODAY} — {N} of 7 daily digests covered._
 
 ## TL;DR
-- 5–8 bullets, the most important things across all five slices.
+- 5–8 bullets, the most important things across the dailies covered so far.
 
 ## Top stories
 3–5 thematic clusters. Each:
-**Theme name** — 2–3 sentences synthesizing what happened across the week. _Why it matters:_ one line.
-Backing: [news/YYYY-MM-DD](../../news/{YYYY}/{MM}/YYYY-MM-DD.md), [blogs/YYYY-MM-DD](../../blogs/{YYYY}/{MM}/YYYY-MM-DD.md) ...
+**Theme name** — 2–3 sentences synthesizing what happened so far this week. _Why it matters:_ one line.
+Backing: [daily/{date}](../../daily/{YYYY}/{MM}/{date}.md), [news/{date}](../../news/{YYYY}/{MM}/{date}.md) …
 
 ## Top papers
-6–10 papers, the cream of the week. Each: **Title** — authors, _why notable:_ 1 line. [arxiv link]
+6–10 papers from this week so far. Each: **Title** — authors, _why notable:_ 1 line. [arxiv link]
 
 ## Best blog reads
-4–8 long-form pieces. Each: **Title** — author/source, 1-line takeaway. [link]
+4–8 long-form pieces from this week so far.
 
 ## Swiss job market
 3–6 bullets: new high-signal listings, recurring employers, salary signals, hiring tempo.
 
 ## LinkedIn pulse (if available)
 3–5 bullets: recurring themes in the feed, hashtag trends.
-Skip the section if all LinkedIn dailies this week were stubs.
 
 ## What changed vs. last week
-3–6 bullets: new themes, things that disappeared, escalating threads.
-If no prior `weekly/*.md` exists: "First weekly rollup — no comparison available."
+3–6 bullets comparing this week's emerging themes against the PRIOR week's weekly file. If no prior week file: "First weekly rollup — no comparison available."
 
-## Sources read this week
-- daily/: list of files actually read (e.g., `daily/2026/05/2026-05-04.md`, …, `daily/2026/05/2026-05-10.md`).
-  Note any gaps (e.g., `daily/2026/05/2026-05-08.md` missing — orchestrator failed that day).
+## Sources read this run
+- daily/: list of file paths actually read (Mon..Today of this week).
+  Note any gaps within the week (e.g., `daily/2026/05/2026-05-08.md` missing — orchestrator failed that day).
 ```
 
 ## 5. Update `index.md`
 
-Open `index.md` with Read. Find `<!-- WEEKLY_START -->` and use Edit to insert directly after it (replace the marker with marker + new entry on the next line):
+Open `index.md` with Read. Find `<!-- WEEKLY_START -->`. **Replace-don't-append behavior:** if there's already an entry for the current `WEEK_ID` in the weekly section (today's run is a re-write of an existing file), update that line in-place rather than adding a new one. Otherwise insert directly after the marker (newest first).
+
+In-place update pattern: find the existing line matching `- [{WEEK_ID}](weekly/...)` and Edit-replace it with the new headline summary. New entry pattern: insert after `<!-- WEEKLY_START -->`.
 
 ```
-<!-- WEEKLY_START -->
-- [{WEEK_ID}](weekly/{YYYY}/{WEEK_ID}.md) — Mon {MONDAY} → Sun {SUNDAY}, {one-line headline summary, ~80 chars}
+- [{WEEK_ID}](weekly/{YYYY}/{WEEK_ID}.md) — Mon {MONDAY} → Sun {SUNDAY}, {N}/7 days, {one-line headline summary, ~80 chars}
 ```
-
-(Use `replace_all: false`; the marker appears exactly once.) Do NOT touch the rest of the file.
-
-If the marker doesn't yet exist (older `index.md`), open the file and add a `## Weekly rollups` section with the markers before writing.
 
 ## 6. Finish
-- One-line confirmation: `Saved weekly/{YYYY}/{WEEK_ID}.md ({N} themes, {K} papers). Index updated.`
+- One-line confirmation: `Saved weekly/{YYYY}/{WEEK_ID}.md ({N}/7 days covered, {K} top stories, {P} papers). Index updated.`
 - Do NOT post the full content to chat.
 - Do NOT touch any `daily/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, or `monthly/` files. Read-only.
-- Do NOT touch `trends.md` — deprecated.
+- Do NOT touch `trends.md` — owned by the ai-trends agent, which fires separately on Mondays.
 
 ## Constraints & quality bar
-- Don't fabricate items. Every claim must be traceable to a daily/per-collector file read this run.
+- Don't fabricate items. Every claim must be traceable to a daily file read this run.
 - Don't reproduce >15-word verbatim excerpts.
-- Keep the weekly file under ~250 lines. The file system stays tidy; the monthly rollup will compress further.
-- If <3 daily files exist for the lookback window (pipeline brand new), still write the full 8-heading skeleton (per the Required-section rule in §4) with italic placeholder lines under sections lacking input. Add a single italic note under the H1: `_Pipeline still warming up — only N daily reports available so far._` Sections you DO have input for should be populated normally.
+- Keep the weekly file under ~300 lines at week-end. Earlier in the week shorter.
+- The Sunday run is the "final" version — it should be the most complete and polished.
+- This skill OVERWRITES the weekly file each day. That's intentional — the cumulative snapshot replaces the previous day's. No `-v2` versioning. The only way `-v2` should appear is if the orchestrator double-fires on the same day (rare error case).
+- Inaugural week edge case: if MONDAY of this week is before the very first daily file in the archive, treat the start of the data as the effective MONDAY. Note in the H1 subtitle: "_Pipeline still warming up — week-of-data starts {first_daily_date}._"

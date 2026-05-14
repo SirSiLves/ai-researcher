@@ -28,7 +28,7 @@ weekly/{YYYY}/{Www}.md OR monthly/{YYYY}/{YYYY-MM}.md → ai-trends (this skill)
 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Your invocation footer tells you the source file as `SOURCE: weekly/{YYYY}/{YYYY-Www}.md` (after weekly rollup) or `SOURCE: monthly/{YYYY}/{YYYY-MM}.md` (after monthly rollup).
-- Compute today's date: `date +%Y-%m-%d`.
+- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
 - Determine invocation type from the SOURCE path (`weekly/` vs `monthly/`).
 
 ## 2. Read inputs

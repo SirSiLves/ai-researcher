@@ -1,806 +1,1587 @@
 {
   "date": "2026-05-12",
   "rolling_window_days": 30,
-  "ema_alpha": 0.3,
+  "ema_alpha_fast": 0.3,
+  "ema_alpha_slow": 0.05,
   "prior_radar": "radar/2026/05/2026-05-11.json",
-  "notes": "Window: 05-04 through 05-12 (excl. 05-08). Enterprise-platform consolidation week \u2014 SAP Sapphire + ServiceNow Knowledge + Salesforce Summer'26 + IBM Think + Anthropic Legal + AWS MCP GA all landed within 8 days.",
   "topics": [
     {
-      "id": "agent-platforms-enterprise",
-      "label": "Enterprise agent platforms \u2014 consolidation week (SAP Sapphire, ServiceNow Knowledge, Salesforce Summer '26, IBM Think, Mistral Workflows)",
-      "stage": "consolidating",
-      "score": 57.82,
-      "raw_score_today": 120.75,
-      "score_yesterday": 30.85,
+      "id": "tool-use-standards",
+      "label": "Tool-use standards / connectors / harness engineering",
+      "stage": "emerging",
+      "score": 20.57,
+      "score_fast": 37.16,
+      "score_slow": 20.57,
+      "raw_score_today": 58.5,
+      "score_fast_yesterday": 28.02,
+      "score_slow_yesterday": 18.57,
+      "direction": "rising",
       "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": 114.1,
-      "momentum_baseline_date": "2026-05-06",
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
       "first_seen": "2026-05-05",
-      "sustained_days": 8,
-      "source_type_count": 8,
-      "source_mentions": {
-        "priority_vendor_blog": 4,
-        "enterprise_vendor_blog": 7,
-        "paper": 1,
-        "long_form_blog": 3,
-        "linkedin_network_post": 5,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 4,
-        "governance_source": 0,
-        "medium_aggregator": 3,
-        "job_posting_skill_mention": 5
-      },
-      "source_mentions_capped": {
-        "priority_vendor_blog": 4,
-        "enterprise_vendor_blog": 5,
-        "paper": 1,
-        "long_form_blog": 3,
-        "linkedin_network_post": 5,
-        "tech_news": 4,
-        "medium_aggregator": 3,
-        "job_posting_skill_mention": 5
-      },
-      "why_it_matters": "Four tier-1 vendors converged on the same architecture in one week \u2014 buying decisions for 2026-Q3 should treat enterprise agent platforms as a default, not an option.",
-      "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md",
-        "papers/2026/05/2026-05-12.md",
-        "jobs/2026/05/2026-05-12.md",
-        "daily/2026/05/2026-05-12.md"
-      ],
-      "supporting_links": [
-        "https://news.sap.com/2026/05/sap-sapphire-sap-unveils-autonomous-enterprise/",
-        "https://news.sap.com/2026/05/sap-anthropic-to-bring-claude-sap-business-ai-platform/",
-        "https://newsroom.servicenow.com/press-releases/details/2026/ServiceNow-opens-its-full-system-of-action-to-every-AI-Agent-in-the-enterprise/default.aspx",
-        "https://www.salesforce.com/news/stories/summer-2026-product-release-announcement/",
-        "https://newsroom.ibm.com/2026-05-05-think-2026-ibm-delivers-the-blueprint-for-the-ai-operating-model-as-the-ai-divide-widens",
-        "https://mistral.ai/news/workflows",
-        "https://www.linkedin.com/pulse/week-vertical-agents-arrived-b2b-andrew-mcpherson-dsp9e",
-        "https://www.linkedin.com/pulse/quiet-power-grab-how-ai-labs-swallowing-enterprise-stack-mqb8f"
-      ]
-    },
-    {
-      "id": "mcp-adoption",
-      "label": "MCP adoption \u2014 hyperscaler + enterprise SaaS substrate (AWS GA, Tableau MCP, ServiceNow MCP, SAP Joule, Anthropic Legal connectors)",
-      "stage": "consolidating",
-      "score": 53.64,
-      "raw_score_today": 108.0,
-      "score_yesterday": 30.34,
-      "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": 175.1,
-      "momentum_baseline_date": "2026-05-06",
-      "first_seen": "2026-05-06",
-      "sustained_days": 7,
-      "source_type_count": 9,
-      "source_mentions": {
-        "priority_vendor_blog": 2,
-        "enterprise_vendor_blog": 5,
-        "paper": 4,
-        "long_form_blog": 1,
-        "linkedin_network_post": 5,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 3,
-        "governance_source": 1,
-        "medium_aggregator": 5,
-        "job_posting_skill_mention": 2
-      },
-      "source_mentions_capped": {
-        "priority_vendor_blog": 2,
-        "enterprise_vendor_blog": 5,
-        "paper": 4,
-        "long_form_blog": 1,
-        "linkedin_network_post": 5,
-        "tech_news": 3,
-        "governance_source": 1,
-        "medium_aggregator": 3,
-        "job_posting_skill_mention": 2
-      },
-      "why_it_matters": "MCP is now the enterprise tool-use substrate (AWS, Salesforce Tableau, ServiceNow, SAP, Anthropic Legal) \u2014 it stopped being a Claude feature.",
-      "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "papers/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md"
-      ],
-      "supporting_links": [
-        "https://aws.amazon.com/about-aws/whats-new/2026/05/aws-mcp-server/",
-        "https://newsroom.servicenow.com/press-releases/details/2026/ServiceNow-opens-its-full-system-of-action-to-every-AI-Agent-in-the-enterprise/default.aspx",
-        "https://www.salesforce.com/news/stories/summer-2026-product-release-announcement/",
-        "https://techcrunch.com/2026/05/12/the-ai-legal-services-industry-is-heating-up-anthropic-is-getting-in-on-the-action/",
-        "https://arxiv.org/abs/2605.10787",
-        "https://arxiv.org/abs/2605.09131",
-        "https://arxiv.org/abs/2605.10913",
-        "https://medium.com/data-science-collective/why-your-mcp-server-is-a-security-disaster-waiting-to-happen-660577d8077c",
-        "https://www.linkedin.com/pulse/enabling-agent-to-agent-a2a-orchestration-between-sap-dharma-atluri-jhdcc"
-      ]
-    },
-    {
-      "id": "agentic-retrieval",
-      "label": "Agentic retrieval / RAG-vs-long-context / vector-DB collapse (Pi-Serini, Route-Before-Retrieve, vector-DB dying)",
-      "stage": "consolidating",
-      "score": 32.55,
-      "raw_score_today": 37.5,
-      "score_yesterday": 30.43,
-      "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": 55.0,
-      "momentum_baseline_date": "2026-05-06",
-      "first_seen": "2026-05-06",
-      "sustained_days": 7,
-      "source_type_count": 5,
-      "source_mentions": {
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 1,
-        "paper": 5,
-        "long_form_blog": 0,
-        "linkedin_network_post": 0,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 1,
-        "governance_source": 0,
-        "medium_aggregator": 4,
-        "job_posting_skill_mention": 2
-      },
-      "source_mentions_capped": {
-        "enterprise_vendor_blog": 1,
-        "paper": 5,
-        "tech_news": 1,
-        "medium_aggregator": 3,
-        "job_posting_skill_mention": 2
-      },
-      "why_it_matters": "Counter-signals dominated this week: Pi-Serini + vector-DB-dying + chunking-as-real-bug \u2014 re-evaluate vector-DB lock-in before signing.",
-      "supporting_files": [
-        "papers/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md",
-        "news/2026/05/2026-05-12.md"
-      ],
-      "supporting_links": [
-        "https://arxiv.org/abs/2605.10848",
-        "https://arxiv.org/abs/2605.10235",
-        "https://arxiv.org/abs/2605.10268",
-        "https://medium.com/data-science-collective/vector-databases-are-dying-heres-the-production-evidence-8c17b54687e2",
-        "https://medium.com/@think-data/most-rag-systems-dont-fail-because-retrieval-is-bad-they-fail-because-we-destroyed-the-context-ca4ed91b926c",
-        "https://www.snowflake.com/en/blog/snowflake-veeva-agentic-ai-life-sciences/"
-      ]
-    },
-    {
-      "id": "coordination-multi-agent",
-      "label": "Multi-agent coordination, observability, constraint drift, persona drift, bystander effect, dreaming",
-      "stage": "consolidating",
-      "score": 30.83,
-      "raw_score_today": 40.5,
-      "score_yesterday": 26.69,
-      "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": 71.3,
-      "momentum_baseline_date": "2026-05-06",
-      "first_seen": "2026-05-06",
-      "sustained_days": 7,
+      "sustained_days": 4,
       "source_type_count": 4,
       "source_mentions": {
-        "priority_vendor_blog": 1,
-        "enterprise_vendor_blog": 0,
-        "paper": 5,
-        "long_form_blog": 0,
-        "linkedin_network_post": 2,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 0,
-        "governance_source": 0,
-        "medium_aggregator": 1,
-        "job_posting_skill_mention": 0
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 3,
+        "paper": 9,
+        "medium_aggregator": 4,
+        "long_form_blog": 5
       },
       "source_mentions_capped": {
-        "priority_vendor_blog": 1,
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 3,
         "paper": 5,
-        "linkedin_network_post": 2,
-        "medium_aggregator": 1
+        "medium_aggregator": 3,
+        "long_form_blog": 5
       },
-      "why_it_matters": "Three converging papers on constraint drift / bystander effect / persona drift mean single-turn safety tests no longer suffice for multi-agent systems.",
       "supporting_files": [
-        "papers/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md"
-      ],
-      "supporting_links": [
-        "https://arxiv.org/abs/2605.10481",
-        "https://arxiv.org/abs/2605.10698",
-        "https://arxiv.org/abs/2605.10528",
-        "https://arxiv.org/abs/2605.09863",
-        "https://www.linkedin.com/pulse/enabling-agent-to-agent-a2a-orchestration-between-sap-dharma-atluri-jhdcc",
-        "https://www.linkedin.com/pulse/claude-agents-learn-while-sleep-what-anthropics-dreaming-albadri-ef4de"
-      ]
-    },
-    {
-      "id": "agentic-ides",
-      "label": "Agentic IDEs / coding workflow (Claude Agent View, Build Agent everywhere, Shopify River, Vibe remote agents, Addy Osmani workflow, GitLab layoffs)",
-      "stage": "emerging",
-      "score": 40.5,
-      "raw_score_today": 40.5,
-      "score_yesterday": null,
-      "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": null,
-      "momentum_baseline_date": null,
-      "first_seen": "2026-05-09",
-      "sustained_days": 1,
-      "source_type_count": 5,
-      "source_mentions": {
-        "priority_vendor_blog": 2,
-        "enterprise_vendor_blog": 1,
-        "paper": 0,
-        "long_form_blog": 3,
-        "linkedin_network_post": 0,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 1,
-        "governance_source": 0,
-        "medium_aggregator": 2,
-        "job_posting_skill_mention": 0
-      },
-      "source_mentions_capped": {
-        "priority_vendor_blog": 2,
-        "enterprise_vendor_blog": 1,
-        "long_form_blog": 3,
-        "tech_news": 1,
-        "medium_aggregator": 2
-      },
-      "why_it_matters": "Coding workflow is consolidating around 'agent does the loop, human reviews' \u2014 GitLab layoffs make it the first structural-not-cyclical seat reshape.",
-      "supporting_files": [
+        "blogs/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-09.md",
+        "blogs/2026/05/2026-05-10.md",
+        "blogs/2026/05/2026-05-11.md",
         "blogs/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md",
         "news/2026/05/2026-05-12.md"
       ],
-      "supporting_links": [
-        "https://simonwillison.net/2026/May/11/learning-on-the-shop-floor/",
-        "https://simonwillison.net/2026/May/11/gitlab-act-2/",
-        "https://simonwillison.net/2026/May/6/vibe-coding-and-agentic-engineering/",
-        "https://mistral.ai/news/vibe-remote-agents-mistral-medium-3-5",
-        "https://ai-engineering-trend.medium.com/anthropic-launches-claude-agent-view-manage-all-your-coding-sessions-in-one-place-49b1ece00ce1",
-        "https://medium.com/@addyosmani/my-llm-coding-workflow-going-into-2026-52fe1681325e",
-        "https://newsroom.servicenow.com/press-releases/details/2026/ServiceNow-Build-Agent-now-works-inside-every-major-AI-coding-tool-governed-by-default/default.aspx"
-      ]
-    },
-    {
-      "id": "vendor-governance-business-line",
-      "label": "Vendor governance as business line \u2014 ServiceNow AI Control Tower, Salesforce Agent Fabric, ISO 42001, Five Eyes",
-      "stage": "emerging",
-      "score": 32.38,
-      "raw_score_today": 57.0,
-      "score_yesterday": 21.83,
-      "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": null,
-      "momentum_baseline_date": null,
-      "first_seen": "2026-05-09",
-      "sustained_days": 4,
-      "source_type_count": 9,
-      "source_mentions": {
-        "priority_vendor_blog": 1,
-        "enterprise_vendor_blog": 3,
-        "paper": 1,
-        "long_form_blog": 1,
-        "linkedin_network_post": 2,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 1,
-        "governance_source": 2,
-        "medium_aggregator": 2,
-        "job_posting_skill_mention": 2
-      },
-      "source_mentions_capped": {
-        "priority_vendor_blog": 1,
-        "enterprise_vendor_blog": 3,
-        "paper": 1,
-        "long_form_blog": 1,
-        "linkedin_network_post": 2,
-        "tech_news": 1,
-        "governance_source": 2,
-        "medium_aggregator": 2,
-        "job_posting_skill_mention": 2
-      },
-      "why_it_matters": "ServiceNow AI Control Tower + Salesforce Agent Fabric + ISO 42001 traction signal governance is becoming a paid product layer, not a checkbox.",
-      "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md"
-      ],
-      "supporting_links": [
-        "https://newsroom.servicenow.com/press-releases/details/2026/ServiceNow-expands-AI-Control-Tower-to-discover-observe-govern-secure-and-measure-AI-deployed-across-any-system-in-the-enterprise/default.aspx",
-        "https://www.salesforce.com/news/stories/agent-fabric-control-plane-announcement/",
-        "https://www.linkedin.com/pulse/warum-iso-42001-f%C3%BCr-ki-gerade-besonders-relevant-wird-annette-zeller-aacgf",
-        "https://www.linkedin.com/pulse/claude-agents-learn-while-sleep-what-anthropics-dreaming-albadri-ef4de",
-        "https://www.lawfaremedia.org/article/ai-agents-must-follow-the-law",
-        "https://media.defense.gov/2026/Apr/30/2003922823/-1/-1/0/CAREFUL%20ADOPTION%20OF%20AGENTIC%20AI%20SERVICES_FINAL.PDF"
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
       ]
     },
     {
       "id": "a2a-protocol",
-      "label": "A2A protocol \u2014 SAP Joule\u00d7IBM ICA wire-level, 150-org milestone, A2A v1 stack maps",
+      "label": "A2A protocol (Agent-to-Agent)",
       "stage": "emerging",
-      "score": 26.86,
-      "raw_score_today": 36.0,
-      "score_yesterday": 22.95,
+      "score": 18.94,
+      "score_fast": 27.7,
+      "score_slow": 18.94,
+      "raw_score_today": 46.5,
+      "score_fast_yesterday": 19.64,
+      "score_slow_yesterday": 17.49,
+      "direction": "rising",
       "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": null,
-      "momentum_baseline_date": null,
-      "first_seen": "2026-05-10",
-      "sustained_days": 3,
-      "source_type_count": 5,
-      "source_mentions": {
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 2,
-        "paper": 0,
-        "long_form_blog": 0,
-        "linkedin_network_post": 3,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 1,
-        "governance_source": 1,
-        "medium_aggregator": 3,
-        "job_posting_skill_mention": 0
-      },
-      "source_mentions_capped": {
-        "enterprise_vendor_blog": 2,
-        "linkedin_network_post": 3,
-        "tech_news": 1,
-        "governance_source": 1,
-        "medium_aggregator": 3
-      },
-      "why_it_matters": "First production wire-level A2A integration shipped (SAP Joule \u00d7 IBM ICA via Agent Gateway) \u2014 A2A is leaving demo territory.",
-      "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md"
-      ],
-      "supporting_links": [
-        "https://www.linkedin.com/pulse/enabling-agent-to-agent-a2a-orchestration-between-sap-dharma-atluri-jhdcc",
-        "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year",
-        "https://medium.com/@richardhightower/a2a-protocol-v1-2026-how-ai-agents-actually-talk-to-each-other-c500079bca73",
-        "https://medium.com/@visrow/a2a-mcp-ag-ui-a2ui-the-essential-2026-ai-agent-protocol-stack-ee0e65a672ef"
-      ]
-    },
-    {
-      "id": "vertical-agents-finance",
-      "label": "Vertical agents \u2014 finance (Anthropic 10 finance agents, JPMorgan/Goldman/Citi/AIG/Visa, Snowflake+Veeva)",
-      "stage": "emerging",
-      "score": 26.41,
-      "raw_score_today": 35.25,
-      "score_yesterday": 22.62,
-      "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": 130.6,
-      "momentum_baseline_date": "2026-05-06",
-      "first_seen": "2026-05-05",
-      "sustained_days": 7,
-      "source_type_count": 5,
-      "source_mentions": {
-        "priority_vendor_blog": 1,
-        "enterprise_vendor_blog": 2,
-        "paper": 0,
-        "long_form_blog": 0,
-        "linkedin_network_post": 2,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 1,
-        "governance_source": 0,
-        "medium_aggregator": 0,
-        "job_posting_skill_mention": 5
-      },
-      "source_mentions_capped": {
-        "priority_vendor_blog": 1,
-        "enterprise_vendor_blog": 2,
-        "linkedin_network_post": 2,
-        "tech_news": 1,
-        "job_posting_skill_mention": 5
-      },
-      "why_it_matters": "Concrete bank deployments (JPMorgan/Goldman/Citi/AIG/Visa) + sustained Swiss-FS hiring pull this from concept into a sector trend.",
-      "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md",
-        "jobs/2026/05/2026-05-12.md"
-      ],
-      "supporting_links": [
-        "https://www.anthropic.com/news/finance-agents",
-        "https://www.snowflake.com/en/blog/snowflake-veeva-agentic-ai-life-sciences/",
-        "https://www.linkedin.com/pulse/week-vertical-agents-arrived-b2b-andrew-mcpherson-dsp9e",
-        "https://www.linkedin.com/pulse/anthropic-isnt-just-selling-models-anymore-15b-services-ahmed-albadri-ahbpe"
-      ]
-    },
-    {
-      "id": "eu-ai-act",
-      "label": "EU AI Act Omnibus + ISO 42001 \u2014 16-month deadline slip, tighter transparency, governance-as-management-system",
-      "stage": "emerging",
-      "score": 25.89,
-      "raw_score_today": 29.25,
-      "score_yesterday": 24.45,
-      "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": 115.8,
-      "momentum_baseline_date": "2026-05-06",
-      "first_seen": "2026-05-06",
-      "sustained_days": 7,
-      "source_type_count": 6,
-      "source_mentions": {
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 0,
-        "paper": 0,
-        "long_form_blog": 1,
-        "linkedin_network_post": 2,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 2,
-        "governance_source": 2,
-        "medium_aggregator": 2,
-        "job_posting_skill_mention": 1
-      },
-      "source_mentions_capped": {
-        "long_form_blog": 1,
-        "linkedin_network_post": 2,
-        "tech_news": 2,
-        "governance_source": 2,
-        "medium_aggregator": 2,
-        "job_posting_skill_mention": 1
-      },
-      "why_it_matters": "16 months of breathing room on high-risk deadlines (2027/2028) bought with a tighter transparency regime \u2014 sequencing of compliance work needs replanning.",
-      "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md"
-      ],
-      "supporting_links": [
-        "https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/",
-        "https://iapp.org/news/a/ai-act-omnibus-what-just-happened-and-what-comes-next",
-        "https://www.linkedin.com/pulse/warum-iso-42001-f%C3%BCr-ki-gerade-besonders-relevant-wird-annette-zeller-aacgf",
-        "https://www.lawfaremedia.org/article/ai-agents-must-follow-the-law"
-      ]
-    },
-    {
-      "id": "frontier-model-releases",
-      "label": "Frontier model releases \u2014 Mistral Medium 3.5, GPT-5.5 Instant, Gemini Workspace, NVIDIA Rubin CPX, Grok 4.3",
-      "stage": "emerging",
-      "score": 25.48,
-      "raw_score_today": 45.0,
-      "score_yesterday": 17.11,
-      "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": -0.1,
-      "momentum_baseline_date": "2026-05-07",
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
       "first_seen": "2026-05-07",
-      "sustained_days": 6,
-      "source_type_count": 6,
+      "sustained_days": 4,
+      "source_type_count": 4,
       "source_mentions": {
-        "priority_vendor_blog": 3,
-        "enterprise_vendor_blog": 1,
-        "paper": 0,
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 6,
         "long_form_blog": 1,
-        "linkedin_network_post": 1,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 2,
-        "governance_source": 0,
-        "medium_aggregator": 1,
-        "job_posting_skill_mention": 0
+        "medium_aggregator": 3,
+        "linkedin_network_post": 18
       },
       "source_mentions_capped": {
-        "priority_vendor_blog": 3,
-        "enterprise_vendor_blog": 1,
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
         "long_form_blog": 1,
-        "linkedin_network_post": 1,
-        "tech_news": 2,
-        "medium_aggregator": 1
+        "medium_aggregator": 3,
+        "linkedin_network_post": 5
       },
-      "why_it_matters": "Mistral Medium 3.5 + GPT-5.5 Instant + Gemini Workspace + Rubin CPX hardware all in one window \u2014 the model layer is again the bottleneck-shifting layer.",
       "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md"
+        "blogs/2026/05/2026-05-12.md",
+        "linkedin/2026/05/2026-05-07.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-10.md",
+        "linkedin/2026/05/2026-05-11.md",
+        "linkedin/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md"
       ],
-      "supporting_links": [
-        "https://mistral.ai/news/vibe-remote-agents-mistral-medium-3-5",
-        "https://mistral.ai/news/workflows",
-        "https://openai.com/index/gpt-5-5-instant/",
-        "https://blog.google/innovation-and-ai/models-and-research/gemini-models/",
-        "https://nvidianews.nvidia.com/news/nvidia-unveils-rubin-cpx-a-new-class-of-gpu-designed-for-massive-context-inference",
-        "https://stratechery.com/2026/the-inference-shift/"
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
       ]
     },
     {
-      "id": "frontier-lab-jvs",
-      "label": "Frontier-lab JVs / FDE wars \u2014 OpenAI Deployment Co ($4B+Tomoro), Anthropic services JV ($1.5B Blackstone+H&F+Goldman)",
+      "id": "agent-sdks",
+      "label": "Agent SDKs & frameworks (LangGraph, CrewAI, Microsoft Agent Framework)",
       "stage": "emerging",
-      "score": 24.75,
-      "raw_score_today": 30.0,
-      "score_yesterday": 22.5,
+      "score": 17.91,
+      "score_fast": 27.0,
+      "score_slow": 17.91,
+      "raw_score_today": 31.5,
+      "score_fast_yesterday": 25.07,
+      "score_slow_yesterday": 17.2,
+      "direction": "rising",
       "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": null,
-      "momentum_baseline_date": null,
-      "first_seen": "2026-05-11",
-      "sustained_days": 2,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 6,
       "source_type_count": 5,
       "source_mentions": {
-        "priority_vendor_blog": 1,
-        "enterprise_vendor_blog": 0,
-        "paper": 0,
-        "long_form_blog": 1,
-        "linkedin_network_post": 3,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 1,
-        "governance_source": 0,
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 8,
+        "paper": 1,
+        "long_form_blog": 2,
         "medium_aggregator": 1,
-        "job_posting_skill_mention": 0
+        "job_posting_skill_mention": 2
       },
       "source_mentions_capped": {
-        "priority_vendor_blog": 1,
-        "long_form_blog": 1,
-        "linkedin_network_post": 3,
-        "tech_news": 1,
-        "medium_aggregator": 1
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "paper": 1,
+        "long_form_blog": 2,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 2
       },
-      "why_it_matters": "OpenAI Deployment Co and Anthropic services JV are the same play (model-access + captive distribution) \u2014 McKinsey/BCG/Bain are now competitive targets.",
       "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md"
+        "blogs/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-09.md",
+        "blogs/2026/05/2026-05-10.md",
+        "jobs/2026/05/2026-05-07.md",
+        "jobs/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-09.md"
       ],
-      "supporting_links": [
-        "https://openai.com/index/openai-launches-the-deployment-company/",
-        "https://www.linkedin.com/pulse/anthropic-isnt-just-selling-models-anymore-15b-services-ahmed-albadri-ahbpe",
-        "https://www.linkedin.com/pulse/week-vertical-agents-arrived-b2b-andrew-mcpherson-dsp9e",
-        "https://news.smol.ai/issues/26-05-11-not-much"
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
       ]
     },
     {
       "id": "mcp-security",
-      "label": "MCP security & agent-IAM (Five Eyes guidance, MCP Server Security Disaster, PRISM secret leakage, single-neuron bypass)",
+      "label": "MCP security / PQ-crypto audits / auth gaps",
       "stage": "emerging",
-      "score": 24.28,
-      "raw_score_today": 24.0,
-      "score_yesterday": 24.4,
+      "score": 17.43,
+      "score_fast": 33.41,
+      "score_slow": 17.43,
+      "raw_score_today": 40.5,
+      "score_fast_yesterday": 30.37,
+      "score_slow_yesterday": 16.22,
+      "direction": "rising",
       "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": 111.1,
-      "momentum_baseline_date": "2026-05-07",
-      "first_seen": "2026-05-07",
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
       "sustained_days": 6,
-      "source_type_count": 5,
+      "source_type_count": 6,
       "source_mentions": {
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 0,
-        "paper": 2,
-        "long_form_blog": 0,
-        "linkedin_network_post": 1,
-        "linkedin_hashtag_post": 0,
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
         "tech_news": 1,
-        "governance_source": 2,
-        "medium_aggregator": 1,
-        "job_posting_skill_mention": 0
+        "paper": 1,
+        "long_form_blog": 1,
+        "medium_aggregator": 3,
+        "linkedin_network_post": 12,
+        "linkedin_hashtag_post": 1
       },
       "source_mentions_capped": {
-        "paper": 2,
-        "linkedin_network_post": 1,
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
         "tech_news": 1,
-        "governance_source": 2,
-        "medium_aggregator": 1
+        "paper": 1,
+        "long_form_blog": 1,
+        "medium_aggregator": 3,
+        "linkedin_network_post": 5,
+        "linkedin_hashtag_post": 1
       },
-      "why_it_matters": "Five Eyes joint guidance + PRISM secret-leakage paper + single-neuron bypass \u2014 MCP attack surface is now named and being benchmarked.",
       "supporting_files": [
-        "papers/2026/05/2026-05-12.md",
-        "news/2026/05/2026-05-12.md",
+        "blogs/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-09.md",
+        "blogs/2026/05/2026-05-11.md",
         "blogs/2026/05/2026-05-12.md",
-        "linkedin/2026/05/2026-05-12.md"
+        "linkedin/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-07.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-10.md"
       ],
-      "supporting_links": [
-        "https://www.cisa.gov/news-events/news/cisa-us-and-international-partners-release-guide-secure-adoption-agentic-ai",
-        "https://media.defense.gov/2026/Apr/30/2003922823/-1/-1/0/CAREFUL%20ADOPTION%20OF%20AGENTIC%20AI%20SERVICES_FINAL.PDF",
-        "https://arxiv.org/abs/2605.10614",
-        "https://arxiv.org/abs/2605.08513",
-        "https://medium.com/data-science-collective/why-your-mcp-server-is-a-security-disaster-waiting-to-happen-660577d8077c"
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
       ]
     },
     {
-      "id": "vertical-agents-legal",
-      "label": "Vertical agents \u2014 legal (Anthropic 20+ MCP connectors + 12 practice-area plugins; Harvey/CoCounsel integration)",
+      "id": "agentic-retrieval",
+      "label": "Agentic retrieval / RAG-as-decision-loop",
       "stage": "emerging",
-      "score": 22.5,
-      "raw_score_today": 22.5,
-      "score_yesterday": null,
+      "score": 13.22,
+      "score_fast": 21.61,
+      "score_slow": 13.22,
+      "raw_score_today": 28.5,
+      "score_fast_yesterday": 18.66,
+      "score_slow_yesterday": 12.42,
+      "direction": "rising",
       "convergence_multiplier_applied": 1.5,
-      "momentum_pct_vs_baseline": null,
-      "momentum_baseline_date": null,
-      "first_seen": "2026-05-12",
-      "sustained_days": 1,
-      "source_type_count": 4,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 4,
+      "source_type_count": 3,
       "source_mentions": {
-        "priority_vendor_blog": 1,
-        "enterprise_vendor_blog": 0,
-        "paper": 0,
-        "long_form_blog": 1,
-        "linkedin_network_post": 1,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 2,
-        "governance_source": 0,
-        "medium_aggregator": 0,
-        "job_posting_skill_mention": 0
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 1,
+        "medium_aggregator": 2,
+        "linkedin_network_post": 6
       },
       "source_mentions_capped": {
-        "priority_vendor_blog": 1,
-        "long_form_blog": 1,
-        "linkedin_network_post": 1,
-        "tech_news": 2
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 1,
+        "medium_aggregator": 2,
+        "linkedin_network_post": 5
       },
-      "why_it_matters": "Anthropic's 20+ connectors + 12 practice-area plugins make MCP-as-distribution-channel real in a regulated vertical for the first time.",
       "supporting_files": [
-        "news/2026/05/2026-05-12.md",
-        "blogs/2026/05/2026-05-12.md"
+        "blogs/2026/05/2026-05-10.md",
+        "blogs/2026/05/2026-05-11.md",
+        "linkedin/2026/05/2026-05-07.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-10.md",
+        "linkedin/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-06.md"
       ],
-      "supporting_links": [
-        "https://techcrunch.com/2026/05/12/the-ai-legal-services-industry-is-heating-up-anthropic-is-getting-in-on-the-action/",
-        "https://www.lawnext.com/2026/05/anthropic-goes-all-in-on-legal-releasing-more-than-20-connectors-and-12-practice-area-plugins-for-claude.html",
-        "https://www.lawfaremedia.org/article/ai-agents-must-follow-the-law"
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 7,
+      "breadth_30d": 7,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
       ]
     },
     {
-      "id": "agent-evals",
-      "label": "Real-world agentic evals saturating (WildClawBench, ComplexMCP, evidence-supported bounds, role-specialized benchmark, Phone-use safety)",
+      "id": "vector-db-market",
+      "label": "Vector DB market consolidation",
       "stage": "emerging",
-      "score": 18,
-      "raw_score_today": 18,
-      "score_yesterday": null,
-      "convergence_multiplier_applied": 1.0,
-      "momentum_pct_vs_baseline": null,
-      "momentum_baseline_date": null,
-      "first_seen": "2026-05-12",
-      "sustained_days": 1,
-      "source_type_count": 2,
+      "score": 12.64,
+      "score_fast": 17.77,
+      "score_slow": 12.64,
+      "raw_score_today": 21.75,
+      "score_fast_yesterday": 16.06,
+      "score_slow_yesterday": 12.16,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 4,
+      "source_type_count": 3,
       "source_mentions": {
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 0,
-        "paper": 5,
-        "long_form_blog": 1,
-        "linkedin_network_post": 0,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 0,
-        "governance_source": 0,
-        "medium_aggregator": 0,
-        "job_posting_skill_mention": 0
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 9,
+        "medium_aggregator": 6,
+        "job_posting_skill_mention": 3
       },
       "source_mentions_capped": {
-        "paper": 5,
-        "long_form_blog": 1
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "medium_aggregator": 3,
+        "job_posting_skill_mention": 3
       },
-      "why_it_matters": "WildClawBench + ComplexMCP + evidence-supported bounds + role-specialized benchmarks \u2014 vendor leaderboard numbers will need error bars by EOY.",
       "supporting_files": [
-        "papers/2026/05/2026-05-12.md"
+        "blogs/2026/05/2026-05-09.md",
+        "blogs/2026/05/2026-05-10.md",
+        "blogs/2026/05/2026-05-11.md",
+        "blogs/2026/05/2026-05-12.md",
+        "jobs/2026/05/2026-05-06.md",
+        "jobs/2026/05/2026-05-11.md",
+        "jobs/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-06.md"
       ],
-      "supporting_links": [
-        "https://arxiv.org/abs/2605.10912",
-        "https://arxiv.org/abs/2605.10787",
-        "https://arxiv.org/abs/2605.10448",
-        "https://arxiv.org/abs/2605.08761",
-        "https://arxiv.org/abs/2605.07630"
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
       ]
     },
     {
-      "id": "compute-scarcity",
-      "label": "Compute scarcity / inference shift (NVIDIA Rubin CPX, Cloudflare layoffs, Anthropic-SpaceX, Cerebras IPO, China-labs notes)",
+      "id": "voice-realtime-agents",
+      "label": "Voice / Realtime agentic deployments",
       "stage": "emerging",
-      "score": 16.18,
-      "raw_score_today": 13,
-      "score_yesterday": 17.55,
+      "score": 11.35,
+      "score_fast": 12.92,
+      "score_slow": 11.35,
+      "raw_score_today": 16.0,
+      "score_fast_yesterday": 11.6,
+      "score_slow_yesterday": 11.1,
+      "direction": "rising",
       "convergence_multiplier_applied": 1.0,
-      "momentum_pct_vs_baseline": null,
-      "momentum_baseline_date": null,
-      "first_seen": "2026-05-10",
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-09",
       "sustained_days": 3,
       "source_type_count": 2,
       "source_mentions": {
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 0,
-        "paper": 0,
-        "long_form_blog": 3,
-        "linkedin_network_post": 0,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 2,
-        "governance_source": 0,
-        "medium_aggregator": 0,
-        "job_posting_skill_mention": 0
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 6,
+        "long_form_blog": 2
       },
       "source_mentions_capped": {
-        "long_form_blog": 3,
-        "tech_news": 2
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "long_form_blog": 2
       },
-      "why_it_matters": "Cloudflare layoffs + Anthropic-SpaceX deal + Rubin CPX + Cerebras IPO all argue inference economics are reshaping faster than the model layer.",
       "supporting_files": [
+        "blogs/2026/05/2026-05-10.md",
         "blogs/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md",
+        "news/2026/05/2026-05-11.md",
         "news/2026/05/2026-05-12.md"
       ],
-      "supporting_links": [
-        "https://stratechery.com/2026/the-inference-shift/",
-        "https://stratechery.com/2026/spacex-and-anthropic-xais-two-companies-elon-musk-and-spacexais-future/",
-        "https://www.interconnects.ai/p/notes-from-inside-chinas-ai-labs",
-        "https://nvidianews.nvidia.com/news/nvidia-unveils-rubin-cpx-a-new-class-of-gpu-designed-for-massive-context-inference",
-        "https://techcrunch.com/2026/05/08/cloudflare-says-ai-made-1100-jobs-obsolete-even-as-revenue-hit-a-record-high/"
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
       ]
     },
     {
-      "id": "swiss-ch-adoption",
-      "label": "Switzerland GenAI adoption + KI-Barometer 2026 (Meyrat data piece, Zeller ISO 42001, KI-Barometer heise, $2.5T AI spend)",
+      "id": "agent-platforms-enterprise",
+      "label": "Enterprise agent platforms (Agentforce, Joule, ServiceNow Otto, watsonx Orchestrate)",
       "stage": "emerging",
-      "score": 10,
-      "raw_score_today": 10,
-      "score_yesterday": null,
+      "score": 11.04,
+      "score_fast": 15.76,
+      "score_slow": 11.04,
+      "raw_score_today": 25.0,
+      "score_fast_yesterday": 11.8,
+      "score_slow_yesterday": 10.3,
+      "direction": "rising",
       "convergence_multiplier_applied": 1.0,
-      "momentum_pct_vs_baseline": null,
-      "momentum_baseline_date": null,
-      "first_seen": "2026-05-12",
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 3,
+      "source_type_count": 2,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 8,
+        "linkedin_network_post": 6
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "linkedin_network_post": 5
+      },
+      "supporting_files": [
+        "linkedin/2026/05/2026-05-10.md",
+        "linkedin/2026/05/2026-05-11.md",
+        "linkedin/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-06.md",
+        "news/2026/05/2026-05-12.md"
+      ],
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "vertical-agents-finance",
+      "label": "Vertical agents - finance (Anthropic finance templates, Vals AI)",
+      "stage": "emerging",
+      "score": 10.49,
+      "score_fast": 12.55,
+      "score_slow": 10.49,
+      "raw_score_today": 15.0,
+      "score_fast_yesterday": 11.5,
+      "score_slow_yesterday": 10.25,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 3,
+      "source_type_count": 2,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 3,
+        "linkedin_network_post": 3
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 3,
+        "linkedin_network_post": 3
+      },
+      "supporting_files": [
+        "linkedin/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-10.md",
+        "news/2026/05/2026-05-11.md"
+      ],
+      "supporting_links": [],
+      "sector": "Agents & infrastructure",
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "ai-engineer-hiring",
+      "label": "AI engineer hiring (Switzerland + global)",
+      "stage": "emerging",
+      "score": 23.33,
+      "score_fast": 38.02,
+      "score_slow": 23.33,
+      "raw_score_today": 42.75,
+      "score_fast_yesterday": 35.99,
+      "score_slow_yesterday": 22.31,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 33.3,
+      "score_7d_ago": 17.5,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 7,
+      "source_type_count": 4,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "long_form_blog": 3,
+        "medium_aggregator": 2,
+        "job_posting_skill_mention": 88,
+        "linkedin_network_post": 18
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "long_form_blog": 3,
+        "medium_aggregator": 2,
+        "job_posting_skill_mention": 5,
+        "linkedin_network_post": 5
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-09.md",
+        "blogs/2026/05/2026-05-10.md",
+        "blogs/2026/05/2026-05-12.md",
+        "jobs/2026/05/2026-05-05.md",
+        "jobs/2026/05/2026-05-06.md",
+        "jobs/2026/05/2026-05-07.md",
+        "jobs/2026/05/2026-05-09.md"
+      ],
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "implementation-revenue",
+      "label": "Implementation revenue & SI plays (FDEs, Tomoro, Accenture/Deloitte squeeze)",
+      "stage": "emerging",
+      "score": 21.85,
+      "score_fast": 28.51,
+      "score_slow": 21.85,
+      "raw_score_today": 38.25,
+      "score_fast_yesterday": 24.34,
+      "score_slow_yesterday": 20.99,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 4,
+      "source_type_count": 3,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 5,
+        "job_posting_skill_mention": 1,
+        "linkedin_network_post": 5
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "job_posting_skill_mention": 1,
+        "linkedin_network_post": 5
+      },
+      "supporting_files": [
+        "jobs/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-07.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-10.md",
+        "linkedin/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-09.md"
+      ],
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "eu-ai-act",
+      "label": "EU AI Act / Digital Omnibus / trilogue",
+      "stage": "emerging",
+      "score": 20.45,
+      "score_fast": 45.99,
+      "score_slow": 20.45,
+      "raw_score_today": 60.0,
+      "score_fast_yesterday": 39.98,
+      "score_slow_yesterday": 18.37,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 6,
+      "source_type_count": 6,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 6,
+        "governance_source": 5,
+        "long_form_blog": 1,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 2,
+        "linkedin_network_post": 20
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "governance_source": 5,
+        "long_form_blog": 1,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 2,
+        "linkedin_network_post": 5
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-11.md",
+        "jobs/2026/05/2026-05-09.md",
+        "jobs/2026/05/2026-05-12.md",
+        "linkedin/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-07.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-10.md"
+      ],
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "swiss-ai-context",
+      "label": "Swiss AI context (KI-Barometer, sovereign LLM, Romandie adoption)",
+      "stage": "emerging",
+      "score": 18.95,
+      "score_fast": 25.29,
+      "score_slow": 18.95,
+      "raw_score_today": 35.25,
+      "score_fast_yesterday": 21.02,
+      "score_slow_yesterday": 18.09,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 3,
+      "source_type_count": 3,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 3,
+        "job_posting_skill_mention": 23,
+        "linkedin_network_post": 11
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 3,
+        "job_posting_skill_mention": 5,
+        "linkedin_network_post": 5
+      },
+      "supporting_files": [
+        "jobs/2026/05/2026-05-05.md",
+        "jobs/2026/05/2026-05-06.md",
+        "jobs/2026/05/2026-05-07.md",
+        "jobs/2026/05/2026-05-09.md",
+        "jobs/2026/05/2026-05-10.md",
+        "jobs/2026/05/2026-05-11.md",
+        "jobs/2026/05/2026-05-12.md",
+        "linkedin/2026/05/2026-05-09.md"
+      ],
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "iso-42001",
+      "label": "ISO/IEC 42001 (AI management system standard)",
+      "stage": "emerging",
+      "score": 16.85,
+      "score_fast": 22.79,
+      "score_slow": 16.85,
+      "raw_score_today": 32.25,
+      "score_fast_yesterday": 18.73,
+      "score_slow_yesterday": 16.04,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-07",
+      "sustained_days": 3,
+      "source_type_count": 4,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 2,
+        "governance_source": 1,
+        "job_posting_skill_mention": 1,
+        "linkedin_network_post": 11
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 2,
+        "governance_source": 1,
+        "job_posting_skill_mention": 1,
+        "linkedin_network_post": 5
+      },
+      "supporting_files": [
+        "jobs/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-07.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-10.md",
+        "linkedin/2026/05/2026-05-11.md",
+        "linkedin/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-12.md"
+      ],
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "frontier-lab-jvs",
+      "label": "Frontier-lab joint ventures (Anthropic+Goldman/Blackstone, OpenAI Deployment Co)",
+      "stage": "emerging",
+      "score": 16.2,
+      "score_fast": 20.84,
+      "score_slow": 16.2,
+      "raw_score_today": 25.0,
+      "score_fast_yesterday": 19.05,
+      "score_slow_yesterday": 15.74,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 4,
+      "source_type_count": 2,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 13,
+        "linkedin_network_post": 8
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "linkedin_network_post": 5
+      },
+      "supporting_files": [
+        "linkedin/2026/05/2026-05-06.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-10.md",
+        "linkedin/2026/05/2026-05-11.md",
+        "linkedin/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md"
+      ],
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "ai-safety-institute",
+      "label": "AI Safety Institute / Safety Reports",
+      "stage": "emerging",
+      "score": 14.81,
+      "score_fast": 20.2,
+      "score_slow": 14.81,
+      "raw_score_today": 27.0,
+      "score_fast_yesterday": 17.28,
+      "score_slow_yesterday": 14.17,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 4,
+      "source_type_count": 4,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "governance_source": 2,
+        "tech_news": 5,
+        "long_form_blog": 1,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "governance_source": 2,
+        "tech_news": 5,
+        "long_form_blog": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-06.md",
+        "blogs/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-06.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md",
+        "news/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-12.md"
+      ],
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 7,
+      "breadth_30d": 7,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "vendor-governance-business-line",
+      "label": "Vendor governance as a business line (AI Control Tower / Agent Fabric)",
+      "stage": "emerging",
+      "score": 13.0,
+      "score_fast": 13.0,
+      "score_slow": 13.0,
+      "raw_score_today": 13.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-11",
       "sustained_days": 1,
       "source_type_count": 2,
       "source_mentions": {
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 0,
-        "paper": 0,
-        "long_form_blog": 0,
-        "linkedin_network_post": 2,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 2,
-        "governance_source": 0,
-        "medium_aggregator": 0,
-        "job_posting_skill_mention": 0
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 5,
+        "linkedin_network_post": 1
       },
       "source_mentions_capped": {
-        "linkedin_network_post": 2,
-        "tech_news": 2
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "linkedin_network_post": 1
       },
-      "why_it_matters": "Switzerland leads Europe at 73% GenAI try-rate but with sharp generational/educational/linguistic splits \u2014 local 'Brandbeschleuniger' risk now has numbers.",
       "supporting_files": [
-        "linkedin/2026/05/2026-05-12.md",
+        "linkedin/2026/05/2026-05-11.md",
         "news/2026/05/2026-05-12.md"
       ],
-      "supporting_links": [
-        "https://www.linkedin.com/pulse/ki-ist-angekommen-aber-nicht-bei-allen-paul-meyrat-5ltxe",
-        "https://www.linkedin.com/pulse/warum-iso-42001-f%C3%BCr-ki-gerade-besonders-relevant-wird-annette-zeller-aacgf",
-        "https://www.heise.de/news/KI-Barometer-2026-Wie-Unternehmen-KI-heute-tatsaechlich-einsetzen-11266671.html",
-        "https://www.handelsblatt.com/technik/kuenstliche-intelligenz-ki-ausgaben-steigen-2026-auf-25-billionen-dollar/100191851.html"
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 2,
+      "breadth_30d": 2,
+      "breadth_orgs_7d": [],
+      "high_breadth": false,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "long-context-vs-rag",
+      "label": "Long-context vs RAG trade-offs",
+      "stage": "emerging",
+      "score": 16.18,
+      "score_fast": 30.08,
+      "score_slow": 16.18,
+      "raw_score_today": 42.0,
+      "score_fast_yesterday": 24.97,
+      "score_slow_yesterday": 14.82,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 34.8,
+      "score_7d_ago": 12.0,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 7,
+      "source_type_count": 3,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 6,
+        "paper": 6,
+        "medium_aggregator": 6
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "paper": 5,
+        "medium_aggregator": 3
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-05.md",
+        "blogs/2026/05/2026-05-07.md",
+        "blogs/2026/05/2026-05-09.md",
+        "blogs/2026/05/2026-05-10.md",
+        "blogs/2026/05/2026-05-11.md",
+        "blogs/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-09.md"
+      ],
+      "supporting_links": [],
+      "sector": "Methods & research",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "disaggregated-serving",
+      "label": "Disaggregated serving (prefill/decode split, Cloudflare Infire/Unweight)",
+      "stage": "emerging",
+      "score": 13.0,
+      "score_fast": 13.0,
+      "score_slow": 13.0,
+      "raw_score_today": 13.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 1,
+      "source_type_count": 2,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 5,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-06.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-10.md"
+      ],
+      "supporting_links": [],
+      "sector": "Methods & research",
+      "breadth_7d": 5,
+      "breadth_30d": 5,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "co-packaged-optics",
+      "label": "Co-packaged optics (CPO) / Vera+Rubin / inference hardware",
+      "stage": "emerging",
+      "score": 12.0,
+      "score_fast": 12.0,
+      "score_slow": 12.0,
+      "raw_score_today": 12.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 1,
+      "source_type_count": 2,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 3,
+        "long_form_blog": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 3,
+        "long_form_blog": 2
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-05.md",
+        "blogs/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-12.md"
+      ],
+      "supporting_links": [],
+      "sector": "Methods & research",
+      "breadth_7d": 3,
+      "breadth_30d": 3,
+      "breadth_orgs_7d": [],
+      "high_breadth": false,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "real-world-agentic-evals",
+      "label": "Real-world agentic evals (production websites, eval gap)",
+      "stage": "emerging",
+      "score": 11.0,
+      "score_fast": 11.0,
+      "score_slow": 11.0,
+      "raw_score_today": 11.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 1,
+      "source_type_count": 2,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 1,
+        "paper": 3
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 1,
+        "paper": 3
+      },
+      "supporting_files": [
+        "news/2026/05/2026-05-05.md",
+        "papers/2026/05/2026-05-12.md"
+      ],
+      "supporting_links": [],
+      "sector": "Methods & research",
+      "breadth_7d": 2,
+      "breadth_30d": 2,
+      "breadth_orgs_7d": [],
+      "high_breadth": false,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-llama-qwen-kimi",
+      "label": "Open-weight frontier (Llama 4.x / Qwen 3.x / Kimi K2.x)",
+      "stage": "emerging",
+      "score": 17.22,
+      "score_fast": 24.35,
+      "score_slow": 17.22,
+      "raw_score_today": 28.5,
+      "score_fast_yesterday": 22.57,
+      "score_slow_yesterday": 16.63,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 6,
+      "source_type_count": 3,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 11,
+        "paper": 2,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "paper": 2,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md",
+        "news/2026/05/2026-05-12.md",
+        "papers/2026/05/2026-05-06.md",
+        "papers/2026/05/2026-05-11.md"
+      ],
+      "supporting_links": [],
+      "sector": "Models & capabilities",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-openai",
+      "label": "OpenAI frontier models (GPT-5.x / Realtime / Voice)",
+      "stage": "emerging",
+      "score": 13.85,
+      "score_fast": 18.1,
+      "score_slow": 13.85,
+      "raw_score_today": 30.0,
+      "score_fast_yesterday": 13.0,
+      "score_slow_yesterday": 13.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 2,
+      "source_type_count": 4,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 11,
+        "long_form_blog": 1,
+        "medium_aggregator": 1,
+        "linkedin_network_post": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "long_form_blog": 1,
+        "medium_aggregator": 1,
+        "linkedin_network_post": 2
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-12.md",
+        "linkedin/2026/05/2026-05-11.md",
+        "linkedin/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md",
+        "news/2026/05/2026-05-11.md"
+      ],
+      "supporting_links": [],
+      "sector": "Models & capabilities",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-deepseek",
+      "label": "DeepSeek (V4 / R-series / state-backed financing)",
+      "stage": "emerging",
+      "score": 12.56,
+      "score_fast": 19.16,
+      "score_slow": 12.56,
+      "raw_score_today": 27.0,
+      "score_fast_yesterday": 15.8,
+      "score_slow_yesterday": 11.8,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 4,
+      "source_type_count": 4,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 15,
+        "paper": 1,
+        "medium_aggregator": 2,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "paper": 1,
+        "medium_aggregator": 2,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-05.md",
+        "blogs/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md",
+        "news/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-12.md"
+      ],
+      "supporting_links": [],
+      "sector": "Models & capabilities",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-google",
+      "label": "Google Gemini (2.x / DeepMind / Android OS-layer)",
+      "stage": "emerging",
+      "score": 12.02,
+      "score_fast": 12.15,
+      "score_slow": 12.02,
+      "raw_score_today": 12.5,
+      "score_fast_yesterday": 12.0,
+      "score_slow_yesterday": 12.0,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 2,
+      "source_type_count": 2,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 23,
+        "job_posting_skill_mention": 5
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "job_posting_skill_mention": 5
+      },
+      "supporting_files": [
+        "jobs/2026/05/2026-05-11.md",
+        "jobs/2026/05/2026-05-12.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-06.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md",
+        "news/2026/05/2026-05-11.md"
+      ],
+      "supporting_links": [],
+      "sector": "Models & capabilities",
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-anthropic",
+      "label": "Anthropic frontier models (Opus 4.7 / Claude family)",
+      "stage": "emerging",
+      "score": 11.72,
+      "score_fast": 15.08,
+      "score_slow": 11.72,
+      "raw_score_today": 22.5,
+      "score_fast_yesterday": 11.9,
+      "score_slow_yesterday": 11.15,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 3,
+      "source_type_count": 3,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 4,
+        "medium_aggregator": 1,
+        "linkedin_network_post": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 4,
+        "medium_aggregator": 1,
+        "linkedin_network_post": 2
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-12.md",
+        "linkedin/2026/05/2026-05-09.md",
+        "linkedin/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-05.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md"
+      ],
+      "supporting_links": [],
+      "sector": "Models & capabilities",
+      "breadth_7d": 7,
+      "breadth_30d": 7,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-mistral",
+      "label": "Mistral (Medium 3.x / Large 3 MoE / Workflows / Vibe)",
+      "stage": "emerging",
+      "score": 11.0,
+      "score_fast": 11.0,
+      "score_slow": 11.0,
+      "raw_score_today": 11.0,
+      "score_fast_yesterday": 11.0,
+      "score_slow_yesterday": 11.0,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-07",
+      "sustained_days": 2,
+      "source_type_count": 2,
+      "source_mentions": {
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 9,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 5,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-07.md",
+        "news/2026/05/2026-05-09.md",
+        "news/2026/05/2026-05-10.md",
+        "news/2026/05/2026-05-11.md",
+        "news/2026/05/2026-05-12.md"
+      ],
+      "supporting_links": [],
+      "sector": "Models & capabilities",
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [],
+      "high_breadth": true,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-12",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
       ]
     }
   ],
   "stage_movements": [
     {
-      "topic": "coordination-multi-agent",
-      "label": "Multi-agent coordination, observability, constraint drift, persona drift, bystander effect, dreaming",
-      "from": "emerging",
-      "to": "consolidating",
-      "first_observed_today": false
-    },
-    {
-      "topic": "agentic-ides",
-      "label": "Agentic IDEs / coding workflow (Claude Agent View, Build Agent everywhere, Shopify River, Vibe remote agents, Addy Osmani workflow, GitLab layoffs)",
+      "topic": "vendor-governance-business-line",
       "from": null,
       "to": "emerging",
       "first_observed_today": true
     },
     {
-      "topic": "vertical-agents-legal",
-      "label": "Vertical agents \u2014 legal (Anthropic 20+ MCP connectors + 12 practice-area plugins; Harvey/CoCounsel integration)",
+      "topic": "disaggregated-serving",
       "from": null,
       "to": "emerging",
       "first_observed_today": true
     },
     {
-      "topic": "agent-evals",
-      "label": "Real-world agentic evals saturating (WildClawBench, ComplexMCP, evidence-supported bounds, role-specialized benchmark, Phone-use safety)",
+      "topic": "co-packaged-optics",
       "from": null,
       "to": "emerging",
       "first_observed_today": true
     },
     {
-      "topic": "swiss-ch-adoption",
-      "label": "Switzerland GenAI adoption + KI-Barometer 2026 (Meyrat data piece, Zeller ISO 42001, KI-Barometer heise, $2.5T AI spend)",
+      "topic": "real-world-agentic-evals",
       "from": null,
       "to": "emerging",
       "first_observed_today": true
-    },
-    {
-      "topic": "automating-ai-research",
-      "label": "Automating AI research (Jack Clark 12h horizons, AlphaEvolve, Nathan Lambert China labs)",
-      "from": "emerging",
-      "to": "background",
-      "first_observed_today": false
-    },
-    {
-      "topic": "ai-engineer-hiring",
-      "label": "Swiss AI engineer hiring (CERN ML/LLM, ETH Swiss AI Initiative, UBS RiskLab, Knowledge Lab FS, SonarSource, BLP, Anthropic Zurich)",
-      "from": "emerging",
-      "to": "background",
-      "first_observed_today": false
     }
   ],
-  "background_topics_count": 2,
+  "background_topics_count": 26,
   "config_snapshot": {
+    "_purpose": "exact tuning constants in effect this run, for reproducibility",
     "source_weights": {
+      "_comment": "Per-mention contribution. Higher = stronger signal. Tune by raising weights for sources you trust more.",
       "priority_vendor_blog": 5,
       "enterprise_vendor_blog": 4,
       "paper": 3,
@@ -812,7 +1593,13 @@
       "linkedin_hashtag_post": 1,
       "job_posting_skill_mention": 0.5
     },
+    "convergence_multiplier": {
+      "_comment": "When a topic appears in N or more DIFFERENT source types, score is multiplied. Counters monoculture (single-source loud day) and rewards cross-source agreement.",
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
     "max_mentions_per_source_type": {
+      "_comment": "Per-source cap on counted mentions per topic per run. Prevents one chatty source (LinkedIn hashtags, Medium aggregators) from dominating the score just by volume. Beyond the cap, additional mentions are recorded in source_mentions for transparency but stop adding to raw_score. Tune up/down based on what dominates the radar \u2014 added 2026-05-12 after LinkedIn accounted for 46% of a topic's score.",
       "priority_vendor_blog": 5,
       "enterprise_vendor_blog": 5,
       "paper": 5,
@@ -824,10 +1611,115 @@
       "linkedin_hashtag_post": 3,
       "job_posting_skill_mention": 5
     },
-    "convergence_multiplier": {
-      "min_source_types": 3,
-      "multiplier": 1.5
+    "stages": {
+      "emerging": {
+        "score_range": [
+          10,
+          30
+        ],
+        "max_age_days": 21,
+        "min_source_types": 2,
+        "description": "Early signal. 1-2 weak sources or one strong novel source. Worth watching."
+      },
+      "consolidating": {
+        "score_range": [
+          30,
+          70
+        ],
+        "min_sustained_days": 7,
+        "min_source_types": 3,
+        "description": "Multiple independent sources are converging on the same take. Pattern is forming."
+      },
+      "mainstream": {
+        "score_range": [
+          70,
+          999
+        ],
+        "min_sustained_days": 30,
+        "description": "Consensus. Most credible sources reference this; further coverage is incremental."
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50",
+        "description": "Was hot, now declining. Useful to know \u2014 don't bet here, expect coverage to dry up."
+      }
     },
-    "ema_alpha": 0.3
-  }
+    "ema_alpha_fast": 0.3,
+    "ema_alpha_slow": 0.05
+  },
+  "sectors": [
+    {
+      "name": "Agents & infrastructure",
+      "topic_ids": [
+        "tool-use-standards",
+        "a2a-protocol",
+        "agent-sdks",
+        "mcp-security",
+        "agentic-retrieval",
+        "vector-db-market",
+        "voice-realtime-agents",
+        "agent-platforms-enterprise",
+        "vertical-agents-finance"
+      ],
+      "first_seen": "2026-05-12",
+      "consecutive_low_days": 0,
+      "description": "Agent protocols, SDKs, retrieval, agent platforms, vertical agents \u2014 the integration layer",
+      "topic_count": 9,
+      "active_orgs": null,
+      "_backfilled": true
+    },
+    {
+      "name": "Governance & market",
+      "topic_ids": [
+        "ai-engineer-hiring",
+        "implementation-revenue",
+        "eu-ai-act",
+        "swiss-ai-context",
+        "iso-42001",
+        "frontier-lab-jvs",
+        "ai-safety-institute",
+        "vendor-governance-business-line"
+      ],
+      "first_seen": "2026-05-12",
+      "consecutive_low_days": 0,
+      "description": "Regulation, compliance frameworks, vendor M&A, joint ventures, hiring signals, geographic markets",
+      "topic_count": 8,
+      "active_orgs": null,
+      "_backfilled": true
+    },
+    {
+      "name": "Methods & research",
+      "topic_ids": [
+        "long-context-vs-rag",
+        "disaggregated-serving",
+        "co-packaged-optics",
+        "real-world-agentic-evals"
+      ],
+      "first_seen": "2026-05-12",
+      "consecutive_low_days": 0,
+      "description": "Evals, infrastructure research, technique comparisons, papers driving the next wave",
+      "topic_count": 4,
+      "active_orgs": null,
+      "_backfilled": true
+    },
+    {
+      "name": "Models & capabilities",
+      "topic_ids": [
+        "frontier-models-llama-qwen-kimi",
+        "frontier-models-openai",
+        "frontier-models-deepseek",
+        "frontier-models-google",
+        "frontier-models-anthropic",
+        "frontier-models-mistral"
+      ],
+      "first_seen": "2026-05-12",
+      "consecutive_low_days": 0,
+      "description": "Frontier model releases, capability claims, open-weight competitive moves",
+      "topic_count": 6,
+      "active_orgs": null,
+      "_backfilled": true
+    }
+  ],
+  "sector_movements": [],
+  "sectors_dissolved_today": [],
+  "sectors_spawned_today": []
 }

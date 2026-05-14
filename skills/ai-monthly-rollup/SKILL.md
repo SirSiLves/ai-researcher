@@ -18,7 +18,7 @@ Each layer reads only the layer immediately below.
 
 ## 1. Setup
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
-- Compute today's date: `date +%Y-%m-%d`. You're invoked on the first Monday of a month, so today's day-of-month is in 1–7.
+- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
 - Compute the previous month: today minus ~30 days, formatted `YYYY-MM`. Example: invoked 2026-06-01 → previous month is `2026-05`.
 - Output: `monthly/{YYYY}/{YYYY-MM}.md`. If exists, append `-v2`, `-v3`, etc. (never overwrite).
 

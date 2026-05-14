@@ -292,7 +292,10 @@
     "_comment": "Trend radar — fired daily by orchestrator after daily synthesis. Scores topics by source-weighted convergence over a rolling window; smooths via EMA to avoid daily jumps. Outputs radar/{date}.md (human-read) + radar/{date}.json (structured data for future web app). Tune the constants here; the SKILL reads them at runtime.",
 
     "rolling_window_days": 30,
-    "ema_alpha": 0.3,
+    "ema_alpha_fast": 0.3,
+    "ema_alpha_slow": 0.05,
+    "_ema_comment": "Two EMAs run in parallel. Fast (α=0.3, ~2.3-day half-life) reacts to news of the day. Slow (α=0.05, ~14-day half-life) tracks structural shifts. Stage classification uses score_slow so loud single events don't bounce topics between stages — fast vs. slow comparison tells you direction. score_fast > score_slow → rising; score_fast < score_slow → fading. Tune 'ema_alpha_slow' lower (e.g., 0.02 → ~35-day half-life) if the radar still feels too event-driven; tune higher (e.g., 0.1 → ~7-day) if it feels too slow to react.",
+    "_legacy_ema_alpha": 0.3,
 
     "source_weights": {
       "_comment": "Per-mention contribution. Higher = stronger signal. Tune by raising weights for sources you trust more.",
@@ -354,7 +357,7 @@
     },
 
     "topic_taxonomy_seed": {
-      "_comment": "Seed list of known topics so the radar has stable IDs across days. Agent may add new topics it discovers, but should reuse these IDs when applicable to keep timelines coherent.",
+      "_comment": "Seed list of known topics so the radar has stable IDs across days. The group keys (frontier_models, agent_protocols, etc.) are CATEGORY HINTS — they bias initial clustering but are NOT authoritative. Each run's sectors are determined dynamically by the radar skill from the topics that are actually active that week. The field evolves: RAG was a sector once; today its topics scatter across Agents and Retrieval. Agent may add new topic IDs as new themes appear.",
       "frontier_models": ["GPT-5.x", "Claude Opus 4.x", "Claude Sonnet 4.x", "Gemini 2.x", "Llama 4.x", "Mistral Medium 3.x", "DeepSeek V4", "Kimi K2.x", "Qwen 3.x"],
       "agent_protocols": ["mcp-adoption", "a2a-protocol", "agent-sdks", "tool-use-standards", "opentelemetry-for-ai"],
       "retrieval": ["agentic-retrieval", "vector-db-market", "long-context-vs-rag", "rag-eval", "knowledge-graphs"],
@@ -365,6 +368,36 @@
       "coding": ["agentic-ides", "autonomous-pr-agents", "compound-engineering", "ai-research-agents"],
       "open_weight": ["open-vs-closed", "open-coding-parity", "open-weight-wave"],
       "labor_market": ["ai-engineer-hiring", "rag-engineer-postings", "agent-engineer-postings", "prompt-engineer-decline", "ai-governance-roles", "ml-platform-engineer"]
+    },
+
+    "sector_config": {
+      "_comment": "Dynamic sectors (radar quadrants) — recomputed every run based on what's actually active. Sectors carry over from yesterday's radar unless hysteresis rules trigger a change. This is what makes it a TREND radar (sectors evolve) rather than a fixed taxonomy. User-stated reason 2026-05-14: 'if I had this earlier, we had only Models / RAG, and now from RAG we went to Agents, that's why I say it needs to be flexible.'",
+      "min_sectors": 3,
+      "max_sectors": 6,
+      "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3,
+      "sector_dissolve_after_days_below_min": 5,
+      "_clustering_method": "LLM clusters topics into themes by reading topic labels + supporting context. Prior run's sectors are passed in as starting point — clusterer keeps them when membership is stable, splits/merges/renames only when warranted. The topic_taxonomy_seed group keys above are initial hints, NOT enforced labels.",
+      "_starter_sectors": [
+        "Models & capabilities",
+        "Agents & infrastructure",
+        "Governance & market",
+        "Methods & research"
+      ],
+      "_starter_sectors_comment": "Used only on the very first radar run when no prior sectors exist. After that, the clusterer evolves them. If sectors get stuck for too long, manually clearing prior_sectors in the most recent radar JSON forces a fresh cluster."
+    },
+
+    "breadth_config": {
+      "_comment": "Cross-source breadth — orthogonal to the EMA-based persistence score. Answers 'how many distinct organizations are talking about this right now?' as a primary, visible dimension. User-stated reason 2026-05-14: 'if many companies are talking or writing about the same topic, this means high-weighted related, should be seen easier.'",
+      "window_short_days": 7,
+      "window_long_days": 30,
+      "max_mentions_per_org_per_day": 2,
+      "_org_definition": "An 'org' is the primary publisher or subject of the mention — Anthropic, OpenAI, ServiceNow, Heise, Handelsblatt, an individual author of a long-form blog post. The radar skill extracts orgs from each mention's context. For backfill where org data isn't separately stored, breadth is approximated by distinct (source_type, file_date) pairs in the window.",
+      "thresholds": {
+        "_comment": "How the viewer interprets breadth into visual cues.",
+        "high_breadth_7d": 5,
+        "very_high_breadth_7d": 8
+      }
     },
 
     "output_format": {

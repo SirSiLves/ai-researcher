@@ -12,7 +12,7 @@ You are the **LinkedIn collector** in the AI Researcher pipeline. Your job is to
 ## 1. Setup
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `linkedin_collector` section. Note `pulse_topic_queries`, `min_substance_chars`, `languages_allowed`, `url_capture_rule`.
-- Compute today's date: `date +%Y-%m-%d` (local TZ).
+- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
 - Output: `linkedin/{YYYY}/{MM}/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
 
 ## 2. Probe Chrome

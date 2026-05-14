@@ -4,6 +4,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Daily reports
 <!-- INDEX_START -->
+- [2026-05-13](daily/2026/05/2026-05-13.md) — Google Android Show / Gemini Intelligence + Googlebook; DeepSeek $45B Big Fund round; ServiceNow Otto + Project Arc; Mistral 3 family; OpenAI Voice Intelligence; MCP security thread hardens
 - [2026-05-12](daily/2026/05/2026-05-12.md) — SAP Sapphire Autonomous Enterprise + n8n $5.2B stake; Anthropic legal MCP push; ServiceNow MCP GA; Salesforce Tableau MCP; EU AI Act Omnibus agreed
 - [2026-05-11](daily/2026/05/2026-05-11.md) — OpenAI Deployment Co + Tomoro $4B JV; AWS MCP GA; Pinecone Nexus/KnowQL; CAISI signs DeepMind/Microsoft/xAI
 - [2026-05-10](daily/2026/05/2026-05-10.md) — Anthropic M365 add-ins; Gemini File Search multimodal RAG; Apple iOS 27 opens; A2A at 150 orgs
@@ -17,8 +18,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Weekly rollups
 <!-- WEEKLY_START -->
-- [2026-W19-v2](weekly/2026/2026-W19-v2.md) — Mon 2026-05-04 → Sun 2026-05-10, 7 dailies: frontier-lab pile-up, MCP/A2A consolidate + first security reckoning, EU AI Act lands
-- [2026-W19](weekly/2026/2026-W19.md) — Mon 2026-05-04 → Sun 2026-05-10, 3 dailies: capital rewrite, geopolitical divergence, agentic+MCP hardened, RAG→agentic retrieval
+- [2026-W19](weekly/2026/2026-W19.md) — Mon 2026-05-04 → Sun 2026-05-10, 7 dailies: frontier-lab pile-up, MCP/A2A consolidate + first security reckoning, EU AI Act lands
 <!-- ai-weekly-digest auto-prepends new weekly entries above this line. -->
 <!-- WEEKLY_END -->
 
@@ -29,13 +29,14 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Trend radar
 <!-- RADAR_START -->
-- [2026-05-12](radar/2026/05/2026-05-12.md) — 16 topics, 7 stage movements, top consolidating: Enterprise agent platforms (SAP Sapphire + ServiceNow + Salesforce + IBM all in one week)
-- [2026-05-11](radar/2026/05/2026-05-11.md) — 14 topics, 4 stage movements, top consolidating: Enterprise agent platforms (OpenAI Deployment Co, Anthropic Cowork, Pinecone Nexus)
-- [2026-05-10](radar/2026/05/2026-05-10.md) — 13 topics, 2 stage movements, top emerging: Enterprise agent platforms (Anthropic Cowork+M365 add-ins)
-- [2026-05-09](radar/2026/05/2026-05-09.md) — 11 topics, 2 stage movements, top emerging: Enterprise agent platforms (Anthropic Dreaming, Claude Code, ServiceNow)
-- [2026-05-07](radar/2026/05/2026-05-07.md) — 10 topics, 2 stage movements, top emerging: Enterprise agent platforms (Microsoft Agent 365, OpenAI Responses, Anthropic Managed Agents)
-- [2026-05-06](radar/2026/05/2026-05-06.md) — 8 topics, 6 stage movements, top emerging: Enterprise agent platforms (Microsoft Agent 365, OpenAI Responses, AWS Strands)
-- [2026-05-05](radar/2026/05/2026-05-05.md) — 2 topics, 2 stage movements, top emerging: Open-weight frontier wave (DeepSeek V4, Kimi K2.6, Qwen 3.5, Gemma 4, Llama 4)
+- [2026-05-13](radar/2026/05/2026-05-13.md) — 32 topics, 5 stage movements, top emerging: AI engineer hiring (Switzerland + global)
+- [2026-05-12](radar/2026/05/2026-05-12.md) — 27 topics, 4 stage movements, top emerging: AI engineer hiring (Switzerland + global)
+- [2026-05-11](radar/2026/05/2026-05-11.md) — 23 topics, 3 stage movements, top emerging: AI engineer hiring (Switzerland + global)
+- [2026-05-10](radar/2026/05/2026-05-10.md) — 20 topics, 6 stage movements, top emerging: AI engineer hiring (Switzerland + global)
+- [2026-05-09](radar/2026/05/2026-05-09.md) — 14 topics, 8 stage movements, top emerging: AI engineer hiring (Switzerland + global)
+- [2026-05-07](radar/2026/05/2026-05-07.md) — 6 topics, 0 stage movements, top emerging: AI engineer hiring (Switzerland + global)
+- [2026-05-06](radar/2026/05/2026-05-06.md) — 6 topics, 4 stage movements, top emerging: AI engineer hiring (Switzerland + global)
+- [2026-05-05](radar/2026/05/2026-05-05.md) — 2 topics, 2 stage movements, top emerging: AI engineer hiring (Switzerland + global)
 <!-- ai-trend-radar auto-prepends new daily entries above this line. -->
 <!-- RADAR_END -->
 

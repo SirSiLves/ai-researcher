@@ -1,119 +1,224 @@
 {
   "date": "2026-05-05",
   "rolling_window_days": 30,
-  "ema_alpha": 0.3,
+  "ema_alpha_fast": 0.3,
+  "ema_alpha_slow": 0.05,
   "prior_radar": null,
-  "first_run_flag": true,
-  "notes": "Single-day rolling window — pipeline warming up; no EMA baseline. Capped-score math (max_mentions_per_source_type) applied throughout.",
   "topics": [
     {
-      "id": "open-weight-wave",
-      "label": "Open-weight frontier wave (DeepSeek V4, Kimi K2.6, Qwen 3.5, Gemma 4, Llama 4)",
+      "id": "ai-engineer-hiring",
+      "label": "AI engineer hiring (Switzerland + global)",
       "stage": "emerging",
-      "score": 22.5,
-      "raw_score_today": 22.5,
-      "score_yesterday": null,
-      "convergence_multiplier_applied": 1.5,
+      "score": 17.5,
+      "score_fast": 17.5,
+      "score_slow": 17.5,
+      "raw_score_today": 17.5,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
       "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
       "first_seen": "2026-05-05",
       "sustained_days": 1,
-      "source_type_count": 3,
+      "source_type_count": 2,
       "source_mentions": {
-        "_note": "Uncapped raw counts — for transparency.",
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 0,
-        "paper": 0,
-        "long_form_blog": 2,
-        "linkedin_network_post": 0,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 2,
-        "governance_source": 0,
-        "medium_aggregator": 2,
-        "job_posting_skill_mention": 0
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "job_posting_skill_mention": 11,
+        "linkedin_network_post": 6
       },
       "source_mentions_capped": {
-        "_note": "min(count, cap_for_type) applied.",
-        "long_form_blog": 2,
-        "tech_news": 2,
-        "medium_aggregator": 2
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "job_posting_skill_mention": 5,
+        "linkedin_network_post": 5
       },
       "supporting_files": [
-        "news/2026/05/2026-05-05.md",
-        "blogs/2026/05/2026-05-05.md",
-        "daily/2026/05/2026-05-05.md"
+        "jobs/2026/05/2026-05-05.md",
+        "linkedin/2026/05/2026-05-05.md"
       ],
-      "supporting_links": [
-        "https://codersera.com/blog/best-open-source-llm-2026-llama-4-qwen-3-5-deepseek-v4-gemma-4-mistral/",
-        "https://www.interconnects.ai/p/my-bets-on-open-models-mid-2026",
-        "https://www.interconnects.ai/p/gemma-4-and-what-makes-an-open-model"
+      "supporting_links": [],
+      "sector": "Governance & market",
+      "breadth_7d": 2,
+      "breadth_30d": 2,
+      "breadth_orgs_7d": [],
+      "high_breadth": false,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-05",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
       ]
     },
     {
-      "id": "automating-ai-research",
-      "label": "Automating AI research (lab-internal coding agents doing AI R&D)",
+      "id": "long-context-vs-rag",
+      "label": "Long-context vs RAG trade-offs",
       "stage": "emerging",
-      "score": 13.5,
-      "raw_score_today": 13.5,
-      "score_yesterday": null,
+      "score": 12.0,
+      "score_fast": 12.0,
+      "score_slow": 12.0,
+      "raw_score_today": 12.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "steady",
       "convergence_multiplier_applied": 1.5,
       "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
       "first_seen": "2026-05-05",
       "sustained_days": 1,
       "source_type_count": 3,
       "source_mentions": {
-        "priority_vendor_blog": 0,
-        "enterprise_vendor_blog": 0,
+        "_note": "Uncapped raw counts - for transparency. Capped values are used for scoring.",
+        "tech_news": 2,
         "paper": 1,
-        "long_form_blog": 1,
-        "linkedin_network_post": 0,
-        "linkedin_hashtag_post": 0,
-        "tech_news": 1,
-        "governance_source": 0,
-        "medium_aggregator": 0,
-        "job_posting_skill_mention": 0
+        "medium_aggregator": 1
       },
       "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 2,
         "paper": 1,
-        "long_form_blog": 1,
-        "tech_news": 1
+        "medium_aggregator": 1
       },
       "supporting_files": [
         "blogs/2026/05/2026-05-05.md",
-        "papers/2026/05/2026-05-05.md",
-        "daily/2026/05/2026-05-05.md"
+        "news/2026/05/2026-05-05.md",
+        "papers/2026/05/2026-05-05.md"
       ],
-      "supporting_links": [
-        "https://jack-clark.net/2026/05/04/import-ai-455-automating-ai-research/",
-        "https://arxiv.org/html/2603.08640v2"
+      "supporting_links": [],
+      "sector": "Methods & research",
+      "breadth_7d": 3,
+      "breadth_30d": 3,
+      "breadth_orgs_7d": [],
+      "high_breadth": false,
+      "_breadth_method": "approx_from_supporting_files",
+      "sector_history": [
+        {
+          "date": "2026-05-05",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "backfill seed"
+        }
       ]
     }
   ],
   "stage_movements": [
-    {"topic": "open-weight-wave", "from": null, "to": "emerging", "first_observed_today": true},
-    {"topic": "automating-ai-research", "from": null, "to": "emerging", "first_observed_today": true}
+    {
+      "topic": "long-context-vs-rag",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    },
+    {
+      "topic": "ai-engineer-hiring",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    }
   ],
-  "background_topics_count": 14,
-  "background_topics_sample": [
-    "frontier-lab-jvs", "agentic-retrieval", "real-world-agentic-evals", "mcp-adoption",
-    "compound-engineering", "prompt-engineer-decline", "disaggregated-serving", "world-models",
-    "vertical-agents-finance", "ai-engineer-hiring", "vendor-governance-business-line",
-    "agentic-ides", "agent-platforms-enterprise", "long-context-vs-rag"
-  ],
+  "background_topics_count": 23,
   "config_snapshot": {
-    "_purpose": "exact tuning constants in effect this run (cap-aware backfill)",
+    "_purpose": "exact tuning constants in effect this run, for reproducibility",
     "source_weights": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 4, "paper": 3,
-      "long_form_blog": 3, "linkedin_network_post": 3, "tech_news": 2,
-      "governance_source": 2, "medium_aggregator": 1, "linkedin_hashtag_post": 1,
+      "_comment": "Per-mention contribution. Higher = stronger signal. Tune by raising weights for sources you trust more.",
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
       "job_posting_skill_mention": 0.5
     },
+    "convergence_multiplier": {
+      "_comment": "When a topic appears in N or more DIFFERENT source types, score is multiplied. Counters monoculture (single-source loud day) and rewards cross-source agreement.",
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
     "max_mentions_per_source_type": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5,
-      "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5,
-      "governance_source": 5, "medium_aggregator": 3, "linkedin_hashtag_post": 3,
+      "_comment": "Per-source cap on counted mentions per topic per run. Prevents one chatty source (LinkedIn hashtags, Medium aggregators) from dominating the score just by volume. Beyond the cap, additional mentions are recorded in source_mentions for transparency but stop adding to raw_score. Tune up/down based on what dominates the radar \u2014 added 2026-05-12 after LinkedIn accounted for 46% of a topic's score.",
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
       "job_posting_skill_mention": 5
     },
-    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
-    "ema_alpha": 0.3
-  }
+    "stages": {
+      "emerging": {
+        "score_range": [
+          10,
+          30
+        ],
+        "max_age_days": 21,
+        "min_source_types": 2,
+        "description": "Early signal. 1-2 weak sources or one strong novel source. Worth watching."
+      },
+      "consolidating": {
+        "score_range": [
+          30,
+          70
+        ],
+        "min_sustained_days": 7,
+        "min_source_types": 3,
+        "description": "Multiple independent sources are converging on the same take. Pattern is forming."
+      },
+      "mainstream": {
+        "score_range": [
+          70,
+          999
+        ],
+        "min_sustained_days": 30,
+        "description": "Consensus. Most credible sources reference this; further coverage is incremental."
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50",
+        "description": "Was hot, now declining. Useful to know \u2014 don't bet here, expect coverage to dry up."
+      }
+    },
+    "ema_alpha_fast": 0.3,
+    "ema_alpha_slow": 0.05
+  },
+  "sectors": [
+    {
+      "name": "Governance & market",
+      "topic_ids": [
+        "ai-engineer-hiring"
+      ],
+      "first_seen": "2026-05-05",
+      "consecutive_low_days": 0,
+      "description": "Regulation, compliance frameworks, vendor M&A, joint ventures, hiring signals, geographic markets",
+      "topic_count": 1,
+      "active_orgs": null,
+      "_backfilled": true
+    },
+    {
+      "name": "Methods & research",
+      "topic_ids": [
+        "long-context-vs-rag"
+      ],
+      "first_seen": "2026-05-05",
+      "consecutive_low_days": 0,
+      "description": "Evals, infrastructure research, technique comparisons, papers driving the next wave",
+      "topic_count": 1,
+      "active_orgs": null,
+      "_backfilled": true
+    }
+  ],
+  "sector_movements": [],
+  "sectors_dissolved_today": [],
+  "sectors_spawned_today": []
 }
