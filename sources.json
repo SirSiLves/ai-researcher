@@ -9,87 +9,311 @@
     "Agent interoperability protocols and standards — MCP (Model Context Protocol), A2A (Agent-to-Agent), tool-use / function-calling standards, OpenTelemetry for AI, agent runtime standards",
     "AI governance, policy, safety, regulation (EU AI Act, NIST AI RMF, ISO 42001, AI Safety Institutes)"
   ],
-
   "news_collector": {
     "_priority_vendors_comment": "Frontier labs whose announcements must NEVER be missed. The news skill treats these as mandatory coverage: every URL fetched, fallback_search invoked if the index page is egress-blocked, vendor permalink preferred over aggregator coverage in synthesis. Edit freely — this is just a list, no other config depends on the keys.",
     "priority_vendors": {
       "openai": {
-        "blog_urls": ["https://openai.com/blog", "https://openai.com/index"],
-        "research_urls": ["https://openai.com/research"],
+        "blog_urls": [
+          "https://openai.com/blog",
+          "https://openai.com/index"
+        ],
+        "research_urls": [
+          "https://openai.com/research"
+        ],
         "fallback_search": "site:openai.com 2026 announcement OR release OR launch"
       },
       "anthropic": {
         "_comment": "Anthropic publishes across TWO domains: anthropic.com/news (corporate/policy/partnerships) and claude.com/blog (product announcements — Claude apps, Claude Code, MCP server features). Both must be watched. Gap noticed 2026-05-12 when Claude Code agent-view announcement was cited via root index instead of canonical claude.com/blog/agent-view-in-claude-code URL.",
-        "blog_urls": ["https://www.anthropic.com/news", "https://claude.com/blog"],
-        "research_urls": ["https://www.anthropic.com/research", "https://www.anthropic.com/engineering"],
+        "blog_urls": [
+          "https://www.anthropic.com/news",
+          "https://claude.com/blog"
+        ],
+        "research_urls": [
+          "https://www.anthropic.com/research",
+          "https://www.anthropic.com/engineering"
+        ],
         "fallback_search": "(site:anthropic.com OR site:claude.com) 2026 (announcement OR release OR launch OR enterprise OR agents OR Claude-Code)"
       },
       "google_deepmind": {
-        "blog_urls": ["https://blog.google/technology/ai/", "https://deepmind.google/blog/"],
-        "research_urls": ["https://research.google/blog/"],
+        "blog_urls": [
+          "https://blog.google/technology/ai/",
+          "https://deepmind.google/blog/"
+        ],
+        "research_urls": [
+          "https://research.google/blog/"
+        ],
         "fallback_search": "(site:deepmind.google OR site:blog.google) Gemini 2026 announcement"
       },
       "meta": {
-        "blog_urls": ["https://ai.meta.com/blog/"],
-        "research_urls": ["https://ai.meta.com/research/publications/"],
+        "blog_urls": [
+          "https://ai.meta.com/blog/"
+        ],
+        "research_urls": [
+          "https://ai.meta.com/research/publications/"
+        ],
         "fallback_search": "site:ai.meta.com 2026 (Llama OR announcement OR release)"
       },
       "mistral": {
-        "blog_urls": ["https://mistral.ai/news"],
+        "blog_urls": [
+          "https://mistral.ai/news"
+        ],
         "research_urls": [],
         "fallback_search": "site:mistral.ai 2026 (announcement OR release OR launch)"
       },
       "deepseek": {
-        "blog_urls": ["https://api-docs.deepseek.com/news"],
-        "research_urls": ["https://huggingface.co/deepseek-ai"],
+        "blog_urls": [
+          "https://api-docs.deepseek.com/news"
+        ],
+        "research_urls": [
+          "https://huggingface.co/deepseek-ai"
+        ],
         "fallback_search": "DeepSeek 2026 (V4 OR R2 OR release OR announcement) site:huggingface.co OR site:x.com"
       }
     },
-
     "_enterprise_vendors_comment": "Enterprise AI platforms — the layer ABOVE frontier-lab announcements. These are the vendors who package frontier models for the enterprise market (SAP, Salesforce, ServiceNow), the ones who own enterprise infra (Red Hat, IBM, NVIDIA, Snowflake, Databricks), and the workflow/automation layer that's becoming AI-native (n8n, Workday). Same coverage discipline as priority_vendors: every URL fetched, fallback_search invoked if egress-blocked, vendor permalink preferred over aggregator. Without this section the digest skewed toward frontier-lab MCP/A2A chatter and missed major business news (n8n becoming Germany's most valuable AI co via SAP deal, Red Hat AI 3.4 release, etc.).",
     "enterprise_vendors": {
       "redhat_ibm": {
-        "blog_urls": ["https://www.redhat.com/en/blog", "https://research.ibm.com/blog", "https://www.ibm.com/think/topics/artificial-intelligence"],
+        "blog_urls": [
+          "https://www.redhat.com/en/blog",
+          "https://research.ibm.com/blog",
+          "https://www.ibm.com/think/topics/artificial-intelligence"
+        ],
         "research_urls": [],
         "fallback_search": "(site:redhat.com OR site:ibm.com) 2026 (AI OR agent OR OpenShift OR Granite OR Watsonx)"
       },
       "sap": {
-        "blog_urls": ["https://news.sap.com/topics/artificial-intelligence/", "https://www.sap.com/products/artificial-intelligence/news.html"],
+        "blog_urls": [
+          "https://news.sap.com/topics/artificial-intelligence/",
+          "https://www.sap.com/products/artificial-intelligence/news.html"
+        ],
         "research_urls": [],
         "fallback_search": "site:sap.com 2026 (Joule OR generative-AI OR agent OR partnership)"
       },
       "salesforce": {
-        "blog_urls": ["https://www.salesforce.com/news/category/products/ai-features/", "https://www.salesforce.com/blog/category/artificial-intelligence/"],
+        "blog_urls": [
+          "https://www.salesforce.com/news/category/products/ai-features/",
+          "https://www.salesforce.com/blog/category/artificial-intelligence/"
+        ],
         "research_urls": [],
         "fallback_search": "site:salesforce.com 2026 (Agentforce OR Einstein OR agent OR release)"
       },
       "nvidia": {
-        "blog_urls": ["https://blogs.nvidia.com/blog/category/generative-ai/", "https://developer.nvidia.com/blog/category/generative-ai/"],
+        "blog_urls": [
+          "https://blogs.nvidia.com/blog/category/generative-ai/",
+          "https://developer.nvidia.com/blog/category/generative-ai/"
+        ],
         "research_urls": [],
         "fallback_search": "site:nvidia.com 2026 (NIM OR AI-Enterprise OR Blackwell OR Rubin OR announcement)"
       },
       "snowflake": {
-        "blog_urls": ["https://www.snowflake.com/en/blog/?_categories=ai-ml"],
+        "blog_urls": [
+          "https://www.snowflake.com/en/blog/?_categories=ai-ml"
+        ],
         "research_urls": [],
         "fallback_search": "site:snowflake.com 2026 (Cortex OR AI OR agent OR release)"
       },
       "servicenow": {
-        "blog_urls": ["https://www.servicenow.com/company/media/press-room.html", "https://www.servicenow.com/blogs/category/now-on-now/ai.html"],
+        "blog_urls": [
+          "https://www.servicenow.com/company/media/press-room.html",
+          "https://www.servicenow.com/blogs/category/now-on-now/ai.html"
+        ],
         "research_urls": [],
         "fallback_search": "site:servicenow.com 2026 (Now-Assist OR agent OR release OR partnership)"
       },
       "n8n": {
-        "blog_urls": ["https://n8n.io/blog/", "https://blog.n8n.io"],
+        "blog_urls": [
+          "https://n8n.io/blog/",
+          "https://blog.n8n.io"
+        ],
         "research_urls": [],
         "fallback_search": "n8n 2026 (funding OR SAP OR agent OR valuation OR release) site:n8n.io OR site:handelsblatt.com OR site:techcrunch.com"
       },
       "workday_oracle": {
-        "blog_urls": ["https://blog.workday.com/en-us/topics/artificial-intelligence.html", "https://blogs.oracle.com/ai-and-datascience/"],
+        "blog_urls": [
+          "https://blog.workday.com/en-us/topics/artificial-intelligence.html",
+          "https://blogs.oracle.com/ai-and-datascience/"
+        ],
         "research_urls": [],
         "fallback_search": "(site:workday.com OR site:oracle.com) 2026 (AI OR agent OR Illuminate OR generative)"
+      },
+      "accenture": {
+        "blog_urls": [
+          "https://newsroom.accenture.com"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:newsroom.accenture.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 36 mentions, 4 src types, 7 days over 28d (sustained-day gate waived for first run)"
+      },
+      "alibaba-qwen": {
+        "blog_urls": [
+          "https://qwenlm.github.io/blog/"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:qwenlm.github.io 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 29 mentions, 4 src types, 9 days over 28d (sustained-day gate waived for first run)"
+      },
+      "amazon-aws": {
+        "blog_urls": [
+          "https://aws.amazon.com/blogs/machine-learning/"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:aws.amazon.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 15 mentions, 3 src types, 10 days over 28d (sustained-day gate waived for first run)"
+      },
+      "blackstone": {
+        "blog_urls": [
+          "https://www.blackstone.com/news/"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:blackstone.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 44 mentions, 3 src types, 12 days over 28d (sustained-day gate waived for first run)"
+      },
+      "cohere": {
+        "blog_urls": [
+          "https://cohere.com/blog"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:cohere.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 11 mentions, 3 src types, 4 days over 28d (sustained-day gate waived for first run)"
+      },
+      "deloitte": {
+        "blog_urls": [
+          "https://www2.deloitte.com/global/en/insights.html"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:2.deloitte.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 14 mentions, 3 src types, 6 days over 28d (sustained-day gate waived for first run)"
+      },
+      "goldman-sachs": {
+        "blog_urls": [
+          "https://www.goldmansachs.com/insights/"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:goldmansachs.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 9 mentions, 3 src types, 6 days over 28d (sustained-day gate waived for first run)"
+      },
+      "mckinsey": {
+        "blog_urls": [
+          "https://www.mckinsey.com/featured-insights"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:mckinsey.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 10 mentions, 5 src types, 5 days over 28d (sustained-day gate waived for first run)"
+      },
+      "moonshot": {
+        "blog_urls": [
+          "https://platform.moonshot.cn"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:platform.moonshot.cn 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 34 mentions, 4 src types, 6 days over 28d (sustained-day gate waived for first run) + HOT event (valuation)",
+        "_expires_on": "2026-06-13"
+      },
+      "palantir": {
+        "blog_urls": [
+          "https://blog.palantir.com"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:blog.palantir.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 9 mentions, 3 src types, 4 days over 28d (sustained-day gate waived for first run)"
+      },
+      "tomoro": {
+        "blog_urls": [
+          "https://www.tomoro.ai"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:tomoro.ai 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 15 mentions, 3 src types, 5 days over 28d (sustained-day gate waived for first run) + HOT event (acquisition)",
+        "_expires_on": "2026-06-13"
+      },
+      "ubs": {
+        "blog_urls": [
+          "https://www.ubs.com/global/en/our-firm/innovation"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:ubs.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 44 mentions, 3 src types, 6 days over 28d (sustained-day gate waived for first run) + HOT event (funding round)",
+        "_expires_on": "2026-06-13"
+      },
+      "xai": {
+        "blog_urls": [
+          "https://x.ai/news"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:x.ai 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 87 mentions, 3 src types, 11 days over 28d (sustained-day gate waived for first run)"
+      },
+      "aleph-alpha": {
+        "blog_urls": [
+          "https://aleph-alpha.com/blog"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:aleph-alpha.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 4 mentions, 3 src types, 2 days over 28d (sustained-day gate waived for first run) + HOT event (acquires, merger)",
+        "_expires_on": "2026-06-13"
+      },
+      "cerebras": {
+        "blog_urls": [
+          "https://www.cerebras.net/blog/"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:cerebras.net 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 5 mentions, 3 src types, 2 days over 28d (sustained-day gate waived for first run) + HOT event (ipo)",
+        "_expires_on": "2026-06-13"
+      },
+      "groq": {
+        "blog_urls": [
+          "https://groq.com/news/"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:groq.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 3 mentions, 3 src types, 1 days over 28d (sustained-day gate waived for first run) + HOT event (acquisition)",
+        "_expires_on": "2026-06-13"
+      },
+      "perplexity": {
+        "blog_urls": [
+          "https://www.perplexity.ai/hub"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:perplexity.ai 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-14",
+        "_added_reason": "manual backfill: 7 mentions, 3 src types, 4 days over 28d (sustained-day gate waived for first run) + HOT event (ipo)",
+        "_expires_on": "2026-06-13"
       }
     },
-
     "vendor_blogs": [
       "https://openai.com/blog",
       "https://cookbook.openai.com",
@@ -159,16 +383,114 @@
       "enterprise AI agent deployment customer announcement"
     ]
   },
+  "github_collector": {
+    "_comment": "Daily GitHub trending + curated watch list. Earlier signal than blogs/news: dev mindshare shows up here first. Scrape github.com/trending (HTML; no auth needed) plus star-count diffs on the watch list. Output: github/{YYYY}/{MM}/{date}.md.",
+    "trending_pages": [
+      "https://github.com/trending?since=daily",
+      "https://github.com/trending/python?since=daily",
+      "https://github.com/trending/typescript?since=daily",
+      "https://github.com/trending/rust?since=daily",
+      "https://github.com/trending/go?since=daily"
+    ],
+    "ai_topic_pages": [
+      "https://github.com/topics/llm",
+      "https://github.com/topics/large-language-models",
+      "https://github.com/topics/agents",
+      "https://github.com/topics/rag",
+      "https://github.com/topics/mcp",
+      "https://github.com/topics/agentic-ai"
+    ],
+    "watched_repos": [
+      "openai/openai-cookbook",
+      "openai/openai-python",
+      "anthropics/anthropic-sdk-python",
+      "anthropics/anthropic-cookbook",
+      "anthropics/courses",
+      "modelcontextprotocol/specification",
+      "modelcontextprotocol/servers",
+      "modelcontextprotocol/python-sdk",
+      "modelcontextprotocol/typescript-sdk",
+      "langchain-ai/langchain",
+      "langchain-ai/langgraph",
+      "run-llama/llama_index",
+      "vllm-project/vllm",
+      "ggerganov/llama.cpp",
+      "hiyouga/LLaMA-Factory",
+      "huggingface/transformers",
+      "huggingface/accelerate",
+      "huggingface/peft",
+      "huggingface/smolagents",
+      "microsoft/semantic-kernel",
+      "microsoft/autogen",
+      "Significant-Gravitas/AutoGPT",
+      "joaomdmoura/CrewAI",
+      "All-Hands-AI/OpenHands",
+      "stanfordnlp/dspy",
+      "openinterpreter/open-interpreter",
+      "deepseek-ai/DeepSeek-V3",
+      "deepseek-ai/DeepSeek-R1",
+      "QwenLM/Qwen",
+      "QwenLM/Qwen2.5",
+      "MoonshotAI/Kimi-VL",
+      "01-ai/Yi",
+      "mistralai/mistral-finetune",
+      "ollama/ollama",
+      "lobehub/lobe-chat",
+      "danny-avila/LibreChat",
+      "block/goose",
+      "evilsocket/cake",
+      "elder-plinius/L1B3RT4S",
+      "Aider-AI/aider",
+      "cline/cline",
+      "continuedev/continue",
+      "BerriAI/litellm",
+      "Arize-ai/phoenix",
+      "langfuse/langfuse",
+      "comet-ml/opik",
+      "PrefectHQ/marvin"
+    ],
+    "_watched_comment": "These are repos we track star-count delta on every day. Big delta jumps (≥ +500 stars/day) are leading indicators. Curated manually; the sweep agent could add new repos when one shows up in trending for 3 consecutive days."
+  },
+
+  "hackernews_collector": {
+    "_comment": "Daily HN scan. Filter front page + 'new' for AI items by keyword match. HN comment threads on AI launches are often the highest-signal dev sentiment available — surface them. Output: hackernews/{YYYY}/{MM}/{date}.md.",
+    "endpoints": [
+      "https://news.ycombinator.com/news",
+      "https://news.ycombinator.com/newest",
+      "https://news.ycombinator.com/best"
+    ],
+    "filter_keywords": [
+      "LLM", "large language model", "GPT", "Claude", "Gemini", "Llama", "Mistral",
+      "AI agent", "agentic", "RAG", "retrieval augmented",
+      "MCP", "Model Context Protocol", "A2A",
+      "transformer", "diffusion model", "fine-tun", "embeddings",
+      "vector database", "Anthropic", "OpenAI", "DeepMind",
+      "AI safety", "AI governance", "AI Act",
+      "Cursor", "Devin", "Copilot", "AGI", "coding agent",
+      "Show HN: AI", "Show HN: LLM", "Ask HN: AI",
+      "open source LLM", "open-weight",
+      "GPU", "inference", "AI startup"
+    ],
+    "min_points_for_inclusion": 30,
+    "_min_points_comment": "Anything ≥ 30 points + matches a filter keyword is included. Ask HN/Show HN with ≥ 10 points + keyword match also included (lower bar for new launches).",
+    "scan_limit_per_endpoint": 60
+  },
 
   "papers_collector": {
-    "arxiv_categories": ["cs.CL", "cs.AI", "cs.LG", "cs.MA", "stat.ML", "cs.IR"],
+    "arxiv_categories": [
+      "cs.CL",
+      "cs.AI",
+      "cs.LG",
+      "cs.MA",
+      "stat.ML",
+      "cs.IR"
+    ],
     "additional_sources": [
       "https://huggingface.co/papers",
       "https://papers.cool/arxiv/cs.CL"
     ],
     "max_papers_per_category": 5
   },
-
   "blogs_collector": {
     "medium_tags": [
       "llm",
@@ -216,7 +538,6 @@
       "https://lastweekin.ai"
     ]
   },
-
   "jobs_ch_collector": {
     "roles": [
       "AI Engineer",
@@ -232,7 +553,13 @@
       "AI Risk",
       "AI Compliance"
     ],
-    "locations": ["Switzerland", "Zurich", "Geneva", "Basel", "Remote (Europe)"],
+    "locations": [
+      "Switzerland",
+      "Zurich",
+      "Geneva",
+      "Basel",
+      "Remote (Europe)"
+    ],
     "boards": [
       "linkedin.com/jobs",
       "wellfound.com",
@@ -246,11 +573,15 @@
       "epfl.ch"
     ]
   },
-
   "linkedin_collector": {
     "enabled_via_chrome": true,
     "min_substance_chars": 600,
-    "languages_allowed": ["en", "de", "de-CH", "fr"],
+    "languages_allowed": [
+      "en",
+      "de",
+      "de-CH",
+      "fr"
+    ],
     "comment_priority": "topic_over_author — substantive content wins regardless of poster's follower count or title",
     "pulse_topic_queries": [
       "Anthropic Claude agents enterprise",
@@ -281,22 +612,24 @@
     "url_capture_rule": "Captured link must match /pulse/, /posts/, or /feed/update/{urn}. Search-result URLs and bare /feed/ URLs are NOT acceptable — drop the item if you cannot extract a canonical post URL.",
     "note": "Auto-enabled when Chrome is reachable; silent skip otherwise. Topic-driven Pulse search is the priority layer; hashtag and home-feed scans are secondary."
   },
-
   "weekly_digest": {
-    "input_folders": ["news", "papers", "blogs", "jobs", "linkedin"],
+    "input_folders": [
+      "news",
+      "papers",
+      "blogs",
+      "jobs",
+      "linkedin"
+    ],
     "lookback_days": 7,
     "output_format": "tight summary with links into source dailies"
   },
-
   "radar_config": {
     "_comment": "Trend radar — fired daily by orchestrator after daily synthesis. Scores topics by source-weighted convergence over a rolling window; smooths via EMA to avoid daily jumps. Outputs radar/{date}.md (human-read) + radar/{date}.json (structured data for future web app). Tune the constants here; the SKILL reads them at runtime.",
-
     "rolling_window_days": 30,
     "ema_alpha_fast": 0.3,
     "ema_alpha_slow": 0.05,
     "_ema_comment": "Two EMAs run in parallel. Fast (α=0.3, ~2.3-day half-life) reacts to news of the day. Slow (α=0.05, ~14-day half-life) tracks structural shifts. Stage classification uses score_slow so loud single events don't bounce topics between stages — fast vs. slow comparison tells you direction. score_fast > score_slow → rising; score_fast < score_slow → fading. Tune 'ema_alpha_slow' lower (e.g., 0.02 → ~35-day half-life) if the radar still feels too event-driven; tune higher (e.g., 0.1 → ~7-day) if it feels too slow to react.",
     "_legacy_ema_alpha": 0.3,
-
     "source_weights": {
       "_comment": "Per-mention contribution. Higher = stronger signal. Tune by raising weights for sources you trust more.",
       "priority_vendor_blog": 5,
@@ -304,19 +637,21 @@
       "paper": 3,
       "long_form_blog": 3,
       "linkedin_network_post": 3,
+      "github_trending_signal": 3,
       "tech_news": 2,
       "governance_source": 2,
+      "hn_front_page": 2,
+      "github_watched_star_delta": 2,
       "medium_aggregator": 1,
       "linkedin_hashtag_post": 1,
+      "hn_comment_thread": 1,
       "job_posting_skill_mention": 0.5
     },
-
     "convergence_multiplier": {
       "_comment": "When a topic appears in N or more DIFFERENT source types, score is multiplied. Counters monoculture (single-source loud day) and rewards cross-source agreement.",
       "min_source_types": 3,
       "multiplier": 1.5
     },
-
     "max_mentions_per_source_type": {
       "_comment": "Per-source cap on counted mentions per topic per run. Prevents one chatty source (LinkedIn hashtags, Medium aggregators) from dominating the score just by volume. Beyond the cap, additional mentions are recorded in source_mentions for transparency but stop adding to raw_score. Tune up/down based on what dominates the radar — added 2026-05-12 after LinkedIn accounted for 46% of a topic's score.",
       "priority_vendor_blog": 5,
@@ -326,27 +661,60 @@
       "linkedin_network_post": 5,
       "tech_news": 5,
       "governance_source": 5,
+      "github_trending_signal": 5,
+      "github_watched_star_delta": 5,
+      "hn_front_page": 5,
+      "hn_comment_thread": 3,
       "medium_aggregator": 3,
       "linkedin_hashtag_post": 3,
       "job_posting_skill_mention": 5
     },
 
+    "clustering_config": {
+      "_comment": "Cross-topic clustering — surfaces topics that move together. Built every radar run: for each pair of topics, count days within last 7 where they share ≥1 supporting_file. Topics with co-mention count ≥ min_co_mentions get linked. Connected components → clusters. User-stated reason 2026-05-14: radar treats topics independently, but mcp-adoption + tool-use-standards + a2a-protocol + agent-sdks are clearly one mega-trend.",
+      "co_mention_window_days": 7,
+      "min_co_mentions": 3,
+      "min_cluster_size": 2,
+      "max_clusters": 8,
+      "cluster_name_strategy": "llm_derived",
+      "_strategy_comment": "After computing connected components, the skill names each cluster with a short 2-4 word label that captures the shared theme. Names are sticky across days (carried forward unless membership shifts > 50%)."
+    },
+
+    "velocity_config": {
+      "_comment": "Vendor + topic posting cadence acceleration. A vendor whose mention rate triples relative to its 4-week baseline is signalling something. Cheap to compute from data we already have. User-stated reason 2026-05-14: 'when a vendor's blog cadence accelerates, something's about to ship'.",
+      "window_recent_days": 7,
+      "window_baseline_days": 28,
+      "accelerating_ratio": 3.0,
+      "_accelerating_ratio_comment": "Velocity_7d / velocity_28d_avg. ≥ 3.0 triggers the 'accelerating' flag. ≥ 5.0 contributes to hot_event tier even without a funding keyword.",
+      "hot_event_velocity_threshold": 5.0,
+      "decelerating_ratio": 0.33,
+      "_decelerating_comment": "Below 0.33 (1/3rd of baseline) flags as 'cooling' — informational only, no demote consequence."
+    },
     "stages": {
       "_comment": "Each topic falls into one stage based on score AND sustained signal. Tuning these thresholds shifts how aggressively the radar promotes/demotes themes.",
       "emerging": {
-        "score_range": [10, 30],
+        "score_range": [
+          10,
+          30
+        ],
         "max_age_days": 21,
         "min_source_types": 2,
         "description": "Early signal. 1-2 weak sources or one strong novel source. Worth watching."
       },
       "consolidating": {
-        "score_range": [30, 70],
+        "score_range": [
+          30,
+          70
+        ],
         "min_sustained_days": 7,
         "min_source_types": 3,
         "description": "Multiple independent sources are converging on the same take. Pattern is forming."
       },
       "mainstream": {
-        "score_range": [70, 999],
+        "score_range": [
+          70,
+          999
+        ],
         "min_sustained_days": 30,
         "description": "Consensus. Most credible sources reference this; further coverage is incremental."
       },
@@ -355,21 +723,80 @@
         "description": "Was hot, now declining. Useful to know — don't bet here, expect coverage to dry up."
       }
     },
-
     "topic_taxonomy_seed": {
       "_comment": "Seed list of known topics so the radar has stable IDs across days. The group keys (frontier_models, agent_protocols, etc.) are CATEGORY HINTS — they bias initial clustering but are NOT authoritative. Each run's sectors are determined dynamically by the radar skill from the topics that are actually active that week. The field evolves: RAG was a sector once; today its topics scatter across Agents and Retrieval. Agent may add new topic IDs as new themes appear.",
-      "frontier_models": ["GPT-5.x", "Claude Opus 4.x", "Claude Sonnet 4.x", "Gemini 2.x", "Llama 4.x", "Mistral Medium 3.x", "DeepSeek V4", "Kimi K2.x", "Qwen 3.x"],
-      "agent_protocols": ["mcp-adoption", "a2a-protocol", "agent-sdks", "tool-use-standards", "opentelemetry-for-ai"],
-      "retrieval": ["agentic-retrieval", "vector-db-market", "long-context-vs-rag", "rag-eval", "knowledge-graphs"],
-      "enterprise_distribution": ["frontier-lab-jvs", "vertical-agents-finance", "vertical-agents-healthcare", "agent-platforms-enterprise", "implementation-revenue"],
-      "governance": ["eu-ai-act", "iso-42001", "nist-ai-rmf", "ai-safety-institute", "pentagon-anthropic", "vendor-governance-business-line"],
-      "infra": ["disaggregated-serving", "co-packaged-optics", "kv-cache-handoff", "edge-inference"],
-      "evals": ["clawbench", "swe-bench", "real-world-agentic-evals", "evaluation-gap"],
-      "coding": ["agentic-ides", "autonomous-pr-agents", "compound-engineering", "ai-research-agents"],
-      "open_weight": ["open-vs-closed", "open-coding-parity", "open-weight-wave"],
-      "labor_market": ["ai-engineer-hiring", "rag-engineer-postings", "agent-engineer-postings", "prompt-engineer-decline", "ai-governance-roles", "ml-platform-engineer"]
+      "frontier_models": [
+        "GPT-5.x",
+        "Claude Opus 4.x",
+        "Claude Sonnet 4.x",
+        "Gemini 2.x",
+        "Llama 4.x",
+        "Mistral Medium 3.x",
+        "DeepSeek V4",
+        "Kimi K2.x",
+        "Qwen 3.x"
+      ],
+      "agent_protocols": [
+        "mcp-adoption",
+        "a2a-protocol",
+        "agent-sdks",
+        "tool-use-standards",
+        "opentelemetry-for-ai"
+      ],
+      "retrieval": [
+        "agentic-retrieval",
+        "vector-db-market",
+        "long-context-vs-rag",
+        "rag-eval",
+        "knowledge-graphs"
+      ],
+      "enterprise_distribution": [
+        "frontier-lab-jvs",
+        "vertical-agents-finance",
+        "vertical-agents-healthcare",
+        "agent-platforms-enterprise",
+        "implementation-revenue"
+      ],
+      "governance": [
+        "eu-ai-act",
+        "iso-42001",
+        "nist-ai-rmf",
+        "ai-safety-institute",
+        "pentagon-anthropic",
+        "vendor-governance-business-line"
+      ],
+      "infra": [
+        "disaggregated-serving",
+        "co-packaged-optics",
+        "kv-cache-handoff",
+        "edge-inference"
+      ],
+      "evals": [
+        "clawbench",
+        "swe-bench",
+        "real-world-agentic-evals",
+        "evaluation-gap"
+      ],
+      "coding": [
+        "agentic-ides",
+        "autonomous-pr-agents",
+        "compound-engineering",
+        "ai-research-agents"
+      ],
+      "open_weight": [
+        "open-vs-closed",
+        "open-coding-parity",
+        "open-weight-wave"
+      ],
+      "labor_market": [
+        "ai-engineer-hiring",
+        "rag-engineer-postings",
+        "agent-engineer-postings",
+        "prompt-engineer-decline",
+        "ai-governance-roles",
+        "ml-platform-engineer"
+      ]
     },
-
     "sector_config": {
       "_comment": "Dynamic sectors (radar quadrants) — recomputed every run based on what's actually active. Sectors carry over from yesterday's radar unless hysteresis rules trigger a change. This is what makes it a TREND radar (sectors evolve) rather than a fixed taxonomy. User-stated reason 2026-05-14: 'if I had this earlier, we had only Models / RAG, and now from RAG we went to Agents, that's why I say it needs to be flexible.'",
       "min_sectors": 3,
@@ -386,7 +813,91 @@
       ],
       "_starter_sectors_comment": "Used only on the very first radar run when no prior sectors exist. After that, the clusterer evolves them. If sectors get stuck for too long, manually clearing prior_sectors in the most recent radar JSON forces a fresh cluster."
     },
-
+    "vendor_sweep_config": {
+      "_comment": "Daily vendor sweep — runs every day after the radar, NOT just Mondays. Mines discovered_orgs.json (rolling tally) + radar JSONs to classify every org we've seen into: covered & healthy / silent / promotion candidate / hot-event. User-stated reason 2026-05-14: 'we cover always the same enterprises'. The fixed enterprise_vendors list creates blind spots toward emerging vendors (Cohere, Glean, Sierra, Decagon, Harvey, Asia-region labs, etc.). Sweep surfaces them.",
+      "rolling_window_days": 30,
+      "promotion_thresholds": {
+        "_comment": "An org becomes a promotion candidate if it crosses ALL of these thresholds AND isn't already on a vendor list.",
+        "min_total_mentions": 8,
+        "min_source_types": 3,
+        "min_distinct_days": 4,
+        "window_days": 28
+      },
+      "watch_thresholds": {
+        "_comment": "Below promotion, but worth keeping an eye on. Reported in the watch tier.",
+        "min_total_mentions": 3,
+        "max_total_mentions": 7,
+        "window_days": 28
+      },
+      "silence_thresholds": {
+        "_comment": "If a vendor IS on a list but their blog URLs haven't yielded a topic-relevant mention in this many days, flag for review.",
+        "priority_vendor_silent_days": 45,
+        "enterprise_vendor_silent_days": 60
+      },
+      "hot_event_keywords": [
+        "Series A",
+        "Series B",
+        "Series C",
+        "Series D",
+        "Series E",
+        "funding round",
+        "raised",
+        "valuation",
+        "IPO",
+        "files to go public",
+        "acquires",
+        "acquisition",
+        "acquihire",
+        "merger",
+        "to acquire",
+        "billion",
+        "$1B",
+        "$2B",
+        "$5B",
+        "unicorn",
+        "decacorn"
+      ],
+      "hot_event_min_thresholds": {
+        "_comment": "An org triggers hot-event status when one of its mentions hits a hot keyword. Lower bar than promotion — temporary 30-day inclusion.",
+        "min_mentions": 2,
+        "min_source_types": 1
+      },
+      "seed_org_list_path": "scripts/seed_orgs.json",
+      "_seed_org_list_comment": "Bootstrap-time list of ~100 AI companies the extractor knows about. Used by the bootstrap script for keyword matching. Going forward the skill LLM-extracts org slugs from radar JSONs' breadth_orgs_*; the seed list is only the floor.",
+      "auto_apply": {
+        "_comment": "When enabled, the sweep MUTATES sources.json directly — adds promotions and hot-event inclusions, removes expired ones. The user no longer reviews recommendations. User-stated reason 2026-05-14: 'i dont want to do that by myself, you need to do that directly.' Promotions are additive (low risk). Demotions are NEVER automatic. Every auto-added entry carries _auto_added/_added_on/_added_reason flags so manual entries are never touched.",
+        "enabled": true,
+        "auto_promote": {
+          "enabled": true,
+          "target_list": "enterprise_vendors",
+          "min_consecutive_days_at_promote": 2,
+          "_comment": "Add to enterprise_vendors after the org has sat at 'promote' tier for at least N consecutive sweep runs. Prevents flash promotions from a single noisy day."
+        },
+        "auto_hot_event": {
+          "enabled": true,
+          "target_list": "enterprise_vendors",
+          "ttl_days": 30,
+          "_comment": "Funding/M&A/IPO signals trigger immediate inclusion (no consecutive-day wait — the whole point is to react fast). Marked with _expires_on = today + ttl_days. Auto-removed when expired unless promoted to sustained promote tier in the meantime."
+        },
+        "auto_demote": {
+          "enabled": false,
+          "_comment": "DISABLED. Silent vendors get flagged in the change log but stay on the list. Auto-removal is risky (blog URL might just be temporarily 503-ing). To enable: set true; the sweep will remove enterprise_vendors entries that exceed the silence threshold AND have _auto_added: true (manual entries are still preserved)."
+        },
+        "auto_expire": {
+          "enabled": true,
+          "_comment": "Remove enterprise_vendors entries whose _expires_on < TODAY AND _auto_added: true. Preserves manually-added entries even if they happen to have an expiry field."
+        },
+        "audit_log_path": "vendor_changes.log",
+        "backup_before_write": true,
+        "_recovery": "Before each mutation, sources.json is copied to sources.json.bak (overwrites previous backup). To roll back the last sweep's changes: cp sources.json.bak sources.json."
+      },
+      "output_format": {
+        "primary_view": "vendor_candidates/{YYYY}/{MM}/{date}.md — human read, sections for promote/watch/silent/hot",
+        "machine_view": "discovered_orgs.json — running tally across all runs",
+        "max_promotion_candidates_per_run": 12,
+        "max_watch_per_run": 20
+      }
+    },
     "breadth_config": {
       "_comment": "Cross-source breadth — orthogonal to the EMA-based persistence score. Answers 'how many distinct organizations are talking about this right now?' as a primary, visible dimension. User-stated reason 2026-05-14: 'if many companies are talking or writing about the same topic, this means high-weighted related, should be seen easier.'",
       "window_short_days": 7,
@@ -399,7 +910,6 @@
         "very_high_breadth_7d": 8
       }
     },
-
     "output_format": {
       "primary_view": "radar.md — human read, narrative with stage groupings",
       "machine_view": "radar.json — structured data for future visualization (Angular / HTML / Streamlit / etc.)",
