@@ -346,6 +346,45 @@
       margin-top: 8px;
     }
     code { background: var(--panel-2); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+
+    /* Topic clusters panel */
+    .cluster-card {
+      background: var(--panel-2);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .cluster-card:hover { background: #262b3a; }
+    .cluster-card.active { border-left-width: 5px; background: #262b3a; }
+    .cluster-name { font-weight: 600; font-size: 13px; }
+    .cluster-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .cluster-direction-rising { color: var(--dir-rising); }
+    .cluster-direction-fading { color: var(--dir-fading); }
+    .cluster-direction-steady { color: var(--dir-steady); }
+    .cluster-direction-surging { color: var(--dir-rising); font-weight: 700; }
+    .cluster-members {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .cluster-member-chip {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: var(--text);
+    }
+
+    /* Surging dot ring */
+    .topic-dot-surging {
+      filter: drop-shadow(0 0 8px rgba(88,201,127,0.6));
+    }
+
     .err {
       background: #2a1a1a;
       color: #ff8a8a;
@@ -386,6 +425,14 @@
           <span class="legend-item">center → out: <b style="color:var(--stage-mainstream)">Mainstream</b> · <b style="color:var(--stage-consolidating)">Consolidating</b> · <b style="color:var(--stage-emerging)">Emerging</b> · <b style="color:var(--stage-fading)">Fading</b></span>
         </div>
         <div class="sector-strip" id="sector-strip"></div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>🔗 Topic clusters — moving together</h2>
+        <div class="empty-state" style="margin-bottom:6px">
+          Topics that co-occur in the same source files this week. Click a cluster to highlight its members on the radar.
+        </div>
+        <div id="clusters"></div>
       </div>
 
       <div class="panel" style="margin-top:18px">
@@ -528,15 +575,69 @@
         state.currentEntry = state.manifest.entries.find(e => e.date_id === date_id);
         state.currentData = await loadJson(date_id);
         state.selectedTopicId = null;
+        state.activeClusterId = null;
         renderMeta();
         renderMainView();
         renderSectorStrip();
+        renderClusters();
         renderBreadthList();
         renderMovements();
         renderDetailEmpty();
       } catch (e) {
         showError(e.message);
       }
+    }
+
+    function renderClusters() {
+      const el = document.getElementById('clusters');
+      const clusters = (state.currentData.topic_clusters || []).slice()
+        .sort((a, b) => (b.cluster_score_slow || 0) - (a.cluster_score_slow || 0));
+      if (clusters.length === 0) {
+        el.innerHTML = '<div class="empty-state">No clusters yet — needs ≥3 co-mentions across topic pairs. Will populate as the pipeline accumulates more days.</div>';
+        return;
+      }
+      el.innerHTML = clusters.map(c => {
+        const dir = c.cluster_direction || 'steady';
+        const members = (c.topic_ids || []).map(tid => {
+          const t = (state.currentData.topics || []).find(x => x.id === tid);
+          return `<span class="cluster-member-chip" data-id="${escapeAttr(tid)}">${escapeHtml(t ? t.label : tid)}</span>`;
+        }).join('');
+        const orgs = c.cluster_breadth_7d != null ? `${c.cluster_breadth_7d} orgs` : '';
+        const moving = c.members_moving_together ? ' · 🔗 moving together' : '';
+        return `<div class="cluster-card" data-cluster-id="${escapeAttr(c.id)}">
+          <div class="cluster-name">${escapeHtml(c.name)} <span class="cluster-direction-${dir}">${dir === 'rising' ? '↑' : dir === 'surging' ? '↑↑' : dir === 'fading' ? '↓' : '→'}</span></div>
+          <div class="cluster-meta">${c.size} topics · score ${(c.cluster_score_slow || 0).toFixed(1)} · ${orgs}${moving}</div>
+          <div class="cluster-members">${members}</div>
+        </div>`;
+      }).join('');
+      // Wire up cluster-card clicks (highlight members on radar)
+      el.querySelectorAll('.cluster-card').forEach(node => {
+        node.addEventListener('click', () => {
+          const cid = node.dataset.clusterId;
+          state.activeClusterId = state.activeClusterId === cid ? null : cid;
+          el.querySelectorAll('.cluster-card').forEach(c => c.classList.toggle('active', c.dataset.clusterId === state.activeClusterId));
+          applyClusterHighlight();
+        });
+      });
+      // Wire up member chip clicks (select individual topic)
+      el.querySelectorAll('.cluster-member-chip').forEach(node => {
+        node.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectTopic(node.dataset.id);
+        });
+      });
+    }
+
+    function applyClusterHighlight() {
+      const cluster = (state.currentData.topic_clusters || []).find(c => c.id === state.activeClusterId);
+      const memberIds = cluster ? new Set(cluster.topic_ids) : null;
+      document.querySelectorAll('.topic-dot').forEach(el => {
+        if (!memberIds) {
+          el.classList.remove('dimmed');
+        } else {
+          el.classList.toggle('dimmed', !memberIds.has(el.dataset.id));
+        }
+      });
     }
 
     function renderMeta() {
@@ -669,14 +770,17 @@
 
             const breadth = t.breadth_7d || 0;
             const dotR = Math.max(4, Math.min(15, 4 + breadth * 1.1));
-            const dirColor = t.direction === 'rising' ? 'var(--dir-rising)'
+            const dirColor = t.direction === 'surging' ? 'var(--dir-rising)'
+                            : t.direction === 'rising' ? 'var(--dir-rising)'
                             : t.direction === 'fading' ? 'var(--dir-fading)'
                             : 'var(--dir-steady)';
-            const highBreadthClass = t.high_breadth ? ' topic-dot-high-breadth' : '';
-            dotsHtml.push(`<circle class="topic-dot${highBreadthClass}" data-id="${escapeXml(t.id)}"
+            const breadthClass = t.high_breadth ? ' topic-dot-high-breadth' : '';
+            const surgingClass = t.direction === 'surging' ? ' topic-dot-surging' : '';
+            const titleSuffix = t.direction === 'surging' ? ' ↑↑ SURGING' : t.direction === 'rising' ? ' ↑' : t.direction === 'fading' ? ' ↓' : '';
+            dotsHtml.push(`<circle class="topic-dot${breadthClass}${surgingClass}" data-id="${escapeXml(t.id)}"
               cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotR.toFixed(1)}"
               fill="${dirColor}" stroke="${s.color}" stroke-width="1.5"
-              opacity="0.92"><title>${escapeXml((t.label || t.id) + ' — breadth ' + breadth + ', score ' + (t.score_slow || t.score || 0).toFixed(1))}</title></circle>`);
+              opacity="0.92"><title>${escapeXml((t.label || t.id) + ' — breadth ' + breadth + ', score ' + (t.score_slow || t.score || 0).toFixed(1) + titleSuffix)}</title></circle>`);
           });
         });
       });

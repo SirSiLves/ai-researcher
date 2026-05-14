@@ -40,5 +40,11 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 <!-- ai-trend-radar auto-prepends new daily entries above this line. -->
 <!-- RADAR_END -->
 
+## Vendor sweep
+<!-- VENDOR_START -->
+- [2026-05-14](vendor_candidates/2026/05/2026-05-14.md) — backfill: applied 13 promotions, 7 hot events
+<!-- ai-vendor-sweep auto-prepends new daily entries above this line. -->
+<!-- VENDOR_END -->
+
 ## Trends — long-term timeline
 - [trends.md](trends.md) — status-meeting briefing of durable shifts in the field; compact dated entries, written by `ai-trends` after each weekly/monthly run.

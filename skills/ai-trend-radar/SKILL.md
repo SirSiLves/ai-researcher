@@ -128,10 +128,13 @@ Use `find radar -name '{target_date}*.json' -type f | head -1` for each lookback
 
 ```
 momentum_7d_pct = (score_slow_today - score_7d_ago) / score_7d_ago × 100
-direction = "rising" if score_fast > score_slow * 1.10
-          | "fading" if score_fast < score_slow * 0.90
-          | "steady" otherwise
+direction = "surging" if score_fast > score_slow * 1.50   # 4-tier added 2026-05-14
+          | "rising"  if score_fast > score_slow * 1.10
+          | "fading"  if score_fast < score_slow * 0.90
+          | "steady"  otherwise
 ```
+
+The `surging` tier is the topic-level analogue of the vendor-level velocity surge — score_fast has 1.5×'d the slow baseline, meaning the topic is having a *moment*. The viewer renders these dots with a brighter glow.
 
 The `direction` field is the user-facing answer to "is this trending up or down right now" — short-term derived from comparing fast vs. slow.
 
@@ -176,6 +179,48 @@ e) For every topic whose sector assignment differs from yesterday's, append an e
 - A `sector` field on each topic, plus a (possibly extended) `sector_history` array.
 
 Keep sector names **stable across days** when possible — if yesterday's name was "Agents & infrastructure", don't rename to "Agent infra" today just for style. Renames are visible to the user as a sector dissolution + creation, so reserve them for when the theme truly shifted.
+
+## 4.7. Build cross-topic clusters (co-mention graph)
+
+Sectors group topics by *theme* (what they're about). Clusters group topics by *whether they're talked about together this week* (what's moving in concert). They're different cuts:
+
+- A sector says: "vector-db-market is in 'Agents & infrastructure' because it's about agent-layer retrieval."
+- A cluster says: "vector-db-market + agentic-retrieval + tool-use-standards + a2a-protocol are all co-mentioned in 8+ files this week — they're ONE mega-trend in motion, not four."
+
+User-stated motivation 2026-05-14: "the radar treats topics as independent, but `mcp-adoption + tool-use-standards + a2a-protocol + agent-sdks` are clearly one mega-trend moving together. Cross-topic correlation is signal."
+
+**Procedure:**
+
+a) For every PAIR of topics (T_i, T_j) that placed into a stage this run, compute `co_mention_count` = number of supporting_files dated within the last `clustering_config.co_mention_window_days` (default 7 days) that appear in BOTH topics' `supporting_files`. Skip pairs where T_i == T_j.
+
+b) Build an adjacency graph: edge between T_i and T_j if `co_mention_count >= clustering_config.min_co_mentions` (default 3).
+
+c) Find connected components. Each component with `size >= clustering_config.min_cluster_size` (default 2) becomes a cluster. Singletons stay clusterless.
+
+d) **Name each cluster** with a 2-4 word label that captures the shared theme. Use the topic labels of the largest 2-3 cluster members as input — derive a label that generalizes. Examples that should emerge from current data:
+   - {mcp-adoption, tool-use-standards, a2a-protocol, agent-sdks} → "Agent protocol stack"
+   - {vector-db-market, agentic-retrieval, long-context-vs-rag} → "Retrieval reshuffle"
+   - {eu-ai-act, iso-42001, nist-ai-rmf} → "Governance regime"
+   - {frontier-models-openai, frontier-models-anthropic, frontier-models-google} → "Frontier model cadence"
+
+e) **Sticky names.** Read prior radar's `topic_clusters` if it exists. If a current cluster has ≥ 50% topic overlap with a prior cluster, REUSE the prior cluster's name. Only rename when the cluster's membership has rotated substantially.
+
+f) Compute per-cluster aggregate metrics:
+   - `cluster_score_slow` = avg of member topics' `score_slow`
+   - `cluster_score_fast` = avg of member topics' `score_fast`
+   - `cluster_direction` = "rising" if cluster_score_fast > cluster_score_slow × 1.15, "fading" if < 0.85, else "steady"
+   - `cluster_breadth_7d` = size of union of all member topics' `breadth_orgs_7d`
+   - `members_moving_together` = boolean — true if at least 3 member topics share the same `direction` value
+
+g) On each topic, set `cluster_id` and `cluster_history` (append-only):
+   ```json
+   "cluster_history": [
+     {"date": "2026-05-14", "from": null, "to": "Agent protocol stack", "reason": "first appearance"}
+   ]
+   ```
+   `cluster_history` only gets a new entry when the topic's cluster changes — sticky most days.
+
+Emit `topic_clusters` as a top-level array in the radar JSON output (see §6 schema).
 
 ## 5. Assign stages — based on SLOW score (structural)
 
@@ -229,6 +274,21 @@ Write to `radar/{YYYY-MM-DD}.json`. Structure (note the top-level `sectors` arra
   ],
   "sectors_dissolved_today": ["Retrieval & search"],
   "sectors_spawned_today": [],
+  "topic_clusters": [
+    {
+      "id": "agent-protocol-stack",
+      "name": "Agent protocol stack",
+      "topic_ids": ["mcp-adoption", "tool-use-standards", "a2a-protocol", "agent-sdks"],
+      "size": 4,
+      "first_seen": "2026-04-28",
+      "cluster_score_slow": 24.8,
+      "cluster_score_fast": 39.5,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 11,
+      "members_moving_together": true,
+      "_co_mention_evidence": "shared supporting_files (sample): blogs/2026/05/2026-05-11.md, blogs/2026/05/2026-05-13.md"
+    }
+  ],
   "topics": [
     {
       "id": "agentic-retrieval",
@@ -283,6 +343,10 @@ Write to `radar/{YYYY-MM-DD}.json`. Structure (note the top-level `sectors` arra
       ],
       "supporting_links": [
         "https://www.llamaindex.ai/blog/rag-is-dead-long-live-agentic-retrieval"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {"date": "2026-04-28", "from": null, "to": "Agent protocol stack", "reason": "first appearance"}
       ]
     }
   ],
