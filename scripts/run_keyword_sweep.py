@@ -55,57 +55,55 @@ MARKDOWN_LINK_RE = re.compile(r"\[([^\]]+)\]\([^)]+\)")
 CODE_FENCE_RE = re.compile(r"```[\s\S]*?```", re.MULTILINE)
 FRONTMATTER_RE = re.compile(r"^---[\s\S]*?^---\s*$", re.MULTILINE)
 
-# Boilerplate phrases — these appear in our own collector templates / digest
-# scaffolding rather than in the substance of what's being reported. Hard-coded
-# blocklist to avoid them dominating the n-gram tally. Add new patterns here
-# when the daily candidate output surfaces obvious template artifacts.
-BOILERPLATE_PHRASES = {
-    # Daily / weekly synthesis template
-    "why notable", "why matters", "what changed", "what changed vs",
-    "sources scanned", "sources read", "theme balance", "reading priorities",
-    "top stories", "top papers", "top reading", "new active", "new added",
-    "anon takeaway", "anon takeaways", "takeaway anon",
-    "headline summary", "stack notable", "notable llm", "notable critique",
-    "tldr bullets",
-    # Merge-banner artifacts: "_Merged run at … — N existing kept, M new added._"
-    "existing kept", "kept new", "kept new added", "new added top",
-    "existing kept new", "t13 existing kept",
-    "merged run", "added top", "added top picks",
-    # GitHub collector template
-    "stars today", "stars baseline", "stars baseline last", "baseline last",
-    "baseline last commit", "last commit", "last commit context",
-    "commit context", "trending today", "python stars", "typescript stars",
-    "rust stars", "javascript stars", "stars gained",
-    # HN collector template
-    "pts comments", "comments age", "comments hn", "pts age",
-    # ArXiv / papers boilerplate
-    "category arxiv", "arxiv category", "arxiv link", "arxiv id",
-    # Generic markdown structure
-    "table contents", "bullet point", "code block", "list item",
-    "web search", "web fetch",  # these are our tool names
-}
+# Boilerplate detection is AGENT-DRIVEN, not hard-coded.
+#
+# The script does NOT have a list of boilerplate phrases. Instead, every
+# candidate phrase gets stored in discovered_keywords.json with three fields:
+#
+#   boilerplate_decision:  "signal" | "boilerplate" | null
+#   boilerplate_reason:    short string (the agent's rationale)
+#   boilerplate_decided_at: YYYY-MM-DD (verdict has a 30-day TTL)
+#
+# Phrases where the decision is null OR > 30 days old are added to
+# keyword_judge_request.md for an agent to review. The agent reads the phrase
+# + 1-2 context samples and writes back a JSON verdict file the script then
+# applies on the next run.
+#
+# Until a phrase has been judged, it's tentatively treated as signal — it's
+# tracked in the tally and counted toward classification, but not auto-applied
+# (since auto-apply requires the sustained-day gate anyway). This keeps the
+# pipeline running with no agent involvement; the agent's role is to prune
+# template artifacts when it runs.
+#
+# Why this design:
+# - No hard-coded lists go stale.
+# - New template artifacts the pipeline introduces get caught the first time
+#   the agent reviews them, not after I notice and patch the script.
+# - The 30-day TTL means the agent gets a chance to revise verdicts as the
+#   meaning of phrases shifts over time.
 
-# Boilerplate prefixes/suffixes that indicate template scaffolding regardless
-# of the trailing/leading word. Catches "stars X", "X stars", "X today", etc.
-BOILERPLATE_TOKEN_ANCHORS = {
-    # Prefixes — if the n-gram STARTS with these tokens, drop it
-    "prefix": {"stars", "today's", "yesterday's", "anon", "category", "tldr"},
-    # Suffixes — if the n-gram ENDS with these tokens, drop it
-    "suffix": {"stars", "comments", "today", "yesterday", "arxiv", "id"},
-}
+VERDICT_TTL_DAYS = 30
 
 
-def is_boilerplate(phrase):
-    if phrase in BOILERPLATE_PHRASES:
+def needs_judgment(entry, today_iso):
+    """True if this phrase needs an agent's boilerplate verdict."""
+    if "boilerplate_decision" not in entry:
         return True
-    tokens = phrase.split()
-    if not tokens:
+    if entry["boilerplate_decision"] is None:
         return True
-    if tokens[0] in BOILERPLATE_TOKEN_ANCHORS["prefix"]:
+    decided_at = entry.get("boilerplate_decided_at")
+    if not decided_at:
         return True
-    if tokens[-1] in BOILERPLATE_TOKEN_ANCHORS["suffix"]:
+    try:
+        delta = (date.fromisoformat(today_iso) - date.fromisoformat(decided_at)).days
+    except Exception:
         return True
-    return False
+    return delta > VERDICT_TTL_DAYS
+
+
+def is_judged_boilerplate(entry):
+    """True if this phrase has been judged as boilerplate AND verdict is fresh."""
+    return entry.get("boilerplate_decision") == "boilerplate"
 
 
 def clean_text(text):
@@ -183,24 +181,43 @@ def main():
     else:
         discovered = {"last_updated": TODAY, "keywords": {}}
 
-    # Today's source files only (incremental update per spec §2)
-    today_files = []
-    for p, src_type, fdate in iter_source_files():
-        if fdate == TODAY:
-            today_files.append((p, src_type, fdate))
+    is_first_run = len(discovered.get("keywords", {})) == 0
 
-    if not today_files:
-        # No today files? Mine the whole rolling window for bootstrap purposes.
+    # Pick the scanning window:
+    #   - First run (no prior tally): scan the whole rolling_window_days so the
+    #     tally has real mentions_by_date history. Without this, every phrase
+    #     would have first_seen == last_seen == TODAY and the sustained-day
+    #     classification gate (which needs ≥4 distinct days in the window) can
+    #     never fire until the script runs for 4+ days.
+    #   - Subsequent runs: mine only today's files incrementally.
+    if is_first_run:
         cutoff = (date.fromisoformat(TODAY) - timedelta(days=cfg["rolling_window_days"])).isoformat()
         today_files = [
             (p, st, fd) for p, st, fd in iter_source_files() if fd >= cutoff
         ]
-        print(f"[keyword_sweep] no files dated {TODAY}; falling back to last {cfg['rolling_window_days']}d "
-              f"= {len(today_files)} files (bootstrap mode)", file=sys.stderr)
+        print(f"[keyword_sweep] first run — scanning last {cfg['rolling_window_days']}d "
+              f"= {len(today_files)} files (bootstrap window)", file=sys.stderr)
+    else:
+        today_files = [
+            (p, st, fd) for p, st, fd in iter_source_files() if fd == TODAY
+        ]
+        if not today_files:
+            # No today files? Mine the whole rolling window for catch-up purposes.
+            cutoff = (date.fromisoformat(TODAY) - timedelta(days=cfg["rolling_window_days"])).isoformat()
+            today_files = [
+                (p, st, fd) for p, st, fd in iter_source_files() if fd >= cutoff
+            ]
+            print(f"[keyword_sweep] no files dated {TODAY}; falling back to last {cfg['rolling_window_days']}d "
+                  f"= {len(today_files)} files (catch-up mode)", file=sys.stderr)
 
     # === Step 3: mine n-grams from candidate files ===
+    # Use "9999-12-31" as the initial first_seen so any real date beats it.
+    # Use "0000-01-01" as the initial last_seen so any real date beats it.
+    # The previous default of TODAY caused first_seen=TODAY for every phrase
+    # even when mining older files — visible as "201 phrases all with
+    # first_seen=last_seen=TODAY" in discovered_keywords.json.
     fresh_candidates = defaultdict(lambda: {
-        "first_seen": TODAY, "last_seen": TODAY,
+        "first_seen": "9999-12-31", "last_seen": "0000-01-01",
         "total_mentions": 0,
         "mentions_by_source_type": defaultdict(int),
         "mentions_by_date": defaultdict(int),
@@ -222,8 +239,12 @@ def main():
             for phrase in gen_ngrams(tokens, n, stopwords, min_chars):
                 if phrase in covered_lc:
                     continue
-                if is_boilerplate(phrase):
-                    continue
+                # Suppress phrases the agent has already judged as boilerplate
+                # (verdict cached on the prior tally, still within 30-day TTL).
+                existing = discovered.get("keywords", {}).get(phrase)
+                if existing and is_judged_boilerplate(existing):
+                    if not needs_judgment(existing, TODAY):
+                        continue  # cached "boilerplate" verdict, still fresh
                 phrases_in_file.add(phrase)
                 phrase_counts[phrase] += 1
 
@@ -449,6 +470,87 @@ def main():
     if log_lines:
         with (ROOT / "keyword_changes.log").open("a") as f:
             f.write("\n".join(log_lines) + "\n")
+
+    # === Step 8.5: build keyword_judge_request.md for the agent ===
+    # Every phrase in the tally that lacks a fresh verdict goes into the
+    # request file. The agent reads it, decides signal-vs-boilerplate per
+    # phrase, and writes keyword_judge_verdicts.json which the next sweep
+    # run applies. No hard-coded blocklist; the agent IS the filter.
+    needs = [
+        (phrase, ent) for phrase, ent in discovered["keywords"].items()
+        if needs_judgment(ent, TODAY)
+    ]
+    if needs:
+        request_path = ROOT / "keyword_judge_request.md"
+        lines = [
+            f"# Keyword boilerplate-judgment request — {TODAY}\n",
+            (
+                "_The keyword sweep mined the phrases below from source files. Some are real AI-field "
+                "signal (e.g. 'mcp server', 'frontier model'); others are template scaffolding from "
+                "OUR OWN collector outputs (e.g. 'fresh items', 'why notable', 'pts comments'). For each "
+                "phrase, decide which it is by reading the context snippet. Write a JSON verdicts file at "
+                "`keyword_judge_verdicts.json` with this shape:_\n"
+            ),
+            "```json",
+            "{",
+            "  \"verdicts\": {",
+            "    \"mcp server\":  {\"decision\": \"signal\",      \"reason\": \"real protocol\"},",
+            "    \"fresh items\": {\"decision\": \"boilerplate\", \"reason\": \"news collector template line\"},",
+            "    ...",
+            "  }",
+            "}",
+            "```",
+            "",
+            (
+                "_The next sweep run applies the verdicts: signal phrases stay in the tally, boilerplate "
+                "phrases are suppressed from future runs (cached for 30 days, then re-asked). If a phrase "
+                "is genuinely ambiguous, mark it 'signal' and let the sustained-day gate sort it out._\n"
+            ),
+            f"## {len(needs)} phrases needing a verdict\n",
+        ]
+        # Sort by signal-strength descending (most-mentioned, most-source-types first)
+        # so the agent's attention budget goes to the things that matter most.
+        needs.sort(key=lambda kv: -(kv[1].get("total_mentions", 0) * len(kv[1].get("mentions_by_source_type", {}))))
+        for phrase, ent in needs[:300]:  # cap at 300 per run
+            ctx = ent.get("context_samples") or [""]
+            sample = (ctx[0] if ctx else "")[:180]
+            lines.append(
+                f"- **\"{phrase}\"** — {ent.get('total_mentions', 0)} mentions, "
+                f"{len(ent.get('mentions_by_source_type', {}))} src types, "
+                f"{len(ent.get('mentions_by_date', {}))} distinct days. "
+                f"Context: _{sample}_"
+            )
+        if len(needs) > 300:
+            lines.append(f"_…+{len(needs) - 300} more phrases not shown (capped at 300; will appear next run)._")
+        request_path.write_text("\n".join(lines))
+        print(f"[keyword_sweep] wrote {request_path.relative_to(ROOT)} with {len(needs)} phrases for agent review", file=sys.stderr)
+
+    # === Step 8.6: apply any pending verdicts from the agent ===
+    # The agent writes keyword_judge_verdicts.json after reviewing the request
+    # file. The script picks it up on the next run, applies decisions, and
+    # then deletes the verdicts file (so it doesn't re-apply stale decisions).
+    verdicts_path = ROOT / "keyword_judge_verdicts.json"
+    applied_verdicts = 0
+    if verdicts_path.exists():
+        try:
+            verdicts = json.loads(verdicts_path.read_text())
+            for phrase, v in verdicts.get("verdicts", {}).items():
+                if phrase not in discovered["keywords"]:
+                    continue
+                decision = v.get("decision")
+                if decision not in {"signal", "boilerplate"}:
+                    continue
+                discovered["keywords"][phrase]["boilerplate_decision"] = decision
+                discovered["keywords"][phrase]["boilerplate_reason"] = v.get("reason", "")
+                discovered["keywords"][phrase]["boilerplate_decided_at"] = TODAY
+                applied_verdicts += 1
+            # Don't delete the verdicts file unless every entry was applied.
+            # Move it to .applied so we can audit what came in.
+            (ROOT / f"keyword_judge_verdicts.{TODAY}.applied.json").write_text(verdicts_path.read_text())
+            verdicts_path.unlink()
+            print(f"[keyword_sweep] applied {applied_verdicts} agent verdicts; archived to keyword_judge_verdicts.{TODAY}.applied.json", file=sys.stderr)
+        except Exception as e:
+            print(f"[keyword_sweep] failed to apply verdicts: {e}", file=sys.stderr)
 
     # === Step 9: write discovered_keywords.json ===
     discovered["last_updated"] = TODAY

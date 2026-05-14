@@ -5,9 +5,10 @@ A self-maintaining daily research pipeline for the LLM / Generative AI / RAG / a
 The whole point: **be a step ahead.** Reactive ingestion (news, papers, blogs, jobs, LinkedIn) is necessary but not sufficient. The pipeline adds earlier signals (GitHub trending, Hacker News, vendor velocity) and analytical layers (radar with dual-EMA persistence + cross-source breadth + co-mention clusters) so the long-term shifts are visible alongside the daily news.
 
 > **Pipeline state (as of 2026-05-14).** The pipeline started writing to `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `daily/`, `radar/`, `weekly/` on 2026-05-04. Currently:
-> - **Working:** all 7 collectors, daily synthesis, trend radar (8 days of history), vendor sweep (auto-applied 18 enterprise vendors with 0 drift against the audit log), firm view (83 orgs incl. 6 priority vendors), keyword sweep (first run today produced 200-phrase tally, 17 on watch list, 0 promotions — sustained-day gate needs 2+ consecutive runs), briefing radar (`radar.html`), full polar radar (`radar-classic.html`).
+> - **Working:** all 7 collectors, daily synthesis (10 dailies), trend radar (8 valid runs, 9 markdown files), vendor sweep (26 enterprise vendors of which 18 are `_auto_added`, 0 drift against the audit log), firm view (83 orgs incl. 6 priority vendors), keyword sweep (rolling-window first-run bootstrap with 200-phrase tally, 137 promote-tier candidates pending the 2-consecutive-day gate), briefing radar (`radar.html`), full polar radar (`radar-classic.html`).
+> - **Today's radar didn't produce a canonical output.** The `ai-trend-radar` skill seems to have written an old-schema file at the wrong path (since deleted). Next replay will retry.
 > - **Awaiting first successful Monday run:** `trends.md` — the `ai-trends` skill is Monday-only and either hasn't been spawned by the cron yet, or has only seen "no durable shifts" days. Will materialize when a Monday run produces at least one entry.
-> - **Awaiting first first-Monday-of-month run:** `monthly/` already has 2026-03 and 2026-04 from earlier backfills; June 2026 will be the first cron-produced monthly rollup.
+> - **Monthly rollups:** `monthly/` has 2026-03 and 2026-04 from earlier backfills; June 2026 will be the first cron-produced monthly rollup.
 > If a folder is missing, it's most likely never-yet-fired rather than broken. Run `ai-replay` to force a fresh pass.
 
 ## Pipeline at a glance
@@ -146,14 +147,14 @@ Runs daily after the firm view. Mines today's source files for 2- and 3-gram phr
 
 **Auto-apply safeties** (identical to vendor sweep):
 - `sources.json.bak` rollback before every write.
-- `keyword_changes.log` append-only audit trail (verbs: `promote-add`, `hot-add`, `expire-remove`, `proven-promote`).
+- `keyword_changes.log` append-only audit trail (verbs: `promote-add`, `hot-event-add`, `expire-remove`, `proven-promote`). Legacy `hot-add` (no payload) is deprecated and will not be emitted.
 - JSON parse-validation before write; abort on failure.
 - Auto-demote disabled by default; even when enabled, proven entries are excluded.
 - Disable via `keyword_sweep_config.auto_apply.enabled: false` — reverts to recommendation-only.
 
 **Output:** `keyword_candidates/{YYYY}/{MM}/{date}.md` — daily change log describing what was applied, pending, watching, and newly proven. `discovered_keywords.json` carries the running tally.
 
-**Implementation:** the SKILL.md spec is implemented deterministically in `scripts/run_keyword_sweep.py` (Python, ~500 lines). `ai-replay` calls this script in §6.8 rather than spawning an agent — the procedure is well-defined and reproducibility is more valuable than LLM eloquence here. Includes a hard-coded boilerplate filter to drop template artifacts ("stars today", "kept new added", "pts comments", etc.) that would otherwise dominate the n-gram tally.
+**Implementation:** two-step. `scripts/run_keyword_sweep.py` (deterministic Python) does the mining, classification, sustained-day gate, and auto-apply. An **agent** does boilerplate-judging — the script never has a hard-coded list of "template phrases to drop." Instead, every candidate phrase enters the tally; the script writes `keyword_judge_request.md` listing phrases that need a verdict; the agent reads each phrase + context and writes `keyword_judge_verdicts.json` with `signal`/`boilerplate` decisions; the next sweep run applies the verdicts and caches them for 30 days before re-asking. This means new template artifacts the pipeline introduces get caught the first time the agent reviews them, not after someone notices and patches the script.
 
 ## The vendor sweep — auto-applied
 

@@ -41,7 +41,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Trend radar
 <!-- RADAR_START -->
-- [2026-05-14](radar/2026/05/2026-05-14.md) — 34 topics, 12 stage movements, top emerging: MCP adoption (Model Context Protocol)
+- [2026-05-14 _(old-schema)_](radar/2026/05/2026-05-14.md) — single EMA only, no sectors/clusters; matching JSON was stale and got deleted. Next radar run will produce a current-schema version with sectors and dual-EMA scores.
 - [2026-05-13](radar/2026/05/2026-05-13.md) — 32 topics, 5 stage movements, top emerging: AI engineer hiring (Switzerland + global)
 - [2026-05-12](radar/2026/05/2026-05-12.md) — 27 topics, 4 stage movements, top emerging: AI engineer hiring (Switzerland + global)
 - [2026-05-11](radar/2026/05/2026-05-11.md) — 23 topics, 3 stage movements, top emerging: AI engineer hiring (Switzerland + global)

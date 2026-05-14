@@ -51,7 +51,7 @@ TODAY = date.today().isoformat()
 # bracketed JSON-ish payloads. Use a regex chain rather than a full grammar.
 
 TS_RE = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:[+-]\d{2}:?\d{2}|Z)?)")
-VERB_RE = re.compile(r"^(promote-add|promote-remove|hot-add|hot-event-add|hot-remove|expire-remove|auto-demote|proven-promote|ABORT-INVALID-JSON)$")
+VERB_RE = re.compile(r"^(promote-add|hot-add|hot-event-add|expire-remove|auto-demote|proven-promote|ABORT-INVALID-JSON)$")
 EXPIRES_RE = re.compile(r"expires=(\d{4}-\d{2}-\d{2})")
 REASON_RE = re.compile(r'reason="([^"]*)"')
 BLOG_URLS_RE = re.compile(r'blog_urls=(\[[^\]]*\])')
@@ -123,7 +123,12 @@ def parse_line(line):
 ADD_VERBS_CANONICAL = {"promote-add", "hot-event-add"}
 ADD_VERBS_LEGACY = {"hot-add"}  # log-only; do not contribute to active set
 ADD_VERBS = ADD_VERBS_CANONICAL | ADD_VERBS_LEGACY
-REMOVE_VERBS = {"expire-remove", "promote-remove", "hot-remove", "auto-demote"}
+# Only verbs actually emitted by the skills. The previous spec listed
+# promote-remove and hot-remove as theoretical possibilities, but no skill
+# emits them — removals always go through expire-remove (TTL) or auto-demote
+# (silent vendors). Adding them back would require adding the emit path in
+# the skill first.
+REMOVE_VERBS = {"expire-remove", "auto-demote"}
 PROVEN_VERBS = {"proven-promote"}
 
 

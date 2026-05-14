@@ -304,7 +304,7 @@ After all edits, validate the JSON parses. If it doesn't, abort the write, log `
 ```
 2026-05-14T20:08:00 promote-add     news_web_search_queries      "agentic provenance"           reason="6 mentions, 3 src types, 4 days"
 2026-05-14T20:08:00 promote-add     radar_topic_taxonomy         "agentic provenance"           reason="cross-source convergence"
-2026-05-14T20:08:00 hot-add         hackernews_filter_keywords   "context engineering"   expires=2026-06-13 reason="announcement context"
+2026-05-14T20:08:00 hot-event-add   hackernews_filter_keywords   "context engineering"   expires=2026-06-13 reason="announcement context"
 2026-05-14T20:08:00 expire-remove   news_web_search_queries      "tool-use governance"                       reason="TTL elapsed"
 2026-05-14T20:08:00 proven-promote  news_web_search_queries      "model context protocol"                    reason="lifetime: 47 days, 6 src types, 32 distinct days"
 2026-05-14T20:08:00 proven-promote  radar_topic_taxonomy         "model context protocol"                    reason="lifetime: 47 days, 6 src types, 32 distinct days"

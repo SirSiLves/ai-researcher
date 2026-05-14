@@ -186,19 +186,36 @@ This rebuilds `orgs/index.json` + `orgs/{slug}.json` for every tracked org (disc
 
 If the script exits non-zero, log the error but don't block — the rest of the pipeline doesn't depend on the firm view.
 
-## 6.8. Run ai-keyword-sweep (Python script — preferred path)
+## 6.8. Run ai-keyword-sweep (Python script + agent boilerplate-judging)
 
-Run the deterministic Python implementation rather than spawning an agent — the SKILL.md spec is implemented faithfully in `scripts/run_keyword_sweep.py`:
+Two-step process: a deterministic Python script does the mining + classification + auto-apply, and an agent decides which phrases are real signal vs. template scaffolding.
+
+### Step 6.8a: run the sweep script
 
 ```bash
 python3 scripts/run_keyword_sweep.py
 ```
 
-This mines today's source files for 2/3-gram phrases not yet in any keyword list, filters boilerplate (template artifacts from our own digests), classifies each phrase (already_applied / promote / watch / dormant), promotes phrases that held `promote` tier for ≥2 consecutive days, auto-applies to the four target lists in sources.json, runs proven-promotion for long-history keywords, writes `keyword_candidates/{date}.md`, updates `discovered_keywords.json`, and appends to `keyword_changes.log`.
+This mines today's source files for 2/3-gram phrases (skipping anything covered by existing keyword lists AND anything the agent has already judged as boilerplate, within a 30-day verdict cache), classifies each phrase (already_applied / promote / watch / dormant), promotes phrases that held `promote` tier for ≥2 consecutive days, auto-applies to the four target lists in sources.json, runs proven-promotion for long-history keywords, writes `keyword_candidates/{date}.md`, updates `discovered_keywords.json`, and appends to `keyword_changes.log`.
 
-Same safeguards as the vendor sweep: `sources.json.bak` rollback before any mutation, audit log, JSON parse-validation before write.
+The script writes `keyword_judge_request.md` listing every phrase that lacks a fresh agent verdict.
 
-Fallback (if the script fails or you need a different behavior): spawn an Agent call with `skills/ai-keyword-sweep/SKILL.md` + footer.
+### Step 6.8b: spawn the keyword-judge agent
+
+If `keyword_judge_request.md` exists with phrases listed, spawn ONE Agent call:
+- `subagent_type`: `"general-purpose"`
+- `description`: `"Keyword boilerplate-judging"`
+- `prompt`: contents of `keyword_judge_request.md` + footer.
+
+The agent reads each phrase + context snippet and writes `keyword_judge_verdicts.json` in the format the script expects (`{"verdicts": {"phrase": {"decision": "signal"|"boilerplate", "reason": "..."}, ...}}`). The next `run_keyword_sweep.py` run picks it up, applies the decisions to `discovered_keywords.json`, and archives the verdicts file to `keyword_judge_verdicts.{TODAY}.applied.json`.
+
+If the agent decides to defer some phrases (e.g., truly ambiguous), it can omit them from the verdicts file — those phrases re-appear in tomorrow's request.
+
+Verdict cache is 30 days. After that, the script re-asks the agent to re-evaluate (templates evolve; what was once boilerplate may become signal, or vice versa).
+
+### Safeguards
+
+Same as vendor sweep: `sources.json.bak` rollback before any mutation, audit log, JSON parse-validation before write. Boilerplate judging never mutates sources.json directly — it only affects what enters the tally.
 
 ## 6.9. Rebuild change-log JSONs
 

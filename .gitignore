@@ -2,3 +2,11 @@
 .idea/
 .claude/
 *.bak
+# Keyword-sweep work artifacts — request and verdict files round-trip between
+# the script and the judging agent. The script regenerates the request each run
+# from discovered_keywords.json (the persistent state), and verdict files get
+# archived after application. None of these are source of truth, so keep them
+# out of git.
+keyword_judge_request.md
+keyword_judge_verdicts.json
+keyword_judge_verdicts.*.applied.json
