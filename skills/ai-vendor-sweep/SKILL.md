@@ -124,13 +124,13 @@ recent_distinct_days = { d in mentions_by_date if d >= window_start }
 3. **`hot_event`** — org satisfies EITHER:
    - (keyword path) org has ≥ `hot_event_min_thresholds.min_mentions` (default 2) mentions in the window AND at least one `hot_events` entry within `window_days`. Funding rounds and M&A get a vendor on the radar fast.
    - (velocity path, added 2026-05-14) `velocity_status == "surging"` (velocity_ratio ≥ 5.0). The vendor's posting cadence has 5×'d relative to its 4-week baseline — something material is happening. Record the trigger as `hot_event_reason: "velocity surge — ratio X.Y"` instead of a keyword.
-   Promotes temporarily (30 days) regardless of total volume.
+   Promotes temporarily (30 days) regardless of total volume. **If the slug is currently in `deep_watch_vendors`**, this is a re-promotion (see Step C.6 of auto-apply) — the slug moves back to `enterprise_vendors` rather than creating a duplicate.
 
-4. **`promote`** — org is `coverage: "uncovered"` AND:
+4. **`promote`** — org is `coverage: "uncovered"` OR `coverage: "deep_watch"` AND:
    - `recent_mentions ≥ promotion_thresholds.min_total_mentions` (default 8)
    - `|recent_source_types| ≥ promotion_thresholds.min_source_types` (default 3)
    - `|recent_distinct_days| ≥ promotion_thresholds.min_distinct_days` (default 4)
-   These get a recommended action: "add to `enterprise_vendors` in `sources.json` with `blog_urls: [<blog_url_hint>]`."
+   These get a recommended action: "add to `enterprise_vendors` in `sources.json` with `blog_urls: [<blog_url_hint>]`." **If the slug is currently in `deep_watch_vendors`**, this is a re-promotion (see Step C.6) — the original entry moves back to `enterprise_vendors` (keeping its `blog_urls`, `fallback_search`, original `_added_on` history if useful).
 
 5. **`watch`** — org is `coverage: "uncovered"` AND in the watch range:
    - `watch_thresholds.min_total_mentions ≤ recent_mentions ≤ watch_thresholds.max_total_mentions` (defaults 3..7)
@@ -154,12 +154,14 @@ Otherwise:
 
 **Step A — Backup.** If we're about to write to sources.json, first `cp sources.json sources.json.bak` (overwrites previous backup). This is the rollback button.
 
-**Step B — Compute the change set.** Build a `changes` dict with four lists:
+**Step B — Compute the change set.** Build a `changes` dict with six lists:
 
-- `promotions_to_add`: orgs classified `promote` today AND whose `classification_history` contains `promote` for ≥ `auto_promote.min_consecutive_days_at_promote` (default 2) consecutive days ending today.
-- `hot_events_to_add`: orgs classified `hot_event` today that are NOT already in `enterprise_vendors`. (No sustained-day requirement.)
+- `promotions_to_add`: orgs classified `promote` today AND whose `classification_history` contains `promote` for ≥ `auto_promote.min_consecutive_days_at_promote` (default 2) consecutive days ending today. If the slug is already in `deep_watch_vendors`, route it to `deep_watch_promotions_to_revive` instead (see below) — never create a second copy.
+- `hot_events_to_add`: orgs classified `hot_event` today that are NOT already in `enterprise_vendors`. (No sustained-day requirement.) If the slug is already in `deep_watch_vendors`, route it to `deep_watch_promotions_to_revive` instead.
 - `expired_to_remove`: enterprise_vendors entries where `_auto_added: true` AND `_expires_on < TODAY`. (Manual entries never touched, even if expired.)
 - `auto_demotions_to_remove`: ONLY if `auto_demote.enabled` is true (default false), orgs classified `covered_silent` that are auto-added.
+- `deep_watch_demotions`: enterprise_vendors entries to move into deep_watch_vendors (see Step C.6).
+- `deep_watch_promotions_to_revive`: deep_watch_vendors entries to move back into enterprise_vendors (see Step C.6).
 
 **Step C — Apply the change set to sources.json.** Read sources.json. For each promotion / hot event addition, write into `news_collector.enterprise_vendors.{slug}`:
 
@@ -187,7 +189,46 @@ After all edits, validate the JSON parses (do a JSON round-trip in your head: if
 
 This step exists because earlier sweep runs logged hot-events for slugs like `consilium-eu`, `stratechery`, `stanford-hai` that have no `blog_url_hint` — those entries can't be applied, but the old skill logged them anyway, creating "ghost promotions" visible in `vendor_changes.json.consistency_check.log_only_not_in_sources`.
 
-**Step D — Audit log.** **ONLY** append a line to `vendor_changes.log` for changes that ACTUALLY mutated `sources.json` in Step C. Never log a decision-not-to-apply, never log a rejected candidate, never log before the JSON write completes. Use the EXACT canonical verbs:
+**Step C.6 — Deep-watch demotion (soft cap on enterprise_vendors).** This step runs AFTER Step C's adds/removes, because we want to evaluate the cap against the post-adds state.
+
+Read `auto_apply.deep_watch_demote`. If `enabled` is false, skip this entire step.
+
+```
+current_count = len(news_collector.enterprise_vendors)
+cap = deep_watch_demote.max_enterprise_vendors  (default 30)
+silence = deep_watch_demote.min_silence_days    (default 60)
+budget = deep_watch_demote.max_demotions_per_run (default 3)
+```
+
+If `current_count <= cap`, no demotion needed — skip.
+
+Otherwise, find candidates: `enterprise_vendors` entries where ALL of:
+1. `_auto_added: true` (manual entries NEVER touched — they're sacred)
+2. `(TODAY - last_seen_in_discovered_orgs) >= silence` — there's been no mention activity for the silence window
+3. NOT currently classified `hot_event` or `promote` today (would be self-contradictory to demote what we're also promoting)
+
+Sort candidates by `last_seen` ascending (oldest-silent first). Take the first `min(current_count - cap, budget)` of them. For each:
+
+- Read the full entry from `news_collector.enterprise_vendors`.
+- Add `_demoted_on: TODAY`, `_demoted_reason: "deep-watch: silent {N} days, over soft cap"`, `_demoted_from: "enterprise_vendors"`.
+- WRITE the entry to `news_collector.deep_watch_vendors[slug]`.
+- DELETE from `news_collector.enterprise_vendors`.
+- Update `discovered_orgs.json` for this slug: `coverage: "deep_watch"`, `auto_applied_on: TODAY`.
+- Audit log: `deep-watch-demote {slug} reason="silent {N} days, ranked oldest-silent over cap=30"`.
+
+**Re-promotion path (the inverse).** If today's classification step yielded `hot_event` or sustained-`promote` for a slug that's currently in `deep_watch_vendors`:
+
+- Read the full entry from `news_collector.deep_watch_vendors[slug]`.
+- Drop `_demoted_on`, `_demoted_reason`, `_demoted_from`.
+- Refresh `_added_on: TODAY`. For hot events, set `_expires_on: TODAY + ttl_days`.
+- WRITE back to `news_collector.enterprise_vendors[slug]`.
+- DELETE from `news_collector.deep_watch_vendors`.
+- Update `discovered_orgs.json`: `coverage: "enterprise"`, `auto_applied_on: TODAY`.
+- Audit log: `deep-watch-promote {slug} reason="returned via {hot_event|sustained_promote}"`.
+
+This means a returning vendor doesn't compete for cap headroom with a brand-new promotion — they're already counted in the post-demotion universe.
+
+**Step D — Audit log.** **ONLY** append a line to `vendor_changes.log` for changes that ACTUALLY mutated `sources.json` in Step C / C.6. Never log a decision-not-to-apply, never log a rejected candidate, never log before the JSON write completes. Use the EXACT canonical verbs:
 
 | Verb | When |
 |---|---|
@@ -195,6 +236,8 @@ This step exists because earlier sweep runs logged hot-events for slugs like `co
 | `hot-event-add` | sources.json was mutated to add this slug with a TTL `_expires_on` (hot-event path) |
 | `expire-remove` | sources.json was mutated to delete an expired `_auto_added` entry |
 | `auto-demote` | (only when `auto_demote.enabled: true`) sources.json was mutated to delete a silent `_auto_added` entry |
+| `deep-watch-demote` | sources.json was mutated to move an enterprise_vendors entry into deep_watch_vendors (soft-cap path) |
+| `deep-watch-promote` | sources.json was mutated to move a deep_watch_vendors entry back into enterprise_vendors (re-promotion path) |
 
 Do NOT invent other verbs. The legacy `hot-add` verb seen in early logs is DEPRECATED — never emit it. Format:
 
@@ -206,7 +249,7 @@ Do NOT invent other verbs. The legacy `hot-add` verb seen in early logs is DEPRE
 
 ISO timestamp + verb + slug + payload (always `blog_urls=[...]` for adds; optionally `expires=YYYY-MM-DD` for hot events) + reason. The log is the running history of what the auto-applier DID — never what it considered. If the consistency check in `vendor_changes.json` ever shows non-empty `log_only_not_in_sources`, that's a bug in this step; investigate immediately.
 
-**Step E — Update discovered_orgs.json.** For every org we just promoted, set `coverage: "enterprise"` and `auto_applied_on: "{TODAY}"`. For removals, set back to `coverage: "uncovered"` (or `"informal_url_list"` if the host matches a URL list) and note `removed_on: "{TODAY}"` with the reason.
+**Step E — Update discovered_orgs.json.** For every org we just promoted, set `coverage: "enterprise"` and `auto_applied_on: "{TODAY}"`. For deep-watch demotions, set `coverage: "deep_watch"` and `auto_applied_on: "{TODAY}"`. For deep-watch re-promotions, set `coverage: "enterprise"` and `auto_applied_on: "{TODAY}"`. For removals, set back to `coverage: "uncovered"` (or `"informal_url_list"` if the host matches a URL list) and note `removed_on: "{TODAY}"` with the reason.
 
 ## 5. Write `vendor_candidates/{YYYY}/{MM}/{TODAY}.md` — a CHANGE LOG
 
@@ -223,7 +266,9 @@ If anything was applied:
 - **Added {N} promotion(s):** list each with slug, blog_urls, reason, sustained-day proof.
 - **Added {N} hot-event vendor(s):** list each with slug, trigger keyword, expires_on, snippet.
 - **Removed {N} expired hot-event entry(s):** list each with slug, reason it expired.
-- **Skipped {N} silent vendor(s):** list each — auto-demote is disabled by default; flagged for manual review only.
+- **Demoted {N} to deep-watch ({current_count}/{cap} cap):** list each with slug, last_seen, silence days. These move to `deep_watch_vendors` — no daily fetch, but still tracked for re-promotion. Skip section if empty.
+- **Re-promoted {N} from deep-watch:** list each with slug, trigger (hot_event or sustained promote). Skip section if empty.
+- **Skipped {N} silent vendor(s):** list each — auto-demote is disabled by default; flagged for manual review only. (Note: silent vendors over the soft cap are deep-watch-demoted automatically; this list shows silent vendors NOT yet over cap.)
 
 If nothing was applied:
 _No changes to `sources.json` this run._
@@ -300,7 +345,8 @@ Do NOT post the change log to chat. Do NOT modify any source files (`news/`, `bl
 - **The sweep is daily, not Monday.** Silence and promotion windows are still measured in days (30/45/60), but the analysis runs every day so a new hot event surfaces within 24 hours and sources.json reflects it tomorrow.
 - **Manual entries are sacred.** Any `enterprise_vendors` entry without `_auto_added: true` is manual — never modify it, never remove it, even if it goes silent or hits an expiry condition. The auto-applier touches ONLY entries it added itself.
 - **`priority_vendors` is sacred too.** The auto-applier NEVER writes to `priority_vendors`. Promotions go to `enterprise_vendors`. Manual elevation from enterprise → priority is the user's call.
-- **`covered_silent` triggers a flag, not an auto-removal.** Auto-demote stays disabled by default to prevent removing a vendor whose blog URL just briefly 503'd.
+- **`covered_silent` triggers a flag, not an auto-removal.** Auto-demote stays disabled by default to prevent removing a vendor whose blog URL just briefly 503'd. The soft-cap **deep-watch demotion** is the preferred path: silent auto_added entries over `max_enterprise_vendors` get moved (not deleted) into `deep_watch_vendors`, with a re-promotion path if mentions resurface. Manual entries are still sacred — never moved to deep-watch.
+- **Deep-watch is a holding tier, not a graveyard.** Demoted entries keep their `blog_urls`, `fallback_search`, and `_added_reason` so a future re-promotion is exact (not a re-promotion-as-new). Audit verbs are `deep-watch-demote` and `deep-watch-promote`. Never demote anything without `_auto_added: true`. Demotions never apply to slugs classified `hot_event` or `promote` on the same day.
 - **Hot events are temporary.** They get `_expires_on = TODAY + ttl_days` at insertion. The next sweep that observes an expired hot event removes the entry. If the same org meanwhile crossed sustained promote thresholds, it'd already have been re-added without the expiry — so the removal is harmless.
 - **JSON validity is mandatory.** Before writing sources.json, parse the result. If parsing fails, abort the write, log to `vendor_changes.log` as `ABORT-INVALID-JSON`, and continue with the markdown report only.
 - **Backup before write.** Always `cp sources.json sources.json.bak` before modifying sources.json. One step of rollback is always available.

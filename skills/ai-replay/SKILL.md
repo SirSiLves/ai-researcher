@@ -217,6 +217,20 @@ Verdict cache is 30 days. After that, the script re-asks the agent to re-evaluat
 
 Same as vendor sweep: `sources.json.bak` rollback before any mutation, audit log, JSON parse-validation before write. Boilerplate judging never mutates sources.json directly — it only affects what enters the tally.
 
+## 6.85. Run the github sweep
+
+Pure Python — no subagent needed:
+
+```bash
+python3 scripts/run_github_sweep.py
+```
+
+Mines `github/{YYYY}/{MM}/*.md` (the ai-github collector's daily output) for trending repo appearances over the last 14 days. Repos that trend on ≥3 distinct days AND hold 'promote' tier for ≥2 consecutive sweep runs get auto-added to `news_collector.github_collector.watched_repos`. Repos with a single-day star delta ≥5,000 get a 30-day hot-event TTL. Soft cap at 80 watched repos triggers deep-watch demotion (oldest-silent first; same shape as vendor + keyword sweeps). Manual entries are sacred. Audit trail in `github_changes.log`.
+
+Output: `github_candidates/{YYYY}/{MM}/{TODAY}.md` (change log, same shape as vendor_candidates and keyword_candidates).
+
+If the script exits non-zero, log the error but don't block — the rest of the pipeline doesn't depend on the github sweep.
+
 ## 6.9. Rebuild change-log JSONs
 
 Run the change-log JSON generator directly — pure Python over the append-only logs:
@@ -225,7 +239,7 @@ Run the change-log JSON generator directly — pure Python over the append-only 
 python3 scripts/rebuild_change_logs.py
 ```
 
-This rebuilds `vendor_changes.json` + `keyword_changes.json` by replaying every line of `vendor_changes.log` + `keyword_changes.log`. Each JSON has parsed mutations, counts by verb / month, currently-active set, expired set, proven set, and (for vendor) a consistency check against `sources.json _auto_added` entries (surfaces drift between the log and what was actually applied).
+This rebuilds `vendor_changes.json` + `keyword_changes.json` + `github_changes.json` by replaying every line of `vendor_changes.log` + `keyword_changes.log` + `github_changes.log`. Each JSON has parsed mutations, counts by verb / month, currently-active set, deep-watch set, expired set, proven set, and (for vendor) a consistency check against `sources.json _auto_added` entries (surfaces drift between the log and what was actually applied).
 
 Runs in ~50ms over a year of log volume. Idempotent. The .log files remain the source of truth; the JSONs are safe to delete and rebuild.
 

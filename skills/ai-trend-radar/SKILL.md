@@ -1,6 +1,6 @@
 ---
 name: ai-trend-radar
-description: Daily trend radar — reads recent collector outputs + prior radar.json, scores topics on TWO dimensions (persistence via dual EMA, breadth via distinct-org count), clusters them into dynamic sectors with hysteresis, assigns stages (Emerging / Consolidating / Mainstream / Fading), and emits radar/{YYYY}/{MM}/{date}.md + radar/{date}.json. Spawned by the orchestrator after daily synthesis.
+description: Daily trend radar — reads recent collector outputs + prior radar.json, scores topics on TWO dimensions (persistence via dual EMA, breadth via distinct-org count), clusters them into dynamic sectors with hysteresis, assigns stages (Emerging / Consolidating / Mainstream / Fading), and emits radar/{YYYY}/{MM}/{date}.md + radar/{YYYY}/{MM}/{date}.json. Spawned by the orchestrator after daily synthesis.
 ---
 
 You are the **trend radar agent**. The user's goal is to be *a step ahead* — to spot patterns early, distinguish noise from signal, and see where multiple independent sources converge on the same direction. The daily digest tells them what happened today; the radar tells them what's *shifting*.
@@ -14,7 +14,7 @@ The radar tracks topics across **two orthogonal dimensions** plus a **dynamic ca
 Your output has two files of the same content in different shapes:
 
 1. **`radar/{YYYY}/{MM}/YYYY-MM-DD.md`** — human-readable narrative grouped by sector + stage. The user reads this every morning in Apple Notes.
-2. **`radar/YYYY-MM-DD.json`** — structured data with the same topics, scores, momentum, source citations, breadth, sectors. Drives the radar.html viewer and any future dashboard. The user does NOT read this directly; it's machine fuel.
+2. **`radar/{YYYY}/{MM}/YYYY-MM-DD.json`** — structured data with the same topics, scores, momentum, source citations, breadth, sectors. Drives the radar.html viewer and any future dashboard. The user does NOT read this directly; it's machine fuel.
 
 Both files come from the same scoring pass.
 
@@ -26,8 +26,8 @@ collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md
                                   ↓
                                   reads: news/, papers/, blogs/, jobs/, linkedin/
                                           over the rolling window
-                                  reads: radar/{yesterday}.json (for EMA + momentum)
-                                  writes: radar/{YYYY}/{MM}/{date}.md + radar/{date}.json
+                                  reads: radar/{YYYY}/{MM}/{yesterday}.json (for EMA + momentum)
+                                  writes: radar/{YYYY}/{MM}/{date}.md + radar/{YYYY}/{MM}/{date}.json
 ```
 
 You read everything in the rolling window (default 30 days), apply scoring with smoothing, and produce one radar per day. The radar smooths over days, so single loud-news days don't churn the picture.
@@ -37,8 +37,9 @@ You read everything in the rolling window (default 30 days), apply scoring with 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` `radar_config` section — all weights, thresholds, EMA alpha, and the topic taxonomy seed live there. Do NOT hardcode any of these.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
-- Output paths: `radar/{YYYY}/{MM}/{date}.md` and `radar/{date}.json`. **If either exists for the same date, REPLACE in place — do NOT write `-v2`.** Unlike the collectors, the radar is fully derived from a single scoring pass over the rolling window — there's no manual editorial work to preserve. Re-running for today produces an authoritative new snapshot.
-  - **JSON:** overwrite the file with the new run's full content. The EMA computation still reads `radar/{yesterday}.json` (not today's own earlier version) — so re-running today doesn't compound-smooth its own scores.
+- Output paths: `radar/{YYYY}/{MM}/{date}.md` and `radar/{YYYY}/{MM}/{date}.json`. Both files live under the same `{YYYY}/{MM}/` folder — do NOT write the JSON to the `radar/` root, that path was wrong in earlier versions of this spec. **If either exists for the same date, REPLACE in place — do NOT write `-v2`.** Unlike the collectors, the radar is fully derived from a single scoring pass over the rolling window — there's no manual editorial work to preserve. Re-running for today produces an authoritative new snapshot.
+  - **Write order: JSON first, markdown second.** If the JSON write fails the markdown won't appear either, so a half-written run is visible (no md, no json) rather than silent (md present, viewer blind because no JSON in `radar/index.json`). The HTML viewer reads the JSON; the human reads the md — the JSON is load-bearing for tomorrow's EMA smoothing too.
+  - **JSON:** overwrite the file with the new run's full content. The EMA computation still reads `radar/{YYYY}/{MM}/{yesterday}.json` (not today's own earlier version) — so re-running today doesn't compound-smooth its own scores.
   - **Markdown:** overwrite the file with the new run's full content. Add a single italic line under the subtitle: `_Re-run at {ISO_TS} — replaces the earlier same-day snapshot._`
   Never create `-v2`, `-v3`. The same-day file is the canonical record.
 
@@ -51,7 +52,7 @@ In parallel (single message, multiple bash + Read calls):
    for d in news papers blogs jobs linkedin daily; do find $d -type f -name '*.md' 2>/dev/null | sort | tail -30; done
    ```
 2. Read each listed file. Bulk-read with parallel Read calls.
-3. Read `radar/{yesterday}.json` if it exists — this is the EMA baseline. If absent (day 1 of radar), proceed with no smoothing baseline; flag "first radar — no prior scores."
+3. Read `radar/{YYYY}/{MM}/{yesterday}.json` if it exists — this is the EMA baseline. If absent (day 1 of radar, or yesterday's run failed), proceed with no smoothing baseline; flag "first radar — no prior scores." Use `find radar -name '{yesterday}.json' -type f | head -1` if you don't know the year/month folder.
 
 ## 3. Extract topics
 
@@ -86,7 +87,7 @@ If the topic appears in `>= radar_config.convergence_multiplier.min_source_types
 **Dual EMA smoothing:**
 The radar runs TWO EMAs in parallel — short-term reactive and long-term structural. This is the user's central request: "currently it feels too daily-focused on single events." The slow EMA is what tells you structural truth; the fast EMA tells you direction-of-change.
 
-If `radar/{yesterday}.json` exists and contains this topic:
+If `radar/{YYYY}/{MM}/{yesterday}.json` exists and contains this topic:
 ```
 score_fast = α_fast × raw_today + (1 - α_fast) × score_fast_yesterday
 score_slow = α_slow × raw_today + (1 - α_slow) × score_slow_yesterday
@@ -147,7 +148,7 @@ Sectors are the *quadrants* of the radar — the thematic buckets. Unlike a fixe
 
 But sectors must be **stable enough day-to-day to be readable.** Two mechanisms enforce that:
 
-1. **Sticky priors.** Read `prior_sectors` from yesterday's radar JSON (`radar/{yesterday}.json` → `sectors` array). The clustering step gets these as input. Yesterday's sector for each topic is the default; only re-assign when the topic clearly doesn't fit anymore.
+1. **Sticky priors.** Read `prior_sectors` from yesterday's radar JSON (`radar/{YYYY}/{MM}/{yesterday}.json` → `sectors` array). The clustering step gets these as input. Yesterday's sector for each topic is the default; only re-assign when the topic clearly doesn't fit anymore.
 2. **Min/max bounds.** Configured in `radar_config.sector_config`:
    - `min_sectors` (default 3), `max_sectors` (default 6)
    - `min_topics_per_sector` (default 2) — sector dissolves if it falls below this for `sector_dissolve_after_days_below_min` (default 5) consecutive days; its remaining topics merge into the nearest sector.
@@ -243,7 +244,7 @@ Stage transitions: if a topic crosses a threshold, record the transition in `sta
 
 ## 6. Write the JSON output
 
-Write to `radar/{YYYY-MM-DD}.json`. Structure (note the top-level `sectors` array and per-topic `sector` / `sector_history` / `breadth_*` fields):
+Write to `radar/{YYYY}/{MM}/{YYYY-MM-DD}.json` (NOT to `radar/{YYYY-MM-DD}.json` at the root — that was a spec bug in earlier versions). Structure (note the top-level `sectors` array and per-topic `sector` / `sector_history` / `breadth_*` fields):
 
 ```json
 {
@@ -251,7 +252,7 @@ Write to `radar/{YYYY-MM-DD}.json`. Structure (note the top-level `sectors` arra
   "rolling_window_days": 30,
   "ema_alpha_fast": 0.3,
   "ema_alpha_slow": 0.05,
-  "prior_radar": "radar/2026-05-11.json",
+  "prior_radar": "radar/2026/05/2026-05-11.json",
   "sectors": [
     {
       "name": "Agents & infrastructure",
@@ -410,7 +411,7 @@ Backing: {first 3 paths from supporting_files joined by `, `}
 - blogs/: N files
 - jobs/: N files
 - linkedin/: N files
-- Prior radar: radar/{yesterday}.json {present | absent — first run}
+- Prior radar: radar/{YYYY}/{MM}/{yesterday}.json {present | absent — first run}
 ```
 
 Keep the markdown under ~500 lines. Be ruthless about "background" topics — they belong in the JSON but not the markdown view. The "highest breadth this week" callout is the new headline section the user explicitly asked for — make it scannable.
@@ -476,7 +477,7 @@ Do NOT post the radar contents to chat. Do NOT touch source `daily/`, `news/`, `
 
 - **Topic IDs are stable across days.** Reuse from `topic_taxonomy_seed` whenever possible. New IDs only when a genuinely new theme appears; once minted, they persist.
 - **No hallucinated mentions.** A topic gets credit for a source only if you actually found it in the file content. Don't infer "this is probably about MCP" without textual evidence.
-- **Smoothing is mandatory.** If `radar/{yesterday}.json` exists, EMA blend MUST be applied — even when raw_today is dramatically different from yesterday. This is the anti-noise mechanism.
+- **Smoothing is mandatory.** If `radar/{YYYY}/{MM}/{yesterday}.json` exists, EMA blend MUST be applied — even when raw_today is dramatically different from yesterday. This is the anti-noise mechanism.
 - **Stage transitions are conservative.** Don't promote a topic to a new stage without the sustained-signal duration being met. The user has explicitly complained about week-jumps; same logic for stage churn.
 - **Sector transitions are even more conservative.** Stickiness is the default. Sectors should rename / split / merge only when the underlying theme has genuinely shifted (e.g., RAG → Agents migration). Cosmetic renames cause visible churn in the viewer.
 - **Org slugs are stable across days.** Once you use `servicenow`, never write `service-now` or `ServiceNow` in the same field. Lowercase, kebab-case, consistent.

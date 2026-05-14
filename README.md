@@ -31,6 +31,12 @@ The whole point: **be a step ahead.** Reactive ingestion (news, papers, blogs, j
 │   §6.5  ai-trend-radar      → radar/{date}.{md,json} + radar/index.json    │
 │   §6.6  ai-vendor-sweep     → vendor_candidates/{date}.md (auto-applies    │
 │                                changes to sources.json)                    │
+│   §6.7  scripts/build_org_view.py    → orgs/index.json + orgs/{slug}.json  │
+│   §6.8  scripts/run_keyword_sweep.py → keyword_candidates/{date}.md        │
+│                                + keyword_judge_request.md (agent loop)     │
+│   §6.85 scripts/run_github_sweep.py  → github_candidates/{date}.md         │
+│                                (auto-extends watched_repos)                │
+│   §6.9  scripts/rebuild_change_logs.py → vendor/keyword/github_changes.json│
 │   §7    ai-weekly-digest    → weekly/{YYYY-Www}.md (overwrites daily,      │
 │                                cumulative Mon→Sun)                         │
 │   §7.5  ai-trends           → trends.md (Monday only, reads prior week)    │
@@ -51,10 +57,14 @@ seed_orgs.json (in scripts/) ← bootstrap list of ~120 AI companies for the swe
 discovered_orgs.json         ← running tally of every org we've seen (the sweep's state)
 github_stars.json            ← running star counts on watched repos
 vendor_changes.log           ← append-only audit log of every sources.json vendor mutation
-vendor_changes.json          ← derived structured view (active set + consistency check against sources.json)
+vendor_changes.json          ← derived view: active + deep-watch sets, expired, proven, consistency check
 keyword_changes.log          ← append-only audit log of every sources.json keyword mutation
-keyword_changes.json         ← derived structured view
+keyword_changes.json         ← derived structured view (same shape as vendor_changes.json)
+github_changes.log           ← append-only audit log of every github_collector.watched_repos mutation
+github_changes.json          ← derived structured view (same shape as vendor_changes.json)
 discovered_keywords.json     ← running tally of mined n-gram phrases (the keyword sweep's state)
+discovered_orgs_archive.json ← long-tail orgs pruned from discovered_orgs.json (created lazily by scripts/archive_stale.py)
+discovered_keywords_archive.json ← boilerplate-tagged keywords past TTL (created lazily by scripts/archive_stale.py)
 radar/index.json             ← manifest the HTML viewer reads to enumerate radar dates
 orgs/index.json              ← manifest the firm-view HTML reads to enumerate orgs
 
@@ -94,7 +104,9 @@ github/{YYYY}/{MM}/{date}.md         ← GitHub trending + watch-list deltas
 hackernews/{YYYY}/{MM}/{date}.md     ← AI-filtered HN front page
 radar/{YYYY}/{MM}/{date}.md          ← human-readable radar
 radar/{YYYY}/{MM}/{date}.json        ← machine-readable radar (drives the HTML viewer)
-vendor_candidates/{YYYY}/{MM}/{date}.md  ← daily change log (what auto-applied to sources.json)
+vendor_candidates/{YYYY}/{MM}/{date}.md  ← daily change log (vendor sweep mutations to sources.json)
+keyword_candidates/{YYYY}/{MM}/{date}.md ← daily change log (keyword sweep mutations to sources.json)
+github_candidates/{YYYY}/{MM}/{date}.md  ← daily change log (github sweep mutations to watched_repos)
 weekly/{YYYY}/{YYYY-Www}.md          ← cumulative Mon→Sun, overwritten daily
 monthly/{YYYY}/{YYYY-MM}.md
 trends.md                            ← long-term ledger, Monday-appended
@@ -156,6 +168,33 @@ Runs daily after the firm view. Mines today's source files for 2- and 3-gram phr
 
 **Implementation:** two-step. `scripts/run_keyword_sweep.py` (deterministic Python) does the mining, classification, sustained-day gate, and auto-apply. An **agent** does boilerplate-judging — the script never has a hard-coded list of "template phrases to drop." Instead, every candidate phrase enters the tally; the script writes `keyword_judge_request.md` listing phrases that need a verdict; the agent reads each phrase + context and writes `keyword_judge_verdicts.json` with `signal`/`boilerplate` decisions; the next sweep run applies the verdicts and caches them for 30 days before re-asking. This means new template artifacts the pipeline introduces get caught the first time the agent reviews them, not after someone notices and patches the script.
 
+## The github sweep — auto-extending the watched-repos list
+
+Same pattern as vendor and keyword sweeps, applied to GitHub repos. Motivated by: trending repos surface 1-3 weeks before mainstream coverage, but the daily collector only tracks star-count deltas on the manually-curated `watched_repos` list. A repo that explodes today gets a one-day call-out and then is forgotten. The github sweep auto-extends `watched_repos` for repos that consistently trend.
+
+Runs daily after the keyword sweep. Mines the rolling 14-day window of `github/{YYYY}/{MM}/*.md` files for trending-repo H3 entries. Per-repo: distinct trending days, max one-day star delta, total star delta in the window.
+
+**Tiers:**
+1. `covered_active` — already in `watched_repos`. No action.
+2. `revive` — in `deep_watch_repos` AND ≥1 trending appearance. Re-promote to `watched_repos`.
+3. `hot_event` — uncovered AND max-one-day delta ≥5,000 stars. Auto-add with 30-day TTL.
+4. `promote` — uncovered AND ≥3 distinct trending days in 14d, sustained for ≥2 consecutive sweep runs. Auto-add to `watched_repos`.
+5. `watch` — uncovered AND ≥2 trending days. No action; surfaces in change log.
+6. `dormant` — everything else.
+
+**Soft cap:** `max_watched_repos` (default 80). When exceeded AND `_auto_added` repos are silent for ≥60 days (no trending appearance), the OLDEST-SILENT (up to 3 per run) get moved to `news_collector.github_collector.deep_watch_repos`. The github collector skips the deep-watch list for daily star-fetch but the sweep still recognizes returning trending appearances as `revive`.
+
+**Auto-apply safeties** (identical pattern to vendor + keyword sweeps):
+- `sources.json.bak` rollback before every write.
+- `github_changes.log` append-only audit trail (verbs: `promote-add`, `hot-event-add`, `expire-remove`, `deep-watch-demote`, `deep-watch-promote`).
+- JSON parse-validation before write; abort on failure.
+- Manual entries (no `_auto_added` in `github_stars.json`) are NEVER touched.
+- Disable via `github_sweep_config.auto_apply.enabled: false`.
+
+**State:** `github_stars.json` carries `_auto_added`, `_added_on`, `_added_reason`, `_classification_history`, `_demoted_on/_demoted_reason` (when applicable) per repo. `github_candidates/{YYYY}/{MM}/{date}.md` is the daily change log.
+
+**Implementation:** `scripts/run_github_sweep.py` — single deterministic Python script. No agent involvement.
+
 ## The vendor sweep — auto-applied
 
 Runs daily after the radar. Reads `discovered_orgs.json` (running tally), today's source files, recent radar JSONs (for `breadth_orgs_7d`), and `sources.json` vendor lists. Classifies every org, then **mutates `sources.json` directly**.
@@ -181,6 +220,23 @@ Runs daily after the radar. Reads `discovered_orgs.json` (running tally), today'
 - Disable via `radar_config.vendor_sweep_config.auto_apply.enabled: false` — reverts to recommendation-only.
 
 **Expiration:** hot-event entries past `_expires_on` get auto-removed on the next sweep, UNLESS they meanwhile crossed the sustained-promote gate (in which case they were already re-added without expiry).
+
+**Soft cap + deep-watch demotion (added 2026-05-14):** the sweep enforces `max_enterprise_vendors` (default 30). When the list exceeds the cap AND there are `_auto_added` entries silent for ≥60 days, the OLDEST-SILENT (up to 3 per run) get moved into `news_collector.deep_watch_vendors` rather than deleted. The news collector skips the deep-watch list for daily fetches, but the radar still recognizes mentions. **Re-promotion path:** if a deep-watch vendor classifies as `hot_event` or sustained-`promote`, the original entry moves back to `enterprise_vendors` (so a returning vendor isn't seen as a brand-new promotion). Manual entries and entries classified hot/promote today are NEVER demoted. Audit verbs: `deep-watch-demote`, `deep-watch-promote`. The same mechanism applies to keyword lists (`web_search_queries`, `filter_keywords`, `pulse_topic_queries`, `topic_taxonomy_seed._auto_added`) with per-list caps and `_deep_watch_meta` registries — proven keywords are exempt as always.
+
+## Long-tail archive — `scripts/archive_stale.py`
+
+Two state files grow without bound: `discovered_orgs.json` (running org tally) and `discovered_keywords.json` (mined-phrase tally). Most growth is healthy (real signal), but a long tail of single-mention orgs and boilerplate-tagged keywords doesn't pay rent. Run periodically (weekly or monthly) to prune them into parallel archive files:
+
+```bash
+python3 scripts/archive_stale.py --orgs --keywords --dry-run    # preview
+python3 scripts/archive_stale.py --orgs --keywords              # write
+```
+
+**Org thresholds** (`archive_config.orgs` in sources.json): `total_mentions ≤ 3` AND silent for `≥ 60 days`. Priority/enterprise/deep-watch orgs are never archived. Archived to `discovered_orgs_archive.json` (created lazily).
+
+**Keyword thresholds** (`archive_config.keywords`): boilerplate verdict ≥ 30 days old AND silent for ≥ 30 days. Phrases without a verdict are never archived. Archived to `discovered_keywords_archive.json`.
+
+If a slug or phrase resurfaces after archival, the next sweep creates a fresh entry (no auto-restore from archive — kept simple). The archive files are read-only history.
 
 ## Outputs by cadence
 
@@ -273,6 +329,7 @@ Edit this to change what the pipeline tracks. Major sections:
 |----------------------------------------------|--------------------------------------------------------------------------------------|
 | `news_collector.priority_vendors`            | Frontier labs (5). MANDATORY coverage. Never modified by auto-apply.                 |
 | `news_collector.enterprise_vendors`          | Platform layer (8 starter + auto-added). Mutated by the vendor sweep.                |
+| `news_collector.deep_watch_vendors`          | Auto-demoted vendors (silent + over soft cap). News collector skips these for daily fetch; sweep can re-promote. |
 | `news_collector.vendor_blogs`                | Informal blog URL list. Counted as `informal_covered`.                               |
 | `news_collector.tech_news_sites`             | Heise, Handelsblatt, t3n, TheVerge, TechCrunch, ArsTechnica, …                       |
 | `news_collector.swiss_sources`               | NZZ, SwissInfo.                                                                      |
@@ -281,7 +338,8 @@ Edit this to change what the pipeline tracks. Major sections:
 | `blogs_collector`                            | Medium tags + curated long-form blogs.                                               |
 | `jobs_ch_collector`                          | Swiss role keywords + locations + boards.                                            |
 | `linkedin_collector`                         | Pulse topic queries + hashtag feeds + capture rules.                                 |
-| `github_collector`                           | Trending URLs + AI topic pages + 47 watched repos.                                   |
+| `github_collector`                           | Trending URLs + AI topic pages + watched_repos (manual seed; auto-extended by github sweep). |
+| `github_collector.github_sweep_config`       | Repo promotion thresholds (≥3 trending days in 14d, sustained-day gate), hot-event delta, soft cap (`deep_watch_demote.max_watched_repos`). |
 | `hackernews_collector`                       | HN endpoints + AI filter keywords + min-points threshold.                            |
 | `radar_config.source_weights`                | Per-mention contribution to topic scores.                                            |
 | `radar_config.max_mentions_per_source_type`  | Caps to prevent one chatty source dominating.                                        |
@@ -290,8 +348,10 @@ Edit this to change what the pipeline tracks. Major sections:
 | `radar_config.breadth_config`                | Breadth window days + per-org-per-day cap + high-breadth threshold.                  |
 | `radar_config.clustering_config`             | Co-mention window + min co-mentions + min cluster size.                              |
 | `radar_config.velocity_config`               | Vendor + topic velocity thresholds (surging / accelerating / cooling).               |
-| `radar_config.vendor_sweep_config`           | Promotion / watch / silence thresholds + hot-event keywords + auto-apply rules.      |
+| `radar_config.vendor_sweep_config`           | Promotion / watch / silence thresholds + hot-event keywords + auto-apply rules + soft cap (`deep_watch_demote.max_enterprise_vendors`). |
+| `radar_config.keyword_sweep_config`          | Auto-extending keyword lists; promote/watch/proven thresholds + per-list soft caps (`deep_watch_demote.max_per_list`). |
 | `radar_config.topic_taxonomy_seed`           | Seed topic IDs (group keys serve as category *hints*, not authoritative).            |
+| `archive_config`                             | Long-tail pruning thresholds for `scripts/archive_stale.py` (orgs and keywords).     |
 
 ## How to use
 
@@ -401,13 +461,12 @@ Deferred items (documented in conversation history):
 
 - **Past-date replay** (collectors fetch live URLs — out of scope; would need historical archives like Common Crawl).
 - **Daily health beacon:** `daily/{date}-health.json` with per-collector item counts + failure flags, so "is the pipeline alive" is a one-glance signal.
-- **Soft cap on `enterprise_vendors` size** with a "deep-watch" demotion tier — auto-grown list is at 18 today (post-bug-fix; was 26 before the legacy `hot-add` entries got reclassified). Trajectory still says 40+ by month-end if the sweep keeps promoting; needs a budget mechanism before then.
 - **Cron-side orchestrator alignment.** `skills/ai-replay/SKILL.md` is now the canonical orchestrator spec (the previous `ORCHESTRATOR_UPDATE.md` is deleted). The cron'd `ai-daily-research` task in Cowork's UI should be pasted from §1–§8 of that file. Until verified, treat the cron's behavior as "should match ai-replay but trust nothing."
 - **Twitter/X collector** via Claude in Chrome (curated researcher list).
 - **Earnings-call / 10-Q AI-mention tracker.**
 - **A/B testing infrastructure** for threshold tuning.
 - **Pattern-matching forecasting** ("vibe coding wave looks like 2024 RAG wave").
 
-**Shipped this session:** firm view (`orgs.html`), keyword sweep (Python implementation + first run with 200-phrase tally), briefing radar (`radar.html`), change-log JSON views with consistency check (caught the vendor-sweep legacy `hot-add` bug), vendor-sweep skill hardened to prevent the bug from recurring, maturity badge in briefing radar, sector/cluster filter chips with pinned+dynamic tiers.
+**Shipped this session:** firm view (`orgs.html`), keyword sweep (Python implementation + first run with 200-phrase tally), briefing radar (`radar.html`), change-log JSON views with consistency check (caught the vendor-sweep legacy `hot-add` bug), vendor-sweep skill hardened to prevent the bug from recurring, maturity badge in briefing radar, sector/cluster filter chips with pinned+dynamic tiers, deep-watch demotion for vendors / keywords / github-watched-repos (soft cap + re-promotion path; manual + proven entries sacred), github sweep (`scripts/run_github_sweep.py` — auto-extends `watched_repos` from trending-day tracking; new `github_changes.log/.json`), long-tail archive script (`scripts/archive_stale.py`) for org/keyword tally pruning, shared `scripts/_lib.py` (deduped iter_source_files / whole_word_pattern / SOURCE_DIRS across daily scripts), radar.html sector-shift block + arc-detail expanded stat grid (sustained_days / convergence / breadth / 180d), legacy hot-add filter in vendor_changes.json, full SKILL.md timestamp-footer cleanup, ai-trend-radar SKILL path fixes (root vs nested JSON; write-JSON-first guard).
 
 Add any of the deferred items by writing a new `skills/{name}/SKILL.md` (or `scripts/{name}.py` if deterministic), then wiring it into `ai-replay/SKILL.md` (and the cron-side orchestrator) at the appropriate §3 (collector) or §6.x (post-synthesis agent) step.

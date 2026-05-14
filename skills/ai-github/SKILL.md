@@ -14,7 +14,7 @@ You produce TWO signals per day:
 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `github_collector` section only.
-- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` and use `TODAY`, `WEEK_ID`, `MONTH`. Standalone fallback: `eval "$(scripts/now.sh)"`. Do NOT compute the date locally.
+- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` and use whichever vars you need (full set documented in `skills/ai-replay/SKILL.md` §2 — `TODAY`, `WEEK_ID`, `MONTH` cover this skill's normal use). Standalone fallback: `eval "$(scripts/now.sh)"`. Do NOT compute the date locally.
 - Output: `github/{YYYY}/{MM}/{TODAY}.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
   1. Read the existing file. Parse "Trending now" repos by `owner/name` (primary key). Parse "Watched-repo movers" by `owner/name` too.
   2. For each repo from this run: if its `owner/name` already appears in the existing file, **update the metrics in-place** (today's star count and delta are time-sensitive and the latest run has the freshest values) but preserve any manual commentary line below the metric row.

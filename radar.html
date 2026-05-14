@@ -2,557 +2,547 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI Trend Radar — Briefing</title>
+  <title>AI Trend Radar</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg: #0f1117;
-      --panel: #181b25;
-      --panel-2: #1f2330;
-      --border: #2a2f3d;
-      --text: #e6e8ee;
-      --muted: #8a91a3;
+      --bg: #0b0d12;
+      --surface: #11141c;
+      --surface-2: #161a24;
+      --border: #232836;
+      --border-strong: #2f3547;
+      --text: #e7eaf2;
+      --text-dim: #aab0c0;
+      --muted: #6b7384;
       --accent: #6aa9ff;
-      --accent-dim: #3d5e8a;
-      --pinned: #ffd76a;
-      --pinned-bg: rgba(255, 215, 106, 0.10);
-      --stage-mainstream: #58c97f;
-      --stage-consolidating: #6aa9ff;
-      --stage-emerging: #ffb84d;
-      --stage-fading: #8a91a3;
-      --dir-surging: #58c97f;
-      --dir-rising: #58c97f;
-      --dir-fading: #ff8a8a;
-      --dir-steady: #b8bdc8;
+      --rising: #58c97f;
+      --falling: #ff8a8a;
+      --emerging: #ffb84d;
+      --consolidating: #6aa9ff;
+      --mainstream: #58c97f;
+      --fading: #8a91a3;
     }
     * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
     body {
-      margin: 0;
       background: var(--bg);
       color: var(--text);
-      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font: 13px/1.5 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    button { font: inherit; }
 
-    header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
+    /* -------- top bar -------- */
+    .topbar {
       display: flex;
       align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
+      gap: 20px;
+      padding: 14px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
     }
-    header h1 {
+    .topbar h1 {
       margin: 0;
-      font-size: 17px;
+      font-size: 14px;
       font-weight: 600;
+      letter-spacing: -0.01em;
     }
-    header .subtitle {
-      color: var(--muted);
+    .topbar .meta {
+      color: var(--text-dim);
       font-size: 12px;
     }
-    header select {
-      background: var(--panel);
+    .topbar .meta .sep { color: var(--border-strong); margin: 0 8px; }
+    .topbar .spacer { flex: 1; }
+    .topbar select {
+      background: var(--surface-2);
       color: var(--text);
       border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 4px 8px;
-      font: inherit;
-    }
-    header .nav-link { font-size: 12px; color: var(--accent); }
-
-    .mode-tabs {
-      display: flex;
-      gap: 2px;
-      background: var(--panel);
-      border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 2px;
-    }
-    .mode-tabs button {
-      background: transparent;
-      color: var(--muted);
-      border: none;
-      padding: 5px 14px;
-      border-radius: 4px;
+      padding: 5px 26px 5px 10px;
       font: inherit;
-      font-weight: 600;
+      font-size: 12px;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%), linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+      background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+      background-size: 5px 5px;
+      background-repeat: no-repeat;
       cursor: pointer;
     }
-    .mode-tabs button.active {
-      background: var(--accent);
-      color: var(--bg);
+    .topbar select:hover { border-color: var(--border-strong); }
+    .topbar .links {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+    }
+    .topbar .links a { color: var(--text-dim); }
+    .topbar .links a:hover { color: var(--accent); }
+
+    /* -------- layout -------- */
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 28px 48px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .row-2 {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 900px) {
+      .row-2 { grid-template-columns: 1fr; }
     }
 
-    #maturity-badge {
-      padding: 3px 10px;
-      border-radius: 4px;
+    /* -------- card primitive -------- */
+    .card {
+      background: var(--surface);
       border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-head h2 {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .card-head .hint {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .card-body { padding: 4px 0; }
+    .card-body.padded { padding: 14px 16px; }
+
+    /* -------- "what moved today" list -------- */
+    .moves { list-style: none; margin: 0; padding: 0; }
+    .moves li {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: baseline;
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.08s;
+    }
+    .moves li:last-child { border-bottom: none; }
+    .moves li:hover { background: var(--surface-2); }
+    .moves .title {
+      font-weight: 500;
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .moves .meta {
+      color: var(--text-dim);
+      font-size: 11px;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .moves .tag {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding-left: 12px;
+      align-self: center;
+    }
+    .moves .tag.up { color: var(--rising); }
+    .moves .tag.down { color: var(--falling); }
+    .moves .tag.new { color: var(--accent); }
+    .moves .tag.hot { color: var(--emerging); }
+    .moves .tag.shift { color: #5cd0d0; }
+    .moves .tag.breadth { color: #b48aff; }
+
+    .empty {
+      padding: 24px 16px;
+      color: var(--muted);
+      font-style: italic;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    /* -------- sector cards -------- */
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      padding: 16px;
+    }
+    .sector-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.08s, background 0.08s;
+    }
+    .sector-card:hover { border-color: var(--border-strong); }
+    .sector-card.active {
+      border-color: var(--accent);
+      background: rgba(106, 169, 255, 0.06);
+    }
+    .sector-card .name {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .sector-card .stats {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      color: var(--text-dim);
       font-size: 11px;
     }
-    #maturity-badge.cold    { color: var(--dir-fading);  border-color: var(--dir-fading);  background: rgba(255, 138, 138, 0.08); }
-    #maturity-badge.warming { color: var(--stage-emerging); border-color: var(--stage-emerging); background: rgba(255, 184, 77, 0.08); }
-    #maturity-badge.warm    { color: var(--stage-mainstream); border-color: var(--stage-mainstream); background: rgba(88, 201, 127, 0.08); }
-
-    /* Filter chips row */
-    .chip-row {
-      padding: 10px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
+    .sector-card .count {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
     }
-    .chip-row-label {
+    .sector-card .label {
       font-size: 11px;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      margin-right: 4px;
     }
-    .chip {
-      display: inline-flex;
+
+    /* -------- topics table -------- */
+    .table-toolbar {
+      display: flex;
+      gap: 10px;
       align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      border-radius: 14px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 12px;
-      user-select: none;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
     }
-    .chip:hover { border-color: var(--accent); }
-    .chip.active {
-      background: var(--accent);
-      color: var(--bg);
+    .table-toolbar input {
+      flex: 1;
+      max-width: 260px;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font: inherit;
+      font-size: 12px;
+    }
+    .table-toolbar input::placeholder { color: var(--muted); }
+    .table-toolbar input:focus {
+      outline: none;
       border-color: var(--accent);
     }
-    .chip.pinned {
-      background: var(--pinned-bg);
-      border-color: var(--pinned);
-    }
-    .chip.pinned.active {
-      background: var(--pinned);
-      color: var(--bg);
-    }
-    .chip-star {
-      font-size: 11px;
-      opacity: 0.5;
-      transition: opacity 0.1s;
-    }
-    .chip:hover .chip-star { opacity: 1; }
-    .chip.pinned .chip-star { opacity: 1; color: var(--pinned); }
-    .chip.pinned.active .chip-star { color: var(--bg); }
-    .chip-divider {
-      width: 1px;
-      height: 18px;
-      background: var(--border);
-      margin: 0 4px;
-    }
-    .chip-icon { opacity: 0.7; font-size: 10px; }
-
-    main { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    .mode-pane { /* show/hide controlled inline via JS switchMode() */ }
-
-    /* TODAY mode briefing */
-    .briefing-card {
-      background: var(--panel);
+    .table-toolbar select {
+      background: var(--surface-2);
+      color: var(--text);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin-bottom: 12px;
-    }
-    .briefing-card h2 {
-      margin: 0 0 10px;
+      border-radius: 6px;
+      padding: 5px 26px 5px 10px;
+      font: inherit;
       font-size: 12px;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%), linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+      background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+      background-size: 5px 5px;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+    .table-toolbar .clear {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .table-toolbar .clear:hover { color: var(--text); border-color: var(--border-strong); }
+    .table-toolbar .count {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    table.topics {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    table.topics th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    table.topics th.right { text-align: right; }
+    table.topics th .sortarr { color: var(--text-dim); margin-left: 4px; font-size: 9px; }
+    table.topics th.inactive .sortarr { opacity: 0; }
+    table.topics th:hover { color: var(--text-dim); }
+
+    table.topics td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    table.topics td.right {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.topics tr.row-main { cursor: pointer; }
+    table.topics tr.row-main:hover { background: var(--surface-2); }
+    table.topics tr.row-main.expanded { background: var(--surface-2); }
+    table.topics td.topic-label {
+      max-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    table.topics .stage-pill {
+      display: inline-block;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--muted);
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
     }
-    .briefing-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 10px 0;
+    table.topics .stage-pill.emerging      { color: var(--emerging); border-color: rgba(255, 184, 77, 0.4); }
+    table.topics .stage-pill.consolidating { color: var(--consolidating); border-color: rgba(106, 169, 255, 0.4); }
+    table.topics .stage-pill.mainstream    { color: var(--mainstream); border-color: rgba(88, 201, 127, 0.4); }
+    table.topics .stage-pill.fading        { color: var(--fading); border-color: rgba(138, 145, 163, 0.4); }
+    table.topics .dir { font-weight: 600; }
+    table.topics .dir.rising  { color: var(--rising); }
+    table.topics .dir.surging { color: var(--rising); }
+    table.topics .dir.fading  { color: var(--falling); }
+    table.topics .dir.steady  { color: var(--muted); }
+    table.topics .caret {
+      color: var(--muted);
+      display: inline-block;
+      transition: transform 0.12s;
+      font-size: 10px;
+      margin-right: 6px;
+    }
+    table.topics tr.row-main.expanded .caret { transform: rotate(90deg); }
+
+    /* expanded detail row */
+    tr.row-detail td {
+      padding: 0;
+      background: var(--surface-2);
+    }
+    .detail-wrap {
+      padding: 14px 16px 16px 32px;
       border-bottom: 1px solid var(--border);
-      cursor: pointer;
     }
-    .briefing-item:last-child { border-bottom: none; }
-    .briefing-item:hover { background: var(--panel-2); margin: 0 -8px; padding-left: 8px; padding-right: 8px; }
-    .briefing-icon {
-      font-size: 18px;
-      width: 24px;
-      flex-shrink: 0;
-      line-height: 1.3;
-    }
-    .briefing-body {
-      flex: 1;
-      min-width: 0;
-    }
-    .briefing-title {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 2px;
-    }
-    .briefing-meta {
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .briefing-tag {
-      display: inline-block;
-      padding: 1px 8px;
-      border-radius: 3px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      margin-left: 6px;
-      vertical-align: middle;
-    }
-    .briefing-tag.surge      { background: rgba(88, 201, 127, 0.20); color: var(--dir-rising); }
-    .briefing-tag.fade       { background: rgba(255, 138, 138, 0.15); color: var(--dir-fading); }
-    .briefing-tag.hot        { background: rgba(255, 184, 77, 0.20); color: var(--stage-emerging); }
-    .briefing-tag.new        { background: rgba(106, 169, 255, 0.20); color: var(--accent); }
-    .briefing-tag.breadth    { background: rgba(180, 138, 255, 0.20); color: #b48aff; }
-    .briefing-tag.stage      { background: rgba(180, 138, 255, 0.20); color: #b48aff; }
-
-    .empty-state {
-      color: var(--muted);
-      font-style: italic;
-      padding: 14px 0;
-      font-size: 13px;
-    }
-
-    /* Disclosure panels (hidden by default in TODAY) */
-    details.disclosure {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin-bottom: 12px;
-    }
-    details.disclosure[open] { padding-bottom: 10px; }
-    details.disclosure summary {
-      padding: 12px 20px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-      list-style: none;
-      color: var(--muted);
-    }
-    details.disclosure summary::-webkit-details-marker { display: none; }
-    details.disclosure summary:before {
-      content: "▸ ";
-      display: inline-block;
-      transition: transform 0.15s;
-    }
-    details.disclosure[open] summary:before {
-      content: "▾ ";
-    }
-    details.disclosure[open] summary { color: var(--text); }
-    .disclosure-body { padding: 0 20px; }
-
-    /* ARCS mode */
-    .arcs-layout {
+    .detail-stats {
       display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 16px;
-    }
-    .topic-list {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
-      max-height: 75vh;
-      overflow-y: auto;
-    }
-    .topic-list input {
-      width: 100%;
-      background: var(--panel-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 5px 8px;
-      font: inherit;
-      margin-bottom: 8px;
-    }
-    .topic-row {
-      padding: 7px 8px;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-    }
-    .topic-row:hover { background: var(--panel-2); }
-    .topic-row.active { background: var(--panel-2); border-left: 2px solid var(--accent); padding-left: 6px; }
-    .stage-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .stage-dot.mainstream    { background: var(--stage-mainstream); }
-    .stage-dot.consolidating { background: var(--stage-consolidating); }
-    .stage-dot.emerging      { background: var(--stage-emerging); }
-    .stage-dot.fading        { background: var(--stage-fading); }
-    .topic-row .label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .topic-row .mini-arrow {
-      color: var(--muted);
-      font-size: 11px;
-    }
-    .topic-row .mini-arrow.rising { color: var(--dir-rising); }
-    .topic-row .mini-arrow.surging { color: var(--dir-rising); }
-    .topic-row .mini-arrow.fading { color: var(--dir-fading); }
-
-    .arc-detail {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px 22px;
-    }
-    .arc-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .arc-subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
-    .arc-pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 600;
-      margin: 0 4px 6px 0;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .arc-pill.mainstream    { background: rgba(88, 201, 127, 0.18); color: var(--stage-mainstream); }
-    .arc-pill.consolidating { background: rgba(106, 169, 255, 0.18); color: var(--stage-consolidating); }
-    .arc-pill.emerging      { background: rgba(255, 184, 77, 0.18); color: var(--stage-emerging); }
-    .arc-pill.fading        { background: rgba(138, 145, 163, 0.18); color: var(--stage-fading); }
-    .arc-pill.sector        { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
-    .arc-stat-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
       gap: 10px;
-      margin: 14px 0;
+      margin-bottom: 14px;
     }
-    .arc-stat {
-      background: var(--panel-2);
-      border-radius: 6px;
-      padding: 10px 12px;
+    .detail-stat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px 10px;
     }
-    .arc-stat .label {
-      font-size: 10px;
+    .detail-stat .l {
+      font-size: 9.5px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
       color: var(--muted);
     }
-    .arc-stat .value {
-      font-size: 18px;
+    .detail-stat .v {
+      font-size: 15px;
       font-weight: 600;
       margin-top: 2px;
+      font-variant-numeric: tabular-nums;
     }
-    .arc-stat .value.cold { color: var(--muted); font-size: 13px; font-style: italic; }
-    .chart-wrap {
-      position: relative;
-      height: 240px;
-      margin: 12px 0;
+    .detail-stat .v.dim { color: var(--muted); font-size: 12px; font-weight: 400; font-style: italic; }
+    .detail-section {
+      margin-top: 12px;
+    }
+    .detail-section h4 {
+      margin: 0 0 6px;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
     }
     .org-pill {
       display: inline-block;
-      padding: 1px 7px;
-      margin: 0 2px 2px 0;
+      padding: 1px 8px;
+      margin: 0 4px 4px 0;
       border-radius: 3px;
-      background: var(--panel-2);
+      background: var(--bg);
       border: 1px solid var(--border);
       font-size: 11px;
       color: var(--text);
     }
     .org-pill:hover { border-color: var(--accent); color: var(--accent); }
     .org-pill.priority { border-color: var(--accent); color: var(--accent); font-weight: 600; }
-
-    .arc-section h4 {
-      margin: 16px 0 6px;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-    }
-    .arc-section .files code {
+    .detail-section code {
       display: block;
       font-size: 11px;
-      color: var(--muted);
-      padding: 2px 0;
+      color: var(--text-dim);
+      padding: 1px 0;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
     }
-
-    /* Disclosure bodies — sector evolution + score history charts */
-    .mini-chart-wrap {
+    .detail-chart {
       position: relative;
-      height: 200px;
-      padding: 0 10px 10px;
+      height: 180px;
+      margin-top: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px;
     }
 
-    footer {
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 12px 20px;
-      color: var(--muted);
-      font-size: 11px;
-      border-top: 1px solid var(--border);
+    /* -------- top history chart card -------- */
+    .chart-wrap {
+      position: relative;
+      height: 280px;
+      padding: 14px 16px 16px;
     }
-    footer code { background: var(--panel); padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+
+    /* -------- error -------- */
+    .error {
+      background: rgba(255, 138, 138, 0.08);
+      border: 1px solid var(--falling);
+      color: var(--falling);
+      padding: 12px 16px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🛰️ AI Trend Radar</h1>
-    <div class="mode-tabs" id="mode-tabs">
-      <button data-mode="today" class="active">Today</button>
-      <button data-mode="arcs">Arcs</button>
+  <div class="topbar">
+    <h1>AI Trend Radar</h1>
+    <div class="meta" id="meta-line"></div>
+    <div class="spacer"></div>
+    <label class="meta">Snapshot
+      <select id="date-select" style="margin-left:6px;"></select>
+    </label>
+    <div class="links">
+      <a href="orgs.html">Firm view</a>
+      <a href="radar-classic.html">Polar radar</a>
+      <a href="index.md">Index</a>
     </div>
-    <label>Snapshot: <select id="date-select"></select></label>
-    <span class="subtitle" id="meta-line"></span>
-    <span id="maturity-badge" style="display:none;"></span>
-    <span style="margin-left:auto; display:flex; gap:14px;">
-      <a class="nav-link" href="orgs.html">→ firm view</a>
-      <a class="nav-link" href="radar-classic.html">→ classic radar</a>
-      <a class="nav-link" href="index.md">→ index</a>
-    </span>
-  </header>
-
-  <div class="chip-row" id="chip-row">
-    <span class="chip-row-label">Filter:</span>
-    <span id="chips-pinned"></span>
-    <span class="chip-divider" id="chip-divider-1" style="display:none;"></span>
-    <span id="chips-dynamic"></span>
-    <span class="chip-row-label" id="chips-empty-hint" style="display:none;">no active sectors — try the dropdown above to load a snapshot</span>
   </div>
 
   <main id="main">
-    <!-- Mode panes — only one visible at a time -->
-
-    <div id="mode-today" class="mode-pane">
-      <div class="briefing-card">
-        <h2>📋 Headline — what changed</h2>
-        <div id="headline-list"></div>
-      </div>
-
-      <details class="disclosure" id="disc-radar">
-        <summary>Show polar radar (all topics on one canvas)</summary>
-        <div class="disclosure-body">
-          <p class="empty-state" style="padding:8px 0">The full polar radar view (concentric stage rings, sector quadrants, every topic as a dot) lives in <a href="radar-classic.html">radar-classic.html</a> — kept intact while the new briefing view stabilizes.</p>
+    <section class="row-2">
+      <div class="card">
+        <div class="card-head">
+          <h2>What moved today</h2>
+          <span class="hint" id="moved-count"></span>
         </div>
-      </details>
-
-      <details class="disclosure" id="disc-clusters">
-        <summary>Show topic clusters (co-mention graph)</summary>
-        <div class="disclosure-body">
-          <div id="clusters-body"></div>
-        </div>
-      </details>
-
-      <details class="disclosure" id="disc-sectors">
-        <summary>Show sector evolution (last 8 runs)</summary>
-        <div class="disclosure-body">
-          <div class="mini-chart-wrap" id="sector-evo-body"></div>
-        </div>
-      </details>
-
-      <details class="disclosure" id="disc-scores">
-        <summary>Show score history (top 8 by current score)</summary>
-        <div class="disclosure-body">
-          <div class="chart-wrap"><canvas id="top-history-chart"></canvas></div>
-        </div>
-      </details>
-    </div>
-
-    <div id="mode-arcs" class="mode-pane" style="display:none;">
-      <div class="arcs-layout">
-        <div class="topic-list" id="topic-list-wrap">
-          <input type="text" id="topic-search" placeholder="Search topics…">
-          <div id="topic-list"></div>
-        </div>
-        <div class="arc-detail" id="arc-detail">
-          <div class="empty-state">Pick a topic from the list to see its life-cycle arc.</div>
+        <div class="card-body">
+          <ul class="moves" id="moves-list"></ul>
         </div>
       </div>
-    </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Sectors</h2>
+          <span class="hint" id="sectors-hint"></span>
+        </div>
+        <div class="sectors-grid" id="sectors-grid"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Topics</h2>
+        <span class="hint">Click a row for details</span>
+      </div>
+      <div class="table-toolbar">
+        <input type="text" id="topic-search" placeholder="Search topics…">
+        <select id="sector-filter"><option value="">All sectors</option></select>
+        <button class="clear" id="clear-filters">Clear</button>
+        <span class="count" id="topic-count"></span>
+      </div>
+      <table class="topics" id="topics-table">
+        <thead>
+          <tr>
+            <th data-sort="label">Topic <span class="sortarr">▾</span></th>
+            <th data-sort="sector">Sector <span class="sortarr">▾</span></th>
+            <th data-sort="stage">Stage <span class="sortarr">▾</span></th>
+            <th class="right" data-sort="score_slow">Score <span class="sortarr">▾</span></th>
+            <th class="right" data-sort="direction">Dir <span class="sortarr">▾</span></th>
+            <th class="right" data-sort="breadth_7d">Breadth <span class="sortarr">▾</span></th>
+            <th class="right" data-sort="sustained_days">Days <span class="sortarr">▾</span></th>
+          </tr>
+        </thead>
+        <tbody id="topics-body"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Top 8 by score · history</h2>
+        <span class="hint" id="history-hint"></span>
+      </div>
+      <div class="chart-wrap"><canvas id="top-history-chart"></canvas></div>
+    </section>
   </main>
 
-  <footer>
-    Briefing view loads <code>radar/index.json</code> → <code>radar/{date}.json</code>, plus <code>orgs/index.json</code> + <code>vendor_changes.json</code> + <code>keyword_changes.json</code> (optional). Run a local server: <code>python3 -m http.server 8000</code> then open <code>http://localhost:8000/radar.html</code>. Full polar view at <a href="radar-classic.html">radar-classic.html</a>.
-  </footer>
-
   <script>
-    // =========================================================================
+    // ====================================================================
     // State
-    // =========================================================================
+    // ====================================================================
     const state = {
       manifest: null,
       currentEntry: null,
       currentData: null,
       priorData: null,
       cache: new Map(),
-      mode: 'today',
-      activeFilter: null,         // {kind: 'sector'|'cluster', name: '...'}
-      selectedTopicId: null,
-      pinned: loadPinned(),
       orgs: null,
-      vendorActive: new Map(),
-      vendorProven: new Set(),
-      keywordActive: new Map(),
-      keywordProven: new Set(),
+      sectorFilter: '',
+      search: '',
+      sortBy: 'score_slow',
+      sortDir: 'desc',
+      expanded: new Set(),     // topic ids open in the detail row
       topHistoryChart: null,
-      arcChart: null,
+      detailCharts: new Map(), // topicId -> Chart instance
     };
 
-    const STAGE_LABEL = {
-      mainstream: 'mainstream',
-      consolidating: 'consolidating',
-      emerging: 'emerging',
-      fading: 'fading',
-    };
+    const STAGE_RANK = { fading: 0, emerging: 1, consolidating: 2, mainstream: 3 };
+    const DIR_RANK   = { fading: 0, steady: 1, rising: 2, surging: 3 };
+    const DIR_GLYPH  = { surging: '↑↑', rising: '↑', steady: '→', fading: '↓' };
 
-    // =========================================================================
-    // localStorage pin/unpin
-    // =========================================================================
-    function loadPinned() {
-      try {
-        const raw = localStorage.getItem('radarPinned');
-        if (!raw) return { sectors: [], clusters: [] };
-        const p = JSON.parse(raw);
-        return { sectors: p.sectors || [], clusters: p.clusters || [] };
-      } catch (_) {
-        return { sectors: [], clusters: [] };
-      }
-    }
-    function savePinned() {
-      localStorage.setItem('radarPinned', JSON.stringify(state.pinned));
-    }
-    function isPinned(kind, name) {
-      return state.pinned[kind + 's'].includes(name);
-    }
-    function togglePin(kind, name) {
-      const arr = state.pinned[kind + 's'];
-      const idx = arr.indexOf(name);
-      if (idx === -1) arr.push(name);
-      else arr.splice(idx, 1);
-      savePinned();
-      renderChips();
-    }
-
-    // =========================================================================
+    // ====================================================================
     // Boot
-    // =========================================================================
+    // ====================================================================
     async function init() {
       try {
         const r = await fetch('radar/index.json');
@@ -563,52 +553,60 @@
         return;
       }
 
-      // Side data (all optional)
-      await Promise.all([
-        sideFetch('orgs/index.json', d => {
+      // Optional side data (orgs metadata for priority pills)
+      try {
+        const r = await fetch('orgs/index.json');
+        if (r.ok) {
+          const d = await r.json();
           state.orgs = new Map(d.entries.map(e => [e.slug, e]));
-        }),
-        sideFetch('vendor_changes.json', d => {
-          (d.active_auto_added || []).forEach(e => state.vendorActive.set(e.subject, e));
-          (d.proven_entries || []).forEach(p => state.vendorProven.add(p.subject));
-        }),
-        sideFetch('keyword_changes.json', d => {
-          (d.active_auto_added || []).forEach(e => state.keywordActive.set(e.subject.toLowerCase(), e));
-          (d.proven_entries || []).forEach(p => state.keywordProven.add(p.subject.toLowerCase()));
-        }),
-      ]);
+        }
+      } catch (_) { /* optional */ }
 
       const sel = document.getElementById('date-select');
       state.manifest.entries.forEach(entry => {
         const opt = document.createElement('option');
         opt.value = entry.date_id;
-        opt.textContent = `${entry.date_id} — ${entry.topic_count} topics`;
+        opt.textContent = `${entry.date_id} · ${entry.topic_count} topics`;
         sel.appendChild(opt);
       });
       sel.addEventListener('change', () => loadDate(sel.value));
 
-      document.querySelectorAll('#mode-tabs button').forEach(btn => {
-        btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+      document.getElementById('topic-search').addEventListener('input', e => {
+        state.search = e.target.value.toLowerCase().trim();
+        renderTopics();
+      });
+      document.getElementById('sector-filter').addEventListener('change', e => {
+        state.sectorFilter = e.target.value;
+        renderTopics();
+        renderSectors();
+      });
+      document.getElementById('clear-filters').addEventListener('click', () => {
+        state.search = '';
+        state.sectorFilter = '';
+        document.getElementById('topic-search').value = '';
+        document.getElementById('sector-filter').value = '';
+        renderTopics();
+        renderSectors();
+      });
+      document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          const col = th.dataset.sort;
+          if (state.sortBy === col) {
+            state.sortDir = state.sortDir === 'desc' ? 'asc' : 'desc';
+          } else {
+            state.sortBy = col;
+            state.sortDir = (col === 'label' || col === 'sector' || col === 'stage') ? 'asc' : 'desc';
+          }
+          renderTopics();
+        });
       });
 
-      document.getElementById('topic-search').addEventListener('input', renderTopicList);
-
-      if (state.manifest.entries.length === 0) {
+      if (!state.manifest.entries.length) {
         showError('No radar entries in manifest.');
         return;
       }
       await loadDate(state.manifest.entries[0].date_id);
       await preloadAll();
-    }
-
-    async function sideFetch(path, transform) {
-      try {
-        const r = await fetch(path);
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        transform(await r.json());
-      } catch (e) {
-        console.warn(`[radar] optional ${path} not loaded:`, e.message);
-      }
     }
 
     async function loadJson(date_id) {
@@ -621,577 +619,396 @@
       state.cache.set(date_id, data);
       return data;
     }
+
     async function preloadAll() {
       await Promise.allSettled(state.manifest.entries.map(e => loadJson(e.date_id)));
-      // Now that the cache is warm, redraw mode-specific charts that need history.
-      if (state.mode === 'today') renderTopHistory();
-      if (state.mode === 'arcs' && state.selectedTopicId) renderArcDetail();
+      renderTopHistory();
     }
 
     async function loadDate(date_id) {
       state.currentEntry = state.manifest.entries.find(e => e.date_id === date_id);
       state.currentData = await loadJson(date_id);
-
-      // Load prior radar for breadth-jump detection
       state.priorData = null;
       if (state.currentData.prior_radar) {
         const priorId = state.currentData.prior_radar.split('/').pop().replace('.json', '');
         try { state.priorData = await loadJson(priorId); } catch (_) {}
       }
-
-      renderMeta();
-      renderMaturityBadge();
-      renderChips();
-      renderMode();
+      state.expanded.clear();
+      renderAll();
     }
 
+    function renderAll() {
+      renderMeta();
+      renderSectorFilterOptions();
+      renderMoves();
+      renderSectors();
+      renderTopics();
+      renderTopHistory();
+    }
+
+    // ====================================================================
+    // Meta line
+    // ====================================================================
     function renderMeta() {
       const d = state.currentData;
-      document.getElementById('meta-line').textContent =
-        `${(d.topics || []).length} topics · ${(d.sectors || []).length} sectors`;
+      const parts = [
+        d.date,
+        `${(d.topics || []).length} topics`,
+        `${(d.sectors || []).length} sectors`,
+      ];
+      document.getElementById('meta-line').innerHTML =
+        parts.map(escHtml).join('<span class="sep">·</span>');
     }
 
-    function renderMaturityBadge() {
-      const el = document.getElementById('maturity-badge');
-      const entries = (state.manifest.entries || []).slice().sort((a, b) => a.date.localeCompare(b.date));
-      if (entries.length < 2) { el.style.display = 'none'; return; }
-      const ageDays = Math.round(
-        (new Date(state.currentData.date) - new Date(entries[0].date)) / 86400000
-      );
-      let cls, label, title;
-      if (ageDays < 30) {
-        cls = 'cold';
-        label = `age ${ageDays}d · 30/90/180d cold`;
-        title = 'Pipeline is too young for 30/90/180-day momentum to be reliable. Trust score_slow and 7d momentum only.';
-      } else if (ageDays < 90) {
-        cls = 'warming';
-        label = `age ${ageDays}d · 90/180d warming`;
-        title = '30-day momentum reliable. 90/180-day windows still need more history.';
-      } else if (ageDays < 180) {
-        cls = 'warming';
-        label = `age ${ageDays}d · 180d warming`;
-        title = '30 and 90-day momentum reliable. 180-day window still warming.';
-      } else {
-        cls = 'warm';
-        label = `age ${ageDays}d · all warm`;
-        title = 'All momentum windows have enough history.';
-      }
-      el.className = cls;
-      el.textContent = label;
-      el.title = title;
-      el.style.display = '';
+    function renderSectorFilterOptions() {
+      const sel = document.getElementById('sector-filter');
+      const current = state.sectorFilter;
+      const names = (state.currentData.sectors || []).map(s => s.name).sort();
+      sel.innerHTML = '<option value="">All sectors</option>' +
+        names.map(n => `<option value="${escAttr(n)}"${n === current ? ' selected' : ''}>${escHtml(n)}</option>`).join('');
     }
 
-    // =========================================================================
-    // Filter chips — pinned (★ persistent) + dynamic (today's sectors/clusters)
-    // =========================================================================
-    function renderChips() {
+    // ====================================================================
+    // What moved today
+    // ====================================================================
+    function renderMoves() {
       const d = state.currentData;
-      if (!d) return;
-      const todaySectors = (d.sectors || []).map(s => s.name);
-      const todayClusters = (d.topic_clusters || []).map(c => c.name);
-
-      // Build the full chip universe: union of pinned + today
-      const pinnedSet = new Set([
-        ...state.pinned.sectors.map(s => 'sector:' + s),
-        ...state.pinned.clusters.map(c => 'cluster:' + c),
-      ]);
-      const dynSet = new Set([
-        ...todaySectors.map(s => 'sector:' + s),
-        ...todayClusters.map(c => 'cluster:' + c),
-      ]);
-
-      // Pinned chips render first (even if not in today's data)
-      const pinnedChips = [];
-      state.pinned.sectors.forEach(name => pinnedChips.push(chipHtml('sector', name, true, dynSet.has('sector:' + name))));
-      state.pinned.clusters.forEach(name => pinnedChips.push(chipHtml('cluster', name, true, dynSet.has('cluster:' + name))));
-
-      // Dynamic chips: today's sectors/clusters that aren't already pinned
-      const dynamicChips = [];
-      todaySectors.forEach(name => {
-        if (!pinnedSet.has('sector:' + name)) dynamicChips.push(chipHtml('sector', name, false, true));
-      });
-      todayClusters.forEach(name => {
-        if (!pinnedSet.has('cluster:' + name)) dynamicChips.push(chipHtml('cluster', name, false, true));
-      });
-
-      document.getElementById('chips-pinned').innerHTML = pinnedChips.join('');
-      document.getElementById('chips-dynamic').innerHTML = dynamicChips.join('');
-      document.getElementById('chip-divider-1').style.display =
-        (pinnedChips.length && dynamicChips.length) ? '' : 'none';
-      document.getElementById('chips-empty-hint').style.display =
-        (pinnedChips.length === 0 && dynamicChips.length === 0) ? '' : 'none';
-
-      // Wire up chip clicks
-      document.querySelectorAll('.chip').forEach(node => {
-        node.addEventListener('click', e => {
-          const star = e.target.closest('.chip-star');
-          const kind = node.dataset.kind;
-          const name = node.dataset.name;
-          if (star) {
-            // Star/unstar toggle
-            e.stopPropagation();
-            togglePin(kind, name);
-          } else {
-            // Filter toggle
-            if (state.activeFilter && state.activeFilter.kind === kind && state.activeFilter.name === name) {
-              state.activeFilter = null;
-            } else {
-              state.activeFilter = { kind, name };
-            }
-            renderChips();
-            renderMode();
-          }
-        });
-      });
-    }
-
-    function chipHtml(kind, name, isPinnedFlag, isActiveInData) {
-      const icon = kind === 'sector' ? '◆' : '🔗';
-      const isActive = state.activeFilter
-        && state.activeFilter.kind === kind
-        && state.activeFilter.name === name;
-      const classes = ['chip'];
-      if (isPinnedFlag) classes.push('pinned');
-      if (isActive) classes.push('active');
-      const inactiveTitle = (isPinnedFlag && !isActiveInData)
-        ? ` title="Pinned but no topics in this snapshot."`
-        : '';
-      const star = isPinnedFlag ? '★' : '☆';
-      return `<span class="${classes.join(' ')}" data-kind="${escAttr(kind)}" data-name="${escAttr(name)}"${inactiveTitle}>
-        <span class="chip-icon">${icon}</span>
-        ${escHtml(name)}
-        <span class="chip-star" title="${isPinnedFlag ? 'Unpin' : 'Pin (keep across sessions)'}">${star}</span>
-      </span>`;
-    }
-
-    // Apply filter to a topic list
-    function applyFilter(topics) {
-      if (!state.activeFilter) return topics;
-      const { kind, name } = state.activeFilter;
-      if (kind === 'sector') {
-        return topics.filter(t => t.sector === name);
-      }
-      // cluster filter — look up cluster member IDs from current data
-      const cluster = (state.currentData.topic_clusters || []).find(c => c.name === name);
-      if (!cluster) return [];
-      const members = new Set(cluster.topic_ids || []);
-      return topics.filter(t => members.has(t.id));
-    }
-
-    // =========================================================================
-    // Mode switching
-    // =========================================================================
-    function switchMode(mode) {
-      state.mode = mode;
-      document.querySelectorAll('#mode-tabs button').forEach(b => {
-        b.classList.toggle('active', b.dataset.mode === mode);
-      });
-      document.getElementById('mode-today').style.display = mode === 'today' ? '' : 'none';
-      document.getElementById('mode-arcs').style.display = mode === 'arcs' ? '' : 'none';
-      renderMode();
-    }
-    function renderMode() {
-      if (state.mode === 'today') renderToday();
-      else renderArcs();
-    }
-
-    // =========================================================================
-    // TODAY mode — the briefing
-    // =========================================================================
-    function renderToday() {
-      const d = state.currentData;
-      const topics = applyFilter(d.topics || []);
+      const topicById = new Map((d.topics || []).map(t => [t.id, t]));
       const items = [];
+      const seen = new Set();
 
-      // (1) Stage transitions (both directions)
-      const stageMoves = d.stage_movements || [];
-      stageMoves.forEach(m => {
-        const t = (d.topics || []).find(x => x.id === m.topic);
+      // Stage movements (highest weight)
+      (d.stage_movements || []).forEach(m => {
+        const t = topicById.get(m.topic);
         if (!t) return;
-        if (state.activeFilter) {
-          const filtered = applyFilter([t]);
-          if (filtered.length === 0) return;
-        }
-        const isForward = stageRank(m.to) > stageRank(m.from);
+        seen.add(t.id);
         const isFade = m.to === 'fading';
+        const isForward = STAGE_RANK[m.to] > STAGE_RANK[m.from];
+        const fromLabel = m.from || 'new';
         items.push({
           weight: isFade ? 90 : 100,
-          icon: isFade ? '🔻' : (isForward ? '🔺' : '🔄'),
-          tag: { class: isFade ? 'fade' : 'stage', label: `${m.from || '—'} → ${m.to}` },
           title: t.label || t.id,
-          meta: `${t.sector || 'no sector'} · breadth ${t.breadth_7d || 0} orgs · score ${(t.score_slow || 0).toFixed(1)}`,
+          meta: `${fromLabel} → ${m.to} · ${t.sector || 'no sector'}`,
+          tagLabel: isFade ? 'Fade' : (m.from ? 'Stage' : 'First seen'),
+          tagClass: isFade ? 'down' : (isForward ? 'up' : 'shift'),
           topicId: t.id,
         });
       });
 
-      // (2) Surging topics (direction === 'surging' OR score_fast > 1.5x score_slow)
-      topics.forEach(t => {
+      // Surging topics
+      (d.topics || []).forEach(t => {
+        if (seen.has(t.id)) return;
         const fast = t.score_fast != null ? t.score_fast : t.score;
         const slow = t.score_slow != null ? t.score_slow : t.score;
-        const isSurging = t.direction === 'surging' || (slow > 0 && fast / slow >= 1.5);
-        if (!isSurging) return;
-        // Don't duplicate if already covered by a stage transition
-        if (stageMoves.some(m => m.topic === t.id)) return;
+        const isSurge = t.direction === 'surging' || (slow > 0 && fast / slow >= 1.5);
+        if (!isSurge) return;
+        seen.add(t.id);
+        const pct = slow > 0 ? Math.round((fast / slow - 1) * 100) : null;
         items.push({
           weight: 75,
-          icon: '⚡',
-          tag: { class: 'surge', label: 'surging' },
           title: t.label || t.id,
-          meta: `${t.sector || 'no sector'} · fast ${fast.toFixed(1)} vs slow ${slow.toFixed(1)} (${slow > 0 ? ((fast/slow - 1) * 100).toFixed(0) : '—'}%)`,
+          meta: `${t.sector || 'no sector'} · fast ${fast.toFixed(1)} / slow ${slow.toFixed(1)}${pct != null ? ` (+${pct}%)` : ''}`,
+          tagLabel: 'Surge',
+          tagClass: 'up',
           topicId: t.id,
         });
       });
 
-      // (3) Sector births / deaths
+      // Sector births / deaths
       (d.sectors_spawned_today || []).forEach(name => {
         items.push({
           weight: 85,
-          icon: '🆕',
-          tag: { class: 'new', label: 'sector born' },
           title: name,
-          meta: `New sector clustered today`,
-          topicId: null,
+          meta: 'New sector clustered today',
+          tagLabel: 'New sector',
+          tagClass: 'new',
+          sectorName: name,
         });
       });
       (d.sectors_dissolved_today || []).forEach(name => {
         items.push({
           weight: 70,
-          icon: '💀',
-          tag: { class: 'fade', label: 'sector dissolved' },
           title: name,
-          meta: `Topics scattered to other sectors`,
-          topicId: null,
+          meta: 'Topics scattered to other sectors',
+          tagLabel: 'Dissolved',
+          tagClass: 'down',
+          sectorName: name,
         });
       });
 
-      // (4) Breadth jumps vs prior radar
+      // Sector reassignments
+      (d.sector_movements || []).forEach(m => {
+        const t = topicById.get(m.topic);
+        if (!t || seen.has(t.id)) return;
+        seen.add(t.id);
+        items.push({
+          weight: 80,
+          title: t.label || t.id,
+          meta: `${m.from || '—'} → ${m.to || '?'}${m.reason ? ' · ' + m.reason : ''}`,
+          tagLabel: 'Sector shift',
+          tagClass: 'shift',
+          topicId: t.id,
+        });
+      });
+
+      // Breadth jumps vs prior radar
       if (state.priorData) {
         const priorById = new Map((state.priorData.topics || []).map(t => [t.id, t]));
-        topics.forEach(t => {
+        (d.topics || []).forEach(t => {
+          if (seen.has(t.id)) return;
           const prior = priorById.get(t.id);
           if (!prior) return;
           const now = t.breadth_7d || 0;
           const was = prior.breadth_7d || 0;
           if (now >= 5 && now >= was * 1.5 && now - was >= 2) {
-            // Don't duplicate
-            if (items.some(i => i.topicId === t.id)) return;
+            seen.add(t.id);
+            const pct = Math.round((now / Math.max(was, 1) - 1) * 100);
             items.push({
               weight: 60,
-              icon: '📈',
-              tag: { class: 'breadth', label: 'breadth jump' },
               title: t.label || t.id,
-              meta: `${was} → ${now} orgs (+${(((now/Math.max(was,1))-1)*100).toFixed(0)}%)`,
+              meta: `${was} → ${now} orgs (+${pct}%) · ${t.sector || 'no sector'}`,
+              tagLabel: 'Breadth',
+              tagClass: 'breadth',
               topicId: t.id,
             });
           }
         });
       }
 
-      // (5) Hot vendor events (from vendor_changes.json)
-      state.vendorActive.forEach((info, slug) => {
-        const verbIsHot = (info.verb || '').startsWith('hot');
-        if (!verbIsHot) return;
-        // Only show events relevant to the active filter, if any
-        if (state.activeFilter) {
-          // Hot events aren't tied to topics, so a sector/cluster filter excludes them.
-          // That's intentional — they show up in the unfiltered briefing only.
-          return;
+      items.sort((a, b) => b.weight - a.weight);
+      const top = items.slice(0, 8);
+
+      const el = document.getElementById('moves-list');
+      document.getElementById('moved-count').textContent = top.length ? `${top.length} of ${items.length}` : '';
+      if (!top.length) {
+        el.innerHTML = `<li><div class="empty">Quiet day. No promotions, surges, or sector changes.</div></li>`;
+        return;
+      }
+      el.innerHTML = top.map(item => `
+        <li ${item.topicId ? `data-topic-id="${escAttr(item.topicId)}"` : ''} ${item.sectorName ? `data-sector="${escAttr(item.sectorName)}"` : ''}>
+          <div>
+            <div class="title">${escHtml(item.title)}</div>
+            <div class="meta">${escHtml(item.meta)}</div>
+          </div>
+          <div class="tag ${item.tagClass}">${escHtml(item.tagLabel)}</div>
+        </li>`).join('');
+
+      el.querySelectorAll('li[data-topic-id]').forEach(li => {
+        li.addEventListener('click', () => {
+          const id = li.dataset.topicId;
+          state.expanded.add(id);
+          renderTopics();
+          // Scroll the row into view
+          requestAnimationFrame(() => {
+            const row = document.querySelector(`tr.row-main[data-id="${CSS.escape(id)}"]`);
+            if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
+        });
+      });
+      el.querySelectorAll('li[data-sector]').forEach(li => {
+        li.addEventListener('click', () => {
+          state.sectorFilter = li.dataset.sector;
+          document.getElementById('sector-filter').value = state.sectorFilter;
+          renderTopics();
+          renderSectors();
+        });
+      });
+    }
+
+    // ====================================================================
+    // Sector cards
+    // ====================================================================
+    function renderSectors() {
+      const el = document.getElementById('sectors-grid');
+      const sectors = (state.currentData.sectors || []).slice()
+        .sort((a, b) => (b.topic_count || 0) - (a.topic_count || 0));
+      document.getElementById('sectors-hint').textContent = sectors.length ? `${sectors.length} active` : '';
+      if (!sectors.length) {
+        el.innerHTML = `<div class="empty" style="grid-column:1/-1">No sectors yet.</div>`;
+        return;
+      }
+      const topicsBySector = new Map();
+      (state.currentData.topics || []).forEach(t => {
+        if (!topicsBySector.has(t.sector)) topicsBySector.set(t.sector, []);
+        topicsBySector.get(t.sector).push(t);
+      });
+      el.innerHTML = sectors.map(s => {
+        const topics = topicsBySector.get(s.name) || [];
+        const rising = topics.filter(t => t.direction === 'rising' || t.direction === 'surging').length;
+        const active = state.sectorFilter === s.name ? 'active' : '';
+        return `<div class="sector-card ${active}" data-name="${escAttr(s.name)}">
+          <div class="name">${escHtml(s.name)}</div>
+          <div class="stats">
+            <span class="count">${s.topic_count || 0}</span>
+            <span class="label">topics</span>
+            ${rising ? `<span style="margin-left:auto; color:var(--rising); font-size:11px; font-weight:600;">${rising} rising</span>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+      el.querySelectorAll('.sector-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const name = card.dataset.name;
+          state.sectorFilter = (state.sectorFilter === name) ? '' : name;
+          document.getElementById('sector-filter').value = state.sectorFilter;
+          renderTopics();
+          renderSectors();
+        });
+      });
+    }
+
+    // ====================================================================
+    // Topics table
+    // ====================================================================
+    function filteredTopics() {
+      let topics = (state.currentData.topics || []).slice();
+      if (state.sectorFilter) topics = topics.filter(t => t.sector === state.sectorFilter);
+      if (state.search) {
+        topics = topics.filter(t =>
+          (t.label || '').toLowerCase().includes(state.search) ||
+          (t.id || '').toLowerCase().includes(state.search)
+        );
+      }
+      const dir = state.sortDir === 'desc' ? -1 : 1;
+      const k = state.sortBy;
+      topics.sort((a, b) => {
+        let av, bv;
+        if (k === 'stage') { av = STAGE_RANK[a.stage] ?? -1; bv = STAGE_RANK[b.stage] ?? -1; }
+        else if (k === 'direction') { av = DIR_RANK[a.direction] ?? -1; bv = DIR_RANK[b.direction] ?? -1; }
+        else if (k === 'label' || k === 'sector') {
+          av = (a[k] || '').toLowerCase(); bv = (b[k] || '').toLowerCase();
+          if (av < bv) return -1 * dir; if (av > bv) return 1 * dir; return 0;
+        } else {
+          av = a[k] ?? -Infinity; bv = b[k] ?? -Infinity;
         }
-        items.push({
-          weight: 55,
-          icon: '🔥',
-          tag: { class: 'hot', label: 'hot event' },
-          title: slug,
-          meta: info.reason || `auto-promoted ${info.ts_date}`,
-          isOrg: true,
-          orgSlug: slug,
+        return (av - bv) * dir;
+      });
+      return topics;
+    }
+
+    function renderTopics() {
+      const tbody = document.getElementById('topics-body');
+      const topics = filteredTopics();
+      document.getElementById('topic-count').textContent =
+        `${topics.length} of ${(state.currentData.topics || []).length}`;
+
+      // sort header arrows
+      document.querySelectorAll('th[data-sort]').forEach(th => {
+        const active = th.dataset.sort === state.sortBy;
+        th.classList.toggle('inactive', !active);
+        const arr = th.querySelector('.sortarr');
+        if (arr) arr.textContent = active ? (state.sortDir === 'desc' ? '▾' : '▴') : '▾';
+      });
+
+      // Destroy old detail charts before rerendering
+      state.detailCharts.forEach(c => c.destroy());
+      state.detailCharts.clear();
+
+      if (!topics.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty">No topics match.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = topics.map(t => {
+        const isOpen = state.expanded.has(t.id);
+        const dir = t.direction || 'steady';
+        const arrow = DIR_GLYPH[dir] || '→';
+        const score = (t.score_slow != null ? t.score_slow : t.score) || 0;
+        return `
+          <tr class="row-main ${isOpen ? 'expanded' : ''}" data-id="${escAttr(t.id)}">
+            <td class="topic-label"><span class="caret">▸</span>${escHtml(t.label || t.id)}</td>
+            <td>${escHtml(t.sector || '—')}</td>
+            <td><span class="stage-pill ${t.stage}">${escHtml(t.stage || '—')}</span></td>
+            <td class="right">${score.toFixed(1)}</td>
+            <td class="right dir ${dir}">${arrow}</td>
+            <td class="right">${t.breadth_7d != null ? t.breadth_7d : '—'}</td>
+            <td class="right">${t.sustained_days != null ? t.sustained_days : '—'}</td>
+          </tr>
+          ${isOpen ? `<tr class="row-detail" data-id="${escAttr(t.id)}"><td colspan="7">${detailHtml(t)}</td></tr>` : ''}
+        `;
+      }).join('');
+
+      tbody.querySelectorAll('tr.row-main').forEach(tr => {
+        tr.addEventListener('click', () => {
+          const id = tr.dataset.id;
+          if (state.expanded.has(id)) state.expanded.delete(id);
+          else state.expanded.add(id);
+          renderTopics();
         });
       });
 
-      // Sort by weight desc, then cap
-      items.sort((a, b) => b.weight - a.weight);
-      const top = items.slice(0, 10);
-
-      const listEl = document.getElementById('headline-list');
-      const radarDisc = document.getElementById('disc-radar');
-      if (top.length === 0) {
-        // Quiet day → message + auto-open the polar radar disclosure
-        listEl.innerHTML = `<div class="empty-state">— quiet day. No significant movement, surges, or hot events in this snapshot.${state.activeFilter ? ' (Filter active: ' + escHtml(state.activeFilter.name) + ')' : ''} See the polar radar below for the current state of the field.</div>`;
-        radarDisc.open = true;
-      } else {
-        listEl.innerHTML = top.map(renderBriefingItem).join('');
-        radarDisc.open = false;
-        listEl.querySelectorAll('.briefing-item').forEach(node => {
-          node.addEventListener('click', () => {
-            if (node.dataset.org) {
-              window.location.href = `orgs.html?slug=${encodeURIComponent(node.dataset.org)}`;
-            } else if (node.dataset.topicId) {
-              selectTopic(node.dataset.topicId);
-              switchMode('arcs');
-            }
-          });
-        });
-      }
-
-      // Render the disclosure contents on demand (cheap when collapsed)
-      renderClusters();
-      renderSectorEvolution();
-      renderTopHistory();
+      // Render detail charts for any expanded rows
+      state.expanded.forEach(id => renderDetailChart(id));
     }
 
-    function renderBriefingItem(item) {
-      const dataAttr = item.isOrg
-        ? `data-org="${escAttr(item.orgSlug)}"`
-        : (item.topicId ? `data-topic-id="${escAttr(item.topicId)}"` : '');
-      return `<div class="briefing-item" ${dataAttr}>
-        <div class="briefing-icon">${item.icon}</div>
-        <div class="briefing-body">
-          <div class="briefing-title">${escHtml(item.title)}<span class="briefing-tag ${item.tag.class}">${escHtml(item.tag.label)}</span></div>
-          <div class="briefing-meta">${escHtml(item.meta)}</div>
-        </div>
+    function detailHtml(t) {
+      const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
+      const ageDays = runs.length ? Math.round((new Date(state.currentData.date) - new Date(runs[0].date)) / 86400000) : 0;
+
+      const statHtml = (label, val, requiresDays) => {
+        if (val == null) {
+          const isCold = ageDays < requiresDays;
+          return `<div class="detail-stat"><div class="l">${escHtml(label)}</div><div class="v dim">${isCold ? `cold (${requiresDays}d)` : '—'}</div></div>`;
+        }
+        return `<div class="detail-stat"><div class="l">${escHtml(label)}</div><div class="v">${val.toFixed(1)}</div></div>`;
+      };
+
+      const stats = `
+        <div class="detail-stat"><div class="l">Score (slow)</div><div class="v">${((t.score_slow != null ? t.score_slow : t.score) || 0).toFixed(1)}</div></div>
+        ${statHtml('7d ago', t.score_7d_ago, 7)}
+        ${statHtml('30d ago', t.score_30d_ago, 30)}
+        ${statHtml('90d ago', t.score_90d_ago, 90)}
+        ${statHtml('180d ago', t.score_180d_ago, 180)}
+        <div class="detail-stat"><div class="l">Sustained</div><div class="v">${t.sustained_days != null ? t.sustained_days + 'd' : '—'}</div></div>
+        <div class="detail-stat"><div class="l">Breadth 7d</div><div class="v">${t.breadth_7d != null ? t.breadth_7d : '—'}</div></div>
+        <div class="detail-stat"><div class="l">Convergence</div><div class="v">${t.convergence_multiplier_applied != null ? '×' + Number(t.convergence_multiplier_applied).toFixed(1) : '—'}</div></div>
+      `;
+
+      const orgs = (t.breadth_orgs_7d || []).slice(0, 18).map(o => orgPill(o)).join(' ');
+      const sectorHistory = (t.sector_history || []).slice(-5).map(h =>
+        `<div style="font-size:11px; color:var(--text-dim); padding:1px 0">${escHtml(h.date)}: ${escHtml(h.from || '—')} → ${escHtml(h.to)}${h.reason ? ' · ' + escHtml(h.reason) : ''}</div>`
+      ).join('');
+      const files = (t.supporting_files || []).slice(0, 8).map(f => `<code>${escHtml(f)}</code>`).join('');
+
+      return `<div class="detail-wrap">
+        <div class="detail-stats">${stats}</div>
+        <div class="detail-chart"><canvas data-detail-canvas="${escAttr(t.id)}"></canvas></div>
+        ${orgs ? `<div class="detail-section"><h4>Orgs talking (7d)</h4><div>${orgs}</div></div>` : ''}
+        ${sectorHistory ? `<div class="detail-section"><h4>Sector history</h4>${sectorHistory}</div>` : ''}
+        ${files ? `<div class="detail-section"><h4>Supporting files</h4><div>${files}</div></div>` : ''}
       </div>`;
     }
 
-    function stageRank(stage) {
-      return { emerging: 1, consolidating: 2, mainstream: 3, fading: 0 }[stage] ?? -1;
-    }
-
-    function renderClusters() {
-      const el = document.getElementById('clusters-body');
-      const clusters = (state.currentData.topic_clusters || []).slice()
-        .sort((a, b) => (b.cluster_score_slow || 0) - (a.cluster_score_slow || 0));
-      if (clusters.length === 0) {
-        el.innerHTML = '<div class="empty-state">No clusters yet — needs ≥3 co-mentions across topic pairs.</div>';
-        return;
-      }
-      el.innerHTML = clusters.map(c => {
-        const dir = c.cluster_direction || 'steady';
-        const orgs = c.cluster_breadth_7d != null ? `${c.cluster_breadth_7d} orgs` : '';
-        const members = (c.topic_ids || []).slice(0, 6).map(tid => {
-          const t = (state.currentData.topics || []).find(x => x.id === tid);
-          return `<span class="org-pill" style="cursor:pointer" data-topic-id="${escAttr(tid)}">${escHtml(t ? t.label : tid)}</span>`;
-        }).join(' ');
-        return `<div style="padding:10px 0; border-bottom:1px solid var(--border)">
-          <strong>${escHtml(c.name)}</strong>
-          <span style="color:var(--muted); font-size:12px; margin-left:6px;">${c.size} topics · score ${(c.cluster_score_slow || 0).toFixed(1)} · ${orgs} · ${dir}</span>
-          <div style="margin-top:4px">${members}</div>
-        </div>`;
-      }).join('');
-      el.querySelectorAll('[data-topic-id]').forEach(node => {
-        node.addEventListener('click', () => {
-          selectTopic(node.dataset.topicId);
-          switchMode('arcs');
-        });
-      });
-    }
-
-    function renderSectorEvolution() {
-      const el = document.getElementById('sector-evo-body');
-      const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
-      if (runs.length < 2) {
-        el.innerHTML = '<div class="empty-state">Need ≥2 radar runs to show evolution.</div>';
-        return;
-      }
-      // Color map
-      const palette = ['#6aa9ff', '#ffb84d', '#b48aff', '#5cd0d0', '#ff8a8a', '#58c97f', '#b8bdc8', '#ffa17a'];
-      const colorMap = new Map();
-      let cidx = 0;
-      runs.forEach(r => (r.sectors || []).forEach(s => {
-        if (!colorMap.has(s.name)) colorMap.set(s.name, palette[(cidx++) % palette.length]);
-      }));
-      const rows = runs.map(r => {
-        const total = (r.sectors || []).reduce((s, x) => s + (x.topic_count || 0), 0) || 1;
-        const segs = (r.sectors || []).slice().sort((a, b) => (b.topic_count || 0) - (a.topic_count || 0)).map(s => {
-          const pct = ((s.topic_count || 0) / total) * 100;
-          return `<div style="flex:${pct}; background:${colorMap.get(s.name)}; padding:2px 4px; font-size:10px; color:var(--bg); overflow:hidden; white-space:nowrap;" title="${escAttr(s.name)} — ${s.topic_count} topics">${pct >= 8 ? escHtml(s.name.split(' ')[0]) : ''}</div>`;
-        }).join('');
-        return `<div style="display:flex; align-items:center; gap:8px; padding:3px 0">
-          <span style="font-size:11px; color:var(--muted); width:80px">${escHtml(r.date)}</span>
-          <div style="flex:1; display:flex; gap:1px; height:18px">${segs}</div>
-        </div>`;
-      }).join('');
-      el.innerHTML = rows;
-    }
-
-    function renderTopHistory() {
-      const canvas = document.getElementById('top-history-chart');
+    function renderDetailChart(topicId) {
+      const canvas = document.querySelector(`canvas[data-detail-canvas="${CSS.escape(topicId)}"]`);
       if (!canvas) return;
       const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
-      if (runs.length < 2) { return; }
-      const currentTop = applyFilter(state.currentData.topics || [])
-        .slice().sort((a, b) => (b.score_slow || 0) - (a.score_slow || 0)).slice(0, 8);
-      const datasets = currentTop.map((t, i) => {
-        const palette = ['#6aa9ff', '#ffb84d', '#b48aff', '#5cd0d0', '#58c97f', '#ff8a8a', '#b8bdc8', '#ffa17a'];
-        const series = runs.map(r => {
-          const match = (r.topics || []).find(x => x.id === t.id);
-          return match ? (match.score_slow || 0) : null;
-        });
-        return {
-          label: t.label || t.id,
-          data: series,
-          borderColor: palette[i % palette.length],
-          backgroundColor: palette[i % palette.length] + '22',
-          tension: 0.25,
-          spanGaps: true,
-        };
+      if (runs.length < 2) return;
+      const labels = runs.map(r => r.date);
+      const scores = runs.map(r => {
+        const m = (r.topics || []).find(x => x.id === topicId);
+        return m ? (m.score_slow != null ? m.score_slow : m.score) : null;
       });
-      if (state.topHistoryChart) state.topHistoryChart.destroy();
-      state.topHistoryChart = new Chart(canvas, {
+      const breadth = runs.map(r => {
+        const m = (r.topics || []).find(x => x.id === topicId);
+        return m ? (m.breadth_7d || 0) : null;
+      });
+      const chart = new Chart(canvas, {
         type: 'line',
-        data: { labels: runs.map(r => r.date), datasets },
-        options: {
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom', labels: { color: '#e6e8ee', boxWidth: 8, font: { size: 11 } } } },
-          scales: {
-            x: { ticks: { color: '#8a91a3' }, grid: { color: '#2a2f3d' } },
-            y: { beginAtZero: true, ticks: { color: '#8a91a3' }, grid: { color: '#2a2f3d' } },
-          },
+        data: {
+          labels,
+          datasets: [{
+            label: 'Score (slow)', data: scores,
+            borderColor: '#6aa9ff', backgroundColor: 'rgba(106,169,255,0.10)',
+            tension: 0.25, spanGaps: true, fill: true, yAxisID: 'y',
+          }, {
+            label: 'Breadth (orgs 7d)', data: breadth,
+            borderColor: '#58c97f', backgroundColor: 'transparent',
+            tension: 0.25, spanGaps: true, borderDash: [4, 4], yAxisID: 'y1',
+          }],
         },
+        options: chartOptionsDualAxis(),
       });
-    }
-
-    // =========================================================================
-    // ARCS mode
-    // =========================================================================
-    function renderArcs() {
-      renderTopicList();
-      renderArcDetail();
-    }
-
-    function renderTopicList() {
-      const el = document.getElementById('topic-list');
-      const q = (document.getElementById('topic-search').value || '').toLowerCase().trim();
-      let topics = applyFilter(state.currentData.topics || []);
-      if (q) topics = topics.filter(t => (t.label || t.id).toLowerCase().includes(q) || t.id.toLowerCase().includes(q));
-      topics = topics.slice().sort((a, b) => (b.score_slow || 0) - (a.score_slow || 0));
-      el.innerHTML = topics.map(t => {
-        const dir = t.direction || 'steady';
-        const arrow = dir === 'surging' ? '↑↑' : dir === 'rising' ? '↑' : dir === 'fading' ? '↓' : '→';
-        const active = t.id === state.selectedTopicId ? 'active' : '';
-        return `<div class="topic-row ${active}" data-id="${escAttr(t.id)}">
-          <span class="stage-dot ${t.stage}"></span>
-          <span class="label">${escHtml(t.label || t.id)}</span>
-          <span class="mini-arrow ${dir}">${arrow}</span>
-        </div>`;
-      }).join('');
-      el.querySelectorAll('.topic-row').forEach(node => {
-        node.addEventListener('click', () => selectTopic(node.dataset.id));
-      });
-    }
-
-    function selectTopic(topicId) {
-      state.selectedTopicId = topicId;
-      // If currently in TODAY mode, switching to ARCS makes the selection meaningful
-      renderTopicList();
-      renderArcDetail();
-    }
-
-    function renderArcDetail() {
-      const el = document.getElementById('arc-detail');
-      if (!state.selectedTopicId) {
-        el.innerHTML = `<div class="empty-state">Pick a topic from the list to see its life-cycle arc.</div>`;
-        return;
-      }
-      const t = (state.currentData.topics || []).find(x => x.id === state.selectedTopicId);
-      if (!t) {
-        el.innerHTML = `<div class="empty-state">Topic <code>${escHtml(state.selectedTopicId)}</code> not present in this snapshot. Try a different date.</div>`;
-        return;
-      }
-
-      const dir = t.direction || 'steady';
-      const dirArrow = dir === 'surging' ? '↑↑' : dir === 'rising' ? '↑' : dir === 'fading' ? '↓' : '→';
-
-      // History from cache
-      const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
-      const history = runs.map(r => {
-        const m = (r.topics || []).find(x => x.id === t.id);
-        return m ? { date: r.date, score: m.score_slow != null ? m.score_slow : m.score, breadth: m.breadth_7d || 0, stage: m.stage } : { date: r.date, score: null, breadth: null, stage: null };
-      });
-
-      // Long-arc stat values; render "cold" if window not yet warm
-      const ageDays = Math.round((new Date(state.currentData.date) - new Date(runs[0].date)) / 86400000);
-      const fmtArcStat = (val, requiresDays, label) => {
-        if (val == null) {
-          if (ageDays < requiresDays) return { html: `<div class="value cold">cold (${requiresDays}d)</div>`, raw: null };
-          return { html: `<div class="value cold">—</div>`, raw: null };
-        }
-        return { html: `<div class="value">${val.toFixed(1)}</div>`, raw: val };
-      };
-      const stat7 = fmtArcStat(t.score_7d_ago, 7, '7d ago');
-      const stat30 = fmtArcStat(t.score_30d_ago, 30, '30d ago');
-      const stat90 = fmtArcStat(t.score_90d_ago, 90, '90d ago');
-      const stat180 = fmtArcStat(t.score_180d_ago, 180, '180d ago');
-
-      const orgs = (t.breadth_orgs_7d || []).slice(0, 16).map(o => orgPill(o)).join(' ');
-      const sweepPills = sweepPillsForTopic(t);
-      const sectorHistory = (t.sector_history || []).slice(-5).map(h =>
-        `<div style="font-size:12px; color:var(--muted); padding:1px 0">${escHtml(h.date)}: ${escHtml(h.from || '—')} → ${escHtml(h.to)}${h.reason ? ' · ' + escHtml(h.reason) : ''}</div>`
-      ).join('');
-      const files = (t.supporting_files || []).slice(0, 6).map(f => `<code>${escHtml(f)}</code>`).join('');
-
-      el.innerHTML = `
-        <div class="arc-title">${escHtml(t.label || t.id)}</div>
-        <div class="arc-subtitle">
-          <span class="arc-pill ${t.stage}">${STAGE_LABEL[t.stage] || t.stage}</span>
-          <span class="arc-pill sector">${escHtml(t.sector || '—')}</span>
-          <span class="arc-pill" style="background:var(--panel-2); color:var(--text);">direction: ${dirArrow} ${dir}</span>
-          ${sweepPills}
-        </div>
-
-        <div class="arc-stat-grid">
-          <div class="arc-stat"><div class="label">Now (slow)</div><div class="value">${(t.score_slow != null ? t.score_slow : t.score).toFixed(1)}</div></div>
-          <div class="arc-stat"><div class="label">7d ago</div>${stat7.html}</div>
-          <div class="arc-stat"><div class="label">30d ago</div>${stat30.html}</div>
-          <div class="arc-stat"><div class="label">90d ago</div>${stat90.html}</div>
-        </div>
-
-        <div class="chart-wrap"><canvas id="arc-chart"></canvas></div>
-
-        ${orgs ? `<div class="arc-section"><h4>Orgs talking (7d)</h4><div>${orgs}</div></div>` : ''}
-        ${sectorHistory ? `<div class="arc-section"><h4>Sector history</h4>${sectorHistory}</div>` : ''}
-        ${files ? `<div class="arc-section"><h4>Supporting files</h4><div class="files" style="line-height:1.6">${files}</div></div>` : ''}
-      `;
-
-      // Arc chart — persistence + breadth on dual axes
-      const ctx = document.getElementById('arc-chart');
-      if (ctx) {
-        if (state.arcChart) state.arcChart.destroy();
-        state.arcChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: history.map(h => h.date),
-            datasets: [{
-              label: 'Persistence (slow)',
-              data: history.map(h => h.score),
-              borderColor: '#6aa9ff',
-              backgroundColor: 'rgba(106, 169, 255, 0.10)',
-              tension: 0.25,
-              spanGaps: true,
-              fill: true,
-              yAxisID: 'y',
-            }, {
-              label: 'Breadth (orgs 7d)',
-              data: history.map(h => h.breadth),
-              borderColor: '#58c97f',
-              backgroundColor: 'transparent',
-              tension: 0.25,
-              spanGaps: true,
-              borderDash: [4, 4],
-              yAxisID: 'y1',
-            }],
-          },
-          options: {
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { color: '#e6e8ee' } } },
-            scales: {
-              x: { ticks: { color: '#8a91a3' }, grid: { color: '#2a2f3d' } },
-              y:  { position: 'left', beginAtZero: true, ticks: { color: '#6aa9ff' }, grid: { color: '#2a2f3d' } },
-              y1: { position: 'right', beginAtZero: true, ticks: { color: '#58c97f' }, grid: { display: false } },
-            },
-          },
-        });
-      }
+      state.detailCharts.set(topicId, chart);
     }
 
     function orgPill(slug) {
@@ -1201,34 +1018,82 @@
       return `<a class="${cls}" href="orgs.html?slug=${encodeURIComponent(slug)}" title="${escAttr(tip)}">${escHtml(slug)}</a>`;
     }
 
-    function sweepPillsForTopic(t) {
-      const pills = [];
-      const haystack = [(t.id || ''), (t.label || '')].join(' ').toLowerCase();
-      for (const proven of state.keywordProven) {
-        if (haystack.includes(proven)) {
-          pills.push(`<span class="arc-pill" style="background:rgba(88,201,127,0.15); color:var(--stage-mainstream); border:1px solid var(--stage-mainstream)">🏛️ proven kw</span>`);
-          break;
-        }
+    // ====================================================================
+    // Top history chart
+    // ====================================================================
+    function renderTopHistory() {
+      const canvas = document.getElementById('top-history-chart');
+      if (!canvas) return;
+      const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
+      const hint = document.getElementById('history-hint');
+      if (runs.length < 2) {
+        if (state.topHistoryChart) { state.topHistoryChart.destroy(); state.topHistoryChart = null; }
+        hint.textContent = 'Need ≥2 snapshots';
+        return;
       }
-      let kwCount = 0;
-      for (const [phrase, info] of state.keywordActive) {
-        if (state.keywordProven.has(phrase)) continue;
-        if (haystack.includes(phrase)) {
-          pills.push(`<span class="arc-pill" style="background:rgba(180,138,255,0.12); color:#b48aff; border:1px solid #b48aff" title="auto-added ${info.ts_date}: ${escAttr(info.reason || '')}">🔑 ${escHtml(phrase)}</span>`);
-          if (++kwCount >= 2) break;
-        }
-      }
-      return pills.join(' ');
+      hint.textContent = `${runs.length} snapshots`;
+      const top = filteredTopics().slice(0, 8);
+      const palette = ['#6aa9ff', '#ffb84d', '#b48aff', '#5cd0d0', '#58c97f', '#ff8a8a', '#b8bdc8', '#ffa17a'];
+      const datasets = top.map((t, i) => ({
+        label: t.label || t.id,
+        data: runs.map(r => {
+          const m = (r.topics || []).find(x => x.id === t.id);
+          return m ? (m.score_slow != null ? m.score_slow : m.score) : null;
+        }),
+        borderColor: palette[i % palette.length],
+        backgroundColor: palette[i % palette.length] + '22',
+        tension: 0.25,
+        spanGaps: true,
+        borderWidth: 1.6,
+      }));
+      if (state.topHistoryChart) state.topHistoryChart.destroy();
+      state.topHistoryChart = new Chart(canvas, {
+        type: 'line',
+        data: { labels: runs.map(r => r.date), datasets },
+        options: chartOptionsSingleAxis(),
+      });
     }
 
-    // =========================================================================
-    // Errors + helpers
-    // =========================================================================
+    function chartOptionsSingleAxis() {
+      return {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#aab0c0', boxWidth: 8, font: { size: 11 }, usePointStyle: true, pointStyle: 'line' },
+          },
+        },
+        scales: {
+          x: { ticks: { color: '#6b7384', font: { size: 10 } }, grid: { color: '#232836' } },
+          y: { beginAtZero: true, ticks: { color: '#6b7384', font: { size: 10 } }, grid: { color: '#232836' } },
+        },
+      };
+    }
+    function chartOptionsDualAxis() {
+      return {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#aab0c0', boxWidth: 8, font: { size: 10 }, usePointStyle: true, pointStyle: 'line' },
+          },
+        },
+        scales: {
+          x: { ticks: { color: '#6b7384', font: { size: 10 } }, grid: { color: '#232836' } },
+          y:  { position: 'left', beginAtZero: true, ticks: { color: '#6aa9ff', font: { size: 10 } }, grid: { color: '#232836' } },
+          y1: { position: 'right', beginAtZero: true, ticks: { color: '#58c97f', font: { size: 10 } }, grid: { display: false } },
+        },
+      };
+    }
+
+    // ====================================================================
+    // Helpers
+    // ====================================================================
     function showError(msg) {
-      document.getElementById('main').innerHTML = `<div style="background:rgba(255,138,138,0.1); border:1px solid var(--dir-fading); padding:12px 16px; border-radius:8px; color:var(--dir-fading); white-space:pre-wrap">${escHtml(msg)}</div>`;
+      document.getElementById('main').innerHTML = `<div class="error">${escHtml(msg)}</div>`;
     }
     function escHtml(s) {
-      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
     function escAttr(s) { return escHtml(s); }
 

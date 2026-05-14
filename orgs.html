@@ -263,6 +263,14 @@
           <option value="safety">Safety</option>
           <option value="open-weight">Open-weight</option>
         </select>
+        <select id="coverage-filter">
+          <option value="">All coverage</option>
+          <option value="priority">Priority</option>
+          <option value="enterprise">Enterprise</option>
+          <option value="deep_watch">Deep-watch</option>
+          <option value="informal_url_list">Informal URL</option>
+          <option value="uncovered">Uncovered</option>
+        </select>
         <select id="sort">
           <option value="velocity">Sort: velocity ratio</option>
           <option value="mentions">Sort: total mentions</option>
@@ -329,6 +337,7 @@
     function applyFilters() {
       const q = document.getElementById('search').value.toLowerCase().trim();
       const tier = document.getElementById('tier-filter').value;
+      const coverage = document.getElementById('coverage-filter').value;
       const sortBy = document.getElementById('sort').value;
       let entries = [...INDEX.entries];
       if (q) {
@@ -339,6 +348,9 @@
       }
       if (tier) {
         entries = entries.filter(e => e.tier_hint === tier);
+      }
+      if (coverage) {
+        entries = entries.filter(e => e.coverage === coverage);
       }
       const cmp = {
         velocity: (a, b) => b.velocity_ratio - a.velocity_ratio || b.total_mentions - a.total_mentions,
@@ -633,6 +645,7 @@
 
     document.getElementById('search').addEventListener('input', renderOrgList);
     document.getElementById('tier-filter').addEventListener('change', renderOrgList);
+    document.getElementById('coverage-filter').addEventListener('change', renderOrgList);
     document.getElementById('sort').addEventListener('change', renderOrgList);
 
     loadIndex();

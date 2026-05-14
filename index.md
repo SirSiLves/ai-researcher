@@ -4,7 +4,8 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Daily reports
 <!-- INDEX_START -->
-- [2026-05-14](daily/2026/05/2026-05-14.md) — Cerebras IPO at $56B; Cohere → Aleph Alpha forms ~$20B transatlantic champion; Microsoft × CAISI/AISI eval; SAP Sapphire + n8n $5.2B; Anthropic SMB + finance JV; Stripe Agentic Commerce
+- [2026-05-14 _(v2, updated PM)_](daily/2026/05/2026-05-14-v2.md) — SAP Sapphire Day 3 + Joule Studio 2.0 + Claude becomes primary reasoning engine on SAP Business AI Platform; AWS MCP Server GA; Anthropic programmatic-credit split (June 15); Anthropic SMB IPO read; Subquadratic SubQ stealth exit
+- [2026-05-14 _(morning)_](daily/2026/05/2026-05-14.md) — Cerebras IPO at $56B; Cohere → Aleph Alpha forms ~$20B transatlantic champion; Microsoft × CAISI/AISI eval; SAP Sapphire + n8n $5.2B; Anthropic SMB + finance JV; Stripe Agentic Commerce
 - [2026-05-13](daily/2026/05/2026-05-13.md) — Google Android Show / Gemini Intelligence + Googlebook; DeepSeek $45B Big Fund round; ServiceNow Otto + Project Arc; Mistral 3 family; OpenAI Voice Intelligence; MCP security thread hardens
 - [2026-05-12](daily/2026/05/2026-05-12.md) — SAP Sapphire Autonomous Enterprise + n8n $5.2B stake; Anthropic legal MCP push; ServiceNow MCP GA; Salesforce Tableau MCP; EU AI Act Omnibus agreed
 - [2026-05-11](daily/2026/05/2026-05-11.md) — OpenAI Deployment Co + Tomoro $4B JV; AWS MCP GA; Pinecone Nexus/KnowQL; CAISI signs DeepMind/Microsoft/xAI
@@ -19,7 +20,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Weekly rollups
 <!-- WEEKLY_START -->
-- [2026-W20](weekly/2026/2026-W20.md) — Mon 2026-05-11 → Sun 2026-05-17, 4/7 days, enterprise-agent platform consolidation week (SAP/ServiceNow/Salesforce/IBM) + MCP-security hardens
+- [2026-W20](weekly/2026/2026-W20.md) — Mon 2026-05-11 → Sun 2026-05-17, 4/7 days, enterprise-agent consolidation (SAP picks Claude / MCP-everywhere) + Cerebras IPO + DeepSeek $45B Big Fund
 - [2026-W19](weekly/2026/2026-W19.md) — Mon 2026-05-04 → Sun 2026-05-10, 7 dailies: frontier-lab pile-up, MCP/A2A consolidate + first security reckoning, EU AI Act lands
 - [2026-W18](weekly/2026/2026-W18.md) — Mon 2026-04-27 → Sun 2026-05-03 (backfill), Azure exclusivity ends; Pentagon 8-vendor IL-6/7; Agent 365 GA; Mistral Medium 3.5
 - [2026-W17](weekly/2026/2026-W17.md) — Mon 2026-04-20 → Sun 2026-04-26 (backfill), Anthropic $45B + 8.5GW; Google Cloud Next agent control plane; GPT-5.5; DeepSeek V4; Cohere×Aleph Alpha
@@ -41,7 +42,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Trend radar
 <!-- RADAR_START -->
-- [2026-05-14 _(old-schema)_](radar/2026/05/2026-05-14.md) — single EMA only, no sectors/clusters; matching JSON was stale and got deleted. Next radar run will produce a current-schema version with sectors and dual-EMA scores.
+- [2026-05-14](radar/2026/05/2026-05-14.md) — 39 topics, 7 stage movements, top emerging: MCP adoption (servers, registries, vendor uptake)
 - [2026-05-13](radar/2026/05/2026-05-13.md) — 32 topics, 5 stage movements, top emerging: AI engineer hiring (Switzerland + global)
 - [2026-05-12](radar/2026/05/2026-05-12.md) — 27 topics, 4 stage movements, top emerging: AI engineer hiring (Switzerland + global)
 - [2026-05-11](radar/2026/05/2026-05-11.md) — 23 topics, 3 stage movements, top emerging: AI engineer hiring (Switzerland + global)
@@ -55,7 +56,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Vendor sweep
 <!-- VENDOR_START -->
-- [2026-05-14](vendor_candidates/2026/05/2026-05-14.md) — applied: 0 promotions, 1 hot, 0 expired; pending: 3; watch: 25; silent: 0
+- [2026-05-14](vendor_candidates/2026/05/2026-05-14.md) — applied: 0 promotions, 2 hot, 0 expired; pending: 0; watch: 19; silent: 0
 <!-- ai-vendor-sweep auto-prepends new daily entries above this line. -->
 <!-- VENDOR_END -->
 

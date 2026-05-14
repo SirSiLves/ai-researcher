@@ -25,21 +25,11 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from _lib import iter_source_files
+
 ROOT = Path(__file__).resolve().parent.parent
 TODAY = date.today().isoformat()
 NOW_ISO = datetime.now().astimezone().isoformat(timespec="seconds")
-
-SOURCE_DIRS = ["news", "papers", "blogs", "jobs", "linkedin", "daily", "github", "hackernews"]
-SRC_TYPE_FROM_DIR = {
-    "news": "tech_news",
-    "papers": "paper",
-    "blogs": "long_form_blog",
-    "jobs": "job_posting_skill_mention",
-    "linkedin": "linkedin_network_post",
-    "daily": "daily_synthesis",
-    "github": "github_signal",
-    "hackernews": "hackernews_signal",
-}
 
 # Target list section paths in sources.json
 TARGET_PATHS = {
@@ -48,6 +38,32 @@ TARGET_PATHS = {
     "linkedin_pulse_queries": ("linkedin_collector", "pulse_topic_queries"),
     # radar_topic_taxonomy is a special case: a new "_auto_added" key inside topic_taxonomy_seed
 }
+
+# Where the parallel _auto_added_meta / _deep_watch_meta registries live for each
+# target list. Each section gets its OWN registry (locality with the flat list
+# it tracks). Manual entries are anything in the flat list with no registry entry.
+META_PATHS = {
+    "news_web_search_queries":   ("news_collector",),
+    "hackernews_filter_keywords": ("hackernews_collector",),
+    "linkedin_pulse_queries":    ("linkedin_collector",),
+    "radar_topic_taxonomy":      ("radar_config", "topic_taxonomy_seed"),
+}
+
+
+def _meta_container(sources, target):
+    """Walk META_PATHS[target] to get the dict that holds _auto_added_meta + _deep_watch_meta."""
+    obj = sources
+    for key in META_PATHS[target]:
+        obj = obj.setdefault(key, {})
+    return obj
+
+
+def _flat_list(sources, target):
+    """Get the actual list (or _auto_added array) of phrases for this target."""
+    if target == "radar_topic_taxonomy":
+        return sources["radar_config"]["topic_taxonomy_seed"].setdefault("_auto_added", [])
+    key1, key2 = TARGET_PATHS[target]
+    return sources[key1].setdefault(key2, [])
 
 TOKEN_RE = re.compile(r"[a-z][a-z0-9'-]+")
 URL_RE = re.compile(r"https?://\S+|\b[a-z0-9.-]+\.[a-z]{2,}\b")
@@ -146,18 +162,6 @@ def get_covered_keywords(sources, taxonomy):
     return covered
 
 
-def iter_source_files():
-    for top in SOURCE_DIRS:
-        base = ROOT / top
-        if not base.exists():
-            continue
-        for p in base.rglob("*.md"):
-            m = re.match(r"^(\d{4}-\d{2}-\d{2})", p.name)
-            if not m:
-                continue
-            yield p, SRC_TYPE_FROM_DIR[top], m.group(1)
-
-
 def main():
     sources = json.loads((ROOT / "sources.json").read_text())
     cfg = sources["radar_config"]["keyword_sweep_config"]
@@ -193,19 +197,19 @@ def main():
     if is_first_run:
         cutoff = (date.fromisoformat(TODAY) - timedelta(days=cfg["rolling_window_days"])).isoformat()
         today_files = [
-            (p, st, fd) for p, st, fd in iter_source_files() if fd >= cutoff
+            (p, st, fd) for p, st, fd in iter_source_files(ROOT) if fd >= cutoff
         ]
         print(f"[keyword_sweep] first run — scanning last {cfg['rolling_window_days']}d "
               f"= {len(today_files)} files (bootstrap window)", file=sys.stderr)
     else:
         today_files = [
-            (p, st, fd) for p, st, fd in iter_source_files() if fd == TODAY
+            (p, st, fd) for p, st, fd in iter_source_files(ROOT) if fd == TODAY
         ]
         if not today_files:
             # No today files? Mine the whole rolling window for catch-up purposes.
             cutoff = (date.fromisoformat(TODAY) - timedelta(days=cfg["rolling_window_days"])).isoformat()
             today_files = [
-                (p, st, fd) for p, st, fd in iter_source_files() if fd >= cutoff
+                (p, st, fd) for p, st, fd in iter_source_files(ROOT) if fd >= cutoff
             ]
             print(f"[keyword_sweep] no files dated {TODAY}; falling back to last {cfg['rolling_window_days']}d "
                   f"= {len(today_files)} files (catch-up mode)", file=sys.stderr)
@@ -376,7 +380,7 @@ def main():
         if len(mbs) >= 3:
             targets.append("radar_topic_taxonomy")
         if mbs.get("hackernews_signal", 0) > 0 or (
-            mbs.get("tech_news", 0) > 0 and len([d for d in ent.get("mentions_by_date", {}) if d]) >= 2
+            mbs.get("tech_news", 0) > 0 and len(ent.get("mentions_by_date", {})) >= 2
         ):
             targets.append("hackernews_filter_keywords")
         if mbs.get("linkedin_network_post", 0) > 0:
@@ -417,32 +421,69 @@ def main():
 
     log_lines = []
     applied_count = 0
+    revived_count = 0
     for phrase, targets, ent in promotions_to_add:
         applied_targets = []
+        revived_targets = []
+        reason = (f"promote: {sum(ent.get('mentions_by_source_type', {}).values())} mentions, "
+                  f"{len(ent.get('mentions_by_source_type', {}))} src types, "
+                  f"{len(ent.get('mentions_by_date', {}))} days")
         for tgt in targets:
-            if tgt == "radar_topic_taxonomy":
-                # Add to a "_auto_added" key inside topic_taxonomy_seed
-                auto_list = sources["radar_config"]["topic_taxonomy_seed"].setdefault("_auto_added", [])
-                if phrase not in auto_list:
-                    auto_list.append(phrase)
-                    applied_targets.append(tgt)
-            else:
-                key1, key2 = TARGET_PATHS[tgt]
-                arr = sources[key1].setdefault(key2, [])
+            arr = _flat_list(sources, tgt)
+            meta_container = _meta_container(sources, tgt)
+            auto_meta = meta_container.setdefault("_auto_added_meta", {})
+            deep_watch_meta = meta_container.setdefault("_deep_watch_meta", {})
+
+            # Re-promotion path: was this phrase deep-watched? Restore it.
+            if phrase in deep_watch_meta:
+                restored = {k: v for k, v in deep_watch_meta[phrase].items()
+                            if k not in {"_demoted_on", "_demoted_reason"}}
+                restored["_added_on"] = TODAY
+                restored["_added_reason"] = reason
+                auto_meta[phrase] = restored
+                del deep_watch_meta[phrase]
                 if phrase not in arr:
                     arr.append(phrase)
-                    applied_targets.append(tgt)
+                revived_targets.append(tgt)
+                log_lines.append(
+                    f'{NOW_ISO} deep-watch-promote {tgt:<30} "{phrase}" reason="returned via sustained_promote"'
+                )
+                continue
+
+            # Standard new-promotion path.
+            if phrase not in arr:
+                arr.append(phrase)
+                applied_targets.append(tgt)
+                auto_meta[phrase] = {
+                    "_auto_added": True,
+                    "_added_on": TODAY,
+                    "_added_reason": reason,
+                }
+            elif phrase not in auto_meta:
+                # Phrase already in flat list but no metadata — likely manual.
+                # Don't overwrite (manual is sacred). But if we're sure WE added
+                # it earlier (e.g. before metadata tracking existed), at least
+                # adopt it now so future deep-watch can see it.
+                # Heuristic: only adopt if we have applied_on history.
+                if ent.get("applied_to_lists") and tgt in ent.get("applied_to_lists", []):
+                    auto_meta[phrase] = {
+                        "_auto_added": True,
+                        "_added_on": ent.get("applied_on") or TODAY,
+                        "_added_reason": reason + " (adopted from pre-meta era)",
+                    }
+
         if applied_targets:
             ent["applied_to_lists"] = list(set(ent.get("applied_to_lists", []) + applied_targets))
             ent["applied_on"] = TODAY
             applied_count += 1
-            reason = (f"promote: {sum(ent.get('mentions_by_source_type', {}).values())} mentions, "
-                      f"{len(ent.get('mentions_by_source_type', {}))} src types, "
-                      f"{len(ent.get('mentions_by_date', {}))} days")
             for tgt in applied_targets:
                 log_lines.append(
-                    f'{NOW_ISO} promote-add     {tgt:<30} "{phrase}" reason="{reason}"'
+                    f'{NOW_ISO} promote-add        {tgt:<30} "{phrase}" reason="{reason}"'
                 )
+        if revived_targets:
+            ent["applied_to_lists"] = list(set(ent.get("applied_to_lists", []) + revived_targets))
+            ent["applied_on"] = TODAY
+            revived_count += 1
 
     # Proven promotion log lines
     for promotion in proven_promotions:
@@ -451,8 +492,64 @@ def main():
                   f"{promotion['lifetime_days']} distinct days")
         for tgt in promotion["target_lists"]:
             log_lines.append(
-                f'{NOW_ISO} proven-promote  {tgt:<30} "{promotion["phrase"]}" reason="{reason}"'
+                f'{NOW_ISO} proven-promote     {tgt:<30} "{promotion["phrase"]}" reason="{reason}"'
             )
+
+    # === Step 7.5: deep-watch demotion (soft cap on each keyword list) ===
+    dw_cfg = cfg.get("auto_apply", {}).get("deep_watch_demote", {})
+    if dw_cfg.get("enabled"):
+        max_per_list = dw_cfg.get("max_per_list", {})
+        min_silence = dw_cfg.get("min_silence_days", 45)
+        per_run_budget = dw_cfg.get("max_demotions_per_run", 5)
+        today_d_local = date.fromisoformat(TODAY)
+        # Slugs not eligible: classified hot/promote today
+        ineligible = {p for p, t in classifications.items() if t in {"hot_candidate", "promote"}}
+        for tgt, cap in max_per_list.items():
+            if tgt not in TARGET_PATHS and tgt != "radar_topic_taxonomy_auto_added":
+                continue  # unknown target name
+            actual_tgt = "radar_topic_taxonomy" if tgt == "radar_topic_taxonomy_auto_added" else tgt
+            arr = _flat_list(sources, actual_tgt)
+            if len(arr) <= cap:
+                continue
+            meta_container = _meta_container(sources, actual_tgt)
+            auto_meta = meta_container.setdefault("_auto_added_meta", {})
+            proven_meta = meta_container.get("_proven_meta", {})
+            deep_watch_meta = meta_container.setdefault("_deep_watch_meta", {})
+            # Find candidates: in flat list AND in _auto_added_meta AND not proven
+            # AND not classified hot/promote today AND silent >= min_silence.
+            candidates = []
+            for phrase in arr:
+                if phrase not in auto_meta:
+                    continue  # manual or unknown — sacred
+                if phrase in proven_meta:
+                    continue  # proven — sacred
+                if phrase in ineligible:
+                    continue
+                ent = discovered["keywords"].get(phrase, {})
+                last_seen = ent.get("last_seen", auto_meta[phrase].get("_added_on", "0000-01-01"))
+                try:
+                    silence_days = (today_d_local - date.fromisoformat(last_seen)).days
+                except ValueError:
+                    silence_days = 9999
+                if silence_days < min_silence:
+                    continue
+                candidates.append((phrase, last_seen, silence_days))
+            # Sort oldest-silent first (last_seen ascending)
+            candidates.sort(key=lambda x: x[1])
+            n_to_demote = min(len(arr) - cap, per_run_budget, len(candidates))
+            for phrase, last_seen, silence_days in candidates[:n_to_demote]:
+                # Move metadata: _auto_added_meta → _deep_watch_meta
+                entry = dict(auto_meta[phrase])
+                entry["_demoted_on"] = TODAY
+                entry["_demoted_reason"] = f"deep-watch: silent {silence_days}d, over cap {cap}"
+                deep_watch_meta[phrase] = entry
+                del auto_meta[phrase]
+                # Remove phrase string from flat list
+                arr[:] = [p for p in arr if p != phrase]
+                log_lines.append(
+                    f'{NOW_ISO} deep-watch-demote  {actual_tgt:<30} "{phrase}" '
+                    f'reason="silent {silence_days}d, ranked oldest-silent over cap={cap}"'
+                )
 
     # Validate JSON before writing
     try:

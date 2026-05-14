@@ -284,6 +284,8 @@ Otherwise:
 - `expired_to_remove`: `_auto_added` entries (across all 4 target sections) where `_expires_on < TODAY`. **Skip entries whose registry is `_proven_meta`** — proven keywords never expire, regardless of TTL. (In practice this is moot because we move them out of `_auto_added_meta` in §6.5, but the safety check is explicit.)
 - `auto_demotions_to_remove`: ONLY if `auto_demote.enabled` is true (default false), `_auto_added` keywords whose phrase hasn't appeared in any source file for ≥ `rolling_window_days` days. **Never demote `_proven_meta` entries** — they're permanent anchors for trend recognition. The keyword may have gone quiet; the trend continues to exist.
 - `proven_promotions_to_apply`: from §6.5 — registry entries that need to move from `_auto_added_meta` to `_proven_meta`. The flat list stays unchanged; only the registry entry moves. Each move recorded in `keyword_changes.log` with the `proven-promote` verb.
+- `deep_watch_demotions`: ONLY if `auto_apply.deep_watch_demote.enabled` is true (default true). For each target list whose `len > max_per_list[name]`, find `_auto_added_meta` entries silent ≥ `min_silence_days`, sort oldest-silent first, take up to `max_demotions_per_run`. **Skip `_proven_meta` entries** — they're sacred. **Skip entries that classify as `hot_candidate` or `promote` today** — would be self-contradictory.
+- `deep_watch_revivals`: phrases currently in `{section}._deep_watch_meta` that classify as `hot_candidate` or sustained-`promote` today. They get re-promoted (see Step C.6).
 
 **Step C — Apply.** Read sources.json. For each addition:
 
@@ -297,17 +299,60 @@ Otherwise:
 
 For removals (expired), delete the phrase from the matching flat list AND from the registry. Only proceed if the registry entry has `_auto_added: true` — manual entries are sacred.
 
-After all edits, validate the JSON parses. If it doesn't, abort the write, log `ABORT-INVALID-JSON` to `keyword_changes.log`, and continue with the markdown report only.
+**Step C.6 — Deep-watch demotion / re-promotion (soft cap on each keyword list).**
+
+This step runs AFTER the adds/removes in Step C, evaluating the cap against the post-update state.
+
+Read `auto_apply.deep_watch_demote`. If `enabled` is false, skip this step.
+
+For each of the 4 target sections (news_web_search_queries, hackernews_filter_keywords, linkedin_pulse_queries, radar_topic_taxonomy_auto_added):
+
+```
+current_count = len(flat_list_for_section)
+cap = deep_watch_demote.max_per_list[section_name]
+silence = deep_watch_demote.min_silence_days  (default 45)
+budget = deep_watch_demote.max_demotions_per_run  (default 5)
+```
+
+If `current_count <= cap`, skip this section.
+
+Otherwise, find `_auto_added_meta` candidates where ALL of:
+1. The phrase is in the corresponding `_auto_added_meta` registry (i.e. it was auto-added, not manual).
+2. The phrase is NOT in `_proven_meta` for this section (proven keywords are sacred).
+3. `(TODAY - last_seen_in_discovered_keywords[phrase]) >= silence`.
+4. The phrase is NOT classified `hot_candidate` or `promote` in this run (would self-contradict).
+
+Sort candidates by `last_seen` ascending (oldest-silent first). Take the first `min(current_count - cap, budget)`.
+
+For each demotion:
+- Read the metadata entry from `{section}._auto_added_meta[phrase]`.
+- Add `_demoted_on: TODAY`, `_demoted_reason: "deep-watch: silent {N} days, over cap {cap}"`.
+- WRITE to `{section}._deep_watch_meta[phrase]` (initialize the dict if missing).
+- DELETE from `{section}._auto_added_meta[phrase]`.
+- REMOVE the phrase string from the flat list.
+- Audit log: `deep-watch-demote {section_name} "{phrase}" reason="silent {N}d, ranked oldest-silent over cap={cap}"`.
+
+**Re-promotion path.** For each `deep_watch_revivals` candidate:
+- Read the entry from `{section}._deep_watch_meta[phrase]`.
+- Drop `_demoted_on`, `_demoted_reason`. Refresh `_added_on: TODAY`.
+- WRITE back to `{section}._auto_added_meta[phrase]`.
+- DELETE from `{section}._deep_watch_meta[phrase]`.
+- ADD the phrase string back to the flat list.
+- Audit log: `deep-watch-promote {section_name} "{phrase}" reason="returned via {hot_candidate|sustained_promote}"`.
+
+After all edits in Step C / C.6, validate the JSON parses. If it doesn't, abort the write, log `ABORT-INVALID-JSON` to `keyword_changes.log`, and continue with the markdown report only.
 
 **Step D — Audit log.** Append per change to `keyword_changes.log`:
 
 ```
-2026-05-14T20:08:00 promote-add     news_web_search_queries      "agentic provenance"           reason="6 mentions, 3 src types, 4 days"
-2026-05-14T20:08:00 promote-add     radar_topic_taxonomy         "agentic provenance"           reason="cross-source convergence"
-2026-05-14T20:08:00 hot-event-add   hackernews_filter_keywords   "context engineering"   expires=2026-06-13 reason="announcement context"
-2026-05-14T20:08:00 expire-remove   news_web_search_queries      "tool-use governance"                       reason="TTL elapsed"
-2026-05-14T20:08:00 proven-promote  news_web_search_queries      "model context protocol"                    reason="lifetime: 47 days, 6 src types, 32 distinct days"
-2026-05-14T20:08:00 proven-promote  radar_topic_taxonomy         "model context protocol"                    reason="lifetime: 47 days, 6 src types, 32 distinct days"
+2026-05-14T20:08:00 promote-add        news_web_search_queries      "agentic provenance"           reason="6 mentions, 3 src types, 4 days"
+2026-05-14T20:08:00 promote-add        radar_topic_taxonomy         "agentic provenance"           reason="cross-source convergence"
+2026-05-14T20:08:00 hot-event-add      hackernews_filter_keywords   "context engineering"   expires=2026-06-13 reason="announcement context"
+2026-05-14T20:08:00 expire-remove      news_web_search_queries      "tool-use governance"                       reason="TTL elapsed"
+2026-05-14T20:08:00 proven-promote     news_web_search_queries      "model context protocol"                    reason="lifetime: 47 days, 6 src types, 32 distinct days"
+2026-05-14T20:08:00 proven-promote     radar_topic_taxonomy         "model context protocol"                    reason="lifetime: 47 days, 6 src types, 32 distinct days"
+2026-05-14T20:08:00 deep-watch-demote  hackernews_filter_keywords   "old phrase x"                              reason="silent 52d, over cap 80"
+2026-05-14T20:08:00 deep-watch-promote news_web_search_queries      "returning phrase y"                        reason="returned via sustained_promote"
 ```
 
 The `proven-promote` verb is the load-bearing entry — it tells the audit log "this keyword is now PERMANENT, anchored for trend recognition." Search the log with `grep proven-promote keyword_changes.log` to see every keyword that's become proven over time.
@@ -393,6 +438,7 @@ Do NOT post the change log to chat. Do NOT modify any source files or radar/swee
 - **Manual entries are sacred.** A keyword in any of the 4 target lists without an `_auto_added` registry entry is manual — never modify it, never remove it.
 - **Proven entries are sacred too.** Once a keyword crosses the proven threshold (≥14 distinct days, ≥4 source types, ≥30 days of age) and is moved to `_proven_meta`, it's a permanent anchor for trend recognition. **NEVER auto-remove a proven entry.** This is the load-bearing rule for the user's stated requirement: "we need to ensure we keep old, proven keywords, to recognize trends." A 6-month-old keyword going quiet for 3 weeks is not noise to clear out — it's a trend in dormancy that we need to be able to recognize when it returns.
 - **Auto-demote stays disabled by default** to prevent removing a phrase whose source files just briefly missed a sweep window. Even if you enable it, proven entries are excluded.
+- **Deep-watch is the preferred soft-cap path.** When a target list exceeds its `max_per_list` cap AND auto-added entries have gone silent past `min_silence_days`, the sweep MOVES the oldest-silent into `{section}._deep_watch_meta` (and removes the phrase string from the flat list). Re-promotion happens automatically when the phrase resurfaces with promote-tier signal. Proven and manual entries are NEVER demoted to deep-watch. Demotion never touches phrases classified `hot_candidate` or `promote` on the same day. Audit verbs: `deep-watch-demote`, `deep-watch-promote`.
 - **One backup file.** `sources.json.bak` is shared with the vendor sweep — whichever sweep ran last is what you'll roll back to. If you want per-sweep backups, file a follow-up.
 - **JSON validity is mandatory.** Parse-validate before writing sources.json. Abort + log on failure.
 - **Hot topics expire.** Same TTL pattern as vendor hot events — 30 days then auto-removed unless meanwhile crossed sustained-promote thresholds.

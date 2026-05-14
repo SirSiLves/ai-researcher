@@ -33,8 +33,9 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
+from _lib import iter_source_files, whole_word_pattern
+
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE_DIRS = ["news", "papers", "blogs", "jobs", "linkedin", "daily", "github", "hackernews"]
 TODAY = date.today().isoformat()
 
 # Priority vendors — not in discovered_orgs.json but mandatory for the firm view.
@@ -84,18 +85,6 @@ PRIORITY_VENDORS = {
     },
 }
 
-SOURCE_TYPE_FROM_DIR = {
-    "news": "tech_news",
-    "papers": "paper",
-    "blogs": "long_form_blog",
-    "jobs": "job_posting_skill_mention",
-    "linkedin": "linkedin_network_post",
-    "daily": "daily_synthesis",
-    "github": "github_signal",
-    "hackernews": "hackernews_signal",
-}
-
-
 def load_sources_json():
     with open(ROOT / "sources.json") as f:
         return json.load(f)
@@ -104,27 +93,6 @@ def load_sources_json():
 def load_discovered():
     with open(ROOT / "discovered_orgs.json") as f:
         return json.load(f)
-
-
-def iter_source_files():
-    """Yield (path, source_type, file_date_iso) for every dated source file."""
-    for top in SOURCE_DIRS:
-        base = ROOT / top
-        if not base.exists():
-            continue
-        for p in base.rglob("*.md"):
-            name = p.name.replace(".md", "")
-            # Handle YYYY-MM-DD or YYYY-MM-DD-vN
-            m = re.match(r"^(\d{4}-\d{2}-\d{2})", name)
-            if not m:
-                continue
-            yield p, SOURCE_TYPE_FROM_DIR[top], m.group(1)
-
-
-def whole_word_pattern(alias):
-    """Case-insensitive whole-word(ish) match. Special chars in alias are escaped."""
-    # Allow alphanumerics, dots, hyphens inside aliases — they're company names.
-    return re.compile(r"(?<![A-Za-z0-9])" + re.escape(alias) + r"(?![A-Za-z0-9])", re.IGNORECASE)
 
 
 def scan_priority_vendors(file_index):
@@ -333,7 +301,7 @@ def main():
     discovered_orgs = discovered.get("orgs", {})
 
     print(f"[build_org_view] indexing source files…", file=sys.stderr)
-    file_index = list(iter_source_files())
+    file_index = list(iter_source_files(ROOT))
     print(f"[build_org_view] {len(file_index)} source files indexed", file=sys.stderr)
 
     print(f"[build_org_view] scanning for priority vendors…", file=sys.stderr)

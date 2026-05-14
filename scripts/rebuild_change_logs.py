@@ -39,6 +39,15 @@ ROOT = Path(__file__).resolve().parent.parent
 NOW = datetime.now().astimezone().isoformat(timespec="seconds")
 TODAY = date.today().isoformat()
 
+# Legacy hot-add entries written at or before this exact ISO timestamp were a
+# known sweep bug: the verb was emitted but sources.json wasn't actually
+# mutated. We keep them in the .log (append-only, never truncated) but suppress
+# the per-entry replay in the derived JSON view — only the count survives, so
+# the JSON doesn't carry 19 lines of stale noise on every rebuild. New legacy
+# hot-add entries (which shouldn't exist if the sweep skill was hardened
+# correctly) would still surface, since their timestamp is past this point.
+LEGACY_HOT_ADD_CUTOFF_TS = "2026-05-14T13:02:20"
+
 # Log line format examples (variable whitespace tolerated):
 #
 #   2026-05-14T14:00:00 promote-add    xai     blog_urls=["..."] reason="..."
@@ -51,14 +60,14 @@ TODAY = date.today().isoformat()
 # bracketed JSON-ish payloads. Use a regex chain rather than a full grammar.
 
 TS_RE = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:[+-]\d{2}:?\d{2}|Z)?)")
-VERB_RE = re.compile(r"^(promote-add|hot-add|hot-event-add|expire-remove|auto-demote|proven-promote|ABORT-INVALID-JSON)$")
+VERB_RE = re.compile(r"^(promote-add|hot-add|hot-event-add|expire-remove|auto-demote|proven-promote|deep-watch-demote|deep-watch-promote|ABORT-INVALID-JSON)$")
 EXPIRES_RE = re.compile(r"expires=(\d{4}-\d{2}-\d{2})")
 REASON_RE = re.compile(r'reason="([^"]*)"')
 BLOG_URLS_RE = re.compile(r'blog_urls=(\[[^\]]*\])')
 SLUG_OR_QUOTED_RE = re.compile(r'(?:^|\s)("[^"]+"|[A-Za-z0-9_.-]+)(?=\s|$)')
 
 # For keyword sweep, optional target_section column right after verb:
-TARGET_SECTION_RE = re.compile(r"^(news_web_search_queries|radar_topic_taxonomy|hackernews_filter_keywords|linkedin_pulse_queries|priority_vendors|enterprise_vendors|vendor_blogs)$")
+TARGET_SECTION_RE = re.compile(r"^(news_web_search_queries|radar_topic_taxonomy|hackernews_filter_keywords|linkedin_pulse_queries|priority_vendors|enterprise_vendors|deep_watch_vendors|deep_watch_keywords|vendor_blogs|watched_repos|deep_watch_repos)$")
 
 
 def parse_line(line):
@@ -118,8 +127,13 @@ def parse_line(line):
 #                              actually applying to sources.json. Treat these as
 #                              "log-only" candidates that never reached sources.json,
 #                              not as live promotions.)
-#   REMOVE verbs:     expire-remove, promote-remove, hot-remove, auto-demote
+#   REMOVE verbs:     expire-remove, auto-demote (delete entry outright)
 #   PROMOTE-PROVEN:   proven-promote (moves into permanent tier, not a removal)
+#   DEEP-WATCH:       deep-watch-demote moves active → deep-watch holding tier;
+#                     deep-watch-promote moves deep-watch holding → active.
+#                     Neither is a removal — entries persist across the move,
+#                     just in a different section of sources.json. The replay
+#                     tracks both `active` and `deep_watch_active` sets.
 ADD_VERBS_CANONICAL = {"promote-add", "hot-event-add"}
 ADD_VERBS_LEGACY = {"hot-add"}  # log-only; do not contribute to active set
 ADD_VERBS = ADD_VERBS_CANONICAL | ADD_VERBS_LEGACY
@@ -130,17 +144,21 @@ ADD_VERBS = ADD_VERBS_CANONICAL | ADD_VERBS_LEGACY
 # the skill first.
 REMOVE_VERBS = {"expire-remove", "auto-demote"}
 PROVEN_VERBS = {"proven-promote"}
+DEEP_WATCH_DEMOTE_VERBS = {"deep-watch-demote"}
+DEEP_WATCH_PROMOTE_VERBS = {"deep-watch-promote"}
 
 
 def replay(mutations, today_iso):
     """
     Walk parsed mutations in chronological order. Derive active and expired
-    sets. Returns (active_list, expired_list) ordered for stable output.
+    sets. Returns (active_list, expired_list, proven_set, legacy_log_only,
+    deep_watch_active_list) ordered for stable output.
     """
     today = date.fromisoformat(today_iso)
     # active key: (target_section or 'default', subject)
     active = {}
-    legacy_log_only = []  # legacy hot-add entries: in log but never applied
+    deep_watch_active = {}  # entries currently held in deep_watch_* section
+    legacy_log_only = []    # legacy hot-add entries: in log but never applied
     expired = []
     proven_set = set()
 
@@ -175,6 +193,25 @@ def replay(mutations, today_iso):
             proven_set.add(key)
             if key in active:
                 active[key]["tier_lifetime"] = "proven"
+        elif m["verb"] in DEEP_WATCH_DEMOTE_VERBS:
+            existing = active.pop(key, None)
+            if existing is not None:
+                deep_watch_active[key] = {
+                    **existing,
+                    "demoted_ts": m["ts"],
+                    "demoted_reason": m.get("reason"),
+                    "tier_lifetime": "deep_watch",
+                }
+        elif m["verb"] in DEEP_WATCH_PROMOTE_VERBS:
+            existing = deep_watch_active.pop(key, None)
+            if existing is not None:
+                # Promoted back; drop deep-watch fields, restore as active
+                restored = {k: v for k, v in existing.items()
+                            if k not in {"demoted_ts", "demoted_reason"}}
+                restored["promoted_back_ts"] = m["ts"]
+                restored["promoted_back_reason"] = m.get("reason")
+                restored["tier_lifetime"] = "auto_added"
+                active[key] = restored
 
     # Apply TTL-based expiry derived from expires_on
     active_filtered = {}
@@ -208,40 +245,52 @@ def replay(mutations, today_iso):
         key=lambda e: (e.get("removed_ts") or e["ts"]),
         reverse=True,
     )
-    return active_list, expired_list, proven_set, legacy_log_only
+    deep_watch_list = sorted(
+        deep_watch_active.values(),
+        key=lambda e: (e.get("target_section") or "", e["subject"])
+    )
+    return active_list, expired_list, proven_set, legacy_log_only, deep_watch_list
 
 
-def consistency_check_vendor(active_list):
-    """Cross-check derived active set against sources.json _auto_added entries.
+def consistency_check_vendor(active_list, deep_watch_list):
+    """Cross-check derived active + deep-watch sets against sources.json _auto_added entries.
 
     A discrepancy means the log says we promoted X but sources.json doesn't
     have X with `_auto_added: true` (or vice versa). Real cause: a sweep run
     wrote to the log but failed mid-write to sources.json, or wrote to the
     log before deciding not to apply, or two sweeps raced.
 
-    Returns dict with two lists: log_only (in log but not sources.json) and
-    sources_only (in sources.json but not derived). Both should be empty in
-    a healthy pipeline.
+    Returns dict with parallel checks for enterprise_vendors and deep_watch_vendors.
+    All four discrepancy lists should be empty in a healthy pipeline.
     """
     try:
         sources = json.loads((ROOT / "sources.json").read_text())
     except Exception:
         return None
-    auto_in_sources = {
-        slug for slug, entry in
-        sources.get("news_collector", {}).get("enterprise_vendors", {}).items()
-        if entry.get("_auto_added")
+    nc = sources.get("news_collector", {})
+    auto_in_enterprise = {
+        slug for slug, entry in nc.get("enterprise_vendors", {}).items()
+        if isinstance(entry, dict) and entry.get("_auto_added")
+    }
+    auto_in_deep_watch = {
+        slug for slug, entry in nc.get("deep_watch_vendors", {}).items()
+        if isinstance(entry, dict) and entry.get("_auto_added")
     }
     active_subjects = {e["subject"] for e in active_list}
+    deep_watch_subjects = {e["subject"] for e in deep_watch_list}
     return {
-        "auto_in_sources_count": len(auto_in_sources),
+        "auto_in_sources_count": len(auto_in_enterprise),
         "active_per_log_count": len(active_subjects),
-        "log_only_not_in_sources": sorted(active_subjects - auto_in_sources),
-        "sources_only_not_in_log": sorted(auto_in_sources - active_subjects),
+        "log_only_not_in_sources": sorted(active_subjects - auto_in_enterprise),
+        "sources_only_not_in_log": sorted(auto_in_enterprise - active_subjects),
+        "deep_watch_in_sources_count": len(auto_in_deep_watch),
+        "deep_watch_per_log_count": len(deep_watch_subjects),
+        "deep_watch_log_only_not_in_sources": sorted(deep_watch_subjects - auto_in_deep_watch),
+        "deep_watch_sources_only_not_in_log": sorted(auto_in_deep_watch - deep_watch_subjects),
         "_interpretation": (
-            "Both lists should be empty. Non-empty log_only means the sweep "
-            "logged a promotion that didn't get applied to sources.json (failed "
-            "mid-write, or two sweeps raced). Non-empty sources_only means a "
+            "All four discrepancy lists should be empty. Non-empty *_log_only means the "
+            "sweep logged a mutation that didn't get applied to sources.json (failed "
+            "mid-write, or two sweeps raced). Non-empty *_sources_only means a "
             "manual edit set _auto_added: true without a corresponding log entry."
         ),
     }
@@ -261,6 +310,7 @@ def rebuild_one(log_name, json_name):
             "active_auto_added": [],
             "expired_auto_added": [],
             "proven_entries": [],
+            "deep_watch_active": [],
             "mutations": [],
             "_note": f"{log_name} does not exist yet. Nothing to derive.",
         }
@@ -281,7 +331,7 @@ def rebuild_one(log_name, json_name):
     # Chronological order (log lines are append-only but multiple lines can
     # share a timestamp — preserve file order as the tiebreaker).
     mutations_sorted = sorted(mutations, key=lambda m: m["ts"])
-    active, expired, proven_set, legacy_log_only = replay(mutations_sorted, TODAY)
+    active, expired, proven_set, legacy_log_only, deep_watch_active = replay(mutations_sorted, TODAY)
 
     by_verb = defaultdict(int)
     by_month = defaultdict(int)
@@ -305,7 +355,15 @@ def rebuild_one(log_name, json_name):
         "active_auto_added": active,
         "expired_auto_added": expired,
         "proven_entries": proven_entries,
-        "legacy_log_only": legacy_log_only,
+        "deep_watch_active": deep_watch_active,
+        "legacy_log_only_count": len(legacy_log_only),
+        "legacy_log_only_suppressed_count": sum(
+            1 for e in legacy_log_only if e["ts"] <= LEGACY_HOT_ADD_CUTOFF_TS
+        ),
+        "legacy_log_only_cutoff_ts": LEGACY_HOT_ADD_CUTOFF_TS,
+        "legacy_log_only": [
+            e for e in legacy_log_only if e["ts"] > LEGACY_HOT_ADD_CUTOFF_TS
+        ],
         "mutations": mutations_sorted,
         "_note": (
             "Derived view of " + log_name + ". The .log file is the source of truth (append-only, "
@@ -316,10 +374,15 @@ def rebuild_one(log_name, json_name):
 
     # Only vendor_changes.log has a corresponding sources.json section to cross-check.
     if log_name == "vendor_changes.log":
-        check = consistency_check_vendor(active)
+        check = consistency_check_vendor(active, deep_watch_active)
         if check is not None:
             payload["consistency_check"] = check
-            n_drift = len(check["log_only_not_in_sources"]) + len(check["sources_only_not_in_log"])
+            n_drift = (
+                len(check["log_only_not_in_sources"])
+                + len(check["sources_only_not_in_log"])
+                + len(check["deep_watch_log_only_not_in_sources"])
+                + len(check["deep_watch_sources_only_not_in_log"])
+            )
             if n_drift:
                 print(
                     f"[rebuild_change_logs] ⚠ consistency drift: {n_drift} mismatches between "
@@ -331,8 +394,8 @@ def rebuild_one(log_name, json_name):
     json_path.write_text(json.dumps(payload, indent=2))
     print(
         f"[rebuild_change_logs] {log_name}: {len(mutations_sorted)} mutations parsed "
-        f"({skipped} skipped), {len(active)} currently active, {len(expired)} expired, "
-        f"{len(proven_set)} proven. Wrote {json_name}.",
+        f"({skipped} skipped), {len(active)} currently active, {len(deep_watch_active)} deep-watch, "
+        f"{len(expired)} expired, {len(proven_set)} proven. Wrote {json_name}.",
         file=sys.stderr,
     )
 
@@ -340,6 +403,7 @@ def rebuild_one(log_name, json_name):
 def main():
     rebuild_one("vendor_changes.log", "vendor_changes.json")
     rebuild_one("keyword_changes.log", "keyword_changes.json")
+    rebuild_one("github_changes.log", "github_changes.json")
 
 
 if __name__ == "__main__":
