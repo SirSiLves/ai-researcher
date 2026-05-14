@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI Trend Radar</title>
+  <title>AI Trend Radar — Briefing</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
@@ -13,22 +13,17 @@
       --text: #e6e8ee;
       --muted: #8a91a3;
       --accent: #6aa9ff;
-
-      --stage-mainstream:    #58c97f;
+      --accent-dim: #3d5e8a;
+      --pinned: #ffd76a;
+      --pinned-bg: rgba(255, 215, 106, 0.10);
+      --stage-mainstream: #58c97f;
       --stage-consolidating: #6aa9ff;
-      --stage-emerging:      #ffb84d;
-      --stage-fading:        #8a91a3;
-
+      --stage-emerging: #ffb84d;
+      --stage-fading: #8a91a3;
+      --dir-surging: #58c97f;
       --dir-rising: #58c97f;
       --dir-fading: #ff8a8a;
       --dir-steady: #b8bdc8;
-
-      --sector-A: #6aa9ff;
-      --sector-B: #ffb84d;
-      --sector-C: #b48aff;
-      --sector-D: #5cd0d0;
-      --sector-E: #ff8a8a;
-      --sector-F: #58c97f;
     }
     * { box-sizing: border-box; }
     body {
@@ -37,523 +32,582 @@
       color: var(--text);
       font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
     header {
-      padding: 18px 24px;
+      padding: 14px 20px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
       flex-wrap: wrap;
     }
     header h1 {
       margin: 0;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
     }
     header .subtitle {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
     }
-    header select, header button {
+    header select {
       background: var(--panel);
       color: var(--text);
       border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 4px;
+      border-radius: 5px;
+      padding: 4px 8px;
       font: inherit;
-      cursor: pointer;
     }
-    header button.active {
-      background: var(--accent);
-      color: #0f1117;
-      border-color: var(--accent);
-    }
-    .view-toggle {
-      display: inline-flex;
-      gap: 0;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .view-toggle button {
-      border: none;
-      border-radius: 0;
-      padding: 6px 12px;
-    }
-    .view-toggle button + button { border-left: 1px solid var(--border); }
+    header .nav-link { font-size: 12px; color: var(--accent); }
 
-    main {
-      padding: 18px 24px 60px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
-      gap: 18px;
-    }
-    @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
-
-    .panel {
+    .mode-tabs {
+      display: flex;
+      gap: 2px;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 16px;
+      padding: 2px;
     }
-    .panel h2 {
-      margin: 0 0 12px;
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+    .mode-tabs button {
+      background: transparent;
       color: var(--muted);
-    }
-
-    /* Polar radar SVG container */
-    .radar-svg-wrap {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    .radar-svg-wrap svg { display: block; width: 100%; height: auto; }
-
-    /* Polar radar elements */
-    .ring-band-1 { fill: rgba(88,201,127,0.10); stroke: var(--stage-mainstream); stroke-opacity: 0.35; }
-    .ring-band-2 { fill: rgba(106,169,255,0.08); stroke: var(--stage-consolidating); stroke-opacity: 0.30; }
-    .ring-band-3 { fill: rgba(255,184,77,0.06); stroke: var(--stage-emerging); stroke-opacity: 0.30; }
-    .ring-band-4 { fill: rgba(138,145,163,0.04); stroke: var(--stage-fading); stroke-opacity: 0.30; }
-    .ring-divider { stroke-dasharray: 2 3; }
-    .sector-divider { stroke: var(--border); stroke-width: 1; }
-    .ring-label-text { fill: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
-    .sector-label-text { fill: var(--text); font-size: 12px; font-weight: 600; }
-    .sector-label-meta { fill: var(--muted); font-size: 10px; }
-
-    .topic-dot {
+      border: none;
+      padding: 5px 14px;
+      border-radius: 4px;
+      font: inherit;
+      font-weight: 600;
       cursor: pointer;
-      transition: transform 0.1s ease-out;
-      transform-origin: center;
-      transform-box: fill-box;
     }
-    .topic-dot:hover { transform: scale(1.3); }
-    .topic-dot.selected { stroke: #fff; stroke-width: 2; }
-    .topic-dot.dimmed { opacity: 0.25; }
-    .topic-dot-high-breadth {
-      filter: drop-shadow(0 0 6px rgba(255,255,255,0.35));
+    .mode-tabs button.active {
+      background: var(--accent);
+      color: var(--bg);
     }
 
-    .movement-arrow {
-      stroke: var(--accent);
-      stroke-width: 1.2;
-      fill: none;
-      opacity: 0.55;
-      pointer-events: none;
+    #maturity-badge {
+      padding: 3px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      font-size: 11px;
     }
+    #maturity-badge.cold    { color: var(--dir-fading);  border-color: var(--dir-fading);  background: rgba(255, 138, 138, 0.08); }
+    #maturity-badge.warming { color: var(--stage-emerging); border-color: var(--stage-emerging); background: rgba(255, 184, 77, 0.08); }
+    #maturity-badge.warm    { color: var(--stage-mainstream); border-color: var(--stage-mainstream); background: rgba(88, 201, 127, 0.08); }
 
-    /* Scatter view */
-    .scatter-axis-label { fill: var(--muted); font-size: 11px; }
-    .scatter-axis { stroke: var(--border); stroke-width: 1; }
-    .scatter-quadrant-label { fill: var(--muted); font-size: 10px; font-style: italic; opacity: 0.7; }
-
-    /* Legend */
-    .legend {
+    /* Filter chips row */
+    .chip-row {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
       display: flex;
+      gap: 8px;
       flex-wrap: wrap;
-      gap: 16px;
-      margin-top: 10px;
+      align-items: center;
+    }
+    .chip-row-label {
       font-size: 11px;
       color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-right: 4px;
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-swatch {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      display: inline-block;
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 12px;
+      user-select: none;
     }
-    .legend-swatch.rising { background: var(--dir-rising); }
-    .legend-swatch.fading { background: var(--dir-fading); }
-    .legend-swatch.steady { background: var(--dir-steady); }
+    .chip:hover { border-color: var(--accent); }
+    .chip.active {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+    .chip.pinned {
+      background: var(--pinned-bg);
+      border-color: var(--pinned);
+    }
+    .chip.pinned.active {
+      background: var(--pinned);
+      color: var(--bg);
+    }
+    .chip-star {
+      font-size: 11px;
+      opacity: 0.5;
+      transition: opacity 0.1s;
+    }
+    .chip:hover .chip-star { opacity: 1; }
+    .chip.pinned .chip-star { opacity: 1; color: var(--pinned); }
+    .chip.pinned.active .chip-star { color: var(--bg); }
+    .chip-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+    .chip-icon { opacity: 0.7; font-size: 10px; }
 
-    /* Sector chip overview */
-    .sector-strip {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 8px;
-      margin-top: 14px;
+    main { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+    /* TODAY mode briefing */
+    .briefing-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
     }
-    .sector-chip {
-      background: var(--panel-2);
-      border-left: 3px solid var(--accent);
-      padding: 8px 10px;
-      border-radius: 4px;
+    .briefing-card h2 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .briefing-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .briefing-item:last-child { border-bottom: none; }
+    .briefing-item:hover { background: var(--panel-2); margin: 0 -8px; padding-left: 8px; padding-right: 8px; }
+    .briefing-icon {
+      font-size: 18px;
+      width: 24px;
+      flex-shrink: 0;
+      line-height: 1.3;
+    }
+    .briefing-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .briefing-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    .briefing-meta {
+      color: var(--muted);
       font-size: 12px;
     }
-    .sector-chip .sec-name { font-weight: 600; font-size: 12px; }
-    .sector-chip .sec-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
-
-    /* High breadth callout */
-    .breadth-list { margin: 0; padding-left: 0; list-style: none; }
-    .breadth-row {
-      display: flex;
-      gap: 10px;
-      align-items: baseline;
-      padding: 6px 0;
-      border-bottom: 1px dashed var(--border);
-      font-size: 13px;
-    }
-    .breadth-row:last-child { border-bottom: none; }
-    .breadth-count {
-      min-width: 60px;
-      text-align: right;
-      color: var(--dir-rising);
-      font-variant-numeric: tabular-nums;
+    .briefing-tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 3px;
+      font-size: 10px;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 6px;
+      vertical-align: middle;
     }
-    .breadth-row.medium .breadth-count { color: var(--accent); }
-    .breadth-row.low .breadth-count    { color: var(--muted); }
-    .breadth-label { flex: 1; cursor: pointer; }
-    .breadth-label:hover { color: var(--accent); }
-    .breadth-orgs { color: var(--muted); font-size: 11px; margin-top: 2px; }
-
-    /* Movements area */
-    .movement-row {
-      display: flex;
-      gap: 8px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-    }
-    .movement-row:last-child { border-bottom: none; }
-    .movement-arrow-txt { color: var(--accent); white-space: nowrap; }
+    .briefing-tag.surge      { background: rgba(88, 201, 127, 0.20); color: var(--dir-rising); }
+    .briefing-tag.fade       { background: rgba(255, 138, 138, 0.15); color: var(--dir-fading); }
+    .briefing-tag.hot        { background: rgba(255, 184, 77, 0.20); color: var(--stage-emerging); }
+    .briefing-tag.new        { background: rgba(106, 169, 255, 0.20); color: var(--accent); }
+    .briefing-tag.breadth    { background: rgba(180, 138, 255, 0.20); color: #b48aff; }
+    .briefing-tag.stage      { background: rgba(180, 138, 255, 0.20); color: #b48aff; }
 
     .empty-state {
       color: var(--muted);
       font-style: italic;
-      padding: 8px 0;
+      padding: 14px 0;
       font-size: 13px;
     }
 
-    /* Detail panel */
-    .detail-empty {
-      color: var(--muted);
-      font-style: italic;
-      padding: 20px 0;
-      text-align: center;
+    /* Disclosure panels (hidden by default in TODAY) */
+    details.disclosure {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 12px;
     }
-    .detail-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-    .detail-pill {
+    details.disclosure[open] { padding-bottom: 10px; }
+    details.disclosure summary {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      list-style: none;
+      color: var(--muted);
+    }
+    details.disclosure summary::-webkit-details-marker { display: none; }
+    details.disclosure summary:before {
+      content: "▸ ";
+      display: inline-block;
+      transition: transform 0.15s;
+    }
+    details.disclosure[open] summary:before {
+      content: "▾ ";
+    }
+    details.disclosure[open] summary { color: var(--text); }
+    .disclosure-body { padding: 0 20px; }
+
+    /* ARCS mode */
+    .arcs-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 16px;
+    }
+    .topic-list {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+    .topic-list input {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font: inherit;
+      margin-bottom: 8px;
+    }
+    .topic-row {
+      padding: 7px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .topic-row:hover { background: var(--panel-2); }
+    .topic-row.active { background: var(--panel-2); border-left: 2px solid var(--accent); padding-left: 6px; }
+    .stage-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .stage-dot.mainstream    { background: var(--stage-mainstream); }
+    .stage-dot.consolidating { background: var(--stage-consolidating); }
+    .stage-dot.emerging      { background: var(--stage-emerging); }
+    .stage-dot.fading        { background: var(--stage-fading); }
+    .topic-row .label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .topic-row .mini-arrow {
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .topic-row .mini-arrow.rising { color: var(--dir-rising); }
+    .topic-row .mini-arrow.surging { color: var(--dir-rising); }
+    .topic-row .mini-arrow.fading { color: var(--dir-fading); }
+
+    .arc-detail {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 22px;
+    }
+    .arc-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .arc-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    .arc-pill {
       display: inline-block;
       padding: 2px 8px;
       border-radius: 3px;
       font-size: 11px;
+      font-weight: 600;
+      margin: 0 4px 6px 0;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      font-weight: 600;
-      margin: 0 4px 8px 0;
     }
-    .detail-pill.stage-emerging      { background: #4a3a1a; color: var(--stage-emerging); }
-    .detail-pill.stage-consolidating { background: #1a2a4a; color: var(--stage-consolidating); }
-    .detail-pill.stage-mainstream    { background: #1a3a25; color: var(--stage-mainstream); }
-    .detail-pill.stage-fading        { background: #2a2e3a; color: var(--stage-fading); }
-    .detail-pill.sector              { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
-    .detail-pill.dir-rising { background: #1a3a25; color: var(--dir-rising); }
-    .detail-pill.dir-fading { background: #3a1a1a; color: var(--dir-fading); }
-    .detail-pill.dir-steady { background: #2a2e3a; color: var(--dir-steady); }
-
-    .detail-stats {
+    .arc-pill.mainstream    { background: rgba(88, 201, 127, 0.18); color: var(--stage-mainstream); }
+    .arc-pill.consolidating { background: rgba(106, 169, 255, 0.18); color: var(--stage-consolidating); }
+    .arc-pill.emerging      { background: rgba(255, 184, 77, 0.18); color: var(--stage-emerging); }
+    .arc-pill.fading        { background: rgba(138, 145, 163, 0.18); color: var(--stage-fading); }
+    .arc-pill.sector        { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+    .arc-stat-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .arc-stat {
+      background: var(--panel-2);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .arc-stat .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .arc-stat .value {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .arc-stat .value.cold { color: var(--muted); font-size: 13px; font-style: italic; }
+    .chart-wrap {
+      position: relative;
+      height: 240px;
       margin: 12px 0;
     }
-    .stat { background: var(--panel-2); padding: 8px 10px; border-radius: 4px; }
-    .stat-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
-    .stat-value { font-size: 16px; font-weight: 600; margin-top: 2px; }
-
-    .detail-section { margin-top: 14px; }
-    .detail-section h4 {
-      margin: 0 0 6px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-    }
-    .source-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      margin-bottom: 3px;
-    }
-    .source-bar .src-name { color: var(--muted); min-width: 150px; }
-    .source-bar .src-val { background: var(--accent); height: 8px; border-radius: 2px; }
-    .source-bar .src-count { color: var(--text); min-width: 24px; text-align: right; }
-
     .org-pill {
       display: inline-block;
-      background: var(--panel-2);
-      border: 1px solid var(--border);
       padding: 1px 7px;
-      border-radius: 11px;
-      font-size: 11px;
-      margin: 1px 2px;
-      color: var(--text);
-    }
-
-    .link-list { padding-left: 14px; margin: 4px 0; }
-    .link-list li { margin: 2px 0; word-break: break-all; }
-    .link-list a { color: var(--accent); text-decoration: none; font-size: 12px; }
-    .link-list a:hover { text-decoration: underline; }
-
-    .chart-wrap { position: relative; height: 200px; }
-
-    /* Sector evolution timeline */
-    .sector-evolution-row {
-      display: grid;
-      grid-template-columns: 80px 1fr;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 0;
-      font-size: 12px;
-    }
-    .sec-evo-date { color: var(--muted); font-variant-numeric: tabular-nums; }
-    .sec-evo-bar {
-      display: flex;
-      height: 22px;
+      margin: 0 2px 2px 0;
       border-radius: 3px;
-      overflow: hidden;
       background: var(--panel-2);
-    }
-    .sec-evo-segment {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #0f1117;
-      font-size: 10px;
-      font-weight: 600;
-      min-width: 0;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      padding: 0 4px;
-    }
-
-    .footer {
-      grid-column: 1 / -1;
-      color: var(--muted);
-      font-size: 12px;
-      padding: 8px 0 0;
-      border-top: 1px solid var(--border);
-      margin-top: 8px;
-    }
-    code { background: var(--panel-2); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
-
-    /* Topic clusters panel */
-    .cluster-card {
-      background: var(--panel-2);
-      border-left: 3px solid var(--accent);
-      border-radius: 4px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: background 0.1s;
-    }
-    .cluster-card:hover { background: #262b3a; }
-    .cluster-card.active { border-left-width: 5px; background: #262b3a; }
-    .cluster-name { font-weight: 600; font-size: 13px; }
-    .cluster-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
-    .cluster-direction-rising { color: var(--dir-rising); }
-    .cluster-direction-fading { color: var(--dir-fading); }
-    .cluster-direction-steady { color: var(--dir-steady); }
-    .cluster-direction-surging { color: var(--dir-rising); font-weight: 700; }
-    .cluster-members {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 6px;
-    }
-    .cluster-member-chip {
-      background: var(--panel);
       border: 1px solid var(--border);
-      padding: 1px 7px;
-      border-radius: 10px;
       font-size: 11px;
       color: var(--text);
     }
+    .org-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .org-pill.priority { border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
-    /* Surging dot ring */
-    .topic-dot-surging {
-      filter: drop-shadow(0 0 8px rgba(88,201,127,0.6));
+    .arc-section h4 {
+      margin: 16px 0 6px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .arc-section .files code {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 2px 0;
     }
 
-    .err {
-      background: #2a1a1a;
-      color: #ff8a8a;
-      padding: 10px;
-      border-radius: 4px;
-      font-family: ui-monospace, monospace;
-      font-size: 12px;
-      white-space: pre-wrap;
+    /* Disclosure bodies — sector evolution + score history charts */
+    .mini-chart-wrap {
+      position: relative;
+      height: 200px;
+      padding: 0 10px 10px;
     }
+
+    footer {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 12px 20px;
+      color: var(--muted);
+      font-size: 11px;
+      border-top: 1px solid var(--border);
+    }
+    footer code { background: var(--panel); padding: 1px 4px; border-radius: 3px; font-size: 11px; }
   </style>
 </head>
 <body>
   <header>
     <h1>🛰️ AI Trend Radar</h1>
-    <span class="subtitle">Persistence (ring) × breadth (dot size) × sector (quadrant)</span>
-    <span style="flex:1"></span>
-    <div class="view-toggle" id="view-toggle">
-      <button data-view="radar" class="active">Radar</button>
-      <button data-view="scatter">Scatter</button>
+    <div class="mode-tabs" id="mode-tabs">
+      <button data-mode="today" class="active">Today</button>
+      <button data-mode="arcs">Arcs</button>
     </div>
-    <label>Snapshot:
-      <select id="date-select"></select>
-    </label>
+    <label>Snapshot: <select id="date-select"></select></label>
     <span class="subtitle" id="meta-line"></span>
+    <span id="maturity-badge" style="display:none;"></span>
+    <span style="margin-left:auto; display:flex; gap:14px;">
+      <a class="nav-link" href="orgs.html">→ firm view</a>
+      <a class="nav-link" href="radar-classic.html">→ classic radar</a>
+      <a class="nav-link" href="index.md">→ index</a>
+    </span>
   </header>
 
-  <main>
-    <!-- Left column: radar / scatter visual + sector strip + sector evolution -->
-    <section>
-      <div class="panel">
-        <h2 id="view-title">Polar radar — what's shifting</h2>
-        <div class="radar-svg-wrap" id="radar-wrap"></div>
-        <div class="legend" id="legend">
-          <span class="legend-item"><span class="legend-swatch rising"></span> rising (fast EMA &gt; slow)</span>
-          <span class="legend-item"><span class="legend-swatch steady"></span> steady</span>
-          <span class="legend-item"><span class="legend-swatch fading"></span> fading</span>
-          <span class="legend-item">dot size = orgs talking (breadth 7d)</span>
-          <span class="legend-item">center → out: <b style="color:var(--stage-mainstream)">Mainstream</b> · <b style="color:var(--stage-consolidating)">Consolidating</b> · <b style="color:var(--stage-emerging)">Emerging</b> · <b style="color:var(--stage-fading)">Fading</b></span>
+  <div class="chip-row" id="chip-row">
+    <span class="chip-row-label">Filter:</span>
+    <span id="chips-pinned"></span>
+    <span class="chip-divider" id="chip-divider-1" style="display:none;"></span>
+    <span id="chips-dynamic"></span>
+    <span class="chip-row-label" id="chips-empty-hint" style="display:none;">no active sectors — try the dropdown above to load a snapshot</span>
+  </div>
+
+  <main id="main">
+    <!-- Mode panes — only one visible at a time -->
+
+    <div id="mode-today" class="mode-pane">
+      <div class="briefing-card">
+        <h2>📋 Headline — what changed</h2>
+        <div id="headline-list"></div>
+      </div>
+
+      <details class="disclosure" id="disc-radar">
+        <summary>Show polar radar (all topics on one canvas)</summary>
+        <div class="disclosure-body">
+          <p class="empty-state" style="padding:8px 0">The full polar radar view (concentric stage rings, sector quadrants, every topic as a dot) lives in <a href="radar-classic.html">radar-classic.html</a> — kept intact while the new briefing view stabilizes.</p>
         </div>
-        <div class="sector-strip" id="sector-strip"></div>
-      </div>
+      </details>
 
-      <div class="panel" style="margin-top:18px">
-        <h2>🔗 Topic clusters — moving together</h2>
-        <div class="empty-state" style="margin-bottom:6px">
-          Topics that co-occur in the same source files this week. Click a cluster to highlight its members on the radar.
+      <details class="disclosure" id="disc-clusters">
+        <summary>Show topic clusters (co-mention graph)</summary>
+        <div class="disclosure-body">
+          <div id="clusters-body"></div>
         </div>
-        <div id="clusters"></div>
-      </div>
+      </details>
 
-      <div class="panel" style="margin-top:18px">
-        <h2>Sector evolution — last 8 runs</h2>
-        <div id="sector-evolution"></div>
-      </div>
-
-      <div class="panel" style="margin-top:18px">
-        <h2>Score history (top 8 by current score)</h2>
-        <div class="chart-wrap" style="height:240px"><canvas id="topchart"></canvas></div>
-      </div>
-    </section>
-
-    <!-- Right column: highest breadth + movements + detail panel -->
-    <section>
-      <div class="panel">
-        <h2>🔥 Highest breadth this week</h2>
-        <div class="empty-state" style="margin-bottom:6px">
-          Topics talked about by the most distinct organizations in the last 7 days.
+      <details class="disclosure" id="disc-sectors">
+        <summary>Show sector evolution (last 8 runs)</summary>
+        <div class="disclosure-body">
+          <div class="mini-chart-wrap" id="sector-evo-body"></div>
         </div>
-        <ul class="breadth-list" id="breadth-list"></ul>
-      </div>
+      </details>
 
-      <div class="panel" style="margin-top:18px">
-        <h2>What moved this run</h2>
-        <div id="movements"></div>
-      </div>
+      <details class="disclosure" id="disc-scores">
+        <summary>Show score history (top 8 by current score)</summary>
+        <div class="disclosure-body">
+          <div class="chart-wrap"><canvas id="top-history-chart"></canvas></div>
+        </div>
+      </details>
+    </div>
 
-      <div class="panel" style="margin-top:18px">
-        <h2>Topic detail</h2>
-        <div id="detail">
-          <div class="detail-empty">Click any dot on the radar (or row in the lists) to see its full history.</div>
+    <div id="mode-arcs" class="mode-pane" style="display:none;">
+      <div class="arcs-layout">
+        <div class="topic-list" id="topic-list-wrap">
+          <input type="text" id="topic-search" placeholder="Search topics…">
+          <div id="topic-list"></div>
+        </div>
+        <div class="arc-detail" id="arc-detail">
+          <div class="empty-state">Pick a topic from the list to see its life-cycle arc.</div>
         </div>
       </div>
-    </section>
-
-    <section class="footer">
-      Open from <code>file://</code> won't work — the page needs to fetch JSON. Run a local server: <code>cd "~/Documents/Claude/Projects/AI Researcher" &amp;&amp; python3 -m http.server 8000</code>, then open <code>http://localhost:8000/radar.html</code>.
-      <span style="float:right">Data: <code>radar/index.json</code> → <code>radar/{date}.json</code></span>
-    </section>
+    </div>
   </main>
 
-  <script>
-    // ===== Constants ==========================================================
-    // Stage rings from center outward. Center = most settled, outer = least.
-    const STAGES_CENTER_OUT = ['mainstream', 'consolidating', 'emerging', 'fading'];
-    const STAGE_LABEL = {
-      emerging:      'Emerging',
-      consolidating: 'Consolidating',
-      mainstream:    'Mainstream',
-      fading:        'Fading',
-    };
-    const STAGE_COLOR = {
-      emerging:      'var(--stage-emerging)',
-      consolidating: 'var(--stage-consolidating)',
-      mainstream:    'var(--stage-mainstream)',
-      fading:        'var(--stage-fading)',
-    };
-    const SOURCE_LABEL = {
-      priority_vendor_blog:      'Priority vendor blog',
-      enterprise_vendor_blog:    'Enterprise vendor blog',
-      paper:                     'Paper',
-      long_form_blog:            'Long-form blog',
-      linkedin_network_post:     'LinkedIn (network)',
-      linkedin_hashtag_post:     'LinkedIn (hashtag)',
-      tech_news:                 'Tech news',
-      governance_source:         'Governance source',
-      medium_aggregator:         'Medium / aggregator',
-      job_posting_skill_mention: 'Job postings',
-    };
-    const SECTOR_PALETTE = [
-      'var(--sector-A)', 'var(--sector-B)', 'var(--sector-C)',
-      'var(--sector-D)', 'var(--sector-E)', 'var(--sector-F)',
-    ];
+  <footer>
+    Briefing view loads <code>radar/index.json</code> → <code>radar/{date}.json</code>, plus <code>orgs/index.json</code> + <code>vendor_changes.json</code> + <code>keyword_changes.json</code> (optional). Run a local server: <code>python3 -m http.server 8000</code> then open <code>http://localhost:8000/radar.html</code>. Full polar view at <a href="radar-classic.html">radar-classic.html</a>.
+  </footer>
 
-    // ===== State ==============================================================
+  <script>
+    // =========================================================================
+    // State
+    // =========================================================================
     const state = {
       manifest: null,
-      cache: new Map(),
       currentEntry: null,
       currentData: null,
+      priorData: null,
+      cache: new Map(),
+      mode: 'today',
+      activeFilter: null,         // {kind: 'sector'|'cluster', name: '...'}
       selectedTopicId: null,
-      view: 'radar',
-      chart: null,
+      pinned: loadPinned(),
+      orgs: null,
+      vendorActive: new Map(),
+      vendorProven: new Set(),
+      keywordActive: new Map(),
+      keywordProven: new Set(),
+      topHistoryChart: null,
+      arcChart: null,
     };
 
-    // ===== Boot ===============================================================
+    const STAGE_LABEL = {
+      mainstream: 'mainstream',
+      consolidating: 'consolidating',
+      emerging: 'emerging',
+      fading: 'fading',
+    };
+
+    // =========================================================================
+    // localStorage pin/unpin
+    // =========================================================================
+    function loadPinned() {
+      try {
+        const raw = localStorage.getItem('radarPinned');
+        if (!raw) return { sectors: [], clusters: [] };
+        const p = JSON.parse(raw);
+        return { sectors: p.sectors || [], clusters: p.clusters || [] };
+      } catch (_) {
+        return { sectors: [], clusters: [] };
+      }
+    }
+    function savePinned() {
+      localStorage.setItem('radarPinned', JSON.stringify(state.pinned));
+    }
+    function isPinned(kind, name) {
+      return state.pinned[kind + 's'].includes(name);
+    }
+    function togglePin(kind, name) {
+      const arr = state.pinned[kind + 's'];
+      const idx = arr.indexOf(name);
+      if (idx === -1) arr.push(name);
+      else arr.splice(idx, 1);
+      savePinned();
+      renderChips();
+    }
+
+    // =========================================================================
+    // Boot
+    // =========================================================================
     async function init() {
       try {
         const r = await fetch('radar/index.json');
-        if (!r.ok) throw new Error(`radar/index.json HTTP ${r.status}`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         state.manifest = await r.json();
       } catch (e) {
         showError(`Could not load radar/index.json: ${e.message}\n\nLikely cause: opened via file://. Serve over localhost.`);
         return;
       }
 
-      const select = document.getElementById('date-select');
+      // Side data (all optional)
+      await Promise.all([
+        sideFetch('orgs/index.json', d => {
+          state.orgs = new Map(d.entries.map(e => [e.slug, e]));
+        }),
+        sideFetch('vendor_changes.json', d => {
+          (d.active_auto_added || []).forEach(e => state.vendorActive.set(e.subject, e));
+          (d.proven_entries || []).forEach(p => state.vendorProven.add(p.subject));
+        }),
+        sideFetch('keyword_changes.json', d => {
+          (d.active_auto_added || []).forEach(e => state.keywordActive.set(e.subject.toLowerCase(), e));
+          (d.proven_entries || []).forEach(p => state.keywordProven.add(p.subject.toLowerCase()));
+        }),
+      ]);
+
+      const sel = document.getElementById('date-select');
       state.manifest.entries.forEach(entry => {
         const opt = document.createElement('option');
         opt.value = entry.date_id;
         opt.textContent = `${entry.date_id} — ${entry.topic_count} topics`;
-        select.appendChild(opt);
+        sel.appendChild(opt);
       });
-      select.addEventListener('change', () => loadDate(select.value));
+      sel.addEventListener('change', () => loadDate(sel.value));
 
-      document.querySelectorAll('#view-toggle button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.view = btn.dataset.view;
-          document.querySelectorAll('#view-toggle button').forEach(b => b.classList.toggle('active', b === btn));
-          document.getElementById('view-title').textContent =
-            state.view === 'radar' ? 'Polar radar — what\'s shifting' : 'Scatter — persistence × breadth';
-          renderMainView();
-        });
+      document.querySelectorAll('#mode-tabs button').forEach(btn => {
+        btn.addEventListener('click', () => switchMode(btn.dataset.mode));
       });
 
-      if (state.manifest.entries.length === 0) { showError('No radar entries in manifest.'); return; }
+      document.getElementById('topic-search').addEventListener('input', renderTopicList);
+
+      if (state.manifest.entries.length === 0) {
+        showError('No radar entries in manifest.');
+        return;
+      }
       await loadDate(state.manifest.entries[0].date_id);
       await preloadAll();
-      renderTopChart();
-      renderSectorEvolution();
+    }
+
+    async function sideFetch(path, transform) {
+      try {
+        const r = await fetch(path);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        transform(await r.json());
+      } catch (e) {
+        console.warn(`[radar] optional ${path} not loaded:`, e.message);
+      }
     }
 
     async function loadJson(date_id) {
@@ -568,644 +622,614 @@
     }
     async function preloadAll() {
       await Promise.allSettled(state.manifest.entries.map(e => loadJson(e.date_id)));
+      // Now that the cache is warm, redraw mode-specific charts that need history.
+      if (state.mode === 'today') renderTopHistory();
+      if (state.mode === 'arcs' && state.selectedTopicId) renderArcDetail();
     }
 
     async function loadDate(date_id) {
-      try {
-        state.currentEntry = state.manifest.entries.find(e => e.date_id === date_id);
-        state.currentData = await loadJson(date_id);
-        state.selectedTopicId = null;
-        state.activeClusterId = null;
-        renderMeta();
-        renderMainView();
-        renderSectorStrip();
-        renderClusters();
-        renderBreadthList();
-        renderMovements();
-        renderDetailEmpty();
-      } catch (e) {
-        showError(e.message);
-      }
-    }
+      state.currentEntry = state.manifest.entries.find(e => e.date_id === date_id);
+      state.currentData = await loadJson(date_id);
 
-    function renderClusters() {
-      const el = document.getElementById('clusters');
-      const clusters = (state.currentData.topic_clusters || []).slice()
-        .sort((a, b) => (b.cluster_score_slow || 0) - (a.cluster_score_slow || 0));
-      if (clusters.length === 0) {
-        el.innerHTML = '<div class="empty-state">No clusters yet — needs ≥3 co-mentions across topic pairs. Will populate as the pipeline accumulates more days.</div>';
-        return;
+      // Load prior radar for breadth-jump detection
+      state.priorData = null;
+      if (state.currentData.prior_radar) {
+        const priorId = state.currentData.prior_radar.split('/').pop().replace('.json', '');
+        try { state.priorData = await loadJson(priorId); } catch (_) {}
       }
-      el.innerHTML = clusters.map(c => {
-        const dir = c.cluster_direction || 'steady';
-        const members = (c.topic_ids || []).map(tid => {
-          const t = (state.currentData.topics || []).find(x => x.id === tid);
-          return `<span class="cluster-member-chip" data-id="${escapeAttr(tid)}">${escapeHtml(t ? t.label : tid)}</span>`;
-        }).join('');
-        const orgs = c.cluster_breadth_7d != null ? `${c.cluster_breadth_7d} orgs` : '';
-        const moving = c.members_moving_together ? ' · 🔗 moving together' : '';
-        return `<div class="cluster-card" data-cluster-id="${escapeAttr(c.id)}">
-          <div class="cluster-name">${escapeHtml(c.name)} <span class="cluster-direction-${dir}">${dir === 'rising' ? '↑' : dir === 'surging' ? '↑↑' : dir === 'fading' ? '↓' : '→'}</span></div>
-          <div class="cluster-meta">${c.size} topics · score ${(c.cluster_score_slow || 0).toFixed(1)} · ${orgs}${moving}</div>
-          <div class="cluster-members">${members}</div>
-        </div>`;
-      }).join('');
-      // Wire up cluster-card clicks (highlight members on radar)
-      el.querySelectorAll('.cluster-card').forEach(node => {
-        node.addEventListener('click', () => {
-          const cid = node.dataset.clusterId;
-          state.activeClusterId = state.activeClusterId === cid ? null : cid;
-          el.querySelectorAll('.cluster-card').forEach(c => c.classList.toggle('active', c.dataset.clusterId === state.activeClusterId));
-          applyClusterHighlight();
-        });
-      });
-      // Wire up member chip clicks (select individual topic)
-      el.querySelectorAll('.cluster-member-chip').forEach(node => {
-        node.addEventListener('click', (e) => {
-          e.stopPropagation();
-          selectTopic(node.dataset.id);
-        });
-      });
-    }
 
-    function applyClusterHighlight() {
-      const cluster = (state.currentData.topic_clusters || []).find(c => c.id === state.activeClusterId);
-      const memberIds = cluster ? new Set(cluster.topic_ids) : null;
-      document.querySelectorAll('.topic-dot').forEach(el => {
-        if (!memberIds) {
-          el.classList.remove('dimmed');
-        } else {
-          el.classList.toggle('dimmed', !memberIds.has(el.dataset.id));
-        }
-      });
+      renderMeta();
+      renderMaturityBadge();
+      renderChips();
+      renderMode();
     }
 
     function renderMeta() {
       const d = state.currentData;
-      const sectorCount = (d.sectors || []).length;
-      const topicCount = (d.topics || []).length;
-      const prior = d.prior_radar ? `prior: ${d.prior_radar}` : 'no prior';
       document.getElementById('meta-line').textContent =
-        `${topicCount} topics · ${sectorCount} sectors · ${prior}`;
+        `${(d.topics || []).length} topics · ${(d.sectors || []).length} sectors`;
     }
 
-    function renderMainView() {
-      if (state.view === 'radar') renderPolarRadar();
-      else renderScatter();
-    }
-
-    // ===== Polar radar SVG ====================================================
-    function renderPolarRadar() {
-      const wrap = document.getElementById('radar-wrap');
-      const d = state.currentData;
-      const sectors = (d.sectors || []).slice().sort((a, b) => a.name.localeCompare(b.name));
-      const topics = d.topics || [];
-      if (sectors.length === 0 || topics.length === 0) {
-        wrap.innerHTML = '<div class="empty-state">No sectors or topics for this run.</div>';
-        return;
+    function renderMaturityBadge() {
+      const el = document.getElementById('maturity-badge');
+      const entries = (state.manifest.entries || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+      if (entries.length < 2) { el.style.display = 'none'; return; }
+      const ageDays = Math.round(
+        (new Date(state.currentData.date) - new Date(entries[0].date)) / 86400000
+      );
+      let cls, label, title;
+      if (ageDays < 30) {
+        cls = 'cold';
+        label = `age ${ageDays}d · 30/90/180d cold`;
+        title = 'Pipeline is too young for 30/90/180-day momentum to be reliable. Trust score_slow and 7d momentum only.';
+      } else if (ageDays < 90) {
+        cls = 'warming';
+        label = `age ${ageDays}d · 90/180d warming`;
+        title = '30-day momentum reliable. 90/180-day windows still need more history.';
+      } else if (ageDays < 180) {
+        cls = 'warming';
+        label = `age ${ageDays}d · 180d warming`;
+        title = '30 and 90-day momentum reliable. 180-day window still warming.';
+      } else {
+        cls = 'warm';
+        label = `age ${ageDays}d · all warm`;
+        title = 'All momentum windows have enough history.';
       }
+      el.className = cls;
+      el.textContent = label;
+      el.title = title;
+      el.style.display = '';
+    }
 
-      const SIZE = 720;
-      const CX = SIZE / 2, CY = SIZE / 2;
-      const OUTER = 320;
-      // Ring radii (outer edge of each band), from center outward
-      const RING_RADII = {
-        mainstream:    OUTER * 0.30,
-        consolidating: OUTER * 0.55,
-        emerging:      OUTER * 0.82,
-        fading:        OUTER * 1.00,
-      };
-      const RING_INNER = {
-        mainstream:    0,
-        consolidating: RING_RADII.mainstream,
-        emerging:      RING_RADII.consolidating,
-        fading:        RING_RADII.emerging,
-      };
-      const N_SECTORS = sectors.length;
-      const ARC = (2 * Math.PI) / N_SECTORS;
+    // =========================================================================
+    // Filter chips — pinned (★ persistent) + dynamic (today's sectors/clusters)
+    // =========================================================================
+    function renderChips() {
+      const d = state.currentData;
+      if (!d) return;
+      const todaySectors = (d.sectors || []).map(s => s.name);
+      const todayClusters = (d.topic_clusters || []).map(c => c.name);
 
-      // Build sector index for color + angle math
-      const sectorByName = new Map();
-      sectors.forEach((s, i) => {
-        sectorByName.set(s.name, {
-          ...s,
-          index: i,
-          startAngle: -Math.PI / 2 + i * ARC,
-          endAngle: -Math.PI / 2 + (i + 1) * ARC,
-          midAngle: -Math.PI / 2 + (i + 0.5) * ARC,
-          color: SECTOR_PALETTE[i % SECTOR_PALETTE.length],
+      // Build the full chip universe: union of pinned + today
+      const pinnedSet = new Set([
+        ...state.pinned.sectors.map(s => 'sector:' + s),
+        ...state.pinned.clusters.map(c => 'cluster:' + c),
+      ]);
+      const dynSet = new Set([
+        ...todaySectors.map(s => 'sector:' + s),
+        ...todayClusters.map(c => 'cluster:' + c),
+      ]);
+
+      // Pinned chips render first (even if not in today's data)
+      const pinnedChips = [];
+      state.pinned.sectors.forEach(name => pinnedChips.push(chipHtml('sector', name, true, dynSet.has('sector:' + name))));
+      state.pinned.clusters.forEach(name => pinnedChips.push(chipHtml('cluster', name, true, dynSet.has('cluster:' + name))));
+
+      // Dynamic chips: today's sectors/clusters that aren't already pinned
+      const dynamicChips = [];
+      todaySectors.forEach(name => {
+        if (!pinnedSet.has('sector:' + name)) dynamicChips.push(chipHtml('sector', name, false, true));
+      });
+      todayClusters.forEach(name => {
+        if (!pinnedSet.has('cluster:' + name)) dynamicChips.push(chipHtml('cluster', name, false, true));
+      });
+
+      document.getElementById('chips-pinned').innerHTML = pinnedChips.join('');
+      document.getElementById('chips-dynamic').innerHTML = dynamicChips.join('');
+      document.getElementById('chip-divider-1').style.display =
+        (pinnedChips.length && dynamicChips.length) ? '' : 'none';
+      document.getElementById('chips-empty-hint').style.display =
+        (pinnedChips.length === 0 && dynamicChips.length === 0) ? '' : 'none';
+
+      // Wire up chip clicks
+      document.querySelectorAll('.chip').forEach(node => {
+        node.addEventListener('click', e => {
+          const star = e.target.closest('.chip-star');
+          const kind = node.dataset.kind;
+          const name = node.dataset.name;
+          if (star) {
+            // Star/unstar toggle
+            e.stopPropagation();
+            togglePin(kind, name);
+          } else {
+            // Filter toggle
+            if (state.activeFilter && state.activeFilter.kind === kind && state.activeFilter.name === name) {
+              state.activeFilter = null;
+            } else {
+              state.activeFilter = { kind, name };
+            }
+            renderChips();
+            renderMode();
+          }
+        });
+      });
+    }
+
+    function chipHtml(kind, name, isPinnedFlag, isActiveInData) {
+      const icon = kind === 'sector' ? '◆' : '🔗';
+      const isActive = state.activeFilter
+        && state.activeFilter.kind === kind
+        && state.activeFilter.name === name;
+      const classes = ['chip'];
+      if (isPinnedFlag) classes.push('pinned');
+      if (isActive) classes.push('active');
+      const inactiveTitle = (isPinnedFlag && !isActiveInData)
+        ? ` title="Pinned but no topics in this snapshot."`
+        : '';
+      const star = isPinnedFlag ? '★' : '☆';
+      return `<span class="${classes.join(' ')}" data-kind="${escAttr(kind)}" data-name="${escAttr(name)}"${inactiveTitle}>
+        <span class="chip-icon">${icon}</span>
+        ${escHtml(name)}
+        <span class="chip-star" title="${isPinnedFlag ? 'Unpin' : 'Pin (keep across sessions)'}">${star}</span>
+      </span>`;
+    }
+
+    // Apply filter to a topic list
+    function applyFilter(topics) {
+      if (!state.activeFilter) return topics;
+      const { kind, name } = state.activeFilter;
+      if (kind === 'sector') {
+        return topics.filter(t => t.sector === name);
+      }
+      // cluster filter — look up cluster member IDs from current data
+      const cluster = (state.currentData.topic_clusters || []).find(c => c.name === name);
+      if (!cluster) return [];
+      const members = new Set(cluster.topic_ids || []);
+      return topics.filter(t => members.has(t.id));
+    }
+
+    // =========================================================================
+    // Mode switching
+    // =========================================================================
+    function switchMode(mode) {
+      state.mode = mode;
+      document.querySelectorAll('#mode-tabs button').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === mode);
+      });
+      document.getElementById('mode-today').style.display = mode === 'today' ? '' : 'none';
+      document.getElementById('mode-arcs').style.display = mode === 'arcs' ? '' : 'none';
+      renderMode();
+    }
+    function renderMode() {
+      if (state.mode === 'today') renderToday();
+      else renderArcs();
+    }
+
+    // =========================================================================
+    // TODAY mode — the briefing
+    // =========================================================================
+    function renderToday() {
+      const d = state.currentData;
+      const topics = applyFilter(d.topics || []);
+      const items = [];
+
+      // (1) Stage transitions (both directions)
+      const stageMoves = d.stage_movements || [];
+      stageMoves.forEach(m => {
+        const t = (d.topics || []).find(x => x.id === m.topic);
+        if (!t) return;
+        if (state.activeFilter) {
+          const filtered = applyFilter([t]);
+          if (filtered.length === 0) return;
+        }
+        const isForward = stageRank(m.to) > stageRank(m.from);
+        const isFade = m.to === 'fading';
+        items.push({
+          weight: isFade ? 90 : 100,
+          icon: isFade ? '🔻' : (isForward ? '🔺' : '🔄'),
+          tag: { class: isFade ? 'fade' : 'stage', label: `${m.from || '—'} → ${m.to}` },
+          title: t.label || t.id,
+          meta: `${t.sector || 'no sector'} · breadth ${t.breadth_7d || 0} orgs · score ${(t.score_slow || 0).toFixed(1)}`,
+          topicId: t.id,
         });
       });
 
-      // SVG header
-      let svg = `<svg viewBox="0 0 ${SIZE} ${SIZE}" xmlns="http://www.w3.org/2000/svg">`;
-
-      // 1) Ring bands (annuli)
-      STAGES_CENTER_OUT.forEach((stage, idx) => {
-        const rOuter = RING_RADII[stage];
-        const rInner = RING_INNER[stage];
-        const cls = `ring-band-${idx + 1}`;
-        // Outer circle
-        svg += `<path class="${cls}" d="${annulusPath(CX, CY, rInner, rOuter)}" stroke-width="1"/>`;
-      });
-
-      // 2) Sector dividers (radial lines)
-      sectorByName.forEach(s => {
-        const x1 = CX + Math.cos(s.startAngle) * 4;
-        const y1 = CY + Math.sin(s.startAngle) * 4;
-        const x2 = CX + Math.cos(s.startAngle) * OUTER;
-        const y2 = CY + Math.sin(s.startAngle) * OUTER;
-        svg += `<line class="sector-divider" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
-      });
-
-      // 3) Ring labels (at top of each ring, slightly off the y-axis to avoid sector dividers)
-      const labelAngle = -Math.PI / 2 + 0.04;
-      STAGES_CENTER_OUT.forEach(stage => {
-        const r = (RING_INNER[stage] + RING_RADII[stage]) / 2;
-        const lx = CX + Math.cos(labelAngle) * r;
-        const ly = CY + Math.sin(labelAngle) * r;
-        svg += `<text class="ring-label-text" x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" style="fill:${STAGE_COLOR[stage]}; opacity:0.85">${STAGE_LABEL[stage]}</text>`;
-      });
-
-      // 4) Sector labels (just beyond outer ring)
-      sectorByName.forEach(s => {
-        const lr = OUTER + 12;
-        const lx = CX + Math.cos(s.midAngle) * lr;
-        const ly = CY + Math.sin(s.midAngle) * lr;
-        const orgs = s.active_orgs != null ? `${s.active_orgs} orgs` : '';
-        const meta = `${s.topic_count} topics${orgs ? ' · ' + orgs : ''}`;
-        const align = Math.cos(s.midAngle) > 0.3 ? 'start' : Math.cos(s.midAngle) < -0.3 ? 'end' : 'middle';
-        svg += `<text class="sector-label-text" x="${lx}" y="${ly}" text-anchor="${align}" dominant-baseline="middle" fill="${s.color}">${escapeXml(s.name)}</text>`;
-        svg += `<text class="sector-label-meta" x="${lx}" y="${ly + 14}" text-anchor="${align}" dominant-baseline="middle">${meta}</text>`;
-      });
-
-      // 5) Topic dots — placed within their (sector, stage) cell with deterministic jitter
-      // Group topics by sector → stage so we can space them along the arc
-      const byCell = new Map(); // key = sector|stage → [topics]
+      // (2) Surging topics (direction === 'surging' OR score_fast > 1.5x score_slow)
       topics.forEach(t => {
-        const key = `${t.sector}|${t.stage}`;
-        if (!byCell.has(key)) byCell.set(key, []);
-        byCell.get(key).push(t);
+        const fast = t.score_fast != null ? t.score_fast : t.score;
+        const slow = t.score_slow != null ? t.score_slow : t.score;
+        const isSurging = t.direction === 'surging' || (slow > 0 && fast / slow >= 1.5);
+        if (!isSurging) return;
+        // Don't duplicate if already covered by a stage transition
+        if (stageMoves.some(m => m.topic === t.id)) return;
+        items.push({
+          weight: 75,
+          icon: '⚡',
+          tag: { class: 'surge', label: 'surging' },
+          title: t.label || t.id,
+          meta: `${t.sector || 'no sector'} · fast ${fast.toFixed(1)} vs slow ${slow.toFixed(1)} (${slow > 0 ? ((fast/slow - 1) * 100).toFixed(0) : '—'}%)`,
+          topicId: t.id,
+        });
       });
 
-      const dotsHtml = [];
-      const arrowsHtml = [];
-      const dotPositions = new Map(); // topic_id → {x, y}
+      // (3) Sector births / deaths
+      (d.sectors_spawned_today || []).forEach(name => {
+        items.push({
+          weight: 85,
+          icon: '🆕',
+          tag: { class: 'new', label: 'sector born' },
+          title: name,
+          meta: `New sector clustered today`,
+          topicId: null,
+        });
+      });
+      (d.sectors_dissolved_today || []).forEach(name => {
+        items.push({
+          weight: 70,
+          icon: '💀',
+          tag: { class: 'fade', label: 'sector dissolved' },
+          title: name,
+          meta: `Topics scattered to other sectors`,
+          topicId: null,
+        });
+      });
 
-      sectorByName.forEach(s => {
-        STAGES_CENTER_OUT.forEach(stage => {
-          const cell = byCell.get(`${s.name}|${stage}`) || [];
-          const rMid = (RING_INNER[stage] + RING_RADII[stage]) / 2;
-          const arcSpan = ARC * 0.85; // leave gutter on each side of the sector
-          const arcStart = s.midAngle - arcSpan / 2;
-          cell.forEach((t, i) => {
-            const slot = cell.length === 1 ? 0.5 : i / (cell.length - 1 + 0.0001);
-            const a = arcStart + slot * arcSpan;
-            // Radial jitter to spread dots within the ring band
-            const rJitter = (hashFloat(t.id) - 0.5) * (RING_RADII[stage] - RING_INNER[stage]) * 0.55;
-            const r = rMid + rJitter;
-            const x = CX + Math.cos(a) * r;
-            const y = CY + Math.sin(a) * r;
-            dotPositions.set(t.id, { x, y, angle: a, r });
+      // (4) Breadth jumps vs prior radar
+      if (state.priorData) {
+        const priorById = new Map((state.priorData.topics || []).map(t => [t.id, t]));
+        topics.forEach(t => {
+          const prior = priorById.get(t.id);
+          if (!prior) return;
+          const now = t.breadth_7d || 0;
+          const was = prior.breadth_7d || 0;
+          if (now >= 5 && now >= was * 1.5 && now - was >= 2) {
+            // Don't duplicate
+            if (items.some(i => i.topicId === t.id)) return;
+            items.push({
+              weight: 60,
+              icon: '📈',
+              tag: { class: 'breadth', label: 'breadth jump' },
+              title: t.label || t.id,
+              meta: `${was} → ${now} orgs (+${(((now/Math.max(was,1))-1)*100).toFixed(0)}%)`,
+              topicId: t.id,
+            });
+          }
+        });
+      }
 
-            const breadth = t.breadth_7d || 0;
-            const dotR = Math.max(4, Math.min(15, 4 + breadth * 1.1));
-            const dirColor = t.direction === 'surging' ? 'var(--dir-rising)'
-                            : t.direction === 'rising' ? 'var(--dir-rising)'
-                            : t.direction === 'fading' ? 'var(--dir-fading)'
-                            : 'var(--dir-steady)';
-            const breadthClass = t.high_breadth ? ' topic-dot-high-breadth' : '';
-            const surgingClass = t.direction === 'surging' ? ' topic-dot-surging' : '';
-            const titleSuffix = t.direction === 'surging' ? ' ↑↑ SURGING' : t.direction === 'rising' ? ' ↑' : t.direction === 'fading' ? ' ↓' : '';
-            dotsHtml.push(`<circle class="topic-dot${breadthClass}${surgingClass}" data-id="${escapeXml(t.id)}"
-              cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotR.toFixed(1)}"
-              fill="${dirColor}" stroke="${s.color}" stroke-width="1.5"
-              opacity="0.92"><title>${escapeXml((t.label || t.id) + ' — breadth ' + breadth + ', score ' + (t.score_slow || t.score || 0).toFixed(1) + titleSuffix)}</title></circle>`);
+      // (5) Hot vendor events (from vendor_changes.json)
+      state.vendorActive.forEach((info, slug) => {
+        const verbIsHot = (info.verb || '').startsWith('hot');
+        if (!verbIsHot) return;
+        // Only show events relevant to the active filter, if any
+        if (state.activeFilter) {
+          // Hot events aren't tied to topics, so a sector/cluster filter excludes them.
+          // That's intentional — they show up in the unfiltered briefing only.
+          return;
+        }
+        items.push({
+          weight: 55,
+          icon: '🔥',
+          tag: { class: 'hot', label: 'hot event' },
+          title: slug,
+          meta: info.reason || `auto-promoted ${info.ts_date}`,
+          isOrg: true,
+          orgSlug: slug,
+        });
+      });
+
+      // Sort by weight desc, then cap
+      items.sort((a, b) => b.weight - a.weight);
+      const top = items.slice(0, 10);
+
+      const listEl = document.getElementById('headline-list');
+      const radarDisc = document.getElementById('disc-radar');
+      if (top.length === 0) {
+        // Quiet day → message + auto-open the polar radar disclosure
+        listEl.innerHTML = `<div class="empty-state">— quiet day. No significant movement, surges, or hot events in this snapshot.${state.activeFilter ? ' (Filter active: ' + escHtml(state.activeFilter.name) + ')' : ''} See the polar radar below for the current state of the field.</div>`;
+        radarDisc.open = true;
+      } else {
+        listEl.innerHTML = top.map(renderBriefingItem).join('');
+        radarDisc.open = false;
+        listEl.querySelectorAll('.briefing-item').forEach(node => {
+          node.addEventListener('click', () => {
+            if (node.dataset.org) {
+              window.location.href = `orgs.html?slug=${encodeURIComponent(node.dataset.org)}`;
+            } else if (node.dataset.topicId) {
+              selectTopic(node.dataset.topicId);
+              switchMode('arcs');
+            }
           });
         });
-      });
+      }
 
-      // 6) Movement arrows — for stage_movements (within the same sector) and sector_movements
-      const stageMovements = d.stage_movements || [];
-      const sectorMovements = d.sector_movements || [];
-      stageMovements.forEach(m => {
-        const t = topics.find(x => x.id === m.topic);
-        const cur = dotPositions.get(m.topic);
-        if (!t || !cur || !m.from) return;
-        // Estimate "from" position: same angle, but at the from-stage's ring midpoint
-        const fromR = (RING_INNER[m.from] + RING_RADII[m.from]) / 2;
-        const fromX = CX + Math.cos(cur.angle) * fromR;
-        const fromY = CY + Math.sin(cur.angle) * fromR;
-        arrowsHtml.push(arrowPath(fromX, fromY, cur.x, cur.y));
-      });
-      sectorMovements.forEach(m => {
-        const t = topics.find(x => x.id === m.topic);
-        const cur = dotPositions.get(m.topic);
-        if (!t || !cur) return;
-        const fromSector = sectorByName.get(m.from);
-        if (!fromSector) return;
-        // Estimate prior position: same stage's ring midpoint, fromSector's midAngle
-        const rMid = (RING_INNER[t.stage] + RING_RADII[t.stage]) / 2;
-        const fromX = CX + Math.cos(fromSector.midAngle) * rMid;
-        const fromY = CY + Math.sin(fromSector.midAngle) * rMid;
-        arrowsHtml.push(arrowPath(fromX, fromY, cur.x, cur.y));
-      });
-
-      // Arrow marker def
-      svg += `<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)" opacity="0.55"/></marker></defs>`;
-      svg += arrowsHtml.join('');
-      svg += dotsHtml.join('');
-      svg += `</svg>`;
-      wrap.innerHTML = svg;
-
-      // Wire up dot clicks
-      wrap.querySelectorAll('.topic-dot').forEach(el => {
-        el.addEventListener('click', () => selectTopic(el.dataset.id));
-      });
-
-      // Apply selection highlight if any
-      if (state.selectedTopicId) applyDotSelection();
+      // Render the disclosure contents on demand (cheap when collapsed)
+      renderClusters();
+      renderSectorEvolution();
+      renderTopHistory();
     }
 
-    function annulusPath(cx, cy, rInner, rOuter) {
-      if (rInner === 0) return `M ${cx - rOuter},${cy} a ${rOuter},${rOuter} 0 1,0 ${rOuter * 2},0 a ${rOuter},${rOuter} 0 1,0 -${rOuter * 2},0 Z`;
-      return `M ${cx - rOuter},${cy} a ${rOuter},${rOuter} 0 1,0 ${rOuter * 2},0 a ${rOuter},${rOuter} 0 1,0 -${rOuter * 2},0 Z `
-           + `M ${cx - rInner},${cy} a ${rInner},${rInner} 0 1,1 ${rInner * 2},0 a ${rInner},${rInner} 0 1,1 -${rInner * 2},0 Z`;
-    }
-    function arrowPath(x1, y1, x2, y2) {
-      // Curved path with arrowhead
-      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-      const dx = x2 - x1, dy = y2 - y1;
-      const cx = mx + dy * 0.15, cy = my - dx * 0.15;
-      return `<path class="movement-arrow" d="M${x1.toFixed(1)},${y1.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}" marker-end="url(#arrow)"/>`;
-    }
-    // Hash a string to a stable [0,1) float
-    function hashFloat(s) {
-      let h = 2166136261;
-      for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 16777619) >>> 0; }
-      return (h >>> 0) / 0xffffffff;
+    function renderBriefingItem(item) {
+      const dataAttr = item.isOrg
+        ? `data-org="${escAttr(item.orgSlug)}"`
+        : (item.topicId ? `data-topic-id="${escAttr(item.topicId)}"` : '');
+      return `<div class="briefing-item" ${dataAttr}>
+        <div class="briefing-icon">${item.icon}</div>
+        <div class="briefing-body">
+          <div class="briefing-title">${escHtml(item.title)}<span class="briefing-tag ${item.tag.class}">${escHtml(item.tag.label)}</span></div>
+          <div class="briefing-meta">${escHtml(item.meta)}</div>
+        </div>
+      </div>`;
     }
 
-    // ===== Scatter view (persistence × breadth) =================================
-    function renderScatter() {
-      const wrap = document.getElementById('radar-wrap');
-      const d = state.currentData;
-      const topics = (d.topics || []);
-      if (topics.length === 0) { wrap.innerHTML = '<div class="empty-state">No topics.</div>'; return; }
-
-      const SIZE = 720;
-      const PAD = 60;
-      const W = SIZE - 2 * PAD;
-      const H = SIZE - 2 * PAD;
-
-      const maxX = Math.max(50, ...topics.map(t => t.score_slow || t.score || 0)) * 1.1;
-      const maxY = Math.max(8, ...topics.map(t => t.breadth_7d || 0)) * 1.1;
-
-      let svg = `<svg viewBox="0 0 ${SIZE} ${SIZE}" xmlns="http://www.w3.org/2000/svg">`;
-      // Axes
-      svg += `<line class="scatter-axis" x1="${PAD}" y1="${SIZE - PAD}" x2="${SIZE - PAD}" y2="${SIZE - PAD}"/>`;
-      svg += `<line class="scatter-axis" x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${SIZE - PAD}"/>`;
-      // Midlines (median)
-      const midX = PAD + W * 0.5, midY = PAD + H * 0.5;
-      svg += `<line class="scatter-axis" x1="${midX}" y1="${PAD}" x2="${midX}" y2="${SIZE - PAD}" stroke-dasharray="2 4" opacity="0.5"/>`;
-      svg += `<line class="scatter-axis" x1="${PAD}" y1="${midY}" x2="${SIZE - PAD}" y2="${midY}" stroke-dasharray="2 4" opacity="0.5"/>`;
-      // Quadrant labels
-      svg += `<text class="scatter-quadrant-label" x="${PAD + W * 0.05}" y="${PAD + H * 0.1}">hot pile-on (high breadth, low persistence)</text>`;
-      svg += `<text class="scatter-quadrant-label" x="${PAD + W * 0.5 + 10}" y="${PAD + H * 0.1}">structural consensus</text>`;
-      svg += `<text class="scatter-quadrant-label" x="${PAD + W * 0.05}" y="${SIZE - PAD - 10}">noise</text>`;
-      svg += `<text class="scatter-quadrant-label" x="${PAD + W * 0.5 + 10}" y="${SIZE - PAD - 10}">niche durable</text>`;
-      // Axis labels
-      svg += `<text class="scatter-axis-label" x="${SIZE / 2}" y="${SIZE - 18}" text-anchor="middle">Persistence (slow EMA score) →</text>`;
-      svg += `<text class="scatter-axis-label" x="20" y="${SIZE / 2}" text-anchor="middle" transform="rotate(-90, 20, ${SIZE / 2})">Breadth (distinct orgs, 7d) →</text>`;
-
-      // Dots
-      const sectorColorByName = new Map();
-      (d.sectors || []).forEach((s, i) => sectorColorByName.set(s.name, SECTOR_PALETTE[i % SECTOR_PALETTE.length]));
-
-      topics.forEach(t => {
-        const x = PAD + (Math.min(t.score_slow || t.score || 0, maxX) / maxX) * W;
-        const y = (SIZE - PAD) - (Math.min(t.breadth_7d || 0, maxY) / maxY) * H;
-        const dirColor = t.direction === 'rising' ? 'var(--dir-rising)'
-                        : t.direction === 'fading' ? 'var(--dir-fading)'
-                        : 'var(--dir-steady)';
-        const sectorColor = sectorColorByName.get(t.sector) || 'var(--accent)';
-        const r = Math.max(4, Math.min(14, 4 + (t.breadth_7d || 0) * 1.0));
-        svg += `<circle class="topic-dot" data-id="${escapeXml(t.id)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${dirColor}" stroke="${sectorColor}" stroke-width="1.5" opacity="0.9"><title>${escapeXml((t.label || t.id) + ' — persistence ' + (t.score_slow || t.score || 0).toFixed(1) + ', breadth ' + (t.breadth_7d || 0))}</title></circle>`;
-      });
-
-      svg += `</svg>`;
-      wrap.innerHTML = svg;
-      wrap.querySelectorAll('.topic-dot').forEach(el => {
-        el.addEventListener('click', () => selectTopic(el.dataset.id));
-      });
-      if (state.selectedTopicId) applyDotSelection();
+    function stageRank(stage) {
+      return { emerging: 1, consolidating: 2, mainstream: 3, fading: 0 }[stage] ?? -1;
     }
 
-    // ===== Sector strip + breadth list + movements + sector evolution ============
-    function renderSectorStrip() {
-      const strip = document.getElementById('sector-strip');
-      const d = state.currentData;
-      const sectors = (d.sectors || []).slice().sort((a, b) => a.name.localeCompare(b.name));
-      if (sectors.length === 0) { strip.innerHTML = ''; return; }
-      strip.innerHTML = sectors.map((s, i) => {
-        const color = SECTOR_PALETTE[i % SECTOR_PALETTE.length];
-        const orgs = s.active_orgs != null ? `${s.active_orgs} orgs` : 'orgs n/a';
-        const desc = s.description ? `<div class="sec-meta">${escapeHtml(s.description)}</div>` : '';
-        return `<div class="sector-chip" style="border-left-color:${color}">
-                  <div class="sec-name" style="color:${color}">${escapeHtml(s.name)}</div>
-                  <div class="sec-meta">${s.topic_count} topics · ${orgs}</div>
-                  ${desc}
-                </div>`;
-      }).join('');
-    }
-
-    function renderBreadthList() {
-      const el = document.getElementById('breadth-list');
-      const d = state.currentData;
-      const topics = (d.topics || []).slice().sort((a, b) => (b.breadth_7d || 0) - (a.breadth_7d || 0));
-      const top = topics.slice(0, 8);
-      if (top.length === 0 || (top[0].breadth_7d || 0) === 0) {
-        el.innerHTML = '<li class="empty-state">No breadth data yet.</li>';
+    function renderClusters() {
+      const el = document.getElementById('clusters-body');
+      const clusters = (state.currentData.topic_clusters || []).slice()
+        .sort((a, b) => (b.cluster_score_slow || 0) - (a.cluster_score_slow || 0));
+      if (clusters.length === 0) {
+        el.innerHTML = '<div class="empty-state">No clusters yet — needs ≥3 co-mentions across topic pairs.</div>';
         return;
       }
-      el.innerHTML = top.map(t => {
-        const b = t.breadth_7d || 0;
-        const cls = b >= 5 ? '' : b >= 3 ? 'medium' : 'low';
-        const orgs = (t.breadth_orgs_7d || []).slice(0, 6);
-        const orgsHtml = orgs.length ? `<div class="breadth-orgs">${orgs.map(o => `<span class="org-pill">${escapeHtml(o)}</span>`).join('')}${(t.breadth_orgs_7d || []).length > 6 ? ' …' : ''}</div>` : '';
-        return `<li class="breadth-row ${cls}">
-          <span class="breadth-count">${b} orgs</span>
-          <span class="breadth-label" data-id="${escapeAttr(t.id)}">${escapeHtml(t.label || t.id)}${orgsHtml}</span>
-        </li>`;
+      el.innerHTML = clusters.map(c => {
+        const dir = c.cluster_direction || 'steady';
+        const orgs = c.cluster_breadth_7d != null ? `${c.cluster_breadth_7d} orgs` : '';
+        const members = (c.topic_ids || []).slice(0, 6).map(tid => {
+          const t = (state.currentData.topics || []).find(x => x.id === tid);
+          return `<span class="org-pill" style="cursor:pointer" data-topic-id="${escAttr(tid)}">${escHtml(t ? t.label : tid)}</span>`;
+        }).join(' ');
+        return `<div style="padding:10px 0; border-bottom:1px solid var(--border)">
+          <strong>${escHtml(c.name)}</strong>
+          <span style="color:var(--muted); font-size:12px; margin-left:6px;">${c.size} topics · score ${(c.cluster_score_slow || 0).toFixed(1)} · ${orgs} · ${dir}</span>
+          <div style="margin-top:4px">${members}</div>
+        </div>`;
       }).join('');
-      el.querySelectorAll('.breadth-label').forEach(node => {
-        node.addEventListener('click', () => selectTopic(node.dataset.id));
-      });
-    }
-
-    function renderMovements() {
-      const el = document.getElementById('movements');
-      const d = state.currentData;
-      const stageMoves = d.stage_movements || [];
-      const sectorMoves = d.sector_movements || [];
-      const dissolved = d.sectors_dissolved_today || [];
-      const spawned = d.sectors_spawned_today || [];
-
-      let html = '';
-      if (sectorMoves.length) {
-        html += '<h4 style="margin:6px 0 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em">Sector reassignments</h4>';
-        html += sectorMoves.map(m => {
-          const t = d.topics.find(x => x.id === m.topic);
-          const label = t ? t.label : m.topic;
-          return `<div class="movement-row"><span class="breadth-label" data-id="${escapeAttr(m.topic)}">${escapeHtml(label)}</span><span class="movement-arrow-txt">${escapeHtml(m.from || '—')} → ${escapeHtml(m.to)}</span></div>`;
-        }).join('');
-      }
-      if (spawned.length || dissolved.length) {
-        html += '<h4 style="margin:10px 0 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em">Sector births / deaths</h4>';
-        spawned.forEach(s => html += `<div class="movement-row"><span>${escapeHtml(s)}</span><span class="movement-arrow-txt" style="color:var(--dir-rising)">spawned</span></div>`);
-        dissolved.forEach(s => html += `<div class="movement-row"><span>${escapeHtml(s)}</span><span class="movement-arrow-txt" style="color:var(--dir-fading)">dissolved</span></div>`);
-      }
-      if (stageMoves.length) {
-        html += '<h4 style="margin:10px 0 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em">Stage transitions</h4>';
-        html += stageMoves.map(m => {
-          const t = d.topics.find(x => x.id === m.topic);
-          const label = t ? t.label : m.topic;
-          const from = m.from ? STAGE_LABEL[m.from] || m.from : '—';
-          const to = m.to ? STAGE_LABEL[m.to] || m.to : '—';
-          return `<div class="movement-row"><span class="breadth-label" data-id="${escapeAttr(m.topic)}">${escapeHtml(label)}</span><span class="movement-arrow-txt">${from} → ${to}</span></div>`;
-        }).join('');
-      }
-      if (!html) html = '<div class="empty-state">Nothing moved this run — signals are steady.</div>';
-      el.innerHTML = html;
-      el.querySelectorAll('.breadth-label').forEach(node => {
-        node.addEventListener('click', () => selectTopic(node.dataset.id));
+      el.querySelectorAll('[data-topic-id]').forEach(node => {
+        node.addEventListener('click', () => {
+          selectTopic(node.dataset.topicId);
+          switchMode('arcs');
+        });
       });
     }
 
     function renderSectorEvolution() {
-      const el = document.getElementById('sector-evolution');
-      // Read sector composition across all loaded radar runs
+      const el = document.getElementById('sector-evo-body');
       const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
-      if (runs.length === 0) { el.innerHTML = '<div class="empty-state">No history yet.</div>'; return; }
-
-      // Build stable name → color map across all runs
-      const sectorColors = new Map();
-      let colorIdx = 0;
+      if (runs.length < 2) {
+        el.innerHTML = '<div class="empty-state">Need ≥2 radar runs to show evolution.</div>';
+        return;
+      }
+      // Color map
+      const palette = ['#6aa9ff', '#ffb84d', '#b48aff', '#5cd0d0', '#ff8a8a', '#58c97f', '#b8bdc8', '#ffa17a'];
+      const colorMap = new Map();
+      let cidx = 0;
       runs.forEach(r => (r.sectors || []).forEach(s => {
-        if (!sectorColors.has(s.name)) sectorColors.set(s.name, SECTOR_PALETTE[(colorIdx++) % SECTOR_PALETTE.length]);
+        if (!colorMap.has(s.name)) colorMap.set(s.name, palette[(cidx++) % palette.length]);
       }));
-
       const rows = runs.map(r => {
-        const sectors = (r.sectors || []).slice().sort((a, b) => (b.topic_count || 0) - (a.topic_count || 0));
-        const total = sectors.reduce((sum, s) => sum + (s.topic_count || 0), 0) || 1;
-        const segments = sectors.map(s => {
+        const total = (r.sectors || []).reduce((s, x) => s + (x.topic_count || 0), 0) || 1;
+        const segs = (r.sectors || []).slice().sort((a, b) => (b.topic_count || 0) - (a.topic_count || 0)).map(s => {
           const pct = ((s.topic_count || 0) / total) * 100;
-          const color = sectorColors.get(s.name) || 'var(--accent)';
-          return `<div class="sec-evo-segment" style="flex:${pct}; background:${color}" title="${escapeHtml(s.name)} — ${s.topic_count} topics">${pct >= 8 ? escapeHtml(s.name.split(' ')[0]) : ''}</div>`;
+          return `<div style="flex:${pct}; background:${colorMap.get(s.name)}; padding:2px 4px; font-size:10px; color:var(--bg); overflow:hidden; white-space:nowrap;" title="${escAttr(s.name)} — ${s.topic_count} topics">${pct >= 8 ? escHtml(s.name.split(' ')[0]) : ''}</div>`;
         }).join('');
-        return `<div class="sector-evolution-row">
-          <span class="sec-evo-date">${escapeHtml(r.date)}</span>
-          <div class="sec-evo-bar">${segments}</div>
+        return `<div style="display:flex; align-items:center; gap:8px; padding:3px 0">
+          <span style="font-size:11px; color:var(--muted); width:80px">${escHtml(r.date)}</span>
+          <div style="flex:1; display:flex; gap:1px; height:18px">${segs}</div>
         </div>`;
       }).join('');
       el.innerHTML = rows;
     }
 
-    // ===== Detail panel =======================================================
-    function renderDetailEmpty() {
-      document.getElementById('detail').innerHTML =
-        '<div class="detail-empty">Click any dot on the radar (or row in the lists) to see its full history.</div>';
+    function renderTopHistory() {
+      const canvas = document.getElementById('top-history-chart');
+      if (!canvas) return;
+      const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
+      if (runs.length < 2) { return; }
+      const currentTop = applyFilter(state.currentData.topics || [])
+        .slice().sort((a, b) => (b.score_slow || 0) - (a.score_slow || 0)).slice(0, 8);
+      const datasets = currentTop.map((t, i) => {
+        const palette = ['#6aa9ff', '#ffb84d', '#b48aff', '#5cd0d0', '#58c97f', '#ff8a8a', '#b8bdc8', '#ffa17a'];
+        const series = runs.map(r => {
+          const match = (r.topics || []).find(x => x.id === t.id);
+          return match ? (match.score_slow || 0) : null;
+        });
+        return {
+          label: t.label || t.id,
+          data: series,
+          borderColor: palette[i % palette.length],
+          backgroundColor: palette[i % palette.length] + '22',
+          tension: 0.25,
+          spanGaps: true,
+        };
+      });
+      if (state.topHistoryChart) state.topHistoryChart.destroy();
+      state.topHistoryChart = new Chart(canvas, {
+        type: 'line',
+        data: { labels: runs.map(r => r.date), datasets },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { color: '#e6e8ee', boxWidth: 8, font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#8a91a3' }, grid: { color: '#2a2f3d' } },
+            y: { beginAtZero: true, ticks: { color: '#8a91a3' }, grid: { color: '#2a2f3d' } },
+          },
+        },
+      });
+    }
+
+    // =========================================================================
+    // ARCS mode
+    // =========================================================================
+    function renderArcs() {
+      renderTopicList();
+      renderArcDetail();
+    }
+
+    function renderTopicList() {
+      const el = document.getElementById('topic-list');
+      const q = (document.getElementById('topic-search').value || '').toLowerCase().trim();
+      let topics = applyFilter(state.currentData.topics || []);
+      if (q) topics = topics.filter(t => (t.label || t.id).toLowerCase().includes(q) || t.id.toLowerCase().includes(q));
+      topics = topics.slice().sort((a, b) => (b.score_slow || 0) - (a.score_slow || 0));
+      el.innerHTML = topics.map(t => {
+        const dir = t.direction || 'steady';
+        const arrow = dir === 'surging' ? '↑↑' : dir === 'rising' ? '↑' : dir === 'fading' ? '↓' : '→';
+        const active = t.id === state.selectedTopicId ? 'active' : '';
+        return `<div class="topic-row ${active}" data-id="${escAttr(t.id)}">
+          <span class="stage-dot ${t.stage}"></span>
+          <span class="label">${escHtml(t.label || t.id)}</span>
+          <span class="mini-arrow ${dir}">${arrow}</span>
+        </div>`;
+      }).join('');
+      el.querySelectorAll('.topic-row').forEach(node => {
+        node.addEventListener('click', () => selectTopic(node.dataset.id));
+      });
     }
 
     function selectTopic(topicId) {
       state.selectedTopicId = topicId;
-      applyDotSelection();
-      const t = state.currentData.topics.find(t => t.id === topicId);
-      if (t) renderDetail(t);
+      // If currently in TODAY mode, switching to ARCS makes the selection meaningful
+      renderTopicList();
+      renderArcDetail();
     }
 
-    function applyDotSelection() {
-      document.querySelectorAll('.topic-dot').forEach(el => {
-        el.classList.toggle('selected', el.dataset.id === state.selectedTopicId);
-      });
-    }
-
-    function renderDetail(t) {
-      const el = document.getElementById('detail');
-      const m = t.momentum_7d_pct;
-      const mText = m == null ? '—' : (m > 0 ? '↑' : '↓') + ' ' + Math.abs(m).toFixed(1) + '%';
-      const dir = t.direction || 'steady';
-
-      // History across loaded dates
-      const history = [];
-      for (const entry of state.manifest.entries) {
-        const data = state.cache.get(entry.date_id);
-        if (!data) continue;
-        const item = data.topics.find(x => x.id === t.id);
-        if (item) history.push({
-          date: data.date,
-          score: item.score_slow != null ? item.score_slow : item.score,
-          score_fast: item.score_fast,
-          stage: item.stage,
-          sector: item.sector,
-          breadth_7d: item.breadth_7d || 0,
-        });
+    function renderArcDetail() {
+      const el = document.getElementById('arc-detail');
+      if (!state.selectedTopicId) {
+        el.innerHTML = `<div class="empty-state">Pick a topic from the list to see its life-cycle arc.</div>`;
+        return;
       }
-      history.sort((a, b) => a.date.localeCompare(b.date));
+      const t = (state.currentData.topics || []).find(x => x.id === state.selectedTopicId);
+      if (!t) {
+        el.innerHTML = `<div class="empty-state">Topic <code>${escHtml(state.selectedTopicId)}</code> not present in this snapshot. Try a different date.</div>`;
+        return;
+      }
 
-      // Source mention bars (use uncapped raw)
-      const sm = { ...(t.source_mentions || {}) };
-      delete sm._note;
-      const totalMentions = Object.values(sm).reduce((a, b) => a + b, 0) || 1;
-      const sourceBars = Object.entries(sm)
-        .filter(([, v]) => typeof v === 'number' && v > 0)
-        .sort((a, b) => b[1] - a[1])
-        .map(([k, v]) => `
-          <div class="source-bar">
-            <span class="src-name">${SOURCE_LABEL[k] || k}</span>
-            <span class="src-val" style="width:${(v / totalMentions * 180).toFixed(0)}px"></span>
-            <span class="src-count">${v}</span>
-          </div>
-        `).join('');
+      const dir = t.direction || 'steady';
+      const dirArrow = dir === 'surging' ? '↑↑' : dir === 'rising' ? '↑' : dir === 'fading' ? '↓' : '→';
 
-      const orgs = (t.breadth_orgs_7d || []).map(o => `<span class="org-pill">${escapeHtml(o)}</span>`).join('');
+      // History from cache
+      const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
+      const history = runs.map(r => {
+        const m = (r.topics || []).find(x => x.id === t.id);
+        return m ? { date: r.date, score: m.score_slow != null ? m.score_slow : m.score, breadth: m.breadth_7d || 0, stage: m.stage } : { date: r.date, score: null, breadth: null, stage: null };
+      });
+
+      // Long-arc stat values; render "cold" if window not yet warm
+      const ageDays = Math.round((new Date(state.currentData.date) - new Date(runs[0].date)) / 86400000);
+      const fmtArcStat = (val, requiresDays, label) => {
+        if (val == null) {
+          if (ageDays < requiresDays) return { html: `<div class="value cold">cold (${requiresDays}d)</div>`, raw: null };
+          return { html: `<div class="value cold">—</div>`, raw: null };
+        }
+        return { html: `<div class="value">${val.toFixed(1)}</div>`, raw: val };
+      };
+      const stat7 = fmtArcStat(t.score_7d_ago, 7, '7d ago');
+      const stat30 = fmtArcStat(t.score_30d_ago, 30, '30d ago');
+      const stat90 = fmtArcStat(t.score_90d_ago, 90, '90d ago');
+      const stat180 = fmtArcStat(t.score_180d_ago, 180, '180d ago');
+
+      const orgs = (t.breadth_orgs_7d || []).slice(0, 16).map(o => orgPill(o)).join(' ');
+      const sweepPills = sweepPillsForTopic(t);
       const sectorHistory = (t.sector_history || []).slice(-5).map(h =>
-        `<div style="font-size:12px; color:var(--muted)">${escapeHtml(h.date)}: ${escapeHtml(h.from || '—')} → ${escapeHtml(h.to)}${h.reason ? ' · ' + escapeHtml(h.reason) : ''}</div>`
+        `<div style="font-size:12px; color:var(--muted); padding:1px 0">${escHtml(h.date)}: ${escHtml(h.from || '—')} → ${escHtml(h.to)}${h.reason ? ' · ' + escHtml(h.reason) : ''}</div>`
       ).join('');
-
-      const supportingLinks = (t.supporting_links || []).slice(0, 12).map(l =>
-        `<li><a href="${escapeAttr(l)}" target="_blank" rel="noopener">${escapeHtml(l)}</a></li>`).join('');
-      const supportingFiles = (t.supporting_files || []).map(f => `<code>${escapeHtml(f)}</code>`).join('  ');
+      const files = (t.supporting_files || []).slice(0, 6).map(f => `<code>${escHtml(f)}</code>`).join('');
 
       el.innerHTML = `
-        <div class="detail-title">${escapeHtml(t.label || t.id)}</div>
-        <span class="detail-pill stage-${t.stage}">${STAGE_LABEL[t.stage] || t.stage}</span>
-        <span class="detail-pill sector">${escapeHtml(t.sector || '—')}</span>
-        <span class="detail-pill dir-${dir}">${dir}</span>
-
-        <div class="detail-stats">
-          <div class="stat"><div class="stat-label">Persistence (slow)</div><div class="stat-value">${(t.score_slow != null ? t.score_slow : t.score).toFixed(1)}</div></div>
-          <div class="stat"><div class="stat-label">Fast (now)</div><div class="stat-value">${(t.score_fast != null ? t.score_fast : t.score).toFixed(1)}</div></div>
-          <div class="stat"><div class="stat-label">Breadth 7d</div><div class="stat-value">${t.breadth_7d || 0} orgs</div></div>
-          <div class="stat"><div class="stat-label">Breadth 30d</div><div class="stat-value">${t.breadth_30d || 0} orgs</div></div>
-          <div class="stat"><div class="stat-label">7d momentum</div><div class="stat-value">${mText}</div></div>
-          <div class="stat"><div class="stat-label">Sustained</div><div class="stat-value">${t.sustained_days || 0}d</div></div>
+        <div class="arc-title">${escHtml(t.label || t.id)}</div>
+        <div class="arc-subtitle">
+          <span class="arc-pill ${t.stage}">${STAGE_LABEL[t.stage] || t.stage}</span>
+          <span class="arc-pill sector">${escHtml(t.sector || '—')}</span>
+          <span class="arc-pill" style="background:var(--panel-2); color:var(--text);">direction: ${dirArrow} ${dir}</span>
+          ${sweepPills}
         </div>
 
-        <div class="detail-section">
-          <h4>Score history (persistence)</h4>
-          <div class="chart-wrap"><canvas id="detail-chart"></canvas></div>
+        <div class="arc-stat-grid">
+          <div class="arc-stat"><div class="label">Now (slow)</div><div class="value">${(t.score_slow != null ? t.score_slow : t.score).toFixed(1)}</div></div>
+          <div class="arc-stat"><div class="label">7d ago</div>${stat7.html}</div>
+          <div class="arc-stat"><div class="label">30d ago</div>${stat30.html}</div>
+          <div class="arc-stat"><div class="label">90d ago</div>${stat90.html}</div>
         </div>
 
-        ${orgs ? `<div class="detail-section"><h4>Orgs talking (7d)</h4><div>${orgs}</div></div>` : ''}
+        <div class="chart-wrap"><canvas id="arc-chart"></canvas></div>
 
-        ${sectorHistory ? `<div class="detail-section"><h4>Sector history</h4>${sectorHistory}</div>` : ''}
-
-        <div class="detail-section">
-          <h4>Source mentions</h4>
-          ${sourceBars || '<div class="empty-state">No source mentions recorded.</div>'}
-        </div>
-
-        ${supportingFiles ? `<div class="detail-section"><h4>Supporting files</h4><div style="font-size:12px; line-height:1.8">${supportingFiles}</div></div>` : ''}
-
-        ${supportingLinks ? `<div class="detail-section"><h4>Supporting links (${(t.supporting_links || []).length})</h4><ul class="link-list">${supportingLinks}</ul></div>` : ''}
+        ${orgs ? `<div class="arc-section"><h4>Orgs talking (7d)</h4><div>${orgs}</div></div>` : ''}
+        ${sectorHistory ? `<div class="arc-section"><h4>Sector history</h4>${sectorHistory}</div>` : ''}
+        ${files ? `<div class="arc-section"><h4>Supporting files</h4><div class="files" style="line-height:1.6">${files}</div></div>` : ''}
       `;
 
-      // Detail history chart — show persistence AND breadth on dual axes
-      const ctx = document.getElementById('detail-chart');
-      if (history.length >= 1) {
-        new Chart(ctx, {
+      // Arc chart — persistence + breadth on dual axes
+      const ctx = document.getElementById('arc-chart');
+      if (ctx) {
+        if (state.arcChart) state.arcChart.destroy();
+        state.arcChart = new Chart(ctx, {
           type: 'line',
           data: {
             labels: history.map(h => h.date),
             datasets: [{
-              label: 'Persistence',
+              label: 'Persistence (slow)',
               data: history.map(h => h.score),
-              borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#6aa9ff',
-              backgroundColor: 'rgba(106, 169, 255, 0.1)',
+              borderColor: '#6aa9ff',
+              backgroundColor: 'rgba(106, 169, 255, 0.10)',
               tension: 0.25,
-              pointRadius: 3,
+              spanGaps: true,
               fill: true,
               yAxisID: 'y',
             }, {
-              label: 'Breadth (7d orgs)',
-              data: history.map(h => h.breadth_7d),
+              label: 'Breadth (orgs 7d)',
+              data: history.map(h => h.breadth),
               borderColor: '#58c97f',
-              backgroundColor: 'rgba(88, 201, 127, 0.0)',
+              backgroundColor: 'transparent',
               tension: 0.25,
-              pointRadius: 3,
-              fill: false,
-              yAxisID: 'y1',
+              spanGaps: true,
               borderDash: [4, 4],
+              yAxisID: 'y1',
             }],
           },
-          options: chartOpts({ dualAxis: true, legend: true }),
+          options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: '#e6e8ee' } } },
+            scales: {
+              x: { ticks: { color: '#8a91a3' }, grid: { color: '#2a2f3d' } },
+              y:  { position: 'left', beginAtZero: true, ticks: { color: '#6aa9ff' }, grid: { color: '#2a2f3d' } },
+              y1: { position: 'right', beginAtZero: true, ticks: { color: '#58c97f' }, grid: { display: false } },
+            },
+          },
         });
-      } else {
-        ctx.parentElement.innerHTML = '<div class="empty-state">No history available yet.</div>';
       }
     }
 
-    function renderTopChart() {
-      const ctx = document.getElementById('topchart');
-      const topTopics = [...state.currentData.topics]
-        .sort((a, b) => (b.score_slow != null ? b.score_slow : b.score) - (a.score_slow != null ? a.score_slow : a.score))
-        .slice(0, 8);
-      const allDates = [...new Set([...state.cache.values()].map(d => d.date))].sort();
-      const colors = ['#6aa9ff', '#ffb84d', '#58c97f', '#ff8a8a', '#b48aff', '#5cd0d0', '#ffc8a8', '#a0a0a0'];
-      const datasets = topTopics.map((tt, idx) => ({
-        label: tt.label || tt.id,
-        data: allDates.map(d => {
-          for (const data of state.cache.values()) {
-            if (data.date === d) {
-              const item = data.topics.find(x => x.id === tt.id);
-              return item ? (item.score_slow != null ? item.score_slow : item.score) : null;
-            }
-          }
-          return null;
-        }),
-        borderColor: colors[idx % colors.length],
-        backgroundColor: colors[idx % colors.length] + '20',
-        tension: 0.25,
-        pointRadius: 3,
-        spanGaps: true,
-      }));
-      if (state.chart) state.chart.destroy();
-      state.chart = new Chart(ctx, { type: 'line', data: { labels: allDates, datasets }, options: chartOpts({ legend: true }) });
+    function orgPill(slug) {
+      const meta = state.orgs ? state.orgs.get(slug) : null;
+      const cls = meta && meta.is_priority ? 'org-pill priority' : 'org-pill';
+      const tip = meta ? `${meta.total_mentions} mentions · ${meta.distinct_days}d · velocity ${meta.velocity_ratio}×` : '';
+      return `<a class="${cls}" href="orgs.html?slug=${encodeURIComponent(slug)}" title="${escAttr(tip)}">${escHtml(slug)}</a>`;
     }
 
-    function chartOpts({ legend = false, dualAxis = false } = {}) {
-      const scales = {
-        x: { ticks: { color: '#8a91a3', font: { size: 11 } }, grid: { color: '#2a2f3d' } },
-        y: { ticks: { color: '#8a91a3', font: { size: 11 } }, grid: { color: '#2a2f3d' } },
-      };
-      if (dualAxis) {
-        scales.y1 = {
-          position: 'right',
-          ticks: { color: '#58c97f', font: { size: 11 } },
-          grid: { display: false },
-          beginAtZero: true,
-        };
+    function sweepPillsForTopic(t) {
+      const pills = [];
+      const haystack = [(t.id || ''), (t.label || '')].join(' ').toLowerCase();
+      for (const proven of state.keywordProven) {
+        if (haystack.includes(proven)) {
+          pills.push(`<span class="arc-pill" style="background:rgba(88,201,127,0.15); color:var(--stage-mainstream); border:1px solid var(--stage-mainstream)">🏛️ proven kw</span>`);
+          break;
+        }
       }
-      return {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: legend ? { position: 'bottom', labels: { color: '#8a91a3', font: { size: 11 }, boxWidth: 12 } } : { display: false },
-          tooltip: { mode: 'index', intersect: false },
-        },
-        scales,
-        interaction: { mode: 'nearest', axis: 'x', intersect: false },
-      };
+      let kwCount = 0;
+      for (const [phrase, info] of state.keywordActive) {
+        if (state.keywordProven.has(phrase)) continue;
+        if (haystack.includes(phrase)) {
+          pills.push(`<span class="arc-pill" style="background:rgba(180,138,255,0.12); color:#b48aff; border:1px solid #b48aff" title="auto-added ${info.ts_date}: ${escAttr(info.reason || '')}">🔑 ${escHtml(phrase)}</span>`);
+          if (++kwCount >= 2) break;
+        }
+      }
+      return pills.join(' ');
     }
 
+    // =========================================================================
+    // Errors + helpers
+    // =========================================================================
     function showError(msg) {
-      document.querySelector('main').innerHTML = `<div class="err">${escapeHtml(msg)}</div>`;
+      document.getElementById('main').innerHTML = `<div style="background:rgba(255,138,138,0.1); border:1px solid var(--dir-fading); padding:12px 16px; border-radius:8px; color:var(--dir-fading); white-space:pre-wrap">${escHtml(msg)}</div>`;
     }
-    function escapeHtml(s) {
+    function escHtml(s) {
       return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
-    function escapeAttr(s) { return escapeHtml(s); }
-    function escapeXml(s) { return escapeHtml(s); }
+    function escAttr(s) { return escHtml(s); }
 
     init();
   </script>

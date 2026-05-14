@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Trend Radar</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --panel: #181b25;
+      --panel-2: #1f2330;
+      --border: #2a2f3d;
+      --text: #e6e8ee;
+      --muted: #8a91a3;
+      --accent: #6aa9ff;
+
+      --stage-mainstream:    #58c97f;
+      --stage-consolidating: #6aa9ff;
+      --stage-emerging:      #ffb84d;
+      --stage-fading:        #8a91a3;
+
+      --dir-rising: #58c97f;
+      --dir-fading: #ff8a8a;
+      --dir-steady: #b8bdc8;
+
+      --sector-A: #6aa9ff;
+      --sector-B: #ffb84d;
+      --sector-C: #b48aff;
+      --sector-D: #5cd0d0;
+      --sector-E: #ff8a8a;
+      --sector-F: #58c97f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    header select, header button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+    }
+    header button.active {
+      background: var(--accent);
+      color: #0f1117;
+      border-color: var(--accent);
+    }
+    .view-toggle {
+      display: inline-flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .view-toggle button {
+      border: none;
+      border-radius: 0;
+      padding: 6px 12px;
+    }
+    .view-toggle button + button { border-left: 1px solid var(--border); }
+
+    main {
+      padding: 18px 24px 60px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+    }
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    /* Polar radar SVG container */
+    .radar-svg-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .radar-svg-wrap svg { display: block; width: 100%; height: auto; }
+
+    /* Polar radar elements */
+    .ring-band-1 { fill: rgba(88,201,127,0.10); stroke: var(--stage-mainstream); stroke-opacity: 0.35; }
+    .ring-band-2 { fill: rgba(106,169,255,0.08); stroke: var(--stage-consolidating); stroke-opacity: 0.30; }
+    .ring-band-3 { fill: rgba(255,184,77,0.06); stroke: var(--stage-emerging); stroke-opacity: 0.30; }
+    .ring-band-4 { fill: rgba(138,145,163,0.04); stroke: var(--stage-fading); stroke-opacity: 0.30; }
+    .ring-divider { stroke-dasharray: 2 3; }
+    .sector-divider { stroke: var(--border); stroke-width: 1; }
+    .ring-label-text { fill: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .sector-label-text { fill: var(--text); font-size: 12px; font-weight: 600; }
+    .sector-label-meta { fill: var(--muted); font-size: 10px; }
+
+    .topic-dot {
+      cursor: pointer;
+      transition: transform 0.1s ease-out;
+      transform-origin: center;
+      transform-box: fill-box;
+    }
+    .topic-dot:hover { transform: scale(1.3); }
+    .topic-dot.selected { stroke: #fff; stroke-width: 2; }
+    .topic-dot.dimmed { opacity: 0.25; }
+    .topic-dot-high-breadth {
+      filter: drop-shadow(0 0 6px rgba(255,255,255,0.35));
+    }
+
+    .movement-arrow {
+      stroke: var(--accent);
+      stroke-width: 1.2;
+      fill: none;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    /* Scatter view */
+    .scatter-axis-label { fill: var(--muted); font-size: 11px; }
+    .scatter-axis { stroke: var(--border); stroke-width: 1; }
+    .scatter-quadrant-label { fill: var(--muted); font-size: 10px; font-style: italic; opacity: 0.7; }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .legend-swatch.rising { background: var(--dir-rising); }
+    .legend-swatch.fading { background: var(--dir-fading); }
+    .legend-swatch.steady { background: var(--dir-steady); }
+
+    /* Sector chip overview */
+    .sector-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .sector-chip {
+      background: var(--panel-2);
+      border-left: 3px solid var(--accent);
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .sector-chip .sec-name { font-weight: 600; font-size: 12px; }
+    .sector-chip .sec-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+    /* High breadth callout */
+    .breadth-list { margin: 0; padding-left: 0; list-style: none; }
+    .breadth-row {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: 13px;
+    }
+    .breadth-row:last-child { border-bottom: none; }
+    .breadth-count {
+      min-width: 60px;
+      text-align: right;
+      color: var(--dir-rising);
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+    .breadth-row.medium .breadth-count { color: var(--accent); }
+    .breadth-row.low .breadth-count    { color: var(--muted); }
+    .breadth-label { flex: 1; cursor: pointer; }
+    .breadth-label:hover { color: var(--accent); }
+    .breadth-orgs { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .org-pill {
+      display: inline-block;
+      padding: 1px 6px;
+      margin: 0 2px 2px 0;
+      border-radius: 3px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      text-decoration: none;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .org-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .org-pill.priority { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+    .org-pill.auto-added { border-style: dashed; }
+
+    /* Maturity badge */
+    #maturity-badge {
+      padding: 3px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+    #maturity-badge.cold    { color: var(--dir-fading);  border-color: var(--dir-fading);  background: rgba(255, 138, 138, 0.08); }
+    #maturity-badge.warming { color: var(--stage-emerging); border-color: var(--stage-emerging); background: rgba(255, 184, 77, 0.08); }
+    #maturity-badge.warm    { color: var(--stage-mainstream); border-color: var(--stage-mainstream); background: rgba(88, 201, 127, 0.08); }
+
+    /* Sweep-history pills in topic detail */
+    .sweep-pill {
+      display: inline-block;
+      padding: 1px 8px;
+      margin: 2px 4px 2px 0;
+      border-radius: 3px;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+    .sweep-pill.vendor   { background: rgba(106, 169, 255, 0.12); color: var(--accent);          border: 1px solid var(--accent); }
+    .sweep-pill.keyword  { background: rgba(180, 138, 255, 0.12); color: #b48aff;                border: 1px solid #b48aff; }
+    .sweep-pill.proven   { background: rgba(88, 201, 127, 0.15);  color: var(--stage-mainstream); border: 1px solid var(--stage-mainstream); font-weight: 600; }
+    .sweep-pill.expired  { background: rgba(138, 145, 163, 0.10); color: var(--muted);           border: 1px solid var(--muted); text-decoration: line-through; }
+
+    /* Movements area */
+    .movement-row {
+      display: flex;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .movement-row:last-child { border-bottom: none; }
+    .movement-arrow-txt { color: var(--accent); white-space: nowrap; }
+
+    .empty-state {
+      color: var(--muted);
+      font-style: italic;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+
+    /* Detail panel */
+    .detail-empty {
+      color: var(--muted);
+      font-style: italic;
+      padding: 20px 0;
+      text-align: center;
+    }
+    .detail-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .detail-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      margin: 0 4px 8px 0;
+    }
+    .detail-pill.stage-emerging      { background: #4a3a1a; color: var(--stage-emerging); }
+    .detail-pill.stage-consolidating { background: #1a2a4a; color: var(--stage-consolidating); }
+    .detail-pill.stage-mainstream    { background: #1a3a25; color: var(--stage-mainstream); }
+    .detail-pill.stage-fading        { background: #2a2e3a; color: var(--stage-fading); }
+    .detail-pill.sector              { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+    .detail-pill.dir-rising { background: #1a3a25; color: var(--dir-rising); }
+    .detail-pill.dir-fading { background: #3a1a1a; color: var(--dir-fading); }
+    .detail-pill.dir-steady { background: #2a2e3a; color: var(--dir-steady); }
+
+    .detail-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .stat { background: var(--panel-2); padding: 8px 10px; border-radius: 4px; }
+    .stat-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .stat-value { font-size: 16px; font-weight: 600; margin-top: 2px; }
+
+    .detail-section { margin-top: 14px; }
+    .detail-section h4 {
+      margin: 0 0 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .source-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+    .source-bar .src-name { color: var(--muted); min-width: 150px; }
+    .source-bar .src-val { background: var(--accent); height: 8px; border-radius: 2px; }
+    .source-bar .src-count { color: var(--text); min-width: 24px; text-align: right; }
+
+    .org-pill {
+      display: inline-block;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      padding: 1px 7px;
+      border-radius: 11px;
+      font-size: 11px;
+      margin: 1px 2px;
+      color: var(--text);
+    }
+
+    .link-list { padding-left: 14px; margin: 4px 0; }
+    .link-list li { margin: 2px 0; word-break: break-all; }
+    .link-list a { color: var(--accent); text-decoration: none; font-size: 12px; }
+    .link-list a:hover { text-decoration: underline; }
+
+    .chart-wrap { position: relative; height: 200px; }
+
+    /* Sector evolution timeline */
+    .sector-evolution-row {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 12px;
+    }
+    .sec-evo-date { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .sec-evo-bar {
+      display: flex;
+      height: 22px;
+      border-radius: 3px;
+      overflow: hidden;
+      background: var(--panel-2);
+    }
+    .sec-evo-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f1117;
+      font-size: 10px;
+      font-weight: 600;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      padding: 0 4px;
+    }
+
+    .footer {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 8px 0 0;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    code { background: var(--panel-2); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+
+    /* Topic clusters panel */
+    .cluster-card {
+      background: var(--panel-2);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .cluster-card:hover { background: #262b3a; }
+    .cluster-card.active { border-left-width: 5px; background: #262b3a; }
+    .cluster-name { font-weight: 600; font-size: 13px; }
+    .cluster-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .cluster-direction-rising { color: var(--dir-rising); }
+    .cluster-direction-fading { color: var(--dir-fading); }
+    .cluster-direction-steady { color: var(--dir-steady); }
+    .cluster-direction-surging { color: var(--dir-rising); font-weight: 700; }
+    .cluster-members {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .cluster-member-chip {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: var(--text);
+    }
+
+    /* Surging dot ring */
+    .topic-dot-surging {
+      filter: drop-shadow(0 0 8px rgba(88,201,127,0.6));
+    }
+
+    .err {
+      background: #2a1a1a;
+      color: #ff8a8a;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛰️ AI Trend Radar</h1>
+    <span class="subtitle">Persistence (ring) × breadth (dot size) × sector (quadrant)</span>
+    <span style="flex:1"></span>
+    <div class="view-toggle" id="view-toggle">
+      <button data-view="radar" class="active">Radar</button>
+      <button data-view="scatter">Scatter</button>
+    </div>
+    <label>Snapshot:
+      <select id="date-select"></select>
+    </label>
+    <span class="subtitle" id="meta-line"></span>
+    <span class="subtitle" id="maturity-badge" title="" style="display:none;"></span>
+    <span style="margin-left:auto; display:flex; gap:12px; font-size:12px;">
+      <a href="orgs.html" style="color:var(--accent); text-decoration:none;">→ firm view</a>
+      <a href="index.md" style="color:var(--accent); text-decoration:none;">→ index</a>
+    </span>
+  </header>
+
+  <main>
+    <!-- Left column: radar / scatter visual + sector strip + sector evolution -->
+    <section>
+      <div class="panel">
+        <h2 id="view-title">Polar radar — what's shifting</h2>
+        <div class="radar-svg-wrap" id="radar-wrap"></div>
+        <div class="legend" id="legend">
+          <span class="legend-item"><span class="legend-swatch rising"></span> rising (fast EMA &gt; slow)</span>
+          <span class="legend-item"><span class="legend-swatch steady"></span> steady</span>
+          <span class="legend-item"><span class="legend-swatch fading"></span> fading</span>
+          <span class="legend-item">dot size = orgs talking (breadth 7d)</span>
+          <span class="legend-item">center → out: <b style="color:var(--stage-mainstream)">Mainstream</b> · <b style="color:var(--stage-consolidating)">Consolidating</b> · <b style="color:var(--stage-emerging)">Emerging</b> · <b style="color:var(--stage-fading)">Fading</b></span>
+        </div>
+        <div class="sector-strip" id="sector-strip"></div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>🔗 Topic clusters — moving together</h2>
+        <div class="empty-state" style="margin-bottom:6px">
+          Topics that co-occur in the same source files this week. Click a cluster to highlight its members on the radar.
+        </div>
+        <div id="clusters"></div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>Sector evolution — last 8 runs</h2>
+        <div id="sector-evolution"></div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>Score history (top 8 by current score)</h2>
+        <div class="chart-wrap" style="height:240px"><canvas id="topchart"></canvas></div>
+      </div>
+    </section>
+
+    <!-- Right column: highest breadth + movements + detail panel -->
+    <section>
+      <div class="panel">
+        <h2>🔥 Highest breadth this week</h2>
+        <div class="empty-state" style="margin-bottom:6px">
+          Topics talked about by the most distinct organizations in the last 7 days.
+        </div>
+        <ul class="breadth-list" id="breadth-list"></ul>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>What moved this run</h2>
+        <div id="movements"></div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>Topic detail</h2>
+        <div id="detail">
+          <div class="detail-empty">Click any dot on the radar (or row in the lists) to see its full history.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="footer">
+      Open from <code>file://</code> won't work — the page needs to fetch JSON. Run a local server: <code>cd "~/Documents/Claude/Projects/AI Researcher" &amp;&amp; python3 -m http.server 8000</code>, then open <code>http://localhost:8000/radar.html</code>.
+      <span style="float:right">Data: <code>radar/index.json</code> → <code>radar/{date}.json</code></span>
+    </section>
+  </main>
+
+  <script>
+    // ===== Constants ==========================================================
+    // Stage rings from center outward. Center = most settled, outer = least.
+    const STAGES_CENTER_OUT = ['mainstream', 'consolidating', 'emerging', 'fading'];
+    const STAGE_LABEL = {
+      emerging:      'Emerging',
+      consolidating: 'Consolidating',
+      mainstream:    'Mainstream',
+      fading:        'Fading',
+    };
+    const STAGE_COLOR = {
+      emerging:      'var(--stage-emerging)',
+      consolidating: 'var(--stage-consolidating)',
+      mainstream:    'var(--stage-mainstream)',
+      fading:        'var(--stage-fading)',
+    };
+    const SOURCE_LABEL = {
+      priority_vendor_blog:      'Priority vendor blog',
+      enterprise_vendor_blog:    'Enterprise vendor blog',
+      paper:                     'Paper',
+      long_form_blog:            'Long-form blog',
+      linkedin_network_post:     'LinkedIn (network)',
+      linkedin_hashtag_post:     'LinkedIn (hashtag)',
+      tech_news:                 'Tech news',
+      governance_source:         'Governance source',
+      medium_aggregator:         'Medium / aggregator',
+      job_posting_skill_mention: 'Job postings',
+    };
+    const SECTOR_PALETTE = [
+      'var(--sector-A)', 'var(--sector-B)', 'var(--sector-C)',
+      'var(--sector-D)', 'var(--sector-E)', 'var(--sector-F)',
+    ];
+
+    // ===== State ==============================================================
+    const state = {
+      manifest: null,
+      cache: new Map(),
+      currentEntry: null,
+      currentData: null,
+      selectedTopicId: null,
+      view: 'radar',
+      chart: null,
+    };
+
+    // ===== Boot ===============================================================
+    async function init() {
+      try {
+        const r = await fetch('radar/index.json');
+        if (!r.ok) throw new Error(`radar/index.json HTTP ${r.status}`);
+        state.manifest = await r.json();
+      } catch (e) {
+        showError(`Could not load radar/index.json: ${e.message}\n\nLikely cause: opened via file://. Serve over localhost.`);
+        return;
+      }
+
+      // ----- Load side data (orgs index + sweep histories) ---------------
+      // All optional: any missing file just disables that feature, no errors.
+      state.orgs = null;
+      state.vendorActive = new Map();     // slug → {ts, reason, expires_on, verb, tier_lifetime}
+      state.vendorProven = new Set();
+      state.keywordActive = new Map();    // subject (phrase) → {ts, reason, target_section, expires_on, verb, tier_lifetime}
+      state.keywordProven = new Set();
+
+      const sideFetch = async (path, transform) => {
+        try {
+          const r = await fetch(path);
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          transform(await r.json());
+        } catch (e) {
+          console.warn(`[radar] optional ${path} not loaded:`, e.message);
+        }
+      };
+
+      await Promise.all([
+        sideFetch('orgs/index.json', d => {
+          state.orgs = new Map(d.entries.map(e => [e.slug, e]));
+        }),
+        sideFetch('vendor_changes.json', d => {
+          (d.active_auto_added || []).forEach(e => state.vendorActive.set(e.subject, e));
+          (d.proven_entries || []).forEach(p => state.vendorProven.add(p.subject));
+        }),
+        sideFetch('keyword_changes.json', d => {
+          (d.active_auto_added || []).forEach(e => state.keywordActive.set(e.subject.toLowerCase(), e));
+          (d.proven_entries || []).forEach(p => state.keywordProven.add(p.subject.toLowerCase()));
+        }),
+      ]);
+
+      const select = document.getElementById('date-select');
+      state.manifest.entries.forEach(entry => {
+        const opt = document.createElement('option');
+        opt.value = entry.date_id;
+        opt.textContent = `${entry.date_id} — ${entry.topic_count} topics`;
+        select.appendChild(opt);
+      });
+      select.addEventListener('change', () => loadDate(select.value));
+
+      document.querySelectorAll('#view-toggle button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.view = btn.dataset.view;
+          document.querySelectorAll('#view-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+          document.getElementById('view-title').textContent =
+            state.view === 'radar' ? 'Polar radar — what\'s shifting' : 'Scatter — persistence × breadth';
+          renderMainView();
+        });
+      });
+
+      if (state.manifest.entries.length === 0) { showError('No radar entries in manifest.'); return; }
+      await loadDate(state.manifest.entries[0].date_id);
+      await preloadAll();
+      renderTopChart();
+      renderSectorEvolution();
+    }
+
+    async function loadJson(date_id) {
+      if (state.cache.has(date_id)) return state.cache.get(date_id);
+      const entry = state.manifest.entries.find(e => e.date_id === date_id);
+      if (!entry) throw new Error(`${date_id} not in manifest`);
+      const r = await fetch(entry.json_path);
+      if (!r.ok) throw new Error(`${entry.json_path} HTTP ${r.status}`);
+      const data = await r.json();
+      state.cache.set(date_id, data);
+      return data;
+    }
+    async function preloadAll() {
+      await Promise.allSettled(state.manifest.entries.map(e => loadJson(e.date_id)));
+    }
+
+    async function loadDate(date_id) {
+      try {
+        state.currentEntry = state.manifest.entries.find(e => e.date_id === date_id);
+        state.currentData = await loadJson(date_id);
+        state.selectedTopicId = null;
+        state.activeClusterId = null;
+        renderMeta();
+        renderMainView();
+        renderSectorStrip();
+        renderClusters();
+        renderBreadthList();
+        renderMovements();
+        renderDetailEmpty();
+      } catch (e) {
+        showError(e.message);
+      }
+    }
+
+    function renderClusters() {
+      const el = document.getElementById('clusters');
+      const clusters = (state.currentData.topic_clusters || []).slice()
+        .sort((a, b) => (b.cluster_score_slow || 0) - (a.cluster_score_slow || 0));
+      if (clusters.length === 0) {
+        el.innerHTML = '<div class="empty-state">No clusters yet — needs ≥3 co-mentions across topic pairs. Will populate as the pipeline accumulates more days.</div>';
+        return;
+      }
+      el.innerHTML = clusters.map(c => {
+        const dir = c.cluster_direction || 'steady';
+        const members = (c.topic_ids || []).map(tid => {
+          const t = (state.currentData.topics || []).find(x => x.id === tid);
+          return `<span class="cluster-member-chip" data-id="${escapeAttr(tid)}">${escapeHtml(t ? t.label : tid)}</span>`;
+        }).join('');
+        const orgs = c.cluster_breadth_7d != null ? `${c.cluster_breadth_7d} orgs` : '';
+        const moving = c.members_moving_together ? ' · 🔗 moving together' : '';
+        return `<div class="cluster-card" data-cluster-id="${escapeAttr(c.id)}">
+          <div class="cluster-name">${escapeHtml(c.name)} <span class="cluster-direction-${dir}">${dir === 'rising' ? '↑' : dir === 'surging' ? '↑↑' : dir === 'fading' ? '↓' : '→'}</span></div>
+          <div class="cluster-meta">${c.size} topics · score ${(c.cluster_score_slow || 0).toFixed(1)} · ${orgs}${moving}</div>
+          <div class="cluster-members">${members}</div>
+        </div>`;
+      }).join('');
+      // Wire up cluster-card clicks (highlight members on radar)
+      el.querySelectorAll('.cluster-card').forEach(node => {
+        node.addEventListener('click', () => {
+          const cid = node.dataset.clusterId;
+          state.activeClusterId = state.activeClusterId === cid ? null : cid;
+          el.querySelectorAll('.cluster-card').forEach(c => c.classList.toggle('active', c.dataset.clusterId === state.activeClusterId));
+          applyClusterHighlight();
+        });
+      });
+      // Wire up member chip clicks (select individual topic)
+      el.querySelectorAll('.cluster-member-chip').forEach(node => {
+        node.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectTopic(node.dataset.id);
+        });
+      });
+    }
+
+    function applyClusterHighlight() {
+      const cluster = (state.currentData.topic_clusters || []).find(c => c.id === state.activeClusterId);
+      const memberIds = cluster ? new Set(cluster.topic_ids) : null;
+      document.querySelectorAll('.topic-dot').forEach(el => {
+        if (!memberIds) {
+          el.classList.remove('dimmed');
+        } else {
+          el.classList.toggle('dimmed', !memberIds.has(el.dataset.id));
+        }
+      });
+    }
+
+    function renderMeta() {
+      const d = state.currentData;
+      const sectorCount = (d.sectors || []).length;
+      const topicCount = (d.topics || []).length;
+      const prior = d.prior_radar ? `prior: ${d.prior_radar}` : 'no prior';
+      document.getElementById('meta-line').textContent =
+        `${topicCount} topics · ${sectorCount} sectors · ${prior}`;
+      renderMaturityBadge();
+    }
+
+    function renderMaturityBadge() {
+      // Pipeline age = days between earliest radar entry and the current one.
+      // Maturity gates which momentum windows can be trusted:
+      //   <30d → 30d_ago / 90d_ago / 180d_ago all "cold" (insufficient history)
+      //   30-90d → 30d real; 90/180 still warming
+      //   90-180d → 30 + 90 real; 180 still warming
+      //   ≥180d → all warm
+      const el = document.getElementById('maturity-badge');
+      if (!el) return;
+      const entries = (state.manifest.entries || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+      if (entries.length < 2) { el.style.display = 'none'; return; }
+      const first = entries[0].date;
+      const current = state.currentData.date;
+      const ageDays = Math.round((new Date(current) - new Date(first)) / 86400000);
+      let cls, label, title;
+      if (ageDays < 30) {
+        cls = 'cold';
+        label = `pipeline age ${ageDays}d · 30/90/180d momentum cold`;
+        title = 'The radar emits score_30d_ago / score_90d_ago / score_180d_ago for every topic. Until the pipeline has run that many days, those values are null or unreliable. Right now: trust score_slow and 7d momentum only.';
+      } else if (ageDays < 90) {
+        cls = 'warming';
+        label = `pipeline age ${ageDays}d · 90/180d still warming`;
+        title = '30-day momentum is reliable. 90 and 180-day windows still need more history.';
+      } else if (ageDays < 180) {
+        cls = 'warming';
+        label = `pipeline age ${ageDays}d · 180d still warming`;
+        title = '30 and 90-day momentum reliable. 180-day window still warming up.';
+      } else {
+        cls = 'warm';
+        label = `pipeline age ${ageDays}d · all momentum windows warm`;
+        title = 'All momentum windows (30/90/180d) have enough history to be trusted.';
+      }
+      el.className = cls;
+      el.textContent = label;
+      el.title = title;
+      el.style.display = '';
+    }
+
+    function renderMainView() {
+      if (state.view === 'radar') renderPolarRadar();
+      else renderScatter();
+    }
+
+    // ===== Polar radar SVG ====================================================
+    function renderPolarRadar() {
+      const wrap = document.getElementById('radar-wrap');
+      const d = state.currentData;
+      const sectors = (d.sectors || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+      const topics = d.topics || [];
+      if (sectors.length === 0 || topics.length === 0) {
+        wrap.innerHTML = '<div class="empty-state">No sectors or topics for this run.</div>';
+        return;
+      }
+
+      const SIZE = 720;
+      const CX = SIZE / 2, CY = SIZE / 2;
+      const OUTER = 320;
+      // Ring radii (outer edge of each band), from center outward
+      const RING_RADII = {
+        mainstream:    OUTER * 0.30,
+        consolidating: OUTER * 0.55,
+        emerging:      OUTER * 0.82,
+        fading:        OUTER * 1.00,
+      };
+      const RING_INNER = {
+        mainstream:    0,
+        consolidating: RING_RADII.mainstream,
+        emerging:      RING_RADII.consolidating,
+        fading:        RING_RADII.emerging,
+      };
+      const N_SECTORS = sectors.length;
+      const ARC = (2 * Math.PI) / N_SECTORS;
+
+      // Build sector index for color + angle math
+      const sectorByName = new Map();
+      sectors.forEach((s, i) => {
+        sectorByName.set(s.name, {
+          ...s,
+          index: i,
+          startAngle: -Math.PI / 2 + i * ARC,
+          endAngle: -Math.PI / 2 + (i + 1) * ARC,
+          midAngle: -Math.PI / 2 + (i + 0.5) * ARC,
+          color: SECTOR_PALETTE[i % SECTOR_PALETTE.length],
+        });
+      });
+
+      // SVG header
+      let svg = `<svg viewBox="0 0 ${SIZE} ${SIZE}" xmlns="http://www.w3.org/2000/svg">`;
+
+      // 1) Ring bands (annuli)
+      STAGES_CENTER_OUT.forEach((stage, idx) => {
+        const rOuter = RING_RADII[stage];
+        const rInner = RING_INNER[stage];
+        const cls = `ring-band-${idx + 1}`;
+        // Outer circle
+        svg += `<path class="${cls}" d="${annulusPath(CX, CY, rInner, rOuter)}" stroke-width="1"/>`;
+      });
+
+      // 2) Sector dividers (radial lines)
+      sectorByName.forEach(s => {
+        const x1 = CX + Math.cos(s.startAngle) * 4;
+        const y1 = CY + Math.sin(s.startAngle) * 4;
+        const x2 = CX + Math.cos(s.startAngle) * OUTER;
+        const y2 = CY + Math.sin(s.startAngle) * OUTER;
+        svg += `<line class="sector-divider" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+      });
+
+      // 3) Ring labels (at top of each ring, slightly off the y-axis to avoid sector dividers)
+      const labelAngle = -Math.PI / 2 + 0.04;
+      STAGES_CENTER_OUT.forEach(stage => {
+        const r = (RING_INNER[stage] + RING_RADII[stage]) / 2;
+        const lx = CX + Math.cos(labelAngle) * r;
+        const ly = CY + Math.sin(labelAngle) * r;
+        svg += `<text class="ring-label-text" x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" style="fill:${STAGE_COLOR[stage]}; opacity:0.85">${STAGE_LABEL[stage]}</text>`;
+      });
+
+      // 4) Sector labels (just beyond outer ring)
+      sectorByName.forEach(s => {
+        const lr = OUTER + 12;
+        const lx = CX + Math.cos(s.midAngle) * lr;
+        const ly = CY + Math.sin(s.midAngle) * lr;
+        const orgs = s.active_orgs != null ? `${s.active_orgs} orgs` : '';
+        const meta = `${s.topic_count} topics${orgs ? ' · ' + orgs : ''}`;
+        const align = Math.cos(s.midAngle) > 0.3 ? 'start' : Math.cos(s.midAngle) < -0.3 ? 'end' : 'middle';
+        svg += `<text class="sector-label-text" x="${lx}" y="${ly}" text-anchor="${align}" dominant-baseline="middle" fill="${s.color}">${escapeXml(s.name)}</text>`;
+        svg += `<text class="sector-label-meta" x="${lx}" y="${ly + 14}" text-anchor="${align}" dominant-baseline="middle">${meta}</text>`;
+      });
+
+      // 5) Topic dots — placed within their (sector, stage) cell with deterministic jitter
+      // Group topics by sector → stage so we can space them along the arc
+      const byCell = new Map(); // key = sector|stage → [topics]
+      topics.forEach(t => {
+        const key = `${t.sector}|${t.stage}`;
+        if (!byCell.has(key)) byCell.set(key, []);
+        byCell.get(key).push(t);
+      });
+
+      const dotsHtml = [];
+      const arrowsHtml = [];
+      const dotPositions = new Map(); // topic_id → {x, y}
+
+      sectorByName.forEach(s => {
+        STAGES_CENTER_OUT.forEach(stage => {
+          const cell = byCell.get(`${s.name}|${stage}`) || [];
+          const rMid = (RING_INNER[stage] + RING_RADII[stage]) / 2;
+          const arcSpan = ARC * 0.85; // leave gutter on each side of the sector
+          const arcStart = s.midAngle - arcSpan / 2;
+          cell.forEach((t, i) => {
+            const slot = cell.length === 1 ? 0.5 : i / (cell.length - 1 + 0.0001);
+            const a = arcStart + slot * arcSpan;
+            // Radial jitter to spread dots within the ring band
+            const rJitter = (hashFloat(t.id) - 0.5) * (RING_RADII[stage] - RING_INNER[stage]) * 0.55;
+            const r = rMid + rJitter;
+            const x = CX + Math.cos(a) * r;
+            const y = CY + Math.sin(a) * r;
+            dotPositions.set(t.id, { x, y, angle: a, r });
+
+            const breadth = t.breadth_7d || 0;
+            const dotR = Math.max(4, Math.min(15, 4 + breadth * 1.1));
+            const dirColor = t.direction === 'surging' ? 'var(--dir-rising)'
+                            : t.direction === 'rising' ? 'var(--dir-rising)'
+                            : t.direction === 'fading' ? 'var(--dir-fading)'
+                            : 'var(--dir-steady)';
+            const breadthClass = t.high_breadth ? ' topic-dot-high-breadth' : '';
+            const surgingClass = t.direction === 'surging' ? ' topic-dot-surging' : '';
+            const titleSuffix = t.direction === 'surging' ? ' ↑↑ SURGING' : t.direction === 'rising' ? ' ↑' : t.direction === 'fading' ? ' ↓' : '';
+            dotsHtml.push(`<circle class="topic-dot${breadthClass}${surgingClass}" data-id="${escapeXml(t.id)}"
+              cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotR.toFixed(1)}"
+              fill="${dirColor}" stroke="${s.color}" stroke-width="1.5"
+              opacity="0.92"><title>${escapeXml((t.label || t.id) + ' — breadth ' + breadth + ', score ' + (t.score_slow || t.score || 0).toFixed(1) + titleSuffix)}</title></circle>`);
+          });
+        });
+      });
+
+      // 6) Movement arrows — for stage_movements (within the same sector) and sector_movements
+      const stageMovements = d.stage_movements || [];
+      const sectorMovements = d.sector_movements || [];
+      stageMovements.forEach(m => {
+        const t = topics.find(x => x.id === m.topic);
+        const cur = dotPositions.get(m.topic);
+        if (!t || !cur || !m.from) return;
+        // Estimate "from" position: same angle, but at the from-stage's ring midpoint
+        const fromR = (RING_INNER[m.from] + RING_RADII[m.from]) / 2;
+        const fromX = CX + Math.cos(cur.angle) * fromR;
+        const fromY = CY + Math.sin(cur.angle) * fromR;
+        arrowsHtml.push(arrowPath(fromX, fromY, cur.x, cur.y));
+      });
+      sectorMovements.forEach(m => {
+        const t = topics.find(x => x.id === m.topic);
+        const cur = dotPositions.get(m.topic);
+        if (!t || !cur) return;
+        const fromSector = sectorByName.get(m.from);
+        if (!fromSector) return;
+        // Estimate prior position: same stage's ring midpoint, fromSector's midAngle
+        const rMid = (RING_INNER[t.stage] + RING_RADII[t.stage]) / 2;
+        const fromX = CX + Math.cos(fromSector.midAngle) * rMid;
+        const fromY = CY + Math.sin(fromSector.midAngle) * rMid;
+        arrowsHtml.push(arrowPath(fromX, fromY, cur.x, cur.y));
+      });
+
+      // Arrow marker def
+      svg += `<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)" opacity="0.55"/></marker></defs>`;
+      svg += arrowsHtml.join('');
+      svg += dotsHtml.join('');
+      svg += `</svg>`;
+      wrap.innerHTML = svg;
+
+      // Wire up dot clicks
+      wrap.querySelectorAll('.topic-dot').forEach(el => {
+        el.addEventListener('click', () => selectTopic(el.dataset.id));
+      });
+
+      // Apply selection highlight if any
+      if (state.selectedTopicId) applyDotSelection();
+    }
+
+    function annulusPath(cx, cy, rInner, rOuter) {
+      if (rInner === 0) return `M ${cx - rOuter},${cy} a ${rOuter},${rOuter} 0 1,0 ${rOuter * 2},0 a ${rOuter},${rOuter} 0 1,0 -${rOuter * 2},0 Z`;
+      return `M ${cx - rOuter},${cy} a ${rOuter},${rOuter} 0 1,0 ${rOuter * 2},0 a ${rOuter},${rOuter} 0 1,0 -${rOuter * 2},0 Z `
+           + `M ${cx - rInner},${cy} a ${rInner},${rInner} 0 1,1 ${rInner * 2},0 a ${rInner},${rInner} 0 1,1 -${rInner * 2},0 Z`;
+    }
+    function arrowPath(x1, y1, x2, y2) {
+      // Curved path with arrowhead
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const dx = x2 - x1, dy = y2 - y1;
+      const cx = mx + dy * 0.15, cy = my - dx * 0.15;
+      return `<path class="movement-arrow" d="M${x1.toFixed(1)},${y1.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}" marker-end="url(#arrow)"/>`;
+    }
+    // Hash a string to a stable [0,1) float
+    function hashFloat(s) {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 16777619) >>> 0; }
+      return (h >>> 0) / 0xffffffff;
+    }
+
+    // ===== Scatter view (persistence × breadth) =================================
+    function renderScatter() {
+      const wrap = document.getElementById('radar-wrap');
+      const d = state.currentData;
+      const topics = (d.topics || []);
+      if (topics.length === 0) { wrap.innerHTML = '<div class="empty-state">No topics.</div>'; return; }
+
+      const SIZE = 720;
+      const PAD = 60;
+      const W = SIZE - 2 * PAD;
+      const H = SIZE - 2 * PAD;
+
+      const maxX = Math.max(50, ...topics.map(t => t.score_slow || t.score || 0)) * 1.1;
+      const maxY = Math.max(8, ...topics.map(t => t.breadth_7d || 0)) * 1.1;
+
+      let svg = `<svg viewBox="0 0 ${SIZE} ${SIZE}" xmlns="http://www.w3.org/2000/svg">`;
+      // Axes
+      svg += `<line class="scatter-axis" x1="${PAD}" y1="${SIZE - PAD}" x2="${SIZE - PAD}" y2="${SIZE - PAD}"/>`;
+      svg += `<line class="scatter-axis" x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${SIZE - PAD}"/>`;
+      // Midlines (median)
+      const midX = PAD + W * 0.5, midY = PAD + H * 0.5;
+      svg += `<line class="scatter-axis" x1="${midX}" y1="${PAD}" x2="${midX}" y2="${SIZE - PAD}" stroke-dasharray="2 4" opacity="0.5"/>`;
+      svg += `<line class="scatter-axis" x1="${PAD}" y1="${midY}" x2="${SIZE - PAD}" y2="${midY}" stroke-dasharray="2 4" opacity="0.5"/>`;
+      // Quadrant labels
+      svg += `<text class="scatter-quadrant-label" x="${PAD + W * 0.05}" y="${PAD + H * 0.1}">hot pile-on (high breadth, low persistence)</text>`;
+      svg += `<text class="scatter-quadrant-label" x="${PAD + W * 0.5 + 10}" y="${PAD + H * 0.1}">structural consensus</text>`;
+      svg += `<text class="scatter-quadrant-label" x="${PAD + W * 0.05}" y="${SIZE - PAD - 10}">noise</text>`;
+      svg += `<text class="scatter-quadrant-label" x="${PAD + W * 0.5 + 10}" y="${SIZE - PAD - 10}">niche durable</text>`;
+      // Axis labels
+      svg += `<text class="scatter-axis-label" x="${SIZE / 2}" y="${SIZE - 18}" text-anchor="middle">Persistence (slow EMA score) →</text>`;
+      svg += `<text class="scatter-axis-label" x="20" y="${SIZE / 2}" text-anchor="middle" transform="rotate(-90, 20, ${SIZE / 2})">Breadth (distinct orgs, 7d) →</text>`;
+
+      // Dots
+      const sectorColorByName = new Map();
+      (d.sectors || []).forEach((s, i) => sectorColorByName.set(s.name, SECTOR_PALETTE[i % SECTOR_PALETTE.length]));
+
+      topics.forEach(t => {
+        const x = PAD + (Math.min(t.score_slow || t.score || 0, maxX) / maxX) * W;
+        const y = (SIZE - PAD) - (Math.min(t.breadth_7d || 0, maxY) / maxY) * H;
+        const dirColor = t.direction === 'rising' ? 'var(--dir-rising)'
+                        : t.direction === 'fading' ? 'var(--dir-fading)'
+                        : 'var(--dir-steady)';
+        const sectorColor = sectorColorByName.get(t.sector) || 'var(--accent)';
+        const r = Math.max(4, Math.min(14, 4 + (t.breadth_7d || 0) * 1.0));
+        svg += `<circle class="topic-dot" data-id="${escapeXml(t.id)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${dirColor}" stroke="${sectorColor}" stroke-width="1.5" opacity="0.9"><title>${escapeXml((t.label || t.id) + ' — persistence ' + (t.score_slow || t.score || 0).toFixed(1) + ', breadth ' + (t.breadth_7d || 0))}</title></circle>`;
+      });
+
+      svg += `</svg>`;
+      wrap.innerHTML = svg;
+      wrap.querySelectorAll('.topic-dot').forEach(el => {
+        el.addEventListener('click', () => selectTopic(el.dataset.id));
+      });
+      if (state.selectedTopicId) applyDotSelection();
+    }
+
+    // ===== Sector strip + breadth list + movements + sector evolution ============
+    function renderSectorStrip() {
+      const strip = document.getElementById('sector-strip');
+      const d = state.currentData;
+      const sectors = (d.sectors || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+      if (sectors.length === 0) { strip.innerHTML = ''; return; }
+      strip.innerHTML = sectors.map((s, i) => {
+        const color = SECTOR_PALETTE[i % SECTOR_PALETTE.length];
+        const orgs = s.active_orgs != null ? `${s.active_orgs} orgs` : 'orgs n/a';
+        const desc = s.description ? `<div class="sec-meta">${escapeHtml(s.description)}</div>` : '';
+        return `<div class="sector-chip" style="border-left-color:${color}">
+                  <div class="sec-name" style="color:${color}">${escapeHtml(s.name)}</div>
+                  <div class="sec-meta">${s.topic_count} topics · ${orgs}</div>
+                  ${desc}
+                </div>`;
+      }).join('');
+    }
+
+    function renderBreadthList() {
+      const el = document.getElementById('breadth-list');
+      const d = state.currentData;
+      const topics = (d.topics || []).slice().sort((a, b) => (b.breadth_7d || 0) - (a.breadth_7d || 0));
+      const top = topics.slice(0, 8);
+      if (top.length === 0 || (top[0].breadth_7d || 0) === 0) {
+        el.innerHTML = '<li class="empty-state">No breadth data yet.</li>';
+        return;
+      }
+      el.innerHTML = top.map(t => {
+        const b = t.breadth_7d || 0;
+        const cls = b >= 5 ? '' : b >= 3 ? 'medium' : 'low';
+        const orgs = (t.breadth_orgs_7d || []).slice(0, 6);
+        const orgsHtml = orgs.length ? `<div class="breadth-orgs">${orgs.map(o => orgPill(o)).join('')}${(t.breadth_orgs_7d || []).length > 6 ? ' …' : ''}</div>` : '';
+        return `<li class="breadth-row ${cls}">
+          <span class="breadth-count">${b} orgs</span>
+          <span class="breadth-label" data-id="${escapeAttr(t.id)}">${escapeHtml(t.label || t.id)}${orgsHtml}</span>
+        </li>`;
+      }).join('');
+      el.querySelectorAll('.breadth-label').forEach(node => {
+        node.addEventListener('click', () => selectTopic(node.dataset.id));
+      });
+    }
+
+    function renderMovements() {
+      const el = document.getElementById('movements');
+      const d = state.currentData;
+      const stageMoves = d.stage_movements || [];
+      const sectorMoves = d.sector_movements || [];
+      const dissolved = d.sectors_dissolved_today || [];
+      const spawned = d.sectors_spawned_today || [];
+
+      let html = '';
+      if (sectorMoves.length) {
+        html += '<h4 style="margin:6px 0 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em">Sector reassignments</h4>';
+        html += sectorMoves.map(m => {
+          const t = d.topics.find(x => x.id === m.topic);
+          const label = t ? t.label : m.topic;
+          return `<div class="movement-row"><span class="breadth-label" data-id="${escapeAttr(m.topic)}">${escapeHtml(label)}</span><span class="movement-arrow-txt">${escapeHtml(m.from || '—')} → ${escapeHtml(m.to)}</span></div>`;
+        }).join('');
+      }
+      if (spawned.length || dissolved.length) {
+        html += '<h4 style="margin:10px 0 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em">Sector births / deaths</h4>';
+        spawned.forEach(s => html += `<div class="movement-row"><span>${escapeHtml(s)}</span><span class="movement-arrow-txt" style="color:var(--dir-rising)">spawned</span></div>`);
+        dissolved.forEach(s => html += `<div class="movement-row"><span>${escapeHtml(s)}</span><span class="movement-arrow-txt" style="color:var(--dir-fading)">dissolved</span></div>`);
+      }
+      if (stageMoves.length) {
+        html += '<h4 style="margin:10px 0 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em">Stage transitions</h4>';
+        html += stageMoves.map(m => {
+          const t = d.topics.find(x => x.id === m.topic);
+          const label = t ? t.label : m.topic;
+          const from = m.from ? STAGE_LABEL[m.from] || m.from : '—';
+          const to = m.to ? STAGE_LABEL[m.to] || m.to : '—';
+          return `<div class="movement-row"><span class="breadth-label" data-id="${escapeAttr(m.topic)}">${escapeHtml(label)}</span><span class="movement-arrow-txt">${from} → ${to}</span></div>`;
+        }).join('');
+      }
+      if (!html) html = '<div class="empty-state">Nothing moved this run — signals are steady.</div>';
+      el.innerHTML = html;
+      el.querySelectorAll('.breadth-label').forEach(node => {
+        node.addEventListener('click', () => selectTopic(node.dataset.id));
+      });
+    }
+
+    function renderSectorEvolution() {
+      const el = document.getElementById('sector-evolution');
+      // Read sector composition across all loaded radar runs
+      const runs = [...state.cache.values()].sort((a, b) => a.date.localeCompare(b.date));
+      if (runs.length === 0) { el.innerHTML = '<div class="empty-state">No history yet.</div>'; return; }
+
+      // Build stable name → color map across all runs
+      const sectorColors = new Map();
+      let colorIdx = 0;
+      runs.forEach(r => (r.sectors || []).forEach(s => {
+        if (!sectorColors.has(s.name)) sectorColors.set(s.name, SECTOR_PALETTE[(colorIdx++) % SECTOR_PALETTE.length]);
+      }));
+
+      const rows = runs.map(r => {
+        const sectors = (r.sectors || []).slice().sort((a, b) => (b.topic_count || 0) - (a.topic_count || 0));
+        const total = sectors.reduce((sum, s) => sum + (s.topic_count || 0), 0) || 1;
+        const segments = sectors.map(s => {
+          const pct = ((s.topic_count || 0) / total) * 100;
+          const color = sectorColors.get(s.name) || 'var(--accent)';
+          return `<div class="sec-evo-segment" style="flex:${pct}; background:${color}" title="${escapeHtml(s.name)} — ${s.topic_count} topics">${pct >= 8 ? escapeHtml(s.name.split(' ')[0]) : ''}</div>`;
+        }).join('');
+        return `<div class="sector-evolution-row">
+          <span class="sec-evo-date">${escapeHtml(r.date)}</span>
+          <div class="sec-evo-bar">${segments}</div>
+        </div>`;
+      }).join('');
+      el.innerHTML = rows;
+    }
+
+    // ===== Detail panel =======================================================
+    function renderDetailEmpty() {
+      document.getElementById('detail').innerHTML =
+        '<div class="detail-empty">Click any dot on the radar (or row in the lists) to see its full history.</div>';
+    }
+
+    function selectTopic(topicId) {
+      state.selectedTopicId = topicId;
+      applyDotSelection();
+      const t = state.currentData.topics.find(t => t.id === topicId);
+      if (t) renderDetail(t);
+    }
+
+    function applyDotSelection() {
+      document.querySelectorAll('.topic-dot').forEach(el => {
+        el.classList.toggle('selected', el.dataset.id === state.selectedTopicId);
+      });
+    }
+
+    function renderDetail(t) {
+      const el = document.getElementById('detail');
+      const m = t.momentum_7d_pct;
+      const mText = m == null ? '—' : (m > 0 ? '↑' : '↓') + ' ' + Math.abs(m).toFixed(1) + '%';
+      const dir = t.direction || 'steady';
+
+      // History across loaded dates
+      const history = [];
+      for (const entry of state.manifest.entries) {
+        const data = state.cache.get(entry.date_id);
+        if (!data) continue;
+        const item = data.topics.find(x => x.id === t.id);
+        if (item) history.push({
+          date: data.date,
+          score: item.score_slow != null ? item.score_slow : item.score,
+          score_fast: item.score_fast,
+          stage: item.stage,
+          sector: item.sector,
+          breadth_7d: item.breadth_7d || 0,
+        });
+      }
+      history.sort((a, b) => a.date.localeCompare(b.date));
+
+      // Source mention bars (use uncapped raw)
+      const sm = { ...(t.source_mentions || {}) };
+      delete sm._note;
+      const totalMentions = Object.values(sm).reduce((a, b) => a + b, 0) || 1;
+      const sourceBars = Object.entries(sm)
+        .filter(([, v]) => typeof v === 'number' && v > 0)
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, v]) => `
+          <div class="source-bar">
+            <span class="src-name">${SOURCE_LABEL[k] || k}</span>
+            <span class="src-val" style="width:${(v / totalMentions * 180).toFixed(0)}px"></span>
+            <span class="src-count">${v}</span>
+          </div>
+        `).join('');
+
+      const orgs = (t.breadth_orgs_7d || []).map(o => orgPill(o)).join('');
+      const sweepPills = sweepPillsForTopic(t);
+      const sectorHistory = (t.sector_history || []).slice(-5).map(h =>
+        `<div style="font-size:12px; color:var(--muted)">${escapeHtml(h.date)}: ${escapeHtml(h.from || '—')} → ${escapeHtml(h.to)}${h.reason ? ' · ' + escapeHtml(h.reason) : ''}</div>`
+      ).join('');
+
+      const supportingLinks = (t.supporting_links || []).slice(0, 12).map(l =>
+        `<li><a href="${escapeAttr(l)}" target="_blank" rel="noopener">${escapeHtml(l)}</a></li>`).join('');
+      const supportingFiles = (t.supporting_files || []).map(f => `<code>${escapeHtml(f)}</code>`).join('  ');
+
+      el.innerHTML = `
+        <div class="detail-title">${escapeHtml(t.label || t.id)}</div>
+        <span class="detail-pill stage-${t.stage}">${STAGE_LABEL[t.stage] || t.stage}</span>
+        <span class="detail-pill sector">${escapeHtml(t.sector || '—')}</span>
+        <span class="detail-pill dir-${dir}">${dir}</span>
+        ${sweepPills ? `<div style="margin: 4px 0 8px;">${sweepPills}</div>` : ''}
+
+        <div class="detail-stats">
+          <div class="stat"><div class="stat-label">Persistence (slow)</div><div class="stat-value">${(t.score_slow != null ? t.score_slow : t.score).toFixed(1)}</div></div>
+          <div class="stat"><div class="stat-label">Fast (now)</div><div class="stat-value">${(t.score_fast != null ? t.score_fast : t.score).toFixed(1)}</div></div>
+          <div class="stat"><div class="stat-label">Breadth 7d</div><div class="stat-value">${t.breadth_7d || 0} orgs</div></div>
+          <div class="stat"><div class="stat-label">Breadth 30d</div><div class="stat-value">${t.breadth_30d || 0} orgs</div></div>
+          <div class="stat"><div class="stat-label">7d momentum</div><div class="stat-value">${mText}</div></div>
+          <div class="stat"><div class="stat-label">Sustained</div><div class="stat-value">${t.sustained_days || 0}d</div></div>
+        </div>
+
+        <div class="detail-section">
+          <h4>Score history (persistence)</h4>
+          <div class="chart-wrap"><canvas id="detail-chart"></canvas></div>
+        </div>
+
+        ${orgs ? `<div class="detail-section"><h4>Orgs talking (7d)</h4><div>${orgs}</div></div>` : ''}
+
+        ${sectorHistory ? `<div class="detail-section"><h4>Sector history</h4>${sectorHistory}</div>` : ''}
+
+        <div class="detail-section">
+          <h4>Source mentions</h4>
+          ${sourceBars || '<div class="empty-state">No source mentions recorded.</div>'}
+        </div>
+
+        ${supportingFiles ? `<div class="detail-section"><h4>Supporting files</h4><div style="font-size:12px; line-height:1.8">${supportingFiles}</div></div>` : ''}
+
+        ${supportingLinks ? `<div class="detail-section"><h4>Supporting links (${(t.supporting_links || []).length})</h4><ul class="link-list">${supportingLinks}</ul></div>` : ''}
+      `;
+
+      // Detail history chart — show persistence AND breadth on dual axes
+      const ctx = document.getElementById('detail-chart');
+      if (history.length >= 1) {
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: history.map(h => h.date),
+            datasets: [{
+              label: 'Persistence',
+              data: history.map(h => h.score),
+              borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#6aa9ff',
+              backgroundColor: 'rgba(106, 169, 255, 0.1)',
+              tension: 0.25,
+              pointRadius: 3,
+              fill: true,
+              yAxisID: 'y',
+            }, {
+              label: 'Breadth (7d orgs)',
+              data: history.map(h => h.breadth_7d),
+              borderColor: '#58c97f',
+              backgroundColor: 'rgba(88, 201, 127, 0.0)',
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false,
+              yAxisID: 'y1',
+              borderDash: [4, 4],
+            }],
+          },
+          options: chartOpts({ dualAxis: true, legend: true }),
+        });
+      } else {
+        ctx.parentElement.innerHTML = '<div class="empty-state">No history available yet.</div>';
+      }
+    }
+
+    function renderTopChart() {
+      const ctx = document.getElementById('topchart');
+      const topTopics = [...state.currentData.topics]
+        .sort((a, b) => (b.score_slow != null ? b.score_slow : b.score) - (a.score_slow != null ? a.score_slow : a.score))
+        .slice(0, 8);
+      const allDates = [...new Set([...state.cache.values()].map(d => d.date))].sort();
+      const colors = ['#6aa9ff', '#ffb84d', '#58c97f', '#ff8a8a', '#b48aff', '#5cd0d0', '#ffc8a8', '#a0a0a0'];
+      const datasets = topTopics.map((tt, idx) => ({
+        label: tt.label || tt.id,
+        data: allDates.map(d => {
+          for (const data of state.cache.values()) {
+            if (data.date === d) {
+              const item = data.topics.find(x => x.id === tt.id);
+              return item ? (item.score_slow != null ? item.score_slow : item.score) : null;
+            }
+          }
+          return null;
+        }),
+        borderColor: colors[idx % colors.length],
+        backgroundColor: colors[idx % colors.length] + '20',
+        tension: 0.25,
+        pointRadius: 3,
+        spanGaps: true,
+      }));
+      if (state.chart) state.chart.destroy();
+      state.chart = new Chart(ctx, { type: 'line', data: { labels: allDates, datasets }, options: chartOpts({ legend: true }) });
+    }
+
+    function chartOpts({ legend = false, dualAxis = false } = {}) {
+      const scales = {
+        x: { ticks: { color: '#8a91a3', font: { size: 11 } }, grid: { color: '#2a2f3d' } },
+        y: { ticks: { color: '#8a91a3', font: { size: 11 } }, grid: { color: '#2a2f3d' } },
+      };
+      if (dualAxis) {
+        scales.y1 = {
+          position: 'right',
+          ticks: { color: '#58c97f', font: { size: 11 } },
+          grid: { display: false },
+          beginAtZero: true,
+        };
+      }
+      return {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: legend ? { position: 'bottom', labels: { color: '#8a91a3', font: { size: 11 }, boxWidth: 12 } } : { display: false },
+          tooltip: { mode: 'index', intersect: false },
+        },
+        scales,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      };
+    }
+
+    function showError(msg) {
+      document.querySelector('main').innerHTML = `<div class="err">${escapeHtml(msg)}</div>`;
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function escapeAttr(s) { return escapeHtml(s); }
+    function escapeXml(s) { return escapeHtml(s); }
+
+    // ===== Org pill — clickable link to firm view =============================
+    // Adds two visual markers when data is available:
+    //   - priority class for priority vendors (the 6 frontier labs)
+    //   - auto-added class (dashed border) for orgs the vendor sweep auto-promoted
+    function orgPill(slug) {
+      const meta = state.orgs ? state.orgs.get(slug) : null;
+      const auto = state.vendorActive.has(slug);
+      const classes = ['org-pill'];
+      if (meta && meta.is_priority) classes.push('priority');
+      if (auto) classes.push('auto-added');
+      // Title tooltip carries the why-it's-marked info
+      const tips = [];
+      if (meta) tips.push(`${meta.total_mentions} mentions · ${meta.distinct_days}d · velocity ${meta.velocity_ratio}×`);
+      if (auto) {
+        const v = state.vendorActive.get(slug);
+        tips.push(`auto-promoted ${v.ts_date}: ${v.reason || v.verb}`);
+      }
+      if (state.vendorProven.has(slug)) tips.push('PROVEN — permanent anchor');
+      const title = tips.join('\n');
+      return `<a class="${classes.join(' ')}" href="orgs.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(title)}">${escapeHtml(slug)}</a>`;
+    }
+
+    // ===== Sweep-history pills for the topic detail panel =====================
+    // A topic's id and label are matched (case-insensitive substring) against
+    // the keyword sweep's active set + proven set. The vendor sweep applies to
+    // orgs, not topics, so we don't surface it here directly — but a topic's
+    // breadth_orgs_7d list will show vendor auto-added markers on each org pill.
+    function sweepPillsForTopic(t) {
+      const pills = [];
+      const haystack = [(t.id || ''), (t.label || '')].join(' ').toLowerCase();
+
+      // PROVEN keyword anchor — strongest signal, render first
+      for (const proven of state.keywordProven) {
+        if (haystack.includes(proven)) {
+          pills.push(`<span class="sweep-pill proven" title="Promoted to PROVEN by keyword sweep — permanent trend anchor.">🏛️ proven: "${escapeHtml(proven)}"</span>`);
+          break;
+        }
+      }
+      // Auto-added keyword (current, not yet proven)
+      for (const [phrase, info] of state.keywordActive) {
+        if (state.keywordProven.has(phrase)) continue; // proven already rendered above
+        if (haystack.includes(phrase)) {
+          const expiresHtml = info.expires_on ? ` · expires ${info.expires_on}` : '';
+          pills.push(`<span class="sweep-pill keyword" title="Added to ${info.target_section || 'a keyword list'} by sweep on ${info.ts_date}. Reason: ${info.reason || ''}">🔑 kw-sweep: "${escapeHtml(phrase)}"${expiresHtml}</span>`);
+          if (pills.length >= 3) break; // cap at 3 to avoid clutter
+        }
+      }
+      return pills.join(' ');
+    }
+
+    init();
+  </script>
+</body>
+</html>

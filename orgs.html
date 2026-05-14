@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Researcher — Firm view</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --panel: #181b25;
+      --panel-2: #1f2330;
+      --border: #2a2f3d;
+      --text: #e6e8ee;
+      --muted: #8a91a3;
+      --accent: #6aa9ff;
+
+      --vel-surging:      #58c97f;
+      --vel-accelerating: #b3d97e;
+      --vel-steady:       #b8bdc8;
+      --vel-cooling:      #ff8a8a;
+
+      --tier-frontier:   #6aa9ff;
+      --tier-enterprise: #ffb84d;
+      --tier-vertical:   #b48aff;
+      --tier-infra:      #5cd0d0;
+      --tier-research:   #58c97f;
+      --tier-other:      #8a91a3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    header select, header input {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font: inherit;
+    }
+    header a { color: var(--accent); text-decoration: none; }
+    header a:hover { text-decoration: underline; }
+
+    main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    aside {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    aside h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    aside .filters {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    aside .filters input,
+    aside .filters select {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font: inherit;
+    }
+    aside ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    aside li {
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border: 1px solid transparent;
+    }
+    aside li:hover {
+      background: var(--panel-2);
+    }
+    aside li.active {
+      background: var(--panel-2);
+      border-color: var(--accent);
+    }
+    aside li .name {
+      font-weight: 600;
+    }
+    aside li .name .priority-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    aside li .meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    aside li .vel-chip {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    .vel-surging      { background: var(--vel-surging);      color: var(--bg); }
+    .vel-accelerating { background: var(--vel-accelerating); color: var(--bg); }
+    .vel-steady       { background: var(--vel-steady);       color: var(--bg); }
+    .vel-cooling      { background: var(--vel-cooling);      color: var(--bg); }
+
+    .detail {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .card.full {
+      grid-column: 1 / -1;
+    }
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .card .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      font-size: 13px;
+    }
+    .card .meta-grid .label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .card .meta-grid .value {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 220px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      margin: 2px 4px 2px 0;
+    }
+    .pill.tier-frontier   { border-color: var(--tier-frontier);   color: var(--tier-frontier); }
+    .pill.tier-enterprise { border-color: var(--tier-enterprise); color: var(--tier-enterprise); }
+    .pill.tier-vertical   { border-color: var(--tier-vertical);   color: var(--tier-vertical); }
+    .pill.tier-infra      { border-color: var(--tier-infra);      color: var(--tier-infra); }
+    .pill.tier-research   { border-color: var(--tier-research);   color: var(--tier-research); }
+    .ctx-sample {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      background: var(--panel-2);
+      border-radius: 6px;
+      margin: 4px 0;
+      border-left: 2px solid var(--border);
+    }
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+      padding: 20px 0;
+      text-align: center;
+    }
+    .stub-warning {
+      background: rgba(255, 184, 77, 0.08);
+      border: 1px solid var(--tier-enterprise);
+      color: var(--tier-enterprise);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI Researcher — Firm view</h1>
+    <span class="subtitle" id="gen-info">loading…</span>
+    <span style="flex: 1"></span>
+    <a href="radar.html">→ radar view</a>
+    <a href="index.md">→ index</a>
+  </header>
+
+  <main>
+    <aside>
+      <h2>Orgs (<span id="org-count">0</span>)</h2>
+      <div class="filters">
+        <input type="text" id="search" placeholder="Search slug or alias…">
+        <select id="tier-filter">
+          <option value="">All tiers</option>
+          <option value="frontier-lab">Frontier labs</option>
+          <option value="enterprise-vendor">Enterprise vendors</option>
+          <option value="vertical-agent">Vertical agents</option>
+          <option value="infra">Infra</option>
+          <option value="hosting">Hosting</option>
+          <option value="hardware">Hardware</option>
+          <option value="research-lab">Research labs</option>
+          <option value="safety">Safety</option>
+          <option value="open-weight">Open-weight</option>
+        </select>
+        <select id="sort">
+          <option value="velocity">Sort: velocity ratio</option>
+          <option value="mentions">Sort: total mentions</option>
+          <option value="recent">Sort: most recently seen</option>
+          <option value="oldest">Sort: longest history</option>
+          <option value="topics">Sort: topic count</option>
+          <option value="alphabetical">Sort: A–Z</option>
+        </select>
+      </div>
+      <ul id="org-list"></ul>
+    </aside>
+
+    <section id="detail-pane">
+      <div class="empty" id="empty-state">Pick an org from the list to see its profile.</div>
+      <div class="detail" id="detail" style="display:none;">
+        <div class="card full" id="header-card"></div>
+        <div class="card">
+          <h3>Mention activity (full timeline)</h3>
+          <div class="chart-wrap"><canvas id="chart-mentions"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Velocity history (last 30 days)</h3>
+          <div class="chart-wrap"><canvas id="chart-velocity"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Source-type mix</h3>
+          <div class="chart-wrap"><canvas id="chart-srctype"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Topic mix (this org × topic taxonomy)</h3>
+          <div id="topic-warning"></div>
+          <div class="chart-wrap"><canvas id="chart-topics"></canvas></div>
+        </div>
+        <div class="card full" id="card-radar"></div>
+        <div class="card full" id="card-history"></div>
+        <div class="card full" id="card-context"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let INDEX = null;
+    let CURRENT_ORG = null;
+    let CHARTS = {};
+
+    async function loadIndex() {
+      const r = await fetch('orgs/index.json');
+      INDEX = await r.json();
+      document.getElementById('gen-info').textContent =
+        `${INDEX.total_orgs} orgs (${INDEX.priority_count} priority) — generated ${INDEX.generated_at}`;
+      document.getElementById('org-count').textContent = INDEX.total_orgs;
+      renderOrgList();
+
+      // Honor ?slug=... URL param (linked from radar.html org pills). If the
+      // requested slug exists, pre-select it; otherwise fall back to first entry.
+      const params = new URLSearchParams(window.location.search);
+      const requested = params.get('slug');
+      const target = (requested && INDEX.entries.some(e => e.slug === requested))
+        ? requested
+        : (INDEX.entries[0] && INDEX.entries[0].slug);
+      if (target) loadOrg(target);
+    }
+
+    function applyFilters() {
+      const q = document.getElementById('search').value.toLowerCase().trim();
+      const tier = document.getElementById('tier-filter').value;
+      const sortBy = document.getElementById('sort').value;
+      let entries = [...INDEX.entries];
+      if (q) {
+        entries = entries.filter(e =>
+          e.slug.toLowerCase().includes(q) ||
+          (e.top_topics || []).some(t => t.toLowerCase().includes(q))
+        );
+      }
+      if (tier) {
+        entries = entries.filter(e => e.tier_hint === tier);
+      }
+      const cmp = {
+        velocity: (a, b) => b.velocity_ratio - a.velocity_ratio || b.total_mentions - a.total_mentions,
+        mentions: (a, b) => b.total_mentions - a.total_mentions,
+        recent:   (a, b) => (b.last_seen || '').localeCompare(a.last_seen || ''),
+        oldest:   (a, b) => (a.first_seen || 'z').localeCompare(b.first_seen || 'z'),
+        topics:   (a, b) => b.topic_count - a.topic_count,
+        alphabetical: (a, b) => a.slug.localeCompare(b.slug),
+      }[sortBy];
+      // Priority always first when default sort
+      if (sortBy === 'velocity') {
+        entries.sort((a, b) => (b.is_priority - a.is_priority) || cmp(a, b));
+      } else {
+        entries.sort(cmp);
+      }
+      return entries;
+    }
+
+    function renderOrgList() {
+      const entries = applyFilters();
+      document.getElementById('org-count').textContent = entries.length;
+      const list = document.getElementById('org-list');
+      list.innerHTML = entries.map(e => {
+        const velClass = `vel-${e.velocity_status}`;
+        const topics = (e.top_topics || []).slice(0, 2).join(', ');
+        return `
+          <li data-slug="${e.slug}" class="${e.slug === CURRENT_ORG ? 'active' : ''}">
+            <div class="name">
+              ${e.slug}
+              ${e.is_priority ? '<span class="priority-badge">PRIORITY</span>' : ''}
+            </div>
+            <div class="meta">
+              <span class="vel-chip ${velClass}">${e.velocity_ratio.toFixed(1)}×</span>
+              ${e.total_mentions} mentions · ${e.distinct_days}d
+              ${topics ? `· ${topics}` : ''}
+            </div>
+          </li>
+        `;
+      }).join('');
+      list.querySelectorAll('li').forEach(li => {
+        li.addEventListener('click', () => loadOrg(li.dataset.slug));
+      });
+    }
+
+    async function loadOrg(slug) {
+      CURRENT_ORG = slug;
+      renderOrgList(); // refresh active highlight
+      try {
+        const r = await fetch(`orgs/${slug}.json`);
+        const data = await r.json();
+        renderDetail(data);
+      } catch (e) {
+        document.getElementById('empty-state').style.display = '';
+        document.getElementById('empty-state').textContent = `Failed to load ${slug}.json`;
+        document.getElementById('detail').style.display = 'none';
+      }
+    }
+
+    function tierPill(tier) {
+      if (!tier) return '';
+      const cls = (
+        tier === 'frontier-lab' ? 'tier-frontier' :
+        tier === 'enterprise-vendor' ? 'tier-enterprise' :
+        tier === 'vertical-agent' ? 'tier-vertical' :
+        tier === 'infra' || tier === 'hosting' ? 'tier-infra' :
+        tier === 'research-lab' || tier === 'safety' ? 'tier-research' : ''
+      );
+      return `<span class="pill ${cls}">${tier}</span>`;
+    }
+
+    function renderDetail(data) {
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('detail').style.display = '';
+
+      // Header card
+      const vel = data.velocity;
+      const velChip = `<span class="vel-chip vel-${vel.velocity_status}">${vel.velocity_ratio.toFixed(2)}× ${vel.velocity_status}</span>`;
+      document.getElementById('header-card').innerHTML = `
+        <h3>${data.slug}${data.is_priority ? ' <span class="priority-badge" style="background:var(--accent);color:var(--bg);padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;vertical-align:middle;">PRIORITY</span>' : ''}</h3>
+        <div style="margin-bottom:14px;">
+          ${tierPill(data.tier_hint)}
+          ${data.region ? `<span class="pill">region: ${data.region}</span>` : ''}
+          <span class="pill">coverage: ${data.coverage}</span>
+          ${data.last_classification ? `<span class="pill">last classified: ${data.last_classification}</span>` : ''}
+          ${data.blog_url_hint ? `<a class="pill" href="${data.blog_url_hint}" target="_blank">blog ↗</a>` : ''}
+        </div>
+        <div class="meta-grid">
+          <div><div class="label">First seen</div><div class="value">${data.first_seen || '—'}</div></div>
+          <div><div class="label">Last seen</div><div class="value">${data.last_seen || '—'}</div></div>
+          <div><div class="label">Days active</div><div class="value">${data.distinct_days}</div></div>
+          <div><div class="label">Total mentions</div><div class="value">${data.total_mentions.toLocaleString()}</div></div>
+          <div><div class="label">Velocity (7d / wkly-avg over 28d)</div><div class="value">${velChip} ${vel.velocity_7d} / ${vel.velocity_28d_avg}</div></div>
+          <div><div class="label">Source types</div><div class="value">${data.distinct_source_types.length}</div></div>
+        </div>
+      `;
+
+      // Mentions over time
+      renderMentionsChart(data);
+      renderVelocityChart(data);
+      renderSourceTypeChart(data);
+      renderTopicChart(data);
+      renderRadarAppearances(data);
+      renderClassificationHistory(data);
+      renderContextSamples(data);
+    }
+
+    function destroyChart(name) {
+      if (CHARTS[name]) {
+        CHARTS[name].destroy();
+        CHARTS[name] = null;
+      }
+    }
+
+    function renderMentionsChart(data) {
+      destroyChart('mentions');
+      const dates = Object.keys(data.mentions_by_date).sort();
+      const counts = dates.map(d => data.mentions_by_date[d]);
+      if (dates.length === 0) {
+        document.getElementById('chart-mentions').parentElement.innerHTML =
+          '<div class="empty">No mention history.</div>';
+        return;
+      }
+      CHARTS.mentions = new Chart(document.getElementById('chart-mentions'), {
+        type: 'bar',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'files-with-mention',
+            data: counts,
+            backgroundColor: '#6aa9ff',
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#8a91a3', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, grid: { color: '#2a2f3d' } },
+            y: { beginAtZero: true, ticks: { color: '#8a91a3', precision: 0 }, grid: { color: '#2a2f3d' } },
+          },
+        },
+      });
+    }
+
+    function renderVelocityChart(data) {
+      destroyChart('velocity');
+      const h = data.velocity_history;
+      CHARTS.velocity = new Chart(document.getElementById('chart-velocity'), {
+        type: 'line',
+        data: {
+          labels: h.map(p => p.date),
+          datasets: [
+            {
+              label: 'mentions / 7d',
+              data: h.map(p => p.velocity_7d),
+              borderColor: '#6aa9ff',
+              backgroundColor: 'rgba(106,169,255,0.15)',
+              tension: 0.25,
+              yAxisID: 'y1',
+            },
+            {
+              label: 'velocity ratio (7d / weekly-avg-28d)',
+              data: h.map(p => p.velocity_ratio),
+              borderColor: '#ffb84d',
+              backgroundColor: 'rgba(255,184,77,0.15)',
+              tension: 0.25,
+              yAxisID: 'y2',
+            },
+          ],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { color: '#e6e8ee' } } },
+          scales: {
+            x: { ticks: { color: '#8a91a3', maxRotation: 0, autoSkip: true, maxTicksLimit: 8 }, grid: { color: '#2a2f3d' } },
+            y1: { position: 'left', ticks: { color: '#6aa9ff' }, grid: { color: '#2a2f3d' } },
+            y2: { position: 'right', ticks: { color: '#ffb84d' }, grid: { display: false } },
+          },
+        },
+      });
+    }
+
+    function renderSourceTypeChart(data) {
+      destroyChart('srctype');
+      const entries = Object.entries(data.mentions_by_source_type);
+      if (entries.length === 0) {
+        document.getElementById('chart-srctype').parentElement.innerHTML =
+          '<div class="empty">No source-type breakdown.</div>';
+        return;
+      }
+      const colors = ['#6aa9ff', '#ffb84d', '#b48aff', '#5cd0d0', '#58c97f', '#ff8a8a', '#b8bdc8', '#8a91a3'];
+      CHARTS.srctype = new Chart(document.getElementById('chart-srctype'), {
+        type: 'doughnut',
+        data: {
+          labels: entries.map(([k]) => k),
+          datasets: [{
+            data: entries.map(([, v]) => v),
+            backgroundColor: entries.map((_, i) => colors[i % colors.length]),
+            borderColor: '#181b25',
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { color: '#e6e8ee', boxWidth: 10 } },
+          },
+        },
+      });
+    }
+
+    function renderTopicChart(data) {
+      destroyChart('topics');
+      const warn = document.getElementById('topic-warning');
+      const entries = Object.entries(data.topic_mix).slice(0, 15);
+      if (entries.length === 0) {
+        warn.innerHTML = '<div class="stub-warning">No topic-taxonomy strings co-occurred with this org\'s aliases in the source files yet. Will populate as more content is collected.</div>';
+        document.getElementById('chart-topics').parentElement.style.display = 'none';
+        return;
+      }
+      warn.innerHTML = `<div class="stub-warning">Topic mix is computed at build time from source-file co-occurrence with topic-taxonomy strings. Will be replaced by radar's <code>breadth_orgs_7d</code> once the radar starts populating it.</div>`;
+      document.getElementById('chart-topics').parentElement.style.display = '';
+      CHARTS.topics = new Chart(document.getElementById('chart-topics'), {
+        type: 'bar',
+        data: {
+          labels: entries.map(([k]) => k),
+          datasets: [{
+            label: 'co-occurrences',
+            data: entries.map(([, v]) => v),
+            backgroundColor: '#b48aff',
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, ticks: { color: '#8a91a3', precision: 0 }, grid: { color: '#2a2f3d' } },
+            y: { ticks: { color: '#e6e8ee' }, grid: { display: false } },
+          },
+        },
+      });
+    }
+
+    function renderRadarAppearances(data) {
+      const card = document.getElementById('card-radar');
+      if (!data.radar_appearances || data.radar_appearances.length === 0) {
+        card.innerHTML = `
+          <h3>Radar appearances</h3>
+          <div class="empty">This org hasn't appeared in any radar topic's <code>breadth_orgs_7d</code> yet. (Existing radars use the file-count approximation; real org breadth populates as the radar runs forward.)</div>
+        `;
+        return;
+      }
+      const rows = data.radar_appearances.map(r => {
+        const topics = r.topics.map(t => `<span class="pill">${t.topic_label} (${t.stage})</span>`).join(' ');
+        return `<div style="margin-bottom:8px;"><strong>${r.date}</strong> — ${topics}</div>`;
+      }).join('');
+      card.innerHTML = `<h3>Radar appearances (${data.radar_appearances.length})</h3>${rows}`;
+    }
+
+    function renderClassificationHistory(data) {
+      const card = document.getElementById('card-history');
+      const items = [];
+      if (data.classification_history && data.classification_history.length) {
+        items.push(`<div><strong>Classification history</strong></div>`);
+        items.push(...data.classification_history.slice(-10).map(c =>
+          `<div class="pill">${c.date}: ${c.tier}</div>`
+        ));
+      }
+      if (data.hot_events && data.hot_events.length) {
+        items.push(`<div style="margin-top:10px;"><strong>Hot events</strong></div>`);
+        items.push(...data.hot_events.map(h =>
+          `<div class="ctx-sample">${h.date} · <strong>${h.keyword}</strong> — ${h.snippet || ''} <em>${h.source_file || ''}</em></div>`
+        ));
+      }
+      if (items.length === 0) {
+        card.innerHTML = `<h3>Classification &amp; hot events</h3><div class="empty">No classification history or hot events recorded yet.</div>`;
+      } else {
+        card.innerHTML = `<h3>Classification &amp; hot events</h3>${items.join('')}`;
+      }
+    }
+
+    function renderContextSamples(data) {
+      const card = document.getElementById('card-context');
+      if (!data.context_samples || data.context_samples.length === 0) {
+        card.innerHTML = `<h3>Context samples</h3><div class="empty">No context snippets recorded.</div>`;
+        return;
+      }
+      const rows = data.context_samples.map(s =>
+        `<div class="ctx-sample">${s}</div>`
+      ).join('');
+      card.innerHTML = `<h3>Context samples (${data.context_samples.length})</h3>${rows}`;
+    }
+
+    document.getElementById('search').addEventListener('input', renderOrgList);
+    document.getElementById('tier-filter').addEventListener('change', renderOrgList);
+    document.getElementById('sort').addEventListener('change', renderOrgList);
+
+    loadIndex();
+  </script>
+</body>
+</html>
