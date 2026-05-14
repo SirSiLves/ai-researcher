@@ -152,7 +152,7 @@ This is the new step (added 2026-05-14). Read `radar_config.vendor_sweep_config.
 
 Otherwise:
 
-**Step A — Backup.** If we're about to write to sources.json, first `cp sources.json sources.json.bak` (overwrites previous backup). This is the rollback button.
+**Step A — Backup.** If we're about to write to sources.json, first `cp sources.json sources.json.vendor.bak` (overwrites the vendor sweep's previous backup). Per-sweep backups (`sources.json.{vendor,keyword,github}.bak`) keep concurrent or successive sweeps from clobbering each other's rollback target.
 
 **Step B — Compute the change set.** Build a `changes` dict with six lists:
 
@@ -258,7 +258,7 @@ This file describes what the auto-applier did today and what's pending. The user
 ```markdown
 # Vendor sweep — {TODAY}
 
-_Daily change log. The pipeline auto-maintains `sources.json` — promotions and hot events are added directly, expired hot events are removed. This page describes what happened. To roll back a single run: `cp sources.json.bak sources.json`._
+_Daily change log. The pipeline auto-maintains `sources.json` — promotions and hot events are added directly, expired hot events are removed. This page describes what happened. To roll back a single run: `cp sources.json.vendor.bak sources.json`._
 
 ## 📋 What changed in sources.json today
 
@@ -310,7 +310,7 @@ Vendors on lists whose blogs haven't surfaced mentions in {silence_days}+ days. 
 - discovered_orgs.json (last_updated {prev})
 - Today's source files: {list}
 - Radar JSONs in window: {count}
-- sources.json snapshot before edit → sources.json.bak ({applied_changes_count} change(s) applied)
+- sources.json snapshot before edit → sources.json.vendor.bak ({applied_changes_count} change(s) applied)
 ```
 
 Target: 100-250 lines. The change log is short by design — most days the answer is "added 1 thing, removed 0, nothing else of note." That's healthy.
@@ -349,7 +349,7 @@ Do NOT post the change log to chat. Do NOT modify any source files (`news/`, `bl
 - **Deep-watch is a holding tier, not a graveyard.** Demoted entries keep their `blog_urls`, `fallback_search`, and `_added_reason` so a future re-promotion is exact (not a re-promotion-as-new). Audit verbs are `deep-watch-demote` and `deep-watch-promote`. Never demote anything without `_auto_added: true`. Demotions never apply to slugs classified `hot_event` or `promote` on the same day.
 - **Hot events are temporary.** They get `_expires_on = TODAY + ttl_days` at insertion. The next sweep that observes an expired hot event removes the entry. If the same org meanwhile crossed sustained promote thresholds, it'd already have been re-added without the expiry — so the removal is harmless.
 - **JSON validity is mandatory.** Before writing sources.json, parse the result. If parsing fails, abort the write, log to `vendor_changes.log` as `ABORT-INVALID-JSON`, and continue with the markdown report only.
-- **Backup before write.** Always `cp sources.json sources.json.bak` before modifying sources.json. One step of rollback is always available.
+- **Backup before write.** Always `cp sources.json sources.json.vendor.bak` before modifying sources.json. Per-sweep .bak files (`sources.json.{vendor,keyword,github}.bak`) keep concurrent or successive sweeps from clobbering each other's rollback target.
 - **Audit trail.** Every mutation appends a line to `vendor_changes.log`. The log is append-only — never truncated.
 
 ## How to disable auto-apply

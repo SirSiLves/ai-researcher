@@ -275,7 +275,7 @@ Read `keyword_sweep_config.auto_apply`. If `auto_apply.enabled` is `false`, skip
 
 Otherwise:
 
-**Step A — Backup.** `cp sources.json sources.json.bak` (overwrites the previous backup — same single-step rollback as the vendor sweep). One backup file serves both sweeps; the latest mutation wins on rollback. If you want separate backups per sweep, change this in a future iteration.
+**Step A — Backup.** `cp sources.json sources.json.keyword.bak` (overwrites this sweep's previous backup). Per-sweep .bak files (`sources.json.{vendor,keyword,github}.bak`) — successive sweeps no longer clobber each other's rollback target.
 
 **Step B — Compute the change set:**
 
@@ -364,7 +364,7 @@ The `proven-promote` verb is the load-bearing entry — it tells the audit log "
 ```markdown
 # Keyword sweep — {TODAY}
 
-_Daily change log. The pipeline auto-maintains the four keyword lists in sources.json — promotions and hot topics are added directly, expired entries removed. This page describes what happened. Rollback the most recent sweep: `cp sources.json.bak sources.json`._
+_Daily change log. The pipeline auto-maintains the four keyword lists in sources.json — promotions and hot topics are added directly, expired entries removed. This page describes what happened. Rollback the most recent sweep: `cp sources.json.keyword.bak sources.json`._
 
 ## 📋 What changed in sources.json today
 
@@ -406,7 +406,7 @@ Auto-added entries whose TTL elapsed (and that were NOT proven). Removed from th
 - Currently watching: {count}
 - Discovered today (new): {count}
 - Hot topics this run: {count}
-- sources.json snapshot before edit → sources.json.bak ({applied_changes_count} change(s) applied)
+- sources.json snapshot before edit → sources.json.keyword.bak ({applied_changes_count} change(s) applied)
 ```
 
 Target: 100-250 lines. Most days the auto-applier mutates 0-2 things — that's healthy.
@@ -439,7 +439,7 @@ Do NOT post the change log to chat. Do NOT modify any source files or radar/swee
 - **Proven entries are sacred too.** Once a keyword crosses the proven threshold (≥14 distinct days, ≥4 source types, ≥30 days of age) and is moved to `_proven_meta`, it's a permanent anchor for trend recognition. **NEVER auto-remove a proven entry.** This is the load-bearing rule for the user's stated requirement: "we need to ensure we keep old, proven keywords, to recognize trends." A 6-month-old keyword going quiet for 3 weeks is not noise to clear out — it's a trend in dormancy that we need to be able to recognize when it returns.
 - **Auto-demote stays disabled by default** to prevent removing a phrase whose source files just briefly missed a sweep window. Even if you enable it, proven entries are excluded.
 - **Deep-watch is the preferred soft-cap path.** When a target list exceeds its `max_per_list` cap AND auto-added entries have gone silent past `min_silence_days`, the sweep MOVES the oldest-silent into `{section}._deep_watch_meta` (and removes the phrase string from the flat list). Re-promotion happens automatically when the phrase resurfaces with promote-tier signal. Proven and manual entries are NEVER demoted to deep-watch. Demotion never touches phrases classified `hot_candidate` or `promote` on the same day. Audit verbs: `deep-watch-demote`, `deep-watch-promote`.
-- **One backup file.** `sources.json.bak` is shared with the vendor sweep — whichever sweep ran last is what you'll roll back to. If you want per-sweep backups, file a follow-up.
+- **Per-sweep backups.** This sweep writes to `sources.json.keyword.bak`; the vendor sweep writes to `sources.json.vendor.bak`; the github sweep writes to `sources.json.github.bak`. Successive sweeps no longer clobber each other's rollback target.
 - **JSON validity is mandatory.** Parse-validate before writing sources.json. Abort + log on failure.
 - **Hot topics expire.** Same TTL pattern as vendor hot events — 30 days then auto-removed unless meanwhile crossed sustained-promote thresholds.
 - **Bootstrap is slower than steady state.** The first run with no `discovered_keywords.json` will mine all ~200 source files from scratch and produce a large watch list. Subsequent runs are incremental over today's files only.

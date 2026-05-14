@@ -36,7 +36,9 @@ from pathlib import Path
 from _lib import iter_source_files, whole_word_pattern
 
 ROOT = Path(__file__).resolve().parent.parent
-TODAY = date.today().isoformat()
+# Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
+# orchestrator); fall back to wall-clock date for standalone runs.
+TODAY = os.environ.get("TODAY") or date.today().isoformat()
 
 # Priority vendors — not in discovered_orgs.json but mandatory for the firm view.
 # Aliases match case-insensitive whole-word substring (same logic as the sweep).
@@ -364,7 +366,7 @@ def main():
             "is_priority": slug in PRIORITY_VENDORS,
         }
         # Write per-org file
-        (orgs_dir / f"{slug}.json").write_text(json.dumps(per_org, indent=2))
+        (orgs_dir / f"{slug}.json").write_text(json.dumps(per_org, indent=2, ensure_ascii=False))
 
         index_entries.append({
             "slug": slug,
@@ -399,7 +401,7 @@ def main():
         "entries": index_entries,
         "_note": "Rebuilt every run by scripts/build_org_view.py. Consumed by orgs.html.",
     }
-    (orgs_dir / "index.json").write_text(json.dumps(index_payload, indent=2))
+    (orgs_dir / "index.json").write_text(json.dumps(index_payload, indent=2, ensure_ascii=False))
 
     print(
         f"[build_org_view] wrote orgs/index.json + {len(index_entries)} per-org files. "

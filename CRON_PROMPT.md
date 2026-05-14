@@ -200,7 +200,7 @@ One Agent call:
 - `prompt`: contents of `skills/ai-vendor-sweep/SKILL.md` + footer.
 
 Wait for it. The sweep auto-mutates `sources.json` per its rules (with
-`sources.json.bak` rollback and `vendor_changes.log` audit trail).
+`sources.json.vendor.bak` rollback and `vendor_changes.log` audit trail).
 
 ## 6.7. Rebuild the firm view
 

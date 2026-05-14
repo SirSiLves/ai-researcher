@@ -28,12 +28,15 @@ Usage:
 """
 import argparse
 import json
+import os
 import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TODAY = date.today().isoformat()
+# Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
+# orchestrator); fall back to wall-clock date for standalone runs.
+TODAY = os.environ.get("TODAY") or date.today().isoformat()
 
 
 def load_archive_config(sources):
@@ -116,8 +119,8 @@ def archive_orgs(dry_run=False):
         del orgs[slug]
 
     archive["last_archived"] = TODAY
-    arc_path.write_text(json.dumps(archive, indent=2))
-    src_path.write_text(json.dumps(data, indent=2))
+    arc_path.write_text(json.dumps(archive, indent=2, ensure_ascii=False))
+    src_path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
     print(f"[archive_stale] orgs: archived {len(candidates)} entries → {arc_path.name} "
           f"(active tally: {len(orgs)} orgs, archive: {len(archive_orgs_dict)} orgs)")
 
@@ -188,8 +191,8 @@ def archive_keywords(dry_run=False):
         del keywords[phrase]
 
     archive["last_archived"] = TODAY
-    arc_path.write_text(json.dumps(archive, indent=2))
-    src_path.write_text(json.dumps(data, indent=2))
+    arc_path.write_text(json.dumps(archive, indent=2, ensure_ascii=False))
+    src_path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
     print(f"[archive_stale] keywords: archived {len(candidates)} entries → {arc_path.name} "
           f"(active tally: {len(keywords)} phrases, archive: {len(archive_kw_dict)} phrases)")
 

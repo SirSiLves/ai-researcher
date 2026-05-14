@@ -4,12 +4,17 @@ A self-maintaining daily research pipeline for the LLM / Generative AI / RAG / a
 
 The whole point: **be a step ahead.** Reactive ingestion (news, papers, blogs, jobs, LinkedIn) is necessary but not sufficient. The pipeline adds earlier signals (GitHub trending, Hacker News, vendor velocity) and analytical layers (radar with dual-EMA persistence + cross-source breadth + co-mention clusters) so the long-term shifts are visible alongside the daily news.
 
-> **Pipeline state (as of 2026-05-14).** The pipeline started writing to `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `daily/`, `radar/`, `weekly/` on 2026-05-04. Currently:
-> - **Working:** all 7 collectors, daily synthesis (10 dailies), trend radar (8 valid runs, 9 markdown files), vendor sweep (26 enterprise vendors of which 18 are `_auto_added`, 0 drift against the audit log), firm view (83 orgs incl. 6 priority vendors), keyword sweep (rolling-window first-run bootstrap with 200-phrase tally, 137 promote-tier candidates pending the 2-consecutive-day gate), briefing radar (`radar.html`), full polar radar (`radar-classic.html`).
-> - **Today's radar didn't produce a canonical output.** The `ai-trend-radar` skill seems to have written an old-schema file at the wrong path (since deleted). Next replay will retry.
-> - **Awaiting first successful Monday run:** `trends.md` — the `ai-trends` skill is Monday-only and either hasn't been spawned by the cron yet, or has only seen "no durable shifts" days. Will materialize when a Monday run produces at least one entry.
-> - **Monthly rollups:** `monthly/` has 2026-03 and 2026-04 from earlier backfills; June 2026 will be the first cron-produced monthly rollup.
-> If a folder is missing, it's most likely never-yet-fired rather than broken. Run `ai-replay` to force a fresh pass.
+> **Checking pipeline state.** The pipeline started writing on 2026-05-04. To see what's actually been produced (vs. what should have been), the file system is the source of truth:
+> ```bash
+> ls daily/{YYYY}/{MM}/ | wc -l                 # how many daily digests this month
+> for d in news papers blogs jobs linkedin github hackernews; do
+>   echo "$d: $(ls $d/{YYYY}/{MM}/ 2>/dev/null | wc -l) files this month"
+> done                                            # per-collector cadence — silent collectors stand out
+> ls radar/{YYYY}/{MM}/*.json | wc -l            # radar runs on file
+> tail -50 vendor_changes.log                     # what auto-applied recently
+> python3 scripts/rebuild_change_logs.py          # refresh the derived JSON views (vendor/keyword/github)
+> ```
+> If a folder is missing or sparse, it's most likely "never-yet-fired by the cron" rather than broken. Run `ai-replay` to force a fresh pass — it exercises all 7 collectors plus radar/sweeps end-to-end. (Cron drift is a recurring failure mode: see `CRON_PROMPT.md` for the canonical prompt to paste into the Cowork scheduled-task UI.) `trends.md` is Monday-only; first monthly rollup happens on the first Monday of the month.
 
 ## Pipeline at a glance
 
@@ -52,7 +57,9 @@ Failed subagents don't block the orchestrator. The pipeline degrades gracefully.
 
 ```
 sources.json                 ← all config (collector URLs, radar tuning, sweep thresholds, auto-apply rules)
-sources.json.bak             ← one-step rollback of the last sweep mutation
+sources.json.vendor.bak      ← one-step rollback of the last vendor sweep mutation
+sources.json.keyword.bak     ← one-step rollback of the last keyword sweep mutation
+sources.json.github.bak      ← one-step rollback of the last github sweep mutation
 seed_orgs.json (in scripts/) ← bootstrap list of ~120 AI companies for the sweep
 discovered_orgs.json         ← running tally of every org we've seen (the sweep's state)
 github_stars.json            ← running star counts on watched repos
@@ -114,8 +121,7 @@ index.md                             ← table of contents across all cadences
 
 orgs/index.json                      ← sorted list of all orgs (firm view manifest)
 orgs/{slug}.json                     ← per-org timeline / velocity / topic mix
-radar.html                           ← briefing radar viewer — default morning view (Today + Arcs modes, pinned filter chips)
-radar-classic.html                   ← full polar-radar layout (reference; will be retired once briefing view stabilizes)
+radar.html                           ← briefing radar viewer — Today + Arcs modes, pinned filter chips
 orgs.html                            ← single-page firm view (serve via localhost)
 ```
 
@@ -158,7 +164,7 @@ Runs daily after the firm view. Mines today's source files for 2- and 3-gram phr
 **PROVEN keywords are permanent.** This is the load-bearing protection for long-term trend recognition. Once a keyword crosses ≥14 distinct days, ≥4 source types, and ≥30 days of age (while still being on at least one target list), it gets promoted from `_auto_added_meta` to `_proven_meta`. **Proven entries are NEVER auto-removed**, regardless of TTL, auto-demote, or current activity. A keyword going quiet after being proven means a trend is dormant, not dead — when it returns, we need to recognize it as continuation of the existing arc (visible in radar's `score_180d_ago`, momentum charts), not as a brand-new topic. Manual entries are proven by default.
 
 **Auto-apply safeties** (identical to vendor sweep):
-- `sources.json.bak` rollback before every write.
+- `sources.json.keyword.bak` rollback before every write (per-sweep .bak — see "State & persistence").
 - `keyword_changes.log` append-only audit trail (verbs: `promote-add`, `hot-event-add`, `expire-remove`, `proven-promote`). Legacy `hot-add` (no payload) is deprecated and will not be emitted.
 - JSON parse-validation before write; abort on failure.
 - Auto-demote disabled by default; even when enabled, proven entries are excluded.
@@ -185,7 +191,7 @@ Runs daily after the keyword sweep. Mines the rolling 14-day window of `github/{
 **Soft cap:** `max_watched_repos` (default 80). When exceeded AND `_auto_added` repos are silent for ≥60 days (no trending appearance), the OLDEST-SILENT (up to 3 per run) get moved to `news_collector.github_collector.deep_watch_repos`. The github collector skips the deep-watch list for daily star-fetch but the sweep still recognizes returning trending appearances as `revive`.
 
 **Auto-apply safeties** (identical pattern to vendor + keyword sweeps):
-- `sources.json.bak` rollback before every write.
+- `sources.json.github.bak` rollback before every write (per-sweep .bak).
 - `github_changes.log` append-only audit trail (verbs: `promote-add`, `hot-event-add`, `expire-remove`, `deep-watch-demote`, `deep-watch-promote`).
 - JSON parse-validation before write; abort on failure.
 - Manual entries (no `_auto_added` in `github_stars.json`) are NEVER touched.
@@ -213,7 +219,7 @@ Runs daily after the radar. Reads `discovered_orgs.json` (running tally), today'
 **Auto-apply safeties:**
 - Never writes to `priority_vendors`. Promotions and hot events ALWAYS go to `enterprise_vendors`.
 - Never modifies entries without `_auto_added: true` — manual entries are sacred.
-- Before every write: `cp sources.json sources.json.bak` (one-step rollback).
+- Before every write: `cp sources.json sources.json.vendor.bak` (per-sweep rollback target).
 - After every change: line appended to `vendor_changes.log` (append-only audit trail).
 - Before write: JSON parse-validate; abort if invalid.
 - Each auto-added entry carries `_auto_added`, `_added_on`, `_added_reason`, optionally `_expires_on`.
@@ -284,13 +290,9 @@ Features:
 - **Classification & hot events** — last 10 sweep classifications and recorded hot events.
 - **Context samples** — short snippets of where the org was first seen in source files.
 
-## The HTML radar viewer
+## The HTML radar viewer — `radar.html`
 
-Two HTML viewers ship side-by-side. **`radar.html` is the briefing view** (default — what you open every morning). **`radar-classic.html` is the full polar-radar layout** (kept as a reference for now; will be retired if briefing view holds up over a few weeks of use).
-
-### `radar.html` — briefing mode (default)
-
-Two modes accessible via a tab switch at the top:
+The briefing view, opened every morning. Two modes accessible via a tab switch at the top:
 
 - **Today** — the morning briefing. Up to 10 ranked items: stage transitions (both directions), surging topics, sector births/deaths, breadth jumps vs. yesterday, hot vendor events. Sorted by signal weight. Each clickable. On quiet days, auto-opens the polar-radar disclosure with an explanation. Supporting panels (clusters, sector evolution, top-8 score history) live behind `▸` disclosure buttons — present but quiet.
 
@@ -302,21 +304,16 @@ Two modes accessible via a tab switch at the top:
 
 Both sectors (◆) and topic clusters (🔗) get chips in one row.
 
-**Cross-links**: `→ firm view` (`orgs.html`), `→ classic radar` (`radar-classic.html`), `→ index` (`index.md`).
+**Cross-links**: `→ firm view` (`orgs.html`), `→ index` (`index.md`).
 
 **Maturity badge** next to the date selector: pipeline age in days + which momentum windows are reliable (cold / warming / warm).
 
-### `radar-classic.html` — the full polar radar (reference)
-
-The original single-screen layout: polar radar SVG with concentric stage rings and sector quadrants, plus 6 supporting panels (clusters, sector evolution, top-8 score history, highest breadth, what-moved, topic detail) and a Radar/Scatter toggle. Identical data; busier display. Use this when you specifically want the cloud-of-dots view.
-
-### Serve both:
+### Serve it:
 
 ```bash
 cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher"
 python3 -m http.server 8000
-open http://localhost:8000/radar.html         # briefing (default)
-open http://localhost:8000/radar-classic.html # full polar
+open http://localhost:8000/radar.html
 ```
 
 
@@ -372,8 +369,11 @@ open http://localhost:8000/radar.html
 open vendor_candidates/{YYYY}/{MM}/{date}.md
 tail -50 vendor_changes.log
 
-# Roll back the most recent sources.json mutation
-cp sources.json.bak sources.json
+# Roll back the most recent sources.json mutation (per sweep — pick the one whose
+# change you want to undo)
+cp sources.json.vendor.bak sources.json     # undo last vendor sweep mutation
+cp sources.json.keyword.bak sources.json    # undo last keyword sweep mutation
+cp sources.json.github.bak sources.json     # undo last github sweep mutation
 
 # Run the full pipeline on demand (TODAY only)
 # Tell Claude: "Run ai-replay" (or "/ai-replay")
@@ -413,7 +413,7 @@ Everything else (radar, vendor sweep, weekly, Monday trends, first-Monday-of-mon
 - `discovered_orgs.json` — running org tally. The sweep maintains it. Has every org's mention dates, source types, contexts, velocity history, classification history.
 - `github_stars.json` — running star counts for watched repos. The GitHub collector maintains it.
 - `radar/index.json` — manifest of available radar dates, rebuilt every radar run.
-- `sources.json.bak` — single most recent backup before a sweep mutation.
+- `sources.json.{vendor,keyword,github}.bak` — per-sweep backups, each refreshed at the start of its sweep's auto-apply step. Rolling back a single sweep no longer clobbers the others' rollback target.
 - `vendor_changes.log` / `keyword_changes.log` — append-only audit logs of every auto-apply mutation. Never truncated. Source of truth for sweep history.
 - `vendor_changes.json` / `keyword_changes.json` — derived structured views of the logs, rebuilt every run by `scripts/rebuild_change_logs.py`. Carry parsed mutations, counts per verb/month, currently-active set, expired set, proven set, and (for vendor) a consistency check against `sources.json _auto_added` entries. Safe to delete — rebuilt next run.
 

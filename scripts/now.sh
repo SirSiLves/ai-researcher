@@ -118,7 +118,11 @@ PY
 
 case "${1:-}" in
   ""|--shell)
-    printf '%s\n' "$fields"
+    # Prefix `export ` so a single `eval "$(scripts/now.sh)"` makes these
+    # vars visible to spawned Python subprocesses (otherwise they only set
+    # local shell variables). Scripts still fall back to date.today() if
+    # TODAY isn't in the env, so standalone runs keep working.
+    printf '%s\n' "$fields" | sed 's/^/export /'
     ;;
   --json)
     # Convert KEY=VALUE lines to JSON

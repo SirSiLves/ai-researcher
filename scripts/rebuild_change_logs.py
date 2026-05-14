@@ -37,7 +37,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 NOW = datetime.now().astimezone().isoformat(timespec="seconds")
-TODAY = date.today().isoformat()
+# Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
+# orchestrator); fall back to wall-clock date for standalone runs.
+TODAY = os.environ.get("TODAY") or date.today().isoformat()
 
 # Legacy hot-add entries written at or before this exact ISO timestamp were a
 # known sweep bug: the verb was emitted but sources.json wasn't actually
@@ -314,7 +316,7 @@ def rebuild_one(log_name, json_name):
             "mutations": [],
             "_note": f"{log_name} does not exist yet. Nothing to derive.",
         }
-        json_path.write_text(json.dumps(empty, indent=2))
+        json_path.write_text(json.dumps(empty, indent=2, ensure_ascii=False))
         print(f"[rebuild_change_logs] {log_name} missing → wrote empty {json_name}", file=sys.stderr)
         return
 
@@ -391,7 +393,7 @@ def rebuild_one(log_name, json_name):
                     file=sys.stderr,
                 )
 
-    json_path.write_text(json.dumps(payload, indent=2))
+    json_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
     print(
         f"[rebuild_change_logs] {log_name}: {len(mutations_sorted)} mutations parsed "
         f"({skipped} skipped), {len(active)} currently active, {len(deep_watch_active)} deep-watch, "

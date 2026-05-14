@@ -4,8 +4,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Daily reports
 <!-- INDEX_START -->
-- [2026-05-14 _(v2, updated PM)_](daily/2026/05/2026-05-14-v2.md) — SAP Sapphire Day 3 + Joule Studio 2.0 + Claude becomes primary reasoning engine on SAP Business AI Platform; AWS MCP Server GA; Anthropic programmatic-credit split (June 15); Anthropic SMB IPO read; Subquadratic SubQ stealth exit
-- [2026-05-14 _(morning)_](daily/2026/05/2026-05-14.md) — Cerebras IPO at $56B; Cohere → Aleph Alpha forms ~$20B transatlantic champion; Microsoft × CAISI/AISI eval; SAP Sapphire + n8n $5.2B; Anthropic SMB + finance JV; Stripe Agentic Commerce
+- [2026-05-14](daily/2026/05/2026-05-14.md) — Cerebras IPO at $56B; Cohere → Aleph Alpha ~$20B transatlantic champion; SAP Sapphire Day 3 + Joule Studio 2.0 + Claude on SAP Business AI Platform; AWS MCP Server GA; Anthropic SMB IPO + programmatic-credit split (June 15); Stripe Agentic Commerce
 - [2026-05-13](daily/2026/05/2026-05-13.md) — Google Android Show / Gemini Intelligence + Googlebook; DeepSeek $45B Big Fund round; ServiceNow Otto + Project Arc; Mistral 3 family; OpenAI Voice Intelligence; MCP security thread hardens
 - [2026-05-12](daily/2026/05/2026-05-12.md) — SAP Sapphire Autonomous Enterprise + n8n $5.2B stake; Anthropic legal MCP push; ServiceNow MCP GA; Salesforce Tableau MCP; EU AI Act Omnibus agreed
 - [2026-05-11](daily/2026/05/2026-05-11.md) — OpenAI Deployment Co + Tomoro $4B JV; AWS MCP GA; Pinecone Nexus/KnowQL; CAISI signs DeepMind/Microsoft/xAI
@@ -59,6 +58,18 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 - [2026-05-14](vendor_candidates/2026/05/2026-05-14.md) — applied: 0 promotions, 2 hot, 0 expired; pending: 0; watch: 19; silent: 0
 <!-- ai-vendor-sweep auto-prepends new daily entries above this line. -->
 <!-- VENDOR_END -->
+
+## Keyword sweep
+<!-- KEYWORD_START -->
+- [2026-05-14](keyword_candidates/2026/05/2026-05-14.md) — applied: 0 promotion(s), 0 proven-promotion(s); pending: 131; watch: 78; tally: 436 phrases
+<!-- ai-keyword-sweep auto-prepends new daily entries above this line. -->
+<!-- KEYWORD_END -->
+
+## GitHub sweep
+<!-- GITHUB_START -->
+- [2026-05-14](github_candidates/2026/05/2026-05-14.md) — applied: 0 promotion(s), 0 hot, 0 revived; pending: 0; watch: 0; watched_repos: 47 / deep_watch: 0
+<!-- ai-github-sweep auto-prepends new daily entries above this line. -->
+<!-- GITHUB_END -->
 
 ## Trends — long-term timeline
 - [trends.md](trends.md) — status-meeting briefing of durable shifts in the field; compact dated entries, written by `ai-trends` after each weekly/monthly run.

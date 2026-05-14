@@ -172,7 +172,7 @@ One Agent call:
 - `description`: `"Vendor sweep"`
 - `prompt`: contents of `skills/ai-vendor-sweep/SKILL.md` + footer.
 
-Wait for it. The sweep will auto-mutate `sources.json` per its rules (with `sources.json.bak` rollback and `vendor_changes.log` audit trail).
+Wait for it. The sweep will auto-mutate `sources.json` per its rules (with `sources.json.vendor.bak` rollback and `vendor_changes.log` audit trail).
 
 ## 6.7. Rebuild the firm view
 
@@ -215,7 +215,7 @@ Verdict cache is 30 days. After that, the script re-asks the agent to re-evaluat
 
 ### Safeguards
 
-Same as vendor sweep: `sources.json.bak` rollback before any mutation, audit log, JSON parse-validation before write. Boilerplate judging never mutates sources.json directly — it only affects what enters the tally.
+Same shape as vendor sweep, but with its own backup file: `sources.json.keyword.bak` rollback before any mutation, audit log, JSON parse-validation before write. Boilerplate judging never mutates sources.json directly — it only affects what enters the tally.
 
 ## 6.85. Run the github sweep
 
@@ -310,5 +310,5 @@ Examples:
 - **Sources scanned, theme balance, vendor coverage** — these meta-sections describe the *run*, not the items. They always get regenerated with this run's numbers, not merged.
 - **Failed subagents don't block.** If `ai-blogs` returns an error, note it in the daily's "Sources scanned" and continue with synthesis.
 - **No partial-run rollback.** If the user cancels mid-pipeline (e.g. KeyboardInterrupt), the already-completed steps stay completed. The next replay run will merge with them.
-- **`sources.json.bak`** — exists for the vendor sweep's rollback, not for the daily files. If a daily merge goes wrong, the user can `git checkout daily/{YYYY}/{MM}/{TODAY}.md` (assuming the workspace is git-tracked).
+- **`sources.json.{vendor,keyword,github}.bak`** — per-sweep rollback files, not for the daily files. If a daily merge goes wrong, the user can `git checkout daily/{YYYY}/{MM}/{TODAY}.md` (assuming the workspace is git-tracked).
 - **Don't post the daily content to chat.** §8's one-line confirmation is the only chat output.

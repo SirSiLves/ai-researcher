@@ -11,7 +11,7 @@ Outputs (idempotent across re-runs on the same day):
   - keyword_candidates/{YYYY}/{MM}/{TODAY}.md (today's change log)
   - keyword_changes.log            (append-only audit, one line per mutation)
   - sources.json                   (mutated per auto-apply rules, with backup)
-  - sources.json.bak               (one-step rollback target)
+  - sources.json.keyword.bak       (one-step rollback target — per-sweep .bak)
 
 Run order: scripts/run_keyword_sweep.py
 Hooked from ai-replay §6.8 as a fallback when the agent isn't spawned.
@@ -25,10 +25,12 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from _lib import iter_source_files
+from _lib import iter_source_files, upsert_index_marker_line
 
 ROOT = Path(__file__).resolve().parent.parent
-TODAY = date.today().isoformat()
+# Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
+# orchestrator); fall back to wall-clock date for standalone runs.
+TODAY = os.environ.get("TODAY") or date.today().isoformat()
 NOW_ISO = datetime.now().astimezone().isoformat(timespec="seconds")
 
 # Target list section paths in sources.json
@@ -416,8 +418,10 @@ def main():
             continue
         promotions_to_add.append((phrase, targets, ent))
 
-    # Backup sources.json before mutation
-    shutil.copy(ROOT / "sources.json", ROOT / "sources.json.bak")
+    # Backup sources.json before mutation. Per-sweep .bak so a vendor-sweep
+    # rollback can't accidentally clobber a keyword-sweep snapshot (or vice
+    # versa) when both have run the same day.
+    shutil.copy(ROOT / "sources.json", ROOT / "sources.json.keyword.bak")
 
     log_lines = []
     applied_count = 0
@@ -551,13 +555,16 @@ def main():
                     f'reason="silent {silence_days}d, ranked oldest-silent over cap={cap}"'
                 )
 
-    # Validate JSON before writing
+    # Validate JSON before writing. ensure_ascii=False keeps em-dashes and
+    # other UTF-8 chars in their natural form (Python's default escapes them
+    # to —, which produces churn-only diffs against hand-edited files).
+    # Trailing newline matches the convention of hand-edited config files.
     try:
         json.dumps(sources)
-        (ROOT / "sources.json").write_text(json.dumps(sources, indent=2))
+        (ROOT / "sources.json").write_text(json.dumps(sources, indent=2, ensure_ascii=False) + "\n")
     except Exception as e:
         # Restore backup and abort
-        shutil.copy(ROOT / "sources.json.bak", ROOT / "sources.json")
+        shutil.copy(ROOT / "sources.json.keyword.bak", ROOT / "sources.json")
         print(f"[keyword_sweep] JSON validation failed, restored backup: {e}", file=sys.stderr)
         with (ROOT / "keyword_changes.log").open("a") as f:
             f.write(f"{NOW_ISO} ABORT-INVALID-JSON  -  reason=\"sources.json would not parse after edits\"\n")
@@ -653,7 +660,7 @@ def main():
     discovered["last_updated"] = TODAY
     # Sort keys for stable diffs
     discovered["keywords"] = dict(sorted(discovered["keywords"].items()))
-    discovered_path.write_text(json.dumps(discovered, indent=2))
+    discovered_path.write_text(json.dumps(discovered, indent=2, ensure_ascii=False) + "\n")
 
     # === Step 8: write change log markdown ===
     md_dir = ROOT / f"keyword_candidates/{today_d.year:04d}/{today_d.month:02d}"
@@ -666,7 +673,7 @@ def main():
                if t == "promote" and not discovered["keywords"][p].get("applied_on")]
 
     md = [f"# Keyword sweep — {TODAY}\n",
-          f"_Auto-extending the four keyword lists in sources.json: news web_search_queries, radar topic_taxonomy_seed._auto_added, hackernews filter_keywords, linkedin pulse_topic_queries. Pure-Python implementation via `scripts/run_keyword_sweep.py`. Rollback last mutation: `cp sources.json.bak sources.json`._\n"]
+          f"_Auto-extending the four keyword lists in sources.json: news web_search_queries, radar topic_taxonomy_seed._auto_added, hackernews filter_keywords, linkedin pulse_topic_queries. Pure-Python implementation via `scripts/run_keyword_sweep.py`. Rollback last mutation: `cp sources.json.keyword.bak sources.json`._\n"]
 
     md.append("## 📋 What changed in sources.json today\n")
     if applied_count:
@@ -708,10 +715,18 @@ def main():
     md.append(f"- Currently watching: {len(watch_phrases)}")
     md.append(f"- Discovered today (new): {len(fresh_candidates)}")
     md.append(f"- Today's source files scanned: {len(today_files)}")
-    md.append(f"- sources.json snapshot before edit → sources.json.bak ({applied_count} promotion(s), {len(proven_promotions)} proven-promotion(s))")
+    md.append(f"- sources.json snapshot before edit → sources.json.keyword.bak ({applied_count} promotion(s), {len(proven_promotions)} proven-promotion(s))")
     md.append("")
 
     md_path.write_text("\n".join(md))
+
+    # === Step 8.6: update index.md ===
+    rel_path = md_path.relative_to(ROOT).as_posix()
+    index_line = (f"- [{TODAY}]({rel_path}) — "
+                  f"applied: {applied_count} promotion(s), {len(proven_promotions)} proven-promotion(s); "
+                  f"pending: {len(pending)}; watch: {len(watch_phrases)}; "
+                  f"tally: {len(discovered['keywords'])} phrases")
+    upsert_index_marker_line(ROOT / "index.md", "KEYWORD", TODAY, index_line)
 
     print(f"[keyword_sweep] done. applied {applied_count} promotions, "
           f"{len(proven_promotions)} proven-promotions. "

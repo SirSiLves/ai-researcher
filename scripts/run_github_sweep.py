@@ -13,7 +13,7 @@ Same architecture as the vendor + keyword sweeps:
   - deep-watch demotion when watched_repos exceeds the soft cap
   - manual entries (no _auto_added in github_stars.json) are sacred
   - audit trail to github_changes.log
-  - one-step rollback via sources.json.bak
+  - one-step rollback via sources.json.github.bak (per-sweep .bak)
 
 Outputs (idempotent across re-runs on the same day):
   - github_stars.json           (running per-repo state, extended for promotions)
@@ -26,6 +26,7 @@ Hooked from ai-replay §6.x.
 """
 import argparse
 import json
+import os
 import re
 import shutil
 import sys
@@ -33,8 +34,12 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from _lib import upsert_index_marker_line
+
 ROOT = Path(__file__).resolve().parent.parent
-TODAY = date.today().isoformat()
+# Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
+# orchestrator); fall back to wall-clock date for standalone runs.
+TODAY = os.environ.get("TODAY") or date.today().isoformat()
 NOW_ISO = datetime.now().astimezone().isoformat(timespec="seconds")
 
 # Match a trending-repo H3 line in a github/.../*.md file:
@@ -218,7 +223,8 @@ def main():
         log_lines = []
     else:
         if not args.dry_run:
-            shutil.copy(ROOT / "sources.json", ROOT / "sources.json.bak")
+            # Per-sweep .bak so concurrent vendor/keyword runs don't clobber.
+            shutil.copy(ROOT / "sources.json", ROOT / "sources.json.github.bak")
 
         log_lines = []
         applied_count = 0
@@ -369,14 +375,17 @@ def main():
         try:
             json.dumps(sources)
         except Exception as e:
-            shutil.copy(ROOT / "sources.json.bak", ROOT / "sources.json")
+            shutil.copy(ROOT / "sources.json.github.bak", ROOT / "sources.json")
             print(f"[github_sweep] JSON validation failed, restored backup: {e}", file=sys.stderr)
             with (ROOT / "github_changes.log").open("a") as f:
                 f.write(f'{NOW_ISO} ABORT-INVALID-JSON  -  reason="sources.json would not parse after edits"\n')
             return
         if not args.dry_run:
-            (ROOT / "sources.json").write_text(json.dumps(sources, indent=2))
-            stars_path.write_text(json.dumps(stars_state, indent=2))
+            # ensure_ascii=False preserves em-dashes / other UTF-8 in source
+            # strings; default escaping produces churn-only diffs against
+            # hand-edited files. Trailing newline matches hand-edit convention.
+            (ROOT / "sources.json").write_text(json.dumps(sources, indent=2, ensure_ascii=False) + "\n")
+            stars_path.write_text(json.dumps(stars_state, indent=2, ensure_ascii=False) + "\n")
             if log_lines:
                 with (ROOT / "github_changes.log").open("a") as f:
                     f.write("\n".join(log_lines) + "\n")
@@ -388,7 +397,7 @@ def main():
         f"# GitHub sweep — {TODAY}\n",
         ("_Daily change log of trending-repo discoveries. The pipeline auto-extends "
          "`watched_repos` for repos that consistently trend (sustained-day gate). "
-         "Manual entries are sacred. Rollback the most recent sweep: `cp sources.json.bak sources.json`._\n"),
+         "Manual entries are sacred. Rollback the most recent sweep: `cp sources.json.github.bak sources.json`._\n"),
         "## 📋 What changed in sources.json today\n",
     ]
     if applied_count or hot_count or revived_count:
@@ -440,6 +449,12 @@ def main():
 
     if not args.dry_run:
         out_md.write_text("\n".join(lines))
+        rel_path = out_md.relative_to(ROOT).as_posix()
+        index_line = (f"- [{TODAY}]({rel_path}) — "
+                      f"applied: {applied_count} promotion(s), {hot_count} hot, {revived_count} revived; "
+                      f"pending: {len(pending)}; watch: {len(watch_repos)}; "
+                      f"watched_repos: {len(watched)} / deep_watch: {len(deep_watch)}")
+        upsert_index_marker_line(ROOT / "index.md", "GITHUB", TODAY, index_line)
     print(f"[github_sweep] done. applied {applied_count} promotions, {hot_count} hot events, "
           f"{revived_count} revivals. {len(appearances)} repos seen. wrote {out_md.relative_to(ROOT)}.",
           file=sys.stderr)
