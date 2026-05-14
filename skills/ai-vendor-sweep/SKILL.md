@@ -180,7 +180,23 @@ For removals, delete the matching key from `enterprise_vendors`. Only proceed if
 
 After all edits, validate the JSON parses (do a JSON round-trip in your head: if the result wouldn't be valid JSON, abort and write nothing). Write back to sources.json.
 
-**Step D — Audit log.** Append a line per change to `vendor_changes.log` (text file, append-only, never truncated):
+**Step C.5 — Reject candidates that can't actually be applied.** Before logging anything, filter the change set:
+- A `promote` or `hot_event` candidate MUST have a non-empty `blog_url_hint` in `discovered_orgs.json` (or a hard-coded one from `seed_orgs.json`). If it doesn't, we have no URL to put in `blog_urls=[...]` and the entry would be useless to the news collector. **Skip the candidate and record it in `rejected_no_blog_url` for the change-log markdown.** Do NOT append a log line for rejected candidates.
+- A `promote` candidate slug MUST match the format `[a-z][a-z0-9-]*` (lowercase, kebab-case, alphanumeric+hyphen only). Reject slugs containing other characters; log to `rejected_invalid_slug`.
+- The candidate must NOT already exist in `priority_vendors` (sacred) or in manual `enterprise_vendors` entries.
+
+This step exists because earlier sweep runs logged hot-events for slugs like `consilium-eu`, `stratechery`, `stanford-hai` that have no `blog_url_hint` — those entries can't be applied, but the old skill logged them anyway, creating "ghost promotions" visible in `vendor_changes.json.consistency_check.log_only_not_in_sources`.
+
+**Step D — Audit log.** **ONLY** append a line to `vendor_changes.log` for changes that ACTUALLY mutated `sources.json` in Step C. Never log a decision-not-to-apply, never log a rejected candidate, never log before the JSON write completes. Use the EXACT canonical verbs:
+
+| Verb | When |
+|---|---|
+| `promote-add` | sources.json was mutated to add this slug to `enterprise_vendors` (sustained-day path) |
+| `hot-event-add` | sources.json was mutated to add this slug with a TTL `_expires_on` (hot-event path) |
+| `expire-remove` | sources.json was mutated to delete an expired `_auto_added` entry |
+| `auto-demote` | (only when `auto_demote.enabled: true`) sources.json was mutated to delete a silent `_auto_added` entry |
+
+Do NOT invent other verbs. The legacy `hot-add` verb seen in early logs is DEPRECATED — never emit it. Format:
 
 ```
 2026-05-14T20:08:00 promote-add  xai                  blog_urls=["https://x.ai/news"]                          reason="promote: 123 mentions, 3 src types, 13 days"
@@ -188,7 +204,7 @@ After all edits, validate the JSON parses (do a JSON round-trip in your head: if
 2026-05-14T20:08:00 expire-remove glean                                                                          reason="hot event TTL elapsed"
 ```
 
-One line per change. ISO timestamp + verb + slug + payload + reason. This is the running history of what the auto-applier did — never deleted, never edited.
+ISO timestamp + verb + slug + payload (always `blog_urls=[...]` for adds; optionally `expires=YYYY-MM-DD` for hot events) + reason. The log is the running history of what the auto-applier DID — never what it considered. If the consistency check in `vendor_changes.json` ever shows non-empty `log_only_not_in_sources`, that's a bug in this step; investigate immediately.
 
 **Step E — Update discovered_orgs.json.** For every org we just promoted, set `coverage: "enterprise"` and `auto_applied_on: "{TODAY}"`. For removals, set back to `coverage: "uncovered"` (or `"informal_url_list"` if the host matches a URL list) and note `removed_on: "{TODAY}"` with the reason.
 

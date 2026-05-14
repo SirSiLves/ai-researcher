@@ -133,5 +133,5 @@ In-place update pattern: find the existing line matching `- [{WEEK_ID}](weekly/.
 - Don't reproduce >15-word verbatim excerpts.
 - Keep the weekly file under ~300 lines at week-end. Earlier in the week shorter.
 - The Sunday run is the "final" version — it should be the most complete and polished.
-- This skill OVERWRITES the weekly file each day. That's intentional — the cumulative snapshot replaces the previous day's. No `-v2` versioning. The only way `-v2` should appear is if the orchestrator double-fires on the same day (rare error case).
+- This skill OVERWRITES the weekly file each day. That's intentional — the cumulative snapshot replaces the previous day's. **No `-v2` versioning ever, including same-day re-runs.** If invoked twice on the same day (manual re-run from `ai-replay`, or orchestrator double-fire), the second run overwrites the first — both are derived from the same daily files anyway.
 - Inaugural week edge case: if MONDAY of this week is before the very first daily file in the archive, treat the start of the data as the effective MONDAY. Note in the H1 subtitle: "_Pipeline still warming up — week-of-data starts {first_daily_date}._"

@@ -15,7 +15,15 @@ You produce TWO signals per day:
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `github_collector` section only.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` and use `TODAY`, `WEEK_ID`, `MONTH`. Standalone fallback: `eval "$(scripts/now.sh)"`. Do NOT compute the date locally.
-- Output: `github/{YYYY}/{MM}/{TODAY}.md`. If exists, append `-v2`, `-v3`.
+- Output: `github/{YYYY}/{MM}/{TODAY}.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
+  1. Read the existing file. Parse "Trending now" repos by `owner/name` (primary key). Parse "Watched-repo movers" by `owner/name` too.
+  2. For each repo from this run: if its `owner/name` already appears in the existing file, **update the metrics in-place** (today's star count and delta are time-sensitive and the latest run has the freshest values) but preserve any manual commentary line below the metric row.
+  3. If the repo is genuinely new (not in the existing file), append to the matching section.
+  4. The "Sources scanned" meta-section always gets rewritten with this run's numbers.
+  5. Preserve manual edits to headings, section order, and prose.
+  6. Add a single italic line under the H1: `_Merged run at {ISO_TS} — {N} existing repos refreshed, {M} new added._`
+  Never create `-v2`, `-v3`. The same-day file is canonical.
+  **Special: `github_stars.json` state.** This state file is keyed by `owner/name`, not by date, and is always "latest counts wins." Merging the markdown file does NOT change the state-file logic — always overwrite each repo's entry with today's star count.
 - **State file:** `github_stars.json` at workspace root (running tally of watched-repo star counts). Read it, mutate it, write it back.
 
 ## 2. Gather — trending (parallel WebFetch)

@@ -9,7 +9,14 @@ You are the **news collector** in the AI Researcher pipeline. Your job is to cap
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `news_collector` section only.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
-- Output: `news/{YYYY}/{MM}/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
+- Output: `news/{YYYY}/{MM}/YYYY-MM-DD.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules (apply in order):
+  1. Read the existing file. Parse each item under "Major announcements & releases" and "Other notable items" by its link URL (primary key) and by normalized title (secondary key for items missing a URL).
+  2. For each item from this run: if its URL or normalized title already appears in the existing file, **drop the new version** — the existing entry wins. (Preserves any manual edits the user made between runs.)
+  3. If the new item is genuinely new, append it to the matching section in the existing file.
+  4. The "Priority vendor coverage", "Enterprise vendor coverage", "Theme balance", and "Sources scanned" meta-sections always get **rewritten with this run's numbers** — they describe the run, not the items.
+  5. Preserve manual edits to headings, section order, and prose in the body.
+  6. Add a single italic line under the H1: `_Merged run at {ISO_TS} — {N} existing items kept, {M} new items added._`
+  Never create `-v2`, `-v3` etc. The same-day file is the canonical record for that date.
 
 ## 2. Gather (parallel)
 

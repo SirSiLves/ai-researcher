@@ -13,7 +13,15 @@ You are the **LinkedIn collector** in the AI Researcher pipeline. Your job is to
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` and use the `linkedin_collector` section. Note `pulse_topic_queries`, `min_substance_chars`, `languages_allowed`, `url_capture_rule`.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
-- Output: `linkedin/{YYYY}/{MM}/YYYY-MM-DD.md`. If exists, append `-v2`, `-v3`, etc.
+- Output: `linkedin/{YYYY}/{MM}/YYYY-MM-DD.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
+  1. Read the existing file. Parse each item by its LinkedIn URL (Pulse permalink, post URL, hashtag-post URL — primary key). For items without a URL (rare), use normalized `{author-or-tag} — {first-50-chars}`.
+  2. For each item from this run: if its URL already appears in the existing file, **drop the new version** — the existing entry wins (preserves manual annotations).
+  3. If the new item is genuinely new, append it to the matching section.
+  4. The "Sources scanned" meta-section always gets rewritten with this run's numbers.
+  5. Preserve manual edits to headings, section order, and prose.
+  6. Add a single italic line under the H1: `_Merged run at {ISO_TS} — {N} existing items kept, {M} new added._`
+  7. The Chrome-not-connected stub case: if today's file is a stub from an earlier failed run and this run successfully connected to Chrome, **overwrite the stub entirely** — don't try to merge with stub content.
+  Never create `-v2`, `-v3`. The same-day file is canonical.
 
 ## 2. Probe Chrome
 1. Call `mcp__Claude_in_Chrome__list_connected_browsers`.

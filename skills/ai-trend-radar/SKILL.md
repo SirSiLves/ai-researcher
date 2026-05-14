@@ -37,7 +37,10 @@ You read everything in the rolling window (default 30 days), apply scoring with 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` `radar_config` section — all weights, thresholds, EMA alpha, and the topic taxonomy seed live there. Do NOT hardcode any of these.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
-- Output paths: `radar/{YYYY}/{MM}/{date}.md` and `radar/{date}.json`. If either exists, append `-v2`, `-v3`.
+- Output paths: `radar/{YYYY}/{MM}/{date}.md` and `radar/{date}.json`. **If either exists for the same date, REPLACE in place — do NOT write `-v2`.** Unlike the collectors, the radar is fully derived from a single scoring pass over the rolling window — there's no manual editorial work to preserve. Re-running for today produces an authoritative new snapshot.
+  - **JSON:** overwrite the file with the new run's full content. The EMA computation still reads `radar/{yesterday}.json` (not today's own earlier version) — so re-running today doesn't compound-smooth its own scores.
+  - **Markdown:** overwrite the file with the new run's full content. Add a single italic line under the subtitle: `_Re-run at {ISO_TS} — replaces the earlier same-day snapshot._`
+  Never create `-v2`, `-v3`. The same-day file is the canonical record.
 
 ## 2. Gather inputs
 

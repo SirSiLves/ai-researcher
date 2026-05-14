@@ -20,7 +20,14 @@ Each layer reads only the layer immediately below.
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
 - Compute the previous month: today minus ~30 days, formatted `YYYY-MM`. Example: invoked 2026-06-01 → previous month is `2026-05`.
-- Output: `monthly/{YYYY}/{YYYY-MM}.md`. If exists, append `-v2`, `-v3`, etc. (never overwrite).
+- Output: `monthly/{YYYY}/{YYYY-MM}.md`. **If the file already exists for the same target month, MERGE — do NOT write `-v2`.** Merge rules:
+  1. Read the existing file. Parse each item under "Defining themes", "Major releases & milestones", and "Research highlights" by its `**Theme name**` / `**Title**` (primary key).
+  2. For each item from this run: if the same theme/title already appears in the existing file, **drop the new version** — the existing entry wins (preserves manual editorial work in the monthly synthesis).
+  3. If the new item is genuinely new (a theme or release the prior run didn't surface), append it to the matching section.
+  4. The "TL;DR", "Switzerland / job market pulse", "What changed vs. last month", and "Sources read this month" sections always get **rewritten with this run's content** — these are derived summaries, not append-only lists.
+  5. Preserve manual edits to headings, section order, and prose in the body.
+  6. Add a single italic line under the H1: `_Merged run at {ISO_TS} — {N} existing items kept, {M} new added. Summary sections regenerated._`
+  Never create `-v2`, `-v3`. The same-month file is the canonical record.
 
 ## 2. Gather inputs
 
