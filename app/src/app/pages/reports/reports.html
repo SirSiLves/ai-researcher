@@ -1,70 +1,86 @@
 <section class="page reports">
-  <header class="page__header">
+  <header class="page-head">
     <div>
-      <h1 class="page__title">Reports</h1>
-      <p class="page__subtitle">
-        {{ entries().length }} reports across {{ cadences().length }} cadences
-      </p>
+      <h1 class="page-head__title">Reports</h1>
+      <p class="page-head__sub">Every report the pipeline has produced — dailies, weeklies, monthlies, sweeps</p>
+    </div>
+    <div class="page-head__meta">
+      <span><strong>{{ entries().length }}</strong> entries</span>
+      <span><strong>{{ cadences().length }}</strong> cadences</span>
+      <span>showing <strong>{{ filtered().length }}</strong></span>
     </div>
   </header>
 
-  @if (error(); as e) {
-    <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
-  }
-
-  <div class="reports__toolbar">
+  <div class="reports__filters">
     <p-iconfield iconPosition="left" styleClass="reports__search">
       <p-inputicon class="pi pi-search" />
       <input pInputText
+             type="search"
+             name="reports-search"
              [ngModel]="query()"
              (ngModelChange)="query.set($event)"
-             placeholder="Search headlines or dates…" />
+             placeholder="Search headlines, dates, cadence" />
     </p-iconfield>
 
-    <div class="cadence-toggles">
-      @for (c of cadences(); track c) {
-        <button class="cadence-btn"
-                [class.is-active]="isActive(c)"
-                [style.--c-color]="cadenceColor(c)"
-                (click)="toggle(c, !isActive(c))">
-          <span class="cadence-btn__dot"></span>
-          {{ c.replace('_', ' ') }}
-        </button>
-      }
-      @if (activeCadences().size) {
-        <button class="cadence-btn cadence-btn--clear" (click)="clearFilters()">
-          clear
-        </button>
-      }
-    </div>
+    <p-multiselect [options]="cadenceOptions()"
+                   [ngModel]="activeCadences()"
+                   (ngModelChange)="activeCadences.set($event)"
+                   optionLabel="label"
+                   optionValue="value"
+                   placeholder="All cadences"
+                   [maxSelectedLabels]="2"
+                   selectedItemsLabel="{0} cadences"
+                   styleClass="reports__cadence" />
+
+    <label class="reports__versioned">
+      <p-toggleswitch [ngModel]="showVersioned()"
+                      (ngModelChange)="showVersioned.set($event)"
+                      inputId="reports-versioned" />
+      <span>Versioned</span>
+    </label>
+
+    <button pButton type="button" text size="small" class="reports__clear" (click)="clearFilters()">Clear</button>
   </div>
 
+  @if (error(); as e) {
+    <p class="reports__error">{{ e }}</p>
+  }
+
   @if (loading()) {
-    <div class="report-list">
-      @for (i of [1,2,3,4,5,6]; track i) {
-        <p-skeleton width="100%" height="3rem"></p-skeleton>
+    <div class="reports__skeleton">
+      @for (i of [1,2,3,4,5,6,7,8]; track i) {
+        <p-skeleton width="100%" height="2.1rem"></p-skeleton>
       }
     </div>
   } @else {
-    <div class="report-list">
-      @for (e of filtered(); track e.cadence + '|' + e.date_id + '|' + e.path) {
-        <button class="report-row"
-                (click)="open(e)"
-                (keydown.enter)="open(e)">
-          <span class="report-badge" [style.background-color]="cadenceColor(e.cadence)">
-            {{ e.cadence_label }}
-          </span>
-          <time class="report-date tabular">{{ e.date_id }}</time>
-          <span class="report-headline">{{ e.headline || '—' }}</span>
-          @if (e.is_versioned) {
-            <span class="report-versioned">v</span>
-          }
-          <i class="pi pi-arrow-right report-chevron"></i>
-        </button>
-      } @empty {
-        <p class="report-empty">No reports match your filters.</p>
-      }
-    </div>
+    <p-table [value]="filtered()"
+             [paginator]="true" [rows]="40" [rowsPerPageOptions]="[20,40,80,200]"
+             [scrollable]="true" scrollHeight="62vh"
+             sortField="sort_date" [sortOrder]="-1"
+             styleClass="reports__tbl">
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="cadence" style="width:9rem">Cadence <p-sortIcon field="cadence" /></th>
+          <th pSortableColumn="sort_date" style="width:7rem">Date <p-sortIcon field="sort_date" /></th>
+          <th>Headline</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-e>
+        <tr class="reports__row"
+            [class.is-selected]="selected()?.path === e.path"
+            (click)="open(e)">
+          <td>
+            <span class="chip" [class.chip--accent]="e.cadence === 'daily'">{{ cadenceLabel(e.cadence) }}</span>
+            @if (e.is_versioned) { <span class="chip reports__ver">v</span> }
+          </td>
+          <td class="tabular muted">{{ e.date_id }}</td>
+          <td class="reports__headline">{{ e.headline || '—' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr><td colspan="3" class="muted" style="text-align:center; padding:1.5rem">No reports match.</td></tr>
+      </ng-template>
+    </p-table>
   }
 
   <p-drawer [visible]="!!selected()"
@@ -74,21 +90,17 @@
             [showCloseIcon]="false">
     <ng-template #headless>
       @if (selected(); as sel) {
-        <header class="drawer-head">
-          <div class="drawer-head__title">
-            <span class="report-badge" [style.background-color]="cadenceColor(sel.cadence)">{{ sel.cadence_label }}</span>
-            <h2 class="drawer-head__h2 tabular">{{ sel.date_id }}</h2>
+        <div class="reports__drawer-head">
+          <div>
+            <div class="reports__drawer-eyebrow muted">{{ cadenceLabel(sel.cadence) }}</div>
+            <h2 class="reports__drawer-h2 tabular">{{ sel.date_id }}</h2>
           </div>
-          <p-button icon="pi pi-times"
-                    severity="secondary"
-                    [text]="true"
-                    [rounded]="true"
-                    aria-label="Close"
-                    (onClick)="close()" />
-        </header>
-        <div class="drawer-body">
+          <button class="btn btn--ghost" type="button" (click)="close()" aria-label="Close">Close</button>
+        </div>
+        <div class="reports__drawer-meta muted mono">{{ sel.path }}</div>
+        <div class="reports__drawer-body">
           @if (markdownLoading() && !markdown()) {
-            <p-skeleton width="80%" height="1rem"></p-skeleton>
+            <p-skeleton width="80%" height="0.95rem"></p-skeleton>
             <p-skeleton width="100%" height="6rem"></p-skeleton>
           } @else if (markdown()) {
             <app-markdown-viewer [source]="markdown()" />

@@ -59,6 +59,10 @@ export interface RadarSector {
   name: string;
   description?: string;
   topic_ids: string[];
+  first_seen?: string;
+  consecutive_low_days?: number;
+  topic_count?: number;
+  active_orgs?: number;
 }
 
 export interface StageMovement {
@@ -69,12 +73,38 @@ export interface StageMovement {
   reason?: string;
 }
 
+export interface TopicCluster {
+  id: string;
+  name: string;
+  topic_ids: string[];
+  size: number;
+  first_seen: string;
+  cluster_score_slow: number;
+  cluster_score_fast: number;
+  cluster_direction: 'rising' | 'falling' | 'steady' | string;
+  cluster_breadth_7d: number;
+  members_moving_together: boolean;
+}
+
+export interface SectorMovement {
+  sector: string;
+  type?: string;
+  from?: string;
+  to?: string;
+  reason?: string;
+  [k: string]: any;
+}
+
 export interface RadarDay {
   date: string;
+  rolling_window_days?: number;
   sectors: RadarSector[];
   topics: RadarTopic[];
+  topic_clusters?: TopicCluster[];
   stage_movements: StageMovement[];
-  sector_movements?: any[];
+  sector_movements?: SectorMovement[];
+  sectors_spawned_today?: string[];
+  sectors_dissolved_today?: string[];
   background_topics_count?: number;
 }
 
@@ -103,6 +133,19 @@ export interface OrgsIndex {
   _note?: string;
 }
 
+export interface OrgVelocity {
+  velocity_7d: number;
+  velocity_28d_avg: number;
+  velocity_ratio: number;
+  velocity_status: 'surging' | 'accelerating' | 'steady' | 'cooling' | string;
+}
+
+export interface OrgVelocityPoint {
+  date: string;
+  velocity_7d: number;
+  velocity_ratio: number;
+}
+
 export interface OrgDetail {
   slug: string;
   generated_at: string;
@@ -114,11 +157,19 @@ export interface OrgDetail {
   last_seen: string;
   total_mentions: number;
   distinct_days: number;
+  is_priority?: boolean;
   distinct_source_types: string[];
   mentions_by_source_type: Record<string, number>;
-  daily_history?: Array<{ date: string; mentions: number }>;
-  topics?: Array<{ id: string; mentions: number; first_seen: string; last_seen: string }>;
-  recent_context?: Array<{ date: string; source_type: string; snippet: string; path: string }>;
+  mentions_by_date?: Record<string, number>;
+  aliases?: string[];
+  context_samples?: string[];
+  velocity?: OrgVelocity;
+  velocity_history?: OrgVelocityPoint[];
+  topic_mix?: Record<string, number>;
+  radar_appearances?: any[];
+  hot_events?: any[];
+  classification_history?: any[];
+  last_classification?: any;
   [k: string]: any;
 }
 

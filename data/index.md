@@ -4,6 +4,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Daily reports
 <!-- INDEX_START -->
+- [2026-05-15](daily/2026/05/2026-05-15.md) — Cerebras (CBRS) trades — first-day ~$70B market cap; PwC + Anthropic 30,000-staff Claude training; Anthropic + SAP Claude as primary engine on Business AI Platform; Cisco lifts AI-orders forecast to $9B + 4,000 layoffs; xAI Grok Build coding agent + Grok 4.3 default; LangChain Interrupt — Deep Agents Deploy + LangSmith Engine; Snowflake Cobuild + Cortex Guardrails GA; GitHub Skills wave (obra/superpowers, mattpocock/skills); arXiv 1yr-ban on hallucinated citations
 - [2026-05-14](daily/2026/05/2026-05-14.md) — Cerebras IPO at $56B; Cohere → Aleph Alpha ~$20B transatlantic champion; SAP Sapphire Day 3 + Joule Studio 2.0 + Claude on SAP Business AI Platform; AWS MCP Server GA; Anthropic SMB IPO + programmatic-credit split (June 15); Stripe Agentic Commerce
 - [2026-05-13](daily/2026/05/2026-05-13.md) — Google Android Show / Gemini Intelligence + Googlebook; DeepSeek $45B Big Fund round; ServiceNow Otto + Project Arc; Mistral 3 family; OpenAI Voice Intelligence; MCP security thread hardens
 - [2026-05-12](daily/2026/05/2026-05-12.md) — SAP Sapphire Autonomous Enterprise + n8n $5.2B stake; Anthropic legal MCP push; ServiceNow MCP GA; Salesforce Tableau MCP; EU AI Act Omnibus agreed
@@ -92,6 +93,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Trend radar
 <!-- RADAR_START -->
+- [2026-05-15](radar/2026/05/2026-05-15.md) — 37 topics, 1 stage movement, top emerging: Agent skills wave (Claude Code Skills beta, anthropics/skills, mattpocock/skills, gstack)
 - [2026-05-14](radar/2026/05/2026-05-14.md) — 39 topics, 7 stage movements, top emerging: MCP adoption (servers, registries, vendor uptake)
 - [2026-05-13](radar/2026/05/2026-05-13.md) — 32 topics, 5 stage movements, top emerging: AI engineer hiring (Switzerland + global)
 - [2026-05-12](radar/2026/05/2026-05-12.md) — 27 topics, 4 stage movements, top emerging: AI engineer hiring (Switzerland + global)
@@ -158,18 +160,21 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Vendor sweep
 <!-- VENDOR_START -->
+- [2026-05-15](vendor_candidates/2026/05/2026-05-15.md) — applied: 0 promotions, 0 hot, 0 expired; pending: 0; watch: 26; silent: 0
 - [2026-05-14](vendor_candidates/2026/05/2026-05-14.md) — applied: 0 promotions, 2 hot, 0 expired; pending: 0; watch: 19; silent: 0
 <!-- ai-vendor-sweep auto-prepends new daily entries above this line. -->
 <!-- VENDOR_END -->
 
 ## Keyword sweep
 <!-- KEYWORD_START -->
+- [2026-05-15](data/keyword_candidates/2026/05/2026-05-15.md) — applied: 131 promotion(s), 0 proven-promotion(s); pending: 0; watch: 101; tally: 572 phrases
 - [2026-05-14](keyword_candidates/2026/05/2026-05-14.md) — applied: 0 promotion(s), 0 proven-promotion(s); pending: 131; watch: 78; tally: 436 phrases
 <!-- ai-keyword-sweep auto-prepends new daily entries above this line. -->
 <!-- KEYWORD_END -->
 
 ## GitHub sweep
 <!-- GITHUB_START -->
+- [2026-05-15](data/github_candidates/2026/05/2026-05-15.md) — applied: 0 promotion(s), 0 hot, 0 revived; pending: 0; watch: 10; watched_repos: 47 / deep_watch: 0
 - [2026-05-14](github_candidates/2026/05/2026-05-14.md) — applied: 0 promotion(s), 0 hot, 0 revived; pending: 0; watch: 0; watched_repos: 47 / deep_watch: 0
 <!-- ai-github-sweep auto-prepends new daily entries above this line. -->
 <!-- GITHUB_END -->

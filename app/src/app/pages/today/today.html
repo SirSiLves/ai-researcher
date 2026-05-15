@@ -1,58 +1,65 @@
 <section class="page today">
-  <header class="page__header">
+  <header class="page-head">
     <div>
-      <h1 class="page__title">Today</h1>
-      <p class="page__subtitle">
-        @if (current(); as c) {
-          {{ formattedDate() }} &middot; {{ c.headline }}
-        } @else {
-          Daily AI dispatch synthesized from seven collectors.
-        }
-      </p>
+      <h1 class="page-head__title">Today</h1>
+      <p class="page-head__sub">Daily AI research briefing · one ranked digest per day</p>
     </div>
-    <div class="today__controls">
-      <p-button icon="pi pi-chevron-left"
-                severity="secondary"
-                [text]="true"
-                [disabled]="!canPrev()"
-                (onClick)="prev()"
-                aria-label="Previous edition" />
-      <p-button icon="pi pi-chevron-right"
-                severity="secondary"
-                [text]="true"
-                [disabled]="!canNext()"
-                (onClick)="next()"
-                aria-label="Next edition" />
-      <p-select [options]="options()"
-                [ngModel]="selectedDate()"
-                (ngModelChange)="onPick($event)"
-                optionLabel="label"
-                optionValue="value"
-                [filter]="true"
-                filterPlaceholder="Jump to date…"
-                [showClear]="false"
-                [style]="{ minWidth: '18rem' }"
-                placeholder="Pick a date"
-                appendTo="body" />
-    </div>
+    @if (current(); as c) {
+      <div class="page-head__meta">
+        <span class="tabular">{{ c.date_id }}</span>
+        <span>·</span>
+        <span>{{ formattedDate() }}</span>
+        <span>·</span>
+        <span><strong>{{ dailies().length }}</strong> editions</span>
+      </div>
+    }
   </header>
 
-  @if (error(); as e) {
-    <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
-  }
+  <div class="today__layout">
+    <aside class="today__sidebar" aria-label="Edition archive">
+      <div class="today__sidebar-head">
+        <span class="today__sidebar-label">{{ dailies().length }} editions</span>
+        <div class="today__nav">
+          <button class="btn btn--ghost" (click)="next()" [disabled]="!canNext()" type="button" aria-label="Newer edition">↑</button>
+          <button class="btn btn--ghost" (click)="prev()" [disabled]="!canPrev()" type="button" aria-label="Older edition">↓</button>
+        </div>
+      </div>
 
-  @if (loading() && !markdown()) {
+      <p-listbox [options]="dailies()"
+                 [ngModel]="selectedDate()"
+                 (ngModelChange)="onPick($event)"
+                 optionLabel="date_id"
+                 optionValue="date_id"
+                 [filter]="true"
+                 filterPlaceholder="Filter dates"
+                 styleClass="today__listbox"
+                 [listStyle]="{ 'max-height': 'calc(100vh - 240px)' }">
+        <ng-template #item let-d>
+          <div class="today__listitem" [class.is-current]="d.date_id === selectedDate()">
+            <span class="today__listdate tabular">{{ d.date_id.slice(5) }}</span>
+            <span class="today__listheadline">{{ d.headline || '—' }}</span>
+          </div>
+        </ng-template>
+      </p-listbox>
+    </aside>
+
     <article class="today__article">
-      <p-skeleton width="68%" height="1.5rem"></p-skeleton>
-      <p-skeleton width="40%" height="0.9rem"></p-skeleton>
-      <p-skeleton width="100%" height="0.9rem"></p-skeleton>
-      <p-skeleton width="92%" height="0.9rem"></p-skeleton>
-      <p-skeleton width="96%" height="0.9rem"></p-skeleton>
-      <p-skeleton width="60%" height="0.9rem"></p-skeleton>
+      @if (error(); as e) {
+        <p class="today__error">{{ e }}</p>
+      }
+
+      @if (loading() && !markdown()) {
+        <div class="today__skeleton">
+          <p-skeleton width="50%" height="1.6rem"></p-skeleton>
+          <p-skeleton width="32%" height="0.85rem"></p-skeleton>
+          <p-skeleton width="100%" height="0.9rem"></p-skeleton>
+          <p-skeleton width="93%" height="0.9rem"></p-skeleton>
+          <p-skeleton width="97%" height="0.9rem"></p-skeleton>
+          <p-skeleton width="80%" height="0.9rem"></p-skeleton>
+        </div>
+      } @else if (markdown()) {
+        <app-markdown-viewer [source]="markdown()" />
+      }
     </article>
-  } @else if (markdown()) {
-    <article class="today__article">
-      <app-markdown-viewer [source]="markdown()" />
-    </article>
-  }
+  </div>
 </section>

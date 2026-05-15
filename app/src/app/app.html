@@ -1,31 +1,44 @@
-<header class="appbar">
-  <div class="appbar__inner">
-    <a routerLink="/today" class="brand" aria-label="AI Researcher home">
-      <span class="brand__logo" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 17 L9 5 L15 17 M5.5 12 L12.5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="18.5" cy="13" r="3" stroke="currentColor" stroke-width="2"/>
-        </svg>
-      </span>
-      <span class="brand__name">AI Researcher</span>
-    </a>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a routerLink="/today" class="brand" aria-label="AI Researcher home">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__text">AI&nbsp;Researcher</span>
+      </a>
 
-    <nav class="appbar__tabs" aria-label="Primary">
-      @for (tab of tabs; track tab.path) {
-        <a [routerLink]="tab.path"
-           routerLinkActive="is-active"
-           class="appbar__tab">
-          {{ tab.label }}
-        </a>
-      }
-    </nav>
+      <nav class="nav" aria-label="Primary">
+        @for (tab of tabs; track tab.path) {
+          <a [routerLink]="tab.path"
+             routerLinkActive="is-active"
+             class="nav__link">{{ tab.label }}</a>
+        }
+      </nav>
 
-    <div class="appbar__actions">
-      <span class="appbar__date">{{ today() }}</span>
+      <div class="topbar__right">
+        <button pButton
+                type="button"
+                text
+                rounded
+                size="small"
+                class="theme-toggle"
+                (click)="toggleTheme()"
+                [attr.aria-label]="'Switch to ' + (theme() === 'dark' ? 'light' : 'dark') + ' mode'"
+                [title]="theme() === 'dark' ? 'Light mode' : 'Dark mode'">
+          <i class="pi" [class.pi-sun]="theme() === 'dark'" [class.pi-moon]="theme() === 'light'"></i>
+        </button>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<main class="app-main">
-  <router-outlet />
-</main>
+  <main class="app-shell">
+    <router-outlet />
+  </main>
+
+  <footer class="site-footer">
+    <span>AI Researcher</span>
+    <span class="muted">·</span>
+    <span class="muted">Local feed</span>
+    <span class="muted">·</span>
+    <span class="muted">© {{ year }}</span>
+  </footer>
+</div>

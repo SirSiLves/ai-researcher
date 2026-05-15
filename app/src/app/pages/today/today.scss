@@ -1,22 +1,81 @@
-.today {}
-
-.today__controls {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+.today__layout {
+  display: grid;
+  grid-template-columns: 17rem minmax(0, 1fr);
+  gap: 2.25rem;
+  align-items: start;
 }
 
-.today__article {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--r-4);
-  box-shadow: var(--shadow-1);
-  padding: 2rem clamp(1.25rem, 3vw, 2.5rem) 2.25rem;
+.today__sidebar {
+  position: sticky;
+  top: calc(var(--topbar-h) + 1rem);
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.6rem;
+}
+.today__sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+.today__sidebar-label {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--fg-4);
+  letter-spacing: 0.02em;
+}
+.today__nav { display: inline-flex; gap: 0.15rem; }
+.today__nav .btn { padding: 0.18rem 0.45rem; font-size: 0.85rem; line-height: 1; }
+
+.today__listitem {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.55rem;
+  width: 100%;
+}
+.today__listdate {
+  font-size: 0.72rem;
+  color: var(--fg-4);
+  font-variant-numeric: tabular-nums;
+}
+.today__listheadline {
+  font-size: 0.81rem;
+  color: var(--fg-2);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.today__listitem.is-current .today__listdate,
+.today__listitem.is-current .today__listheadline { color: var(--fg); font-weight: 500; }
+
+:host ::ng-deep .today__listbox .p-listbox-option { padding: 0.4rem 0.6rem; }
+:host ::ng-deep .today__listbox .p-listbox-list { gap: 0; }
+
+.today__article { min-width: 0; }
+
+.today__error {
+  color: var(--neg);
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
 }
 
-@media (max-width: 640px) {
-  .today__article { padding: 1.25rem 1rem 1.5rem; }
+.today__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-width: 68ch;
+}
+
+@media (max-width: 900px) {
+  .today__layout {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .today__sidebar {
+    position: static;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
 }

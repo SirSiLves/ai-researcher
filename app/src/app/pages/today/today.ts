@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
 import { Skeleton } from 'primeng/skeleton';
-import { Message } from 'primeng/message';
-import { Button } from 'primeng/button';
+import { Listbox } from 'primeng/listbox';
 
 import { DataService, ReportEntry } from '../../services/data.service';
 import { MarkdownViewer } from '../../components/markdown-viewer/markdown-viewer';
@@ -12,7 +10,7 @@ import { MarkdownViewer } from '../../components/markdown-viewer/markdown-viewer
 @Component({
   selector: 'app-today',
   standalone: true,
-  imports: [FormsModule, Select, Skeleton, Message, Button, MarkdownViewer],
+  imports: [FormsModule, Skeleton, Listbox, MarkdownViewer],
   templateUrl: './today.html',
   styleUrl: './today.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -39,19 +37,15 @@ export class TodayPage {
     return this.dailies().findIndex(d => d.date_id === date);
   });
 
-  readonly options = computed(() =>
-    this.dailies().map(d => ({
-      label: `${d.date_id} — ${d.headline.slice(0, 70)}${d.headline.length > 70 ? '…' : ''}`,
-      value: d.date_id
-    }))
-  );
-
   readonly formattedDate = computed(() => {
     const d = this.selectedDate();
     if (!d) return '';
     const parsed = new Date(d + 'T00:00:00');
     return parsed.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   });
+
+  readonly canPrev = computed(() => this.currentIndex() < this.dailies().length - 1);
+  readonly canNext = computed(() => this.currentIndex() > 0);
 
   constructor() {
     this.data.loadReportsIndex().then(idx => {
@@ -61,7 +55,7 @@ export class TodayPage {
       const initial = routeParam ?? dailies[0]?.date_id ?? null;
       this.selectedDate.set(initial);
     }).catch(err => {
-      this.error.set(`Failed to load reports index: ${err.message ?? err}`);
+      this.error.set(`Couldn't load reports index: ${err.message ?? err}`);
       this.loading.set(false);
     });
 
@@ -89,8 +83,8 @@ export class TodayPage {
     });
   }
 
-  onPick(value: string) {
-    this.selectedDate.set(value);
+  onPick(value: string | null) {
+    if (value) this.selectedDate.set(value);
   }
 
   prev() {
@@ -104,7 +98,4 @@ export class TodayPage {
     const i = this.currentIndex();
     if (i > 0) this.selectedDate.set(list[i - 1].date_id);
   }
-
-  canPrev = computed(() => this.currentIndex() < this.dailies().length - 1);
-  canNext = computed(() => this.currentIndex() > 0);
 }

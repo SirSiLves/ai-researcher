@@ -1,135 +1,202 @@
 <section class="page trends">
-  <header class="page__header">
+  <header class="page-head">
     <div>
-      <h1 class="page__title">Trends</h1>
-      <p class="page__subtitle">
-        @if (day(); as d) {
-          {{ d.topics.length }} topics &middot; {{ d.sectors.length }} sectors &middot;
-          {{ d.stage_movements.length }} stage move{{ d.stage_movements.length === 1 ? '' : 's' }} today
-        } @else {
-          Trend radar across sectors, stages, and breadth.
-        }
-      </p>
+      <h1 class="page-head__title">Trends</h1>
+      <p class="page-head__sub">Topic radar — persistence vs. breadth across the AI field</p>
     </div>
-    <p-select
-      [options]="options()"
-      [ngModel]="selectedDate()"
-      (ngModelChange)="selectedDate.set($event)"
-      optionLabel="label"
-      optionValue="value"
-      [filter]="true"
-      filterPlaceholder="Date…"
-      [showClear]="false"
-      [style]="{ minWidth: '20rem' }"
-      placeholder="Pick a snapshot"
-      appendTo="body" />
+    <div class="page-head__meta">
+      @if (day(); as d) {
+        <span><strong>{{ d.topics.length }}</strong> topics</span>
+        <span><strong>{{ sectors().length }}</strong> sectors</span>
+        <span><strong>{{ risingCount() }}</strong> rising</span>
+        <span><strong>{{ clusters().length }}</strong> clusters</span>
+      }
+    </div>
   </header>
 
-  @if (error(); as e) {
-    <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
-  }
+  <div class="trends__datebar">
+    <button pButton type="button" text size="small"
+            (click)="older()" [disabled]="!canOlder()" aria-label="Older day">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+    <p-datepicker [ngModel]="selectedDateValue()"
+                  (ngModelChange)="pickFromCalendar($event)"
+                  [minDate]="minDate()!"
+                  [maxDate]="maxDate()!"
+                  [disabledDates]="[]"
+                  [dateFormat]="'yy-mm-dd'"
+                  [readonlyInput]="true"
+                  [showIcon]="true"
+                  appendTo="body"
+                  styleClass="trends__datepicker"
+                  inputId="trends-date" />
+    <button pButton type="button" text size="small"
+            (click)="newer()" [disabled]="!canNewer()" aria-label="Newer day">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+    <button pButton type="button" text size="small" (click)="latest()" [disabled]="!canNewer()">
+      Latest
+    </button>
+    <span class="muted trends__datebar-meta">{{ entries().length }} days available</span>
+  </div>
 
   @if (loading() && !day()) {
-    <div class="trends__skeleton">
-      <p-skeleton width="100%" height="30rem"></p-skeleton>
-    </div>
+    <p-skeleton width="100%" height="20rem"></p-skeleton>
   } @else if (day(); as d) {
-    <p-tabs value="radar" scrollable="false">
-      <p-tablist>
-        <p-tab value="radar">Radar</p-tab>
-        <p-tab value="stage">By stage</p-tab>
-        <p-tab value="sector">By sector</p-tab>
-        <p-tab value="moves">Moves ({{ d.stage_movements.length }})</p-tab>
-      </p-tablist>
-      <p-tabpanels>
-        <p-tabpanel value="radar">
-          <div class="trends__panel">
-            <app-radar-chart [topics]="d.topics" />
-          </div>
-        </p-tabpanel>
 
-        <p-tabpanel value="stage">
-          <div class="stage-grid">
-            @for (stage of stages; track stage) {
-              <section class="stage-col">
-                <header class="stage-col__head">
-                  <p-tag [value]="stage" [severity]="stageSeverity(stage)"></p-tag>
-                  <span class="stage-col__count tabular">{{ topicsByStage()[stage].length }}</span>
-                </header>
-                <ul class="topic-list">
-                  @for (t of topicsByStage()[stage]; track t.id) {
-                    <li class="topic">
-                      <div class="topic__row">
-                        <span class="topic__label">{{ t.label }}</span>
-                        <span class="topic__dir tabular" [class]="directionClass(t.direction)">
-                          <i [class]="directionIcon(t.direction)"></i>
-                          {{ t.momentum_7d_pct | number:'1.0-0' }}%
-                        </span>
-                      </div>
-                      <div class="topic__meta">
-                        <span class="mono-chip">{{ t.sector }}</span>
-                        <span class="subtle tabular">score {{ t.score | number:'1.1-1' }}</span>
-                        <span class="subtle tabular">breadth {{ t.breadth_7d }}{{ t.high_breadth ? ' ★' : '' }}</span>
-                      </div>
-                    </li>
-                  } @empty {
-                    <li class="topic-empty">No topics in this stage.</li>
-                  }
-                </ul>
-              </section>
-            }
-          </div>
-        </p-tabpanel>
+    <div class="trends__primary">
+      <section class="card card--flush trends__chart-card">
+        <div class="trends__chart-head">
+          <h2 class="card__title">Topic field</h2>
+          <span class="card__hint">x · momentum · y · sustained days · ⌀ · breadth</span>
+        </div>
+        <div class="trends__chart">
+          <app-radar-chart [topics]="d.topics" />
+        </div>
+      </section>
 
-        <p-tabpanel value="sector">
-          <div class="sector-grid">
-            @for (s of sectors(); track s.name) {
-              <section class="sector-card">
-                <header class="sector-card__head">
-                  <h3 class="sector-card__title">{{ s.name }}</h3>
-                  @if (s.description) { <p class="subtle">{{ s.description }}</p> }
-                  <span class="muted tabular">{{ s.topic_ids.length }} topics</span>
-                </header>
-                <ul class="topic-list topic-list--rows">
-                  @for (t of topicsInSector(s); track t.id) {
-                    <li class="topic topic--row">
-                      <span class="topic__label">{{ t.label }}</span>
-                      <span class="topic__dir tabular" [class]="directionClass(t.direction)">
-                        <i [class]="directionIcon(t.direction)"></i>
-                        {{ t.momentum_7d_pct | number:'1.0-0' }}%
-                      </span>
-                    </li>
-                  }
-                </ul>
-              </section>
-            }
-          </div>
-        </p-tabpanel>
+      <section class="card card--flush trends__movers">
+        <div class="trends__chart-head">
+          <h2 class="card__title">Top movers</h2>
+          <span class="card__hint">7d momentum</span>
+        </div>
+        <p-table [value]="topMovers()" styleClass="trends__tbl">
+          <ng-template #header>
+            <tr>
+              <th>Topic</th>
+              <th style="text-align:right; width:4rem">Mom</th>
+              <th style="width:6rem">Stage</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-t>
+            <tr>
+              <td>
+                <div class="trends__topic">
+                  <span class="fg">{{ t.label }}</span>
+                  <span class="muted">{{ t.sector }}</span>
+                </div>
+              </td>
+              <td class="tabular" style="text-align:right">
+                <span [class.accent]="t.momentum_7d_pct >= 0">
+                  {{ t.momentum_7d_pct >= 0 ? '+' : '' }}{{ t.momentum_7d_pct | number:'1.0-0' }}
+                </span>
+              </td>
+              <td>
+                <span class="chip">
+                  <span class="dot" [class.dot--accent]="t.direction === 'rising'"></span>
+                  {{ t.stage }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template #emptymessage>
+            <tr><td colspan="3" class="muted" style="text-align:center; padding:1rem">No topics.</td></tr>
+          </ng-template>
+        </p-table>
+      </section>
+    </div>
 
-        <p-tabpanel value="moves">
-          @if (d.stage_movements.length) {
-            <ul class="moves-list">
-              @for (m of d.stage_movements; track m.topic) {
-                <li class="move">
-                  <span class="mono-chip">{{ m.topic }}</span>
-                  <span class="move__transition">
-                    <span class="muted">{{ m.from ?? 'new' }}</span>
-                    <i class="pi pi-arrow-right move__arrow"></i>
-                    <strong>{{ m.to }}</strong>
-                  </span>
-                  @if (m.first_observed_today) {
-                    <span class="move__note subtle">first observed today</span>
-                  } @else if (m.reason) {
-                    <span class="move__note subtle">{{ m.reason }}</span>
-                  }
-                </li>
-              }
-            </ul>
-          } @else {
-            <p class="muted">No stage movements today.</p>
+    @if (clusters().length) {
+      <p-panel [toggleable]="true" [collapsed]="false" styleClass="trends__panel trends__panel--cluster">
+        <ng-template #header>
+          <div class="trends__panel-head">
+            <span class="trends__panel-title">Cross-topic clusters</span>
+            <span class="muted">topics moving together · {{ clusters().length }}</span>
+          </div>
+        </ng-template>
+        <div class="trends__clusters">
+          @for (c of clusters(); track c.id) {
+            <article class="trends__cluster">
+              <div class="trends__cluster-head">
+                <h3 class="trends__cluster-title">{{ c.name }}</h3>
+                <span class="trends__cluster-meta">
+                  <span class="dot" [class.dot--accent]="c.cluster_direction === 'rising'"></span>
+                  {{ c.cluster_direction }} · {{ c.size }} topics · {{ c.cluster_breadth_7d }} orgs
+                </span>
+              </div>
+              <ul class="trends__cluster-list">
+                @for (t of topicsInCluster(c); track t.id) {
+                  <li>
+                    <span>{{ t.label }}</span>
+                    <span class="muted tabular">{{ t.momentum_7d_pct >= 0 ? '+' : '' }}{{ t.momentum_7d_pct | number:'1.0-0' }}%</span>
+                  </li>
+                }
+              </ul>
+            </article>
           }
-        </p-tabpanel>
-      </p-tabpanels>
-    </p-tabs>
+        </div>
+      </p-panel>
+    }
+
+    @if (sectors().length) {
+      <p-panel [toggleable]="true" [collapsed]="true" styleClass="trends__panel">
+        <ng-template #header>
+          <div class="trends__panel-head">
+            <span class="trends__panel-title">By sector</span>
+            <span class="muted">curated buckets · {{ sectors().length }}</span>
+          </div>
+        </ng-template>
+        <div class="trends__sectors">
+          @for (s of sectors(); track s.name) {
+            <article class="trends__sector">
+              <div class="trends__sector-head">
+                <h3 class="trends__sector-title">{{ s.name }}</h3>
+                <span class="muted tabular">{{ s.topic_ids.length }} · {{ s.active_orgs ?? 0 }} orgs</span>
+              </div>
+              @if (s.description) {
+                <p class="trends__sector-desc">{{ s.description }}</p>
+              }
+              <ul class="trends__sector-list">
+                @for (t of topicsInSector(s).slice(0, 6); track t.id) {
+                  <li>
+                    <span>{{ t.label }}</span>
+                    <span class="muted tabular">{{ t.momentum_7d_pct >= 0 ? '+' : '' }}{{ t.momentum_7d_pct | number:'1.0-0' }}%</span>
+                  </li>
+                }
+                @if (topicsInSector(s).length > 6) {
+                  <li class="muted">+{{ topicsInSector(s).length - 6 }} more</li>
+                }
+              </ul>
+            </article>
+          }
+        </div>
+      </p-panel>
+    }
+
+    @if (stageMoves().length) {
+      <p-panel [toggleable]="true" [collapsed]="true" styleClass="trends__panel">
+        <ng-template #header>
+          <div class="trends__panel-head">
+            <span class="trends__panel-title">Stage transitions</span>
+            <span class="muted">{{ stageMoves().length }}</span>
+          </div>
+        </ng-template>
+        <ul class="trends__moves">
+          @for (m of stageMoves(); track $index) {
+            <li>
+              <span class="fg">{{ m.topic }}</span>
+              <span class="muted">{{ m.from || 'new' }} → <span class="fg">{{ m.to }}</span></span>
+              @if (m.reason) { <span class="muted">· {{ m.reason }}</span> }
+            </li>
+          }
+        </ul>
+      </p-panel>
+    }
+
+    @if (note()) {
+      <p-panel [toggleable]="true" [collapsed]="true" styleClass="trends__panel">
+        <ng-template #header>
+          <div class="trends__panel-head">
+            <span class="trends__panel-title">Radar note</span>
+            <span class="muted">narrative</span>
+          </div>
+        </ng-template>
+        <app-markdown-viewer [source]="note()" />
+      </p-panel>
+    }
+  }
+
+  @if (error(); as e) {
+    <p class="trends__error">{{ e }}</p>
   }
 </section>
