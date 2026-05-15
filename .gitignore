@@ -1,16 +1,24 @@
 .DS_Store
 .idea/
 .claude/
-*.bak
 __pycache__/
 *.pyc
+
+# Angular app (app/) build + tooling artifacts
 node_modules/
-package-lock.json
+app/dist/
+app/.angular/
+app/tmp/
+app/out-tsc/
+
+# Pipeline state — per-sweep rollback snapshots
+*.bak
+
 # Keyword-sweep work artifacts — request and verdict files round-trip between
 # the script and the judging agent. The script regenerates the request each run
 # from discovered_keywords.json (the persistent state), and verdict files get
 # archived after application. None of these are source of truth, so keep them
-# out of git.
-keyword_judge_request.md
-keyword_judge_verdicts.json
-keyword_judge_verdicts.*.applied.json
+# out of git. (Now live under pipeline/state/.)
+pipeline/state/keyword_judge_request.md
+pipeline/state/keyword_judge_verdicts.json
+pipeline/state/keyword_judge_verdicts.*.applied.json

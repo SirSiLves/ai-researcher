@@ -1,0 +1,126 @@
+<section class="page-container">
+  <header class="trends-head">
+    <div>
+      <h1 class="page-title">Trend radar</h1>
+      <p class="page-subtitle">
+        @if (day(); as d) {
+          {{ d.topics.length }} topics across {{ d.sectors.length }} sectors · {{ d.stage_movements.length }} stage moves today
+        } @else {
+          What's heating up, where it's coming from, and what's fading.
+        }
+      </p>
+    </div>
+
+    <p-select
+      [options]="options()"
+      [ngModel]="selectedDate()"
+      (ngModelChange)="selectedDate.set($event)"
+      optionLabel="label"
+      optionValue="value"
+      [filter]="true"
+      filterPlaceholder="Date…"
+      [showClear]="false"
+      [style]="{ minWidth: '22rem' }"
+      placeholder="Pick a snapshot"
+      appendTo="body" />
+  </header>
+
+  @if (error(); as e) {
+    <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
+  }
+
+  @if (loading() && !day()) {
+    <div class="card skeleton-grid">
+      @for (i of [1,2,3,4]; track i) {
+        <p-skeleton width="100%" height="8rem"></p-skeleton>
+      }
+    </div>
+  } @else if (day(); as d) {
+    <p-tabs value="stage" scrollable="false">
+      <p-tablist>
+        <p-tab value="stage">By stage</p-tab>
+        <p-tab value="sector">By sector</p-tab>
+        <p-tab value="moves">Stage moves ({{ d.stage_movements.length }})</p-tab>
+      </p-tablist>
+      <p-tabpanels>
+        <p-tabpanel value="stage">
+          <div class="stage-grid">
+            @for (stage of stages; track stage) {
+              <section class="stage-col">
+                <header class="stage-head">
+                  <p-tag [value]="stage" [severity]="stageSeverity(stage)"></p-tag>
+                  <span class="stage-count">{{ topicsByStage()[stage].length }}</span>
+                </header>
+                <ul class="topic-list">
+                  @for (t of topicsByStage()[stage]; track t.id) {
+                    <li class="topic">
+                      <header>
+                        <span class="topic-label">{{ t.label }}</span>
+                        <span class="topic-direction" [class]="directionClass(t.direction)">
+                          <i [class]="directionIcon(t.direction)"></i>
+                          {{ t.momentum_7d_pct | number:'1.0-0' }}%
+                        </span>
+                      </header>
+                      <footer class="topic-meta">
+                        <span class="sector-pill">{{ t.sector }}</span>
+                        <span>score {{ t.score | number:'1.1-1' }}</span>
+                        @if (t.high_breadth) {
+                          <span class="tag accent">breadth {{ t.breadth_7d }}</span>
+                        } @else {
+                          <span>breadth {{ t.breadth_7d }}</span>
+                        }
+                      </footer>
+                    </li>
+                  } @empty {
+                    <li class="empty">No topics in this stage.</li>
+                  }
+                </ul>
+              </section>
+            }
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="sector">
+          <div class="sector-grid">
+            @for (s of sectors(); track s.name) {
+              <section class="sector-card card">
+                <header>
+                  <h3>{{ s.name }}</h3>
+                  @if (s.description) { <p>{{ s.description }}</p> }
+                  <span class="muted">{{ s.topic_ids.length }} topics</span>
+                </header>
+                <ul class="topic-list">
+                  @for (t of topicsInSector(s); track t.id) {
+                    <li class="topic">
+                      <span class="topic-label">{{ t.label }}</span>
+                      <span class="topic-direction" [class]="directionClass(t.direction)">
+                        <i [class]="directionIcon(t.direction)"></i>
+                        {{ t.momentum_7d_pct | number:'1.0-0' }}%
+                      </span>
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="moves">
+          @if (d.stage_movements.length) {
+            <ul class="moves-list">
+              @for (m of d.stage_movements; track m.topic_id) {
+                <li class="move">
+                  <strong>{{ m.topic_id }}</strong>
+                  <span class="muted">{{ m.from }} → {{ m.to }}</span>
+                  @if (m.reason) { <span class="reason">{{ m.reason }}</span> }
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="muted">No stage movements today.</p>
+          }
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+</section>

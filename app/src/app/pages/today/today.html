@@ -1,0 +1,45 @@
+<section class="page-container">
+  <header class="today-head">
+    <div>
+      <h1 class="page-title">Daily digest</h1>
+      <p class="page-subtitle">
+        @if (current(); as c) {
+          {{ c.date_id }} — {{ c.headline }}
+        } @else {
+          Latest synthesized briefing from the nightly pipeline.
+        }
+      </p>
+    </div>
+
+    <p-select
+      [options]="options()"
+      [ngModel]="selectedDate()"
+      (ngModelChange)="onPick($event)"
+      optionLabel="label"
+      optionValue="value"
+      [filter]="true"
+      filterPlaceholder="Jump to a date…"
+      [showClear]="false"
+      [style]="{ minWidth: '20rem' }"
+      placeholder="Pick a date"
+      appendTo="body" />
+  </header>
+
+  @if (error(); as e) {
+    <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
+  }
+
+  @if (loading() && !markdown()) {
+    <div class="card skeleton-wrap">
+      <p-skeleton width="40%" height="2rem" styleClass="mb-3"></p-skeleton>
+      <p-skeleton width="80%" height="1rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="70%" height="1rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="90%" height="1rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="60%" height="1rem"></p-skeleton>
+    </div>
+  } @else if (markdown()) {
+    <article class="card daily-body">
+      <app-markdown-viewer [source]="markdown()" />
+    </article>
+  }
+</section>

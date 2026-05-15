@@ -1,0 +1,187 @@
+<section class="page-container">
+  <header class="firms-head">
+    <div>
+      <h1 class="page-title">Firms</h1>
+      <p class="page-subtitle">
+        {{ orgs().length }} organizations tracked · sorted by 7-day velocity by default.
+      </p>
+    </div>
+  </header>
+
+  @if (error(); as e) {
+    <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
+  }
+
+  <div class="firms-toolbar">
+    <span class="search-wrap">
+      <i class="pi pi-search"></i>
+      <input pInputText
+             [ngModel]="query()"
+             (ngModelChange)="query.set($event)"
+             placeholder="Search slug or topic…"
+             class="firms-search" />
+    </span>
+    <p-select [options]="tierOptions()"
+              [ngModel]="tierFilter()"
+              (ngModelChange)="tierFilter.set($event)"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Tier"
+              [style]="{ minWidth: '14rem' }"
+              appendTo="body" />
+    <p-select [options]="velocityOptions"
+              [ngModel]="velocityFilter()"
+              (ngModelChange)="velocityFilter.set($event)"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Velocity"
+              [style]="{ minWidth: '11rem' }"
+              appendTo="body" />
+    <p-select [options]="sortOptions"
+              [ngModel]="sortKey()"
+              (ngModelChange)="sortKey.set($event)"
+              optionLabel="label"
+              optionValue="value"
+              [style]="{ minWidth: '13rem' }"
+              appendTo="body" />
+  </div>
+
+  @if (loading()) {
+    <div class="firm-grid">
+      @for (i of [1,2,3,4,5,6,7,8]; track i) {
+        <p-skeleton width="100%" height="11rem" styleClass="firm-skel"></p-skeleton>
+      }
+    </div>
+  } @else {
+    <div class="firm-grid">
+      @for (o of filtered(); track o.slug) {
+        <button class="firm-card" (click)="open(o.slug)">
+          <header class="firm-head">
+            <span class="firm-slug">{{ o.slug }}</span>
+            @if (o.is_priority) {
+              <span class="tag accent">priority</span>
+            }
+          </header>
+          <div class="firm-stats">
+            <span class="stat">
+              <span class="stat-num">{{ o.velocity_7d }}</span>
+              <span class="stat-lbl">7-day</span>
+            </span>
+            <span class="stat">
+              <span class="stat-num">{{ o.total_mentions }}</span>
+              <span class="stat-lbl">total</span>
+            </span>
+            <span class="stat">
+              <span class="stat-num">{{ o.topic_count }}</span>
+              <span class="stat-lbl">topics</span>
+            </span>
+          </div>
+          <footer class="firm-foot">
+            <span class="velocity" [class]="velocityClass(o.velocity_status)">
+              <i class="pi"
+                 [class.pi-arrow-up]="o.velocity_status === 'surging' || o.velocity_status === 'accelerating'"
+                 [class.pi-arrow-down]="o.velocity_status === 'cooling'"
+                 [class.pi-minus]="o.velocity_status === 'steady'"></i>
+              {{ o.velocity_status }}
+            </span>
+            @if (o.tier_hint) {
+              <span class="tier-pill">{{ o.tier_hint }}</span>
+            }
+          </footer>
+          @if (o.top_topics.length) {
+            <div class="firm-topics">
+              @for (t of o.top_topics.slice(0, 3); track t) {
+                <span class="topic-chip">{{ t }}</span>
+              }
+            </div>
+          }
+        </button>
+      } @empty {
+        <p class="muted">No firms match your filters.</p>
+      }
+    </div>
+  }
+
+  @if (selectedSlug(); as slug) {
+    <div class="drawer-backdrop" (click)="close()"></div>
+    <aside class="drawer" role="dialog" aria-labelledby="drawer-title">
+      <header class="drawer-head">
+        <h2 id="drawer-title">{{ slug }}</h2>
+        <button class="icon-btn" aria-label="Close" (click)="close()">
+          <i class="pi pi-times"></i>
+        </button>
+      </header>
+
+      @if (detailLoading() && !detail()) {
+        <div class="drawer-body">
+          <p-skeleton width="60%" height="1.4rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton width="80%" height="1rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton width="100%" height="6rem"></p-skeleton>
+        </div>
+      } @else if (detail(); as d) {
+        <div class="drawer-body">
+          <div class="drawer-meta">
+            @if (d.tier_hint) { <p-tag [value]="d.tier_hint" severity="info"></p-tag> }
+            @if (d.region) { <span class="muted">{{ d.region }}</span> }
+            @if (d.blog_url_hint) {
+              <a [href]="d.blog_url_hint" target="_blank" rel="noopener">
+                <i class="pi pi-external-link"></i> blog
+              </a>
+            }
+          </div>
+          <dl class="drawer-stats">
+            <div><dt>Total mentions</dt><dd>{{ d.total_mentions }}</dd></div>
+            <div><dt>Distinct days</dt><dd>{{ d.distinct_days }}</dd></div>
+            <div><dt>First seen</dt><dd>{{ d.first_seen }}</dd></div>
+            <div><dt>Last seen</dt><dd>{{ d.last_seen }}</dd></div>
+          </dl>
+
+          <section>
+            <h3>By source type</h3>
+            <ul class="src-list">
+              @for (s of topSources(d); track s.key) {
+                <li>
+                  <span class="src-key">{{ s.key }}</span>
+                  <span class="src-bar">
+                    <span class="src-bar-fill" [style.width.%]="(s.value / d.total_mentions) * 100"></span>
+                  </span>
+                  <span class="src-val">{{ s.value }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+
+          @if (d.topics?.length) {
+            <section>
+              <h3>Top topics</h3>
+              <ul class="topic-strip">
+                @for (t of d.topics!.slice(0, 12); track t.id) {
+                  <li>
+                    <span class="topic-strip-label">{{ t.id }}</span>
+                    <span class="topic-strip-num">{{ t.mentions }}</span>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+
+          @if (d.recent_context?.length) {
+            <section>
+              <h3>Recent context</h3>
+              <ul class="context-list">
+                @for (c of d.recent_context!.slice(0, 6); track c.path + c.date) {
+                  <li>
+                    <header>
+                      <span class="muted">{{ c.date }} · {{ c.source_type }}</span>
+                    </header>
+                    <p>{{ c.snippet }}</p>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+        </div>
+      }
+    </aside>
+  }
+</section>

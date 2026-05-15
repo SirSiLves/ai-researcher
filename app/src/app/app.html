@@ -1,0 +1,26 @@
+<header class="topbar">
+  <div class="topbar-inner">
+    <a routerLink="/today" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-name">Researcher</span>
+    </a>
+    <nav class="tabs" aria-label="Primary">
+      @for (tab of tabs; track tab.path) {
+        <a [routerLink]="tab.path"
+           routerLinkActive="active"
+           class="tab">
+          <i class="pi" [class]="tab.icon"></i>
+          <span>{{ tab.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>
+
+<footer class="appfoot">
+  <div>Generated nightly · Editorial pipeline runs at 06:00 local</div>
+</footer>
