@@ -11,17 +11,15 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 })
 export class App {
   readonly tabs = [
-    { path: '/today',   label: 'Today',   icon: 'pi-calendar' },
-    { path: '/trends',  label: 'Trends',  icon: 'pi-chart-line' },
-    { path: '/firms',   label: 'Firms',   icon: 'pi-building' },
-    { path: '/reports', label: 'Archive', icon: 'pi-book' }
+    { path: '/today',   label: 'Today' },
+    { path: '/trends',  label: 'Trends' },
+    { path: '/firms',   label: 'Firms' },
+    { path: '/reports', label: 'Reports' }
   ];
 
   private readonly now = signal(new Date());
   readonly today = computed(() => {
     const d = this.now();
-    return d.toLocaleDateString('en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   });
 }

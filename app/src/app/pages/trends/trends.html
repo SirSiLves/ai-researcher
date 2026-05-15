@@ -1,14 +1,13 @@
 <section class="page trends">
-  <header class="trends__head">
-    <div class="trends__lede">
-      <span class="eyebrow">Trend radar</span>
-      <h1 class="title-display">What's heating up, what's fading</h1>
-      <p class="deck">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Trends</h1>
+      <p class="page__subtitle">
         @if (day(); as d) {
           {{ d.topics.length }} topics &middot; {{ d.sectors.length }} sectors &middot;
           {{ d.stage_movements.length }} stage move{{ d.stage_movements.length === 1 ? '' : 's' }} today
         } @else {
-          Loading snapshot&hellip;
+          Trend radar across sectors, stages, and breadth.
         }
       </p>
     </div>
@@ -21,7 +20,7 @@
       [filter]="true"
       filterPlaceholder="Date…"
       [showClear]="false"
-      [style]="{ minWidth: '22rem' }"
+      [style]="{ minWidth: '20rem' }"
       placeholder="Pick a snapshot"
       appendTo="body" />
   </header>
@@ -32,7 +31,7 @@
 
   @if (loading() && !day()) {
     <div class="trends__skeleton">
-      <p-skeleton width="100%" height="32rem"></p-skeleton>
+      <p-skeleton width="100%" height="30rem"></p-skeleton>
     </div>
   } @else if (day(); as d) {
     <p-tabs value="radar" scrollable="false">
@@ -40,7 +39,7 @@
         <p-tab value="radar">Radar</p-tab>
         <p-tab value="stage">By stage</p-tab>
         <p-tab value="sector">By sector</p-tab>
-        <p-tab value="moves">Stage moves ({{ d.stage_movements.length }})</p-tab>
+        <p-tab value="moves">Moves ({{ d.stage_movements.length }})</p-tab>
       </p-tablist>
       <p-tabpanels>
         <p-tabpanel value="radar">
@@ -53,32 +52,28 @@
           <div class="stage-grid">
             @for (stage of stages; track stage) {
               <section class="stage-col">
-                <header class="stage-head">
+                <header class="stage-col__head">
                   <p-tag [value]="stage" [severity]="stageSeverity(stage)"></p-tag>
-                  <span class="stage-count tabular">{{ topicsByStage()[stage].length }}</span>
+                  <span class="stage-col__count tabular">{{ topicsByStage()[stage].length }}</span>
                 </header>
                 <ul class="topic-list">
                   @for (t of topicsByStage()[stage]; track t.id) {
                     <li class="topic">
-                      <header>
-                        <span class="topic-label">{{ t.label }}</span>
-                        <span class="topic-direction tabular" [class]="directionClass(t.direction)">
+                      <div class="topic__row">
+                        <span class="topic__label">{{ t.label }}</span>
+                        <span class="topic__dir tabular" [class]="directionClass(t.direction)">
                           <i [class]="directionIcon(t.direction)"></i>
                           {{ t.momentum_7d_pct | number:'1.0-0' }}%
                         </span>
-                      </header>
-                      <footer class="topic-meta">
-                        <span class="sector-pill">{{ t.sector }}</span>
-                        <span>score {{ t.score | number:'1.1-1' }}</span>
-                        @if (t.high_breadth) {
-                          <span class="tag-accent">breadth {{ t.breadth_7d }}</span>
-                        } @else {
-                          <span>breadth {{ t.breadth_7d }}</span>
-                        }
-                      </footer>
+                      </div>
+                      <div class="topic__meta">
+                        <span class="mono-chip">{{ t.sector }}</span>
+                        <span class="subtle tabular">score {{ t.score | number:'1.1-1' }}</span>
+                        <span class="subtle tabular">breadth {{ t.breadth_7d }}{{ t.high_breadth ? ' ★' : '' }}</span>
+                      </div>
                     </li>
                   } @empty {
-                    <li class="empty">No topics in this stage.</li>
+                    <li class="topic-empty">No topics in this stage.</li>
                   }
                 </ul>
               </section>
@@ -90,16 +85,16 @@
           <div class="sector-grid">
             @for (s of sectors(); track s.name) {
               <section class="sector-card">
-                <header>
-                  <h3 class="title-section">{{ s.name }}</h3>
-                  @if (s.description) { <p class="caption">{{ s.description }}</p> }
-                  <span class="byline">{{ s.topic_ids.length }} topics</span>
+                <header class="sector-card__head">
+                  <h3 class="sector-card__title">{{ s.name }}</h3>
+                  @if (s.description) { <p class="subtle">{{ s.description }}</p> }
+                  <span class="muted tabular">{{ s.topic_ids.length }} topics</span>
                 </header>
-                <ul class="topic-list topic-list--row">
+                <ul class="topic-list topic-list--rows">
                   @for (t of topicsInSector(s); track t.id) {
                     <li class="topic topic--row">
-                      <span class="topic-label">{{ t.label }}</span>
-                      <span class="topic-direction tabular" [class]="directionClass(t.direction)">
+                      <span class="topic__label">{{ t.label }}</span>
+                      <span class="topic__dir tabular" [class]="directionClass(t.direction)">
                         <i [class]="directionIcon(t.direction)"></i>
                         {{ t.momentum_7d_pct | number:'1.0-0' }}%
                       </span>
@@ -116,16 +111,16 @@
             <ul class="moves-list">
               @for (m of d.stage_movements; track m.topic) {
                 <li class="move">
-                  <strong class="move__id">{{ m.topic }}</strong>
+                  <span class="mono-chip">{{ m.topic }}</span>
                   <span class="move__transition">
-                    <span class="from">{{ m.from ?? 'new' }}</span>
+                    <span class="muted">{{ m.from ?? 'new' }}</span>
                     <i class="pi pi-arrow-right move__arrow"></i>
-                    <span class="to">{{ m.to }}</span>
+                    <strong>{{ m.to }}</strong>
                   </span>
                   @if (m.first_observed_today) {
-                    <span class="move__note">first observed today</span>
+                    <span class="move__note subtle">first observed today</span>
                   } @else if (m.reason) {
-                    <span class="move__note">{{ m.reason }}</span>
+                    <span class="move__note subtle">{{ m.reason }}</span>
                   }
                 </li>
               }

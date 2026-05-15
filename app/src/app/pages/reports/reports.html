@@ -1,10 +1,9 @@
 <section class="page reports">
-  <header class="reports__head">
-    <div class="reports__lede">
-      <span class="eyebrow">Archive</span>
-      <h1 class="title-display">Every edition, every dispatch</h1>
-      <p class="deck">
-        {{ entries().length }} reports across {{ cadences().length }} cadences &middot; click any to read
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Reports</h1>
+      <p class="page__subtitle">
+        {{ entries().length }} reports across {{ cadences().length }} cadences
       </p>
     </div>
   </header>
@@ -43,13 +42,15 @@
   @if (loading()) {
     <div class="report-list">
       @for (i of [1,2,3,4,5,6]; track i) {
-        <p-skeleton width="100%" height="4rem"></p-skeleton>
+        <p-skeleton width="100%" height="3rem"></p-skeleton>
       }
     </div>
   } @else {
-    <ul class="report-list">
+    <div class="report-list">
       @for (e of filtered(); track e.cadence + '|' + e.date_id + '|' + e.path) {
-        <li class="report-row" tabindex="0" (click)="open(e)" (keydown.enter)="open(e)">
+        <button class="report-row"
+                (click)="open(e)"
+                (keydown.enter)="open(e)">
           <span class="report-badge" [style.background-color]="cadenceColor(e.cadence)">
             {{ e.cadence_label }}
           </span>
@@ -59,25 +60,24 @@
             <span class="report-versioned">v</span>
           }
           <i class="pi pi-arrow-right report-chevron"></i>
-        </li>
+        </button>
       } @empty {
-        <li class="report-empty">No reports match your filters.</li>
+        <p class="report-empty">No reports match your filters.</p>
       }
-    </ul>
+    </div>
   }
 
   <p-drawer [visible]="!!selected()"
             (visibleChange)="$event || close()"
             position="right"
             [style]="{ width: 'min(820px, 100vw)' }"
-            [showCloseIcon]="false"
-            styleClass="report-drawer">
+            [showCloseIcon]="false">
     <ng-template #headless>
       @if (selected(); as sel) {
         <header class="drawer-head">
           <div class="drawer-head__title">
             <span class="report-badge" [style.background-color]="cadenceColor(sel.cadence)">{{ sel.cadence_label }}</span>
-            <h2 class="title-section tabular">{{ sel.date_id }}</h2>
+            <h2 class="drawer-head__h2 tabular">{{ sel.date_id }}</h2>
           </div>
           <p-button icon="pi pi-times"
                     severity="secondary"

@@ -1,58 +1,70 @@
 @use "primeicons/primeicons.css";
 
 /* ============================================================
-   Editorial palette — warm paper, ink, single rust accent.
-   Type does most of the work. Color does very little.
+   Tech-product palette — Linear / Vercel / Stripe family.
+   White surfaces, slate scale for text/border, indigo accent.
+   Inter everywhere, JetBrains Mono for code & numerics.
    ============================================================ */
 :root {
   /* surfaces */
-  --paper:        #f7f3ea;   /* main background, warm off-white  */
-  --paper-deep:   #efe8d8;   /* deeper paper for the masthead    */
-  --card:         #fdfbf6;   /* card surface, slightly lighter   */
-  --card-soft:    #f3eddc;   /* tonal panel, used sparingly      */
-  --rule:         #d9d2c1;   /* hairline rule                    */
-  --rule-strong:  #b9b0a0;   /* heavier rule                     */
+  --bg:           #ffffff;
+  --surface:      #fafafb;
+  --surface-2:    #f4f4f6;
+  --surface-3:    #ececef;
+  --overlay:      rgba(15, 23, 42, 0.45);
 
-  /* ink */
-  --ink:          #1a1612;   /* primary text, near-black with warmth */
-  --ink-2:        #4a423a;   /* secondary text                   */
-  --ink-3:        #6f6557;   /* tertiary                         */
-  --muted:        #8a7f70;   /* labels, captions                 */
+  /* slate ink scale */
+  --ink:          #0f172a;
+  --ink-2:        #1e293b;
+  --ink-3:        #475569;
+  --ink-4:        #64748b;
+  --muted:        #94a3b8;
 
-  /* accents (used sparingly) */
-  --accent:       #a14a26;   /* rust — links, highlights         */
-  --accent-deep:  #8a3e1f;
-  --accent-soft:  rgba(161, 74, 38, 0.10);
-  --rising:       #2d6b3a;
-  --falling:      #9a2a2a;
-  --highlight:    #f1e6cf;   /* soft yellow for emphasis         */
+  /* borders */
+  --border:       #e4e4e7;
+  --border-strong:#d4d4d8;
 
-  /* sectors (kept restrained, not jarring) */
-  --sector-models:   #6f4d8c;
-  --sector-agents:   #2f6383;
-  --sector-gov:      #9a6a23;
-  --sector-methods:  #2d6b3a;
+  /* accent — indigo / violet, used sparingly */
+  --accent:       #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-soft:  rgba(79, 70, 229, 0.10);
+  --accent-ring:  rgba(79, 70, 229, 0.18);
+
+  /* semantic */
+  --rising:       #10b981;
+  --falling:      #ef4444;
+  --warn:         #f59e0b;
+  --info:         #3b82f6;
+
+  /* sector palette — keep restrained */
+  --sector-models:  #6366f1;
+  --sector-agents:  #0ea5e9;
+  --sector-gov:     #f59e0b;
+  --sector-methods: #14b8a6;
 
   /* radii */
-  --radius-sm: 3px;
-  --radius:    6px;
-  --radius-lg: 10px;
+  --r-1: 4px;
+  --r-2: 6px;
+  --r-3: 8px;
+  --r-4: 12px;
+  --r-5: 16px;
 
-  /* shadows (very subtle on warm paper) */
-  --shadow-sm: 0 1px 1px rgba(26, 22, 18, 0.04);
-  --shadow:    0 6px 24px rgba(26, 22, 18, 0.06);
+  /* shadow scale */
+  --shadow-1: 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-2: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-3: 0 4px 12px rgba(15,23,42,0.06), 0 2px 4px rgba(15,23,42,0.04);
+  --shadow-4: 0 10px 30px rgba(15,23,42,0.08), 0 4px 12px rgba(15,23,42,0.04);
+  --shadow-ring: 0 0 0 1px var(--border);
 
   /* layout */
-  --max-page:    1180px;     /* wide pages (firms grid, reports list) */
-  --max-prose:   780px;      /* prose reading width (Today digest)    */
-  --max-chrome:  1180px;     /* nav, toolbars                         */
-  --gutter:      clamp(1.25rem, 3vw, 2.25rem);
-  --nav-height:  64px;
+  --max-app:    1280px;
+  --max-prose:  760px;
+  --gutter:     clamp(1rem, 2.5vw, 2rem);
+  --nav-h:      56px;
 
   /* type */
-  --serif: "Charter", "Iowan Old Style", "Source Serif Pro", "Source Serif 4", Georgia, "Times New Roman", serif;
-  --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
-  --mono:  ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 /* ============================================================ */
@@ -61,344 +73,286 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
-  font-family: var(--serif);
-  font-size: 16px;
-  line-height: 1.6;
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-feature-settings: "kern", "liga", "onum";
+  font-feature-settings: "cv11", "ss01", "ss03";
 }
 
 a {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--rule-strong);
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1px;
-  transition: color .15s, text-decoration-color .15s;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color .15s;
 }
-a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+a:hover { color: var(--accent-hover); text-decoration: underline; text-underline-offset: 2px; }
 
 button { font: inherit; cursor: pointer; color: inherit; background: none; border: 0; padding: 0; }
 
 code, .mono { font-family: var(--mono); font-size: 0.86em; }
+.tabular { font-variant-numeric: tabular-nums; }
 
-em { font-style: italic; }
-strong { font-weight: 600; }
-hr {
-  border: 0;
-  border-top: 1px solid var(--rule);
-  margin: 2rem 0;
-}
+hr { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 
 /* ============================================================
-   Type scale — used in TS as helper classes too.
-   ============================================================ */
-.eyebrow {
-  font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.deck {
-  font-family: var(--sans);
-  font-size: 13px;
-  color: var(--ink-3);
-  letter-spacing: 0.02em;
-}
-
-.byline {
-  font-family: var(--sans);
-  font-size: 12px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.title-display {
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: clamp(1.7rem, 2.8vw, 2.4rem);
-  line-height: 1.15;
-  letter-spacing: -0.012em;
-  margin: 0;
-  color: var(--ink);
-}
-
-.title-section {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.35rem;
-  line-height: 1.25;
-  letter-spacing: -0.005em;
-  margin: 0 0 0.4rem;
-}
-
-.caption {
-  font-family: var(--sans);
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* ============================================================
-   Page containers
+   Page container
    ============================================================ */
 .page {
-  padding: 2rem var(--gutter) 4rem;
-  max-width: var(--max-page);
+  max-width: var(--max-app);
   margin: 0 auto;
+  padding: 1.75rem var(--gutter) 4rem;
 }
+.page--prose { max-width: var(--max-prose); }
 
-.page--prose {
-  max-width: var(--max-prose);
-}
-
-.page__masthead {
+.page__header {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
   flex-wrap: wrap;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 1.1rem;
-  margin-bottom: 2rem;
 }
 
-.page__masthead-lede { max-width: 56ch; }
+.page__title {
+  font-family: var(--sans);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.page__subtitle {
+  font-size: 0.875rem;
+  color: var(--ink-4);
+  margin: 0.25rem 0 0;
+}
 
 /* ============================================================
-   Editorial markdown rendering (for daily / weekly / monthly MD)
+   Card / surface primitives
+   ============================================================ */
+.surface {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  box-shadow: var(--shadow-1);
+}
+
+.surface--padded { padding: 1.25rem 1.5rem; }
+
+.muted   { color: var(--muted); }
+.subtle  { color: var(--ink-4); }
+.tone-up   { color: var(--rising); }
+.tone-down { color: var(--falling); }
+
+/* small monospace chip used for IDs/dates/slugs */
+.mono-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  padding: 0.12rem 0.42rem;
+  border-radius: var(--r-1);
+}
+
+/* ============================================================
+   Markdown body — when we render daily/weekly markdown
    ============================================================ */
 .markdown {
-  font-family: var(--serif);
-  font-size: 1.0625rem;
-  line-height: 1.7;
-  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink-2);
 
   h1, h2, h3, h4 {
-    font-family: var(--serif);
-    line-height: 1.2;
-    letter-spacing: -0.005em;
+    font-family: var(--sans);
     color: var(--ink);
-  }
-  h1 {
-    font-size: 1.85rem;
-    font-weight: 700;
-    margin: 0 0 1rem;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 0.6rem;
-  }
-  h2 {
-    font-size: 1.35rem;
+    letter-spacing: -0.012em;
     font-weight: 600;
-    margin: 2rem 0 0.6rem;
+    line-height: 1.3;
   }
-  h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 1.4rem 0 0.4rem;
-  }
-  h4 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin: 1.1rem 0 0.3rem;
-    text-transform: none;
-  }
-  p { margin: 0.75em 0; }
-  ul, ol { padding-left: 1.3rem; margin: 0.8em 0; }
-  li { margin: 0.35em 0; }
-  li > p { margin: 0.25em 0; }
+  h1 { font-size: 1.5rem; margin: 0 0 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+  h2 { font-size: 1.15rem; margin: 1.8rem 0 0.6rem; }
+  h3 { font-size: 1rem; margin: 1.4rem 0 0.4rem; }
+  h4 { font-size: 0.92rem; margin: 1.1rem 0 0.3rem; color: var(--ink-3); }
+  p  { margin: 0.65em 0; }
+  ul, ol { padding-left: 1.3rem; margin: 0.7em 0; }
+  li { margin: 0.3em 0; }
   blockquote {
-    margin: 1.2em 0;
-    padding: 0.4em 1.1em;
+    margin: 1.1em 0;
+    padding: 0.5em 1rem;
     border-left: 3px solid var(--accent);
-    color: var(--ink-2);
-    font-style: italic;
+    background: var(--surface);
+    color: var(--ink-3);
+    border-radius: 0 var(--r-2) var(--r-2) 0;
   }
   code {
-    background: var(--card-soft);
-    padding: 0.08em 0.4em;
-    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    padding: 0.1em 0.42em;
+    border-radius: var(--r-1);
     font-size: 0.85em;
+    color: var(--ink-2);
   }
   pre {
-    background: #2a241d;
-    color: #f7f3ea;
+    background: var(--ink);
+    color: #e2e8f0;
     padding: 1rem 1.1rem;
-    border-radius: var(--radius);
+    border-radius: var(--r-3);
     overflow-x: auto;
-    line-height: 1.5;
-    margin: 1.2em 0;
+    line-height: 1.55;
+    margin: 1.1em 0;
+    font-size: 0.85rem;
   }
   pre code { background: transparent; padding: 0; color: inherit; }
-  table { border-collapse: collapse; width: 100%; margin: 1.2em 0; font-size: 0.95em; }
-  th, td { border-bottom: 1px solid var(--rule); padding: 0.5em 0.8em; text-align: left; }
-  th { font-family: var(--sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; background: transparent; border-bottom-color: var(--rule-strong); }
-  img { max-width: 100%; }
-  hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
-  a { color: var(--ink); text-decoration-color: var(--accent); }
-  a:hover { color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: 0.9em; }
+  th, td { border-bottom: 1px solid var(--border); padding: 0.55em 0.8em; text-align: left; }
+  th {
+    color: var(--ink-4);
+    background: var(--surface);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 1.6em 0; }
+  a { color: var(--accent); }
+  a:hover { color: var(--accent-hover); }
+  img { max-width: 100%; border-radius: var(--r-3); }
 }
 
 /* ============================================================
-   Cards & framing (used outside PrimeNG when a softer card fits)
+   PrimeNG token overrides — make the library feel native to the
+   tech-product palette (slate/indigo) instead of stock blue.
    ============================================================ */
-.card {
-  background: var(--card);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-lg);
-  padding: 1.4rem 1.6rem;
-}
+.p-component, .p-component * { font-family: var(--sans); }
 
-.panel-tone {
-  background: var(--card-soft);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 1rem 1.2rem;
-}
-
-.divider {
-  border-top: 1px solid var(--rule);
-  margin: 1.5rem 0;
-}
-
-/* utility */
-.muted { color: var(--muted); }
-.ink-2 { color: var(--ink-2); }
-.tabular { font-variant-numeric: tabular-nums; }
-.sans { font-family: var(--sans); }
-.serif { font-family: var(--serif); }
-
-.row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
-.row-tight { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
-.stack { display: flex; flex-direction: column; gap: 0.6rem; }
-
-.tone-rising { color: var(--rising); }
-.tone-falling { color: var(--falling); }
-
-/* ============================================================
-   PrimeNG overrides — push the library to feel editorial.
-   Most styling stays in PrimeNG; we only retune surfaces, fonts,
-   and accent colours so it doesn't look "stock blue dashboard".
-   ============================================================ */
-.p-component,
-.p-component * {
-  font-family: var(--sans);
-}
-
-/* Use the warm card surface on PrimeNG inputs */
+/* Inputs */
 .p-inputtext,
 .p-select,
 .p-iconfield input,
 .p-multiselect {
-  background: var(--card) !important;
-  border-color: var(--rule) !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
   color: var(--ink) !important;
-  border-radius: var(--radius) !important;
-  font-family: var(--sans);
-  font-size: 0.92rem;
+  border-radius: var(--r-3) !important;
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-1) !important;
+  transition: border-color .12s, box-shadow .12s;
 }
 .p-inputtext:hover,
 .p-select:hover,
-.p-multiselect:hover {
-  border-color: var(--rule-strong) !important;
-}
+.p-multiselect:hover { border-color: var(--border-strong) !important; }
 .p-inputtext:focus,
-.p-select:focus,
 .p-select.p-focus,
-.p-multiselect.p-focus {
+.p-multiselect.p-focus,
+.p-inputtext:focus-visible {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+  box-shadow: 0 0 0 3px var(--accent-ring) !important;
   outline: 0;
 }
+.p-iconfield .p-inputicon { color: var(--muted); }
 
-.p-iconfield .p-inputicon {
-  color: var(--muted);
-}
-
-/* Buttons — link / text variants to match editorial language */
+/* Buttons */
 .p-button.p-button-text {
-  color: var(--ink-2);
-  &:hover { background: var(--card-soft); color: var(--ink); }
+  color: var(--ink-3);
+  &:hover { background: var(--surface-2); color: var(--ink); }
+}
+.p-button.p-button-secondary.p-button-text {
+  color: var(--ink-3);
+  &:hover { background: var(--surface-2); }
 }
 
-/* Tabs — flatter underline style instead of stock pill */
+/* Tabs — clean underline (override PrimeNG borders / containers) */
+.p-tabs,
+.p-tabs .p-tablist,
+.p-tabs .p-tablist-tab-list,
+.p-tabs .p-tablist-content {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
 .p-tabs .p-tablist {
-  background: transparent;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: 0 !important;
 }
 .p-tabs .p-tab {
   font-family: var(--sans);
-  font-size: 0.92rem;
-  letter-spacing: 0.01em;
-  color: var(--ink-3);
+  font-size: 0.875rem;
+  color: var(--ink-4) !important;
   font-weight: 500;
-  padding: 0.75rem 1.1rem;
-  background: transparent;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  transition: color .15s, border-color .15s;
+  padding: 0.7rem 1rem !important;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
 }
-.p-tabs .p-tab:hover { color: var(--ink); }
+.p-tabs .p-tab:hover { color: var(--ink) !important; }
 .p-tabs .p-tab.p-tab-active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: var(--accent) !important;
+  border-bottom-color: var(--accent) !important;
+  background: transparent !important;
 }
+.p-tabs .p-tab:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-ring) !important;
+}
+.p-tabs .p-tablist-active-bar { display: none !important; }
 .p-tabs .p-tabpanels {
-  background: transparent;
-  padding-top: 1.5rem;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 1.25rem 0 0 !important;
 }
 
 /* Tag */
 .p-tag {
-  background: var(--card-soft);
-  color: var(--ink-2);
   font-family: var(--sans);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  border-radius: var(--radius-sm);
-  padding: 0.18rem 0.5rem;
+  border-radius: var(--r-1);
+  padding: 0.16rem 0.45rem;
+  background: var(--surface-2);
+  color: var(--ink-3);
 }
-.p-tag.p-tag-info    { background: rgba(47,99,131,0.12);  color: var(--sector-agents); }
-.p-tag.p-tag-success { background: rgba(45,107,58,0.12);  color: var(--rising); }
-.p-tag.p-tag-warn    { background: rgba(154,106,35,0.14); color: var(--sector-gov); }
-.p-tag.p-tag-secondary { background: var(--card-soft); color: var(--muted); }
+.p-tag.p-tag-info    { background: rgba(59,130,246,0.10); color: var(--info); }
+.p-tag.p-tag-success { background: rgba(16,185,129,0.10); color: var(--rising); }
+.p-tag.p-tag-warn    { background: rgba(245,158,11,0.12); color: #b45309; }
+.p-tag.p-tag-secondary { background: var(--surface-2); color: var(--ink-4); }
 
 /* Chip */
 .p-chip {
-  background: var(--card);
-  color: var(--ink-2);
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 0.18rem 0.6rem;
-  font-family: var(--sans);
-  font-size: 0.78rem;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  border: 0;
+  border-radius: var(--r-1);
+  padding: 0.16rem 0.5rem;
+  font-size: 0.74rem;
   font-weight: 500;
 }
 
 /* Drawer */
-.p-drawer-mask {
-  background: rgba(26, 22, 18, 0.30) !important;
-  backdrop-filter: blur(2px);
-}
+.p-drawer-mask { background: var(--overlay) !important; backdrop-filter: blur(2px); }
 .p-drawer {
-  background: var(--paper) !important;
-  border-left: 1px solid var(--rule) !important;
-  box-shadow: -12px 0 36px rgba(26,22,18,0.10) !important;
+  background: var(--bg) !important;
+  border-left: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-4) !important;
 }
 
 /* Skeleton */
 .p-skeleton {
-  background: linear-gradient(90deg, var(--card-soft) 0%, var(--card) 50%, var(--card-soft) 100%) !important;
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface) 50%, var(--surface-2) 100%) !important;
   background-size: 200% 100% !important;
   animation: shimmer 1.4s infinite linear;
-  border-radius: var(--radius-sm) !important;
+  border-radius: var(--r-2) !important;
 }
 @keyframes shimmer {
   0% { background-position: 200% 0; }
@@ -407,75 +361,62 @@ hr {
 
 /* Message */
 .p-message {
-  border-radius: var(--radius) !important;
+  border-radius: var(--r-3) !important;
   font-family: var(--sans);
+  font-size: 0.875rem;
 }
 .p-message-error {
-  background: rgba(154,42,42,0.10) !important;
-  border-color: rgba(154,42,42,0.30) !important;
+  background: rgba(239,68,68,0.08) !important;
+  border-color: rgba(239,68,68,0.30) !important;
   color: var(--falling) !important;
 }
 
-/* PrimeNG Select overlay */
+/* Select overlay */
 .p-select-overlay,
 .p-multiselect-overlay {
-  background: var(--card) !important;
-  border: 1px solid var(--rule) !important;
-  border-radius: var(--radius) !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-3) !important;
+  box-shadow: var(--shadow-3) !important;
   font-family: var(--sans);
 }
-.p-select-option,
-.p-multiselect-option {
+.p-select-option, .p-multiselect-option {
   color: var(--ink-2) !important;
-  padding: 0.55rem 0.9rem !important;
+  padding: 0.5rem 0.85rem !important;
+  font-size: 0.875rem;
 }
 .p-select-option.p-select-option-selected,
 .p-multiselect-option.p-multiselect-option-selected {
   background: var(--accent-soft) !important;
-  color: var(--ink) !important;
+  color: var(--accent) !important;
 }
 .p-select-option:hover:not(.p-select-option-selected),
 .p-multiselect-option:hover:not(.p-multiselect-option-selected) {
-  background: var(--card-soft) !important;
+  background: var(--surface) !important;
 }
 
-/* Card (PrimeNG p-card) — softer, paper-like */
+/* Card */
 .p-card {
-  background: var(--card) !important;
-  border: 1px solid var(--rule) !important;
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-sm) !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-4) !important;
+  box-shadow: var(--shadow-1) !important;
   color: var(--ink) !important;
 }
-.p-card-title { font-family: var(--serif); font-weight: 600; }
 
 /* Toolbar */
-.p-toolbar {
-  background: transparent !important;
-  border: 0 !important;
-  padding: 0 !important;
-}
+.p-toolbar { background: transparent !important; border: 0 !important; padding: 0 !important; }
 
-/* DataView */
-.p-dataview {
-  background: transparent !important;
-  border: 0 !important;
-}
-
-/* ScrollPanel & Tooltip */
+/* Tooltip */
 .p-tooltip-text {
   background: var(--ink) !important;
-  color: var(--paper) !important;
-  border-radius: var(--radius-sm) !important;
+  color: #e2e8f0 !important;
+  border-radius: var(--r-2) !important;
   font-family: var(--sans);
   font-size: 0.78rem;
 }
 
-/* ============================================================
-   Reading-mode tweaks for narrow screens
-   ============================================================ */
 @media (max-width: 640px) {
-  html, body { font-size: 15px; }
-  .markdown { font-size: 1rem; }
+  html, body { font-size: 13.5px; }
   .page { padding: 1.25rem 1rem 3rem; }
 }

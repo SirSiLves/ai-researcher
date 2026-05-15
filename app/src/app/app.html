@@ -1,40 +1,31 @@
-<header class="masthead">
-  <div class="masthead__rules masthead__rules--top"></div>
-  <div class="masthead__inner">
-    <a routerLink="/today" class="wordmark" aria-label="AI Researcher home">
-      <span class="wordmark__name">The&nbsp;AI Researcher</span>
-      <span class="wordmark__sub">Daily dispatch from the AI frontier</span>
+<header class="appbar">
+  <div class="appbar__inner">
+    <a routerLink="/today" class="brand" aria-label="AI Researcher home">
+      <span class="brand__logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 17 L9 5 L15 17 M5.5 12 L12.5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="18.5" cy="13" r="3" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </span>
+      <span class="brand__name">AI Researcher</span>
     </a>
-    <div class="masthead__date">
-      <time class="byline">{{ today() }}</time>
+
+    <nav class="appbar__tabs" aria-label="Primary">
+      @for (tab of tabs; track tab.path) {
+        <a [routerLink]="tab.path"
+           routerLinkActive="is-active"
+           class="appbar__tab">
+          {{ tab.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="appbar__actions">
+      <span class="appbar__date">{{ today() }}</span>
     </div>
   </div>
-  <div class="masthead__rules masthead__rules--mid"></div>
-  <nav class="topnav" aria-label="Primary">
-    <ul>
-      @for (tab of tabs; track tab.path) {
-        <li>
-          <a [routerLink]="tab.path"
-             routerLinkActive="is-active"
-             class="topnav__link">
-            <i class="pi" [class]="tab.icon" aria-hidden="true"></i>
-            <span>{{ tab.label }}</span>
-          </a>
-        </li>
-      }
-    </ul>
-  </nav>
-  <div class="masthead__rules masthead__rules--bottom"></div>
 </header>
 
 <main class="app-main">
   <router-outlet />
 </main>
-
-<footer class="appfoot">
-  <div class="appfoot__rules"></div>
-  <div class="appfoot__inner">
-    <span>The AI Researcher · Auto-generated nightly</span>
-    <span class="muted">Editorial pipeline runs at 06:00 local</span>
-  </div>
-</footer>

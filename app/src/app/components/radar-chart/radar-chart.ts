@@ -22,15 +22,15 @@ import { RadarTopic } from '../../services/data.service';
 
 Chart.register(BubbleController, LinearScale, PointElement, Tooltip, Legend);
 
-// Editorial sector palette — muted, paper-friendly (matches CSS vars).
+// Tech-product palette — cool family aligned with indigo accent.
 const SECTOR_COLORS: Record<string, { fill: string; stroke: string }> = {
-  'Models & capabilities':    { fill: 'rgba(111, 77, 140, 0.55)', stroke: 'rgba(111, 77, 140, 1)' },
-  'Agents & infrastructure':  { fill: 'rgba(47, 99, 131, 0.55)',  stroke: 'rgba(47, 99, 131, 1)' },
-  'Governance & market':      { fill: 'rgba(154, 106, 35, 0.55)', stroke: 'rgba(154, 106, 35, 1)' },
-  'Methods & research':       { fill: 'rgba(45, 107, 58, 0.55)',  stroke: 'rgba(45, 107, 58, 1)' },
+  'Models & capabilities':    { fill: 'rgba(99, 102, 241, 0.55)',  stroke: 'rgba(99, 102, 241, 1)' },   // indigo
+  'Agents & infrastructure':  { fill: 'rgba(14, 165, 233, 0.55)',  stroke: 'rgba(14, 165, 233, 1)' },   // sky
+  'Governance & market':      { fill: 'rgba(245, 158, 11, 0.55)',  stroke: 'rgba(245, 158, 11, 1)' },   // amber
+  'Methods & research':       { fill: 'rgba(20, 184, 166, 0.55)',  stroke: 'rgba(20, 184, 166, 1)' },   // teal
 };
 
-const FALLBACK = { fill: 'rgba(138, 127, 112, 0.55)', stroke: 'rgba(138, 127, 112, 1)' };
+const FALLBACK = { fill: 'rgba(148, 163, 184, 0.55)', stroke: 'rgba(148, 163, 184, 1)' };
 
 interface TopicPoint {
   x: number;          // momentum_7d_pct
@@ -73,26 +73,26 @@ export class RadarChart implements AfterViewInit, OnDestroy {
         scales: {
           x: {
             type: 'linear',
-            title: { display: true, text: '7-day momentum (%)', color: '#6f6557', font: { weight: 500, family: 'Inter, sans-serif', size: 12 } },
-            grid: { color: 'rgba(26,22,18,0.05)' },
-            ticks: { color: '#8a7f70', callback: v => `${v}%`, font: { family: 'Inter, sans-serif', size: 11 } }
+            title: { display: true, text: '7-day momentum (%)', color: '#475569', font: { weight: 500, family: 'Inter, sans-serif', size: 12 } },
+            grid: { color: 'rgba(15,23,42,0.05)' },
+            ticks: { color: '#94a3b8', callback: v => `${v}%`, font: { family: 'Inter, sans-serif', size: 11 } }
           },
           y: {
             type: 'linear',
-            title: { display: true, text: 'Sustained days', color: '#6f6557', font: { weight: 500, family: 'Inter, sans-serif', size: 12 } },
-            grid: { color: 'rgba(26,22,18,0.05)' },
-            ticks: { color: '#8a7f70', stepSize: 1, precision: 0, font: { family: 'Inter, sans-serif', size: 11 } },
+            title: { display: true, text: 'Sustained days', color: '#475569', font: { weight: 500, family: 'Inter, sans-serif', size: 12 } },
+            grid: { color: 'rgba(15,23,42,0.05)' },
+            ticks: { color: '#94a3b8', stepSize: 1, precision: 0, font: { family: 'Inter, sans-serif', size: 11 } },
             min: 0
           }
         },
         plugins: {
           legend: {
             position: 'top',
-            labels: { color: '#4a423a', usePointStyle: true, padding: 16, font: { family: 'Inter, sans-serif', size: 12 } }
+            labels: { color: '#475569', usePointStyle: true, padding: 16, font: { family: 'Inter, sans-serif', size: 12 } }
           },
           tooltip: {
-            backgroundColor: '#1a1612',
-            titleFont: { family: 'Source Serif 4, Charter, serif', weight: 600, size: 13 },
+            backgroundColor: '#0f172a',
+            titleFont: { family: 'Inter, sans-serif', weight: 600, size: 13 },
             bodyFont: { family: 'Inter, sans-serif', size: 12 },
             padding: 10,
             callbacks: {

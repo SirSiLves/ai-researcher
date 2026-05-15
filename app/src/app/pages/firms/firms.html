@@ -1,10 +1,9 @@
 <section class="page firms">
-  <header class="firms__head">
-    <div class="firms__lede">
-      <span class="eyebrow">Firms in coverage</span>
-      <h1 class="title-display">Who's moving the conversation</h1>
-      <p class="deck">
-        {{ orgs().length }} organizations tracked &middot; sorted by 7-day velocity by default
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Firms</h1>
+      <p class="page__subtitle">
+        {{ orgs().length }} organizations tracked &middot; sorted by 7-day velocity
       </p>
     </div>
   </header>
@@ -27,7 +26,7 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Tier"
-              [style]="{ minWidth: '13rem' }"
+              [style]="{ minWidth: '12rem' }"
               appendTo="body" />
     <p-select [options]="velocityOptions"
               [ngModel]="velocityFilter()"
@@ -42,14 +41,14 @@
               (ngModelChange)="sortKey.set($event)"
               optionLabel="label"
               optionValue="value"
-              [style]="{ minWidth: '13rem' }"
+              [style]="{ minWidth: '12rem' }"
               appendTo="body" />
   </div>
 
   @if (loading()) {
     <div class="firm-grid">
       @for (i of [1,2,3,4,5,6,7,8]; track i) {
-        <p-skeleton width="100%" height="11rem"></p-skeleton>
+        <p-skeleton width="100%" height="10rem"></p-skeleton>
       }
     </div>
   } @else {
@@ -59,22 +58,22 @@
           <header class="firm-card__head">
             <span class="firm-card__name">{{ o.slug }}</span>
             @if (o.is_priority) {
-              <p-tag value="priority" severity="warn"></p-tag>
+              <p-tag value="priority" severity="info"></p-tag>
             }
           </header>
 
           <dl class="firm-card__stats">
             <div>
-              <dt>7-day</dt>
               <dd class="tabular">{{ o.velocity_7d }}</dd>
+              <dt>7-day</dt>
             </div>
             <div>
-              <dt>Total</dt>
               <dd class="tabular">{{ o.total_mentions }}</dd>
+              <dt>Total</dt>
             </div>
             <div>
-              <dt>Topics</dt>
               <dd class="tabular">{{ o.topic_count }}</dd>
+              <dt>Topics</dt>
             </div>
           </dl>
 
@@ -94,7 +93,7 @@
           @if (o.top_topics.length) {
             <div class="firm-card__topics">
               @for (t of o.top_topics.slice(0, 3); track t) {
-                <p-chip [label]="t" styleClass="firm-card__chip" />
+                <p-chip [label]="t" />
               }
             </div>
           }
@@ -108,14 +107,13 @@
   <p-drawer [visible]="!!selectedSlug()"
             (visibleChange)="$event || close()"
             position="right"
-            [style]="{ width: 'min(580px, 100vw)' }"
-            [showCloseIcon]="false"
-            styleClass="firm-drawer">
+            [style]="{ width: 'min(560px, 100vw)' }"
+            [showCloseIcon]="false">
     <ng-template #headless>
       <header class="drawer-head">
         <div class="drawer-head__title">
-          <span class="eyebrow">Firm profile</span>
-          <h2 class="title-section">{{ selectedSlug() }}</h2>
+          <h2 class="drawer-head__h2">{{ selectedSlug() }}</h2>
+          <span class="subtle">Firm profile</span>
         </div>
         <p-button icon="pi pi-times"
                   severity="secondary"
@@ -135,13 +133,14 @@
         <div class="drawer-body">
           <div class="drawer-meta">
             @if (d.tier_hint) { <p-tag [value]="d.tier_hint" severity="info"></p-tag> }
-            @if (d.region) { <span class="byline">{{ d.region }}</span> }
+            @if (d.region) { <span class="subtle">{{ d.region }}</span> }
             @if (d.blog_url_hint) {
-              <a [href]="d.blog_url_hint" target="_blank" rel="noopener" class="blog-link">
+              <a [href]="d.blog_url_hint" target="_blank" rel="noopener" class="drawer-link">
                 <i class="pi pi-external-link"></i> blog
               </a>
             }
           </div>
+
           <dl class="drawer-stats">
             <div><dt>Total mentions</dt><dd class="tabular">{{ d.total_mentions }}</dd></div>
             <div><dt>Distinct days</dt><dd class="tabular">{{ d.distinct_days }}</dd></div>
@@ -150,7 +149,7 @@
           </dl>
 
           <section class="drawer-section">
-            <h3 class="drawer-section__title">By source type</h3>
+            <h3 class="drawer-section__title">Source mix</h3>
             <ul class="src-list">
               @for (s of topSources(d); track s.key) {
                 <li>
@@ -185,7 +184,7 @@
                 @for (c of d.recent_context!.slice(0, 6); track c.path + c.date) {
                   <li>
                     <header>
-                      <span class="byline">{{ c.date }} &middot; {{ c.source_type }}</span>
+                      <span class="subtle tabular">{{ c.date }} &middot; {{ c.source_type }}</span>
                     </header>
                     <p>{{ c.snippet }}</p>
                   </li>

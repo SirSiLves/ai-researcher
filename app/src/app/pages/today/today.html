@@ -1,62 +1,54 @@
-<section class="page page--prose today">
-  <header class="today__head">
-    <span class="eyebrow">Daily edition</span>
-    <h1 class="title-display">
-      @if (current(); as c) {
-        {{ c.headline }}
-      } @else {
-        AI Daily &mdash; latest dispatch
-      }
-    </h1>
-    <p class="deck">
-      @if (selectedDate()) {
-        {{ formattedDate() }} &middot; synthesized from seven collectors
-      } @else {
-        Loading the most recent edition&hellip;
-      }
-    </p>
-  </header>
-
-  <div class="today__controls">
-    <div class="today__nav">
-      <p-button icon="pi pi-arrow-left"
+<section class="page today">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Today</h1>
+      <p class="page__subtitle">
+        @if (current(); as c) {
+          {{ formattedDate() }} &middot; {{ c.headline }}
+        } @else {
+          Daily AI dispatch synthesized from seven collectors.
+        }
+      </p>
+    </div>
+    <div class="today__controls">
+      <p-button icon="pi pi-chevron-left"
                 severity="secondary"
                 [text]="true"
                 [disabled]="!canPrev()"
                 (onClick)="prev()"
                 aria-label="Previous edition" />
-      <p-button icon="pi pi-arrow-right"
+      <p-button icon="pi pi-chevron-right"
                 severity="secondary"
                 [text]="true"
                 [disabled]="!canNext()"
                 (onClick)="next()"
                 aria-label="Next edition" />
+      <p-select [options]="options()"
+                [ngModel]="selectedDate()"
+                (ngModelChange)="onPick($event)"
+                optionLabel="label"
+                optionValue="value"
+                [filter]="true"
+                filterPlaceholder="Jump to date…"
+                [showClear]="false"
+                [style]="{ minWidth: '18rem' }"
+                placeholder="Pick a date"
+                appendTo="body" />
     </div>
-    <p-select [options]="options()"
-              [ngModel]="selectedDate()"
-              (ngModelChange)="onPick($event)"
-              optionLabel="label"
-              optionValue="value"
-              [filter]="true"
-              filterPlaceholder="Jump to a date…"
-              [showClear]="false"
-              [style]="{ minWidth: '22rem' }"
-              placeholder="Pick a date"
-              appendTo="body" />
-  </div>
+  </header>
 
   @if (error(); as e) {
     <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
   }
 
   @if (loading() && !markdown()) {
-    <article class="today__article today__article--skeleton">
-      <p-skeleton width="68%" height="2.6rem" styleClass="skel"></p-skeleton>
-      <p-skeleton width="40%" height="1rem" styleClass="skel"></p-skeleton>
-      <p-skeleton width="100%" height="1rem" styleClass="skel"></p-skeleton>
-      <p-skeleton width="92%" height="1rem" styleClass="skel"></p-skeleton>
-      <p-skeleton width="96%" height="1rem" styleClass="skel"></p-skeleton>
-      <p-skeleton width="60%" height="1rem" styleClass="skel"></p-skeleton>
+    <article class="today__article">
+      <p-skeleton width="68%" height="1.5rem"></p-skeleton>
+      <p-skeleton width="40%" height="0.9rem"></p-skeleton>
+      <p-skeleton width="100%" height="0.9rem"></p-skeleton>
+      <p-skeleton width="92%" height="0.9rem"></p-skeleton>
+      <p-skeleton width="96%" height="0.9rem"></p-skeleton>
+      <p-skeleton width="60%" height="0.9rem"></p-skeleton>
     </article>
   } @else if (markdown()) {
     <article class="today__article">
