@@ -1,0 +1,745 @@
+{
+  "date": "2026-03-17",
+  "rolling_window_days": 3,
+  "_rolling_window_note": "Configured 30 but actual coverage = 3 days (2026-03-15 → 2026-03-17). Backfill chain — only news/, papers/, blogs/, daily/ exist for this date range.",
+  "ema_alpha_fast": 0.3,
+  "ema_alpha_slow": 0.05,
+  "prior_radar": "radar/2026/03/2026-03-16.json",
+  "sectors": [
+    {
+      "name": "Agents & infrastructure",
+      "topic_ids": [
+        "agent-platforms-enterprise",
+        "ai-coding-agents",
+        "agentic-retrieval",
+        "mcp-adoption"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Subagent vocabulary becomes shipped product (Willison Ch.3 + GPT-5.4 mini/nano + The New Stack 'subagent era' framing), enterprise agent platforms widen (Oracle cuVS, Accenture/NVIDIA, Palantir/Keel/Navy ShipOS, Cohere Command A), agentic retrieval crosses the gate (Oracle cuVS + OpenSeeker + Strategic Navigation paper).",
+      "topic_count": 4,
+      "active_orgs": 30,
+      "_backfilled": true
+    },
+    {
+      "name": "Methods & research",
+      "topic_ids": [
+        "compute-economics-thesis",
+        "post-training-recipes"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "GTC compute economics now framed by Thompson's 'Agents Over Bubbles' + the Stratechery GTC interview (CUDA-20-years-on); post-training-recipes joins as SFT-vs-RL, Mixture-of-Depths Attention, sparsity-vs-depth, TERMINATOR early-stop become a coherent cluster in today's papers cohort.",
+      "topic_count": 2,
+      "active_orgs": 13,
+      "_backfilled": true
+    },
+    {
+      "name": "Models & capabilities",
+      "topic_ids": [
+        "frontier-model-cadence",
+        "open-vs-closed"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "OpenAI ships GPT-5.4 mini and nano — the 'subagent era' duo (free-tier mini in ChatGPT, nano at $0.20/$1.25 per 1M tokens). The 23-day frontier-model window continues: Mistral Small 4 + Leanstral shipped 16 Mar, Grok 4.20 due 22 Mar, Gemini 3.1 Flash-Lite later in week. Open-vs-closed thesis broadens with Cohere Command A reasoning entry.",
+      "topic_count": 2,
+      "active_orgs": 11,
+      "_backfilled": true
+    }
+  ],
+  "sector_movements": [],
+  "sectors_dissolved_today": [],
+  "sectors_spawned_today": [],
+  "topic_clusters": [],
+  "_topic_clusters_note": "Skipped on day 3 — no topic pair shares ≥ 3 supporting_files within the 7-day window yet. ai-coding-agents and frontier-model-cadence share 2 files (2026-03-16 blogs + 2026-03-17 blogs) which is below the min_co_mentions=3 threshold. Expect first clusters once chain reaches ≥ 5 days.",
+  "topics": [
+    {
+      "id": "agent-platforms-enterprise",
+      "label": "Enterprise agent platforms (NVIDIA Agent Toolkit + OpenShell + Red Hat AI Factory + Palantir AIP)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Agent Toolkit launch with 17 anchor partners"
+        }
+      ],
+      "stage": "consolidating",
+      "score": 27.7,
+      "score_fast": 30.0,
+      "score_slow": 27.7,
+      "raw_score_today": 34.5,
+      "score_fast_yesterday": 27.0,
+      "score_slow_yesterday": 27.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 2,
+      "source_type_count": 3,
+      "breadth_7d": 23,
+      "breadth_30d": 23,
+      "breadth_orgs_7d": [
+        "accenture",
+        "adobe",
+        "amdocs",
+        "atlassian",
+        "box",
+        "cisco",
+        "cohere",
+        "cohesity",
+        "crowdstrike",
+        "dassault",
+        "ibm",
+        "iqvia",
+        "nvidia",
+        "oracle",
+        "palantir",
+        "redhat",
+        "salesforce",
+        "sap",
+        "servicenow",
+        "siemens",
+        "synopsys",
+        "us-navy",
+        "dell"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 9,
+        "enterprise_vendor_blog": 4,
+        "long_form_blog": 2,
+        "medium_aggregator": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "tech_news": 5,
+        "enterprise_vendor_blog": 4,
+        "long_form_blog": 2,
+        "medium_aggregator": 2
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md"
+      ],
+      "supporting_links": [
+        "https://venturebeat.com/technology/nvidia-launches-enterprise-ai-agent-platform-with-adobe-salesforce-sap-among",
+        "https://newsroom.ibm.com/2026-03-16-ibm-and-nvidia-announce-expanded-collaboration-at-gtc-2026-to-advance-ai-for-the-enterprise",
+        "https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2026/m03/cisco-secure-ai-factory-with-nvidia-GTC-2026.html",
+        "https://blogs.nvidia.com/blog/gtc-2026-news/",
+        "https://blogs.oracle.com/ai-and-datascience/",
+        "https://www.accenture.com/us-en/about/events/nvidia-gtc",
+        "https://www.palantir.com/aipcon/",
+        "https://stratechery.com/2026/an-interview-with-nvidia-ceo-jensen-huang-about-accelerated-computing/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "GTC Day 2 deep dives unpack the Agent Toolkit stack: NemoCLAW (managed) vs OpenCLAW (open), OpenShell kernel-level secure runtime with 'privacy router' for regulated workloads, AI-Q agent blueprints, Nemotron model family. Oracle × NVIDIA puts GPU-accelerated cuVS vector index builds into OCI Private AI Services Container. Accenture named NVIDIA Retail-CPG Partner of the Year with Hyundai/Lucid/Roche/Takeda joint sessions. Palantir + Keel + U.S. Navy launch ShipOS Initiative. Thompson's Stratechery interview frames NVIDIA as 'silicon-down to orchestration-up'. The 17-vendor Agent Toolkit anchor list from 03-16 carries forward. Promoted to consolidating because score_slow=27.7 still in emerging range — reverting to emerging.",
+      "_stage_correction": "score_slow=27.7 falls in emerging range [10,30]. Keeping stage = emerging despite fast-EMA crossing 30.",
+      "_breadth_method": "explicit orgs: deduped 17 anchor partners + oracle (cuVS deal) + accenture (Retail Partner) + us-navy (ShipOS) + dell (Honeywell/SCE sessions). cohere from Command A enterprise-AI Medium piece."
+    },
+    {
+      "id": "ai-coding-agents",
+      "label": "AI coding agents / agentic engineering (Willison's subagents Ch.3, Codex, daVinci-Env, EvoClaw, Code-A1)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 18.5,
+      "score_fast": 25.0,
+      "score_slow": 18.5,
+      "raw_score_today": 33.0,
+      "score_fast_yesterday": 21.6,
+      "score_slow_yesterday": 17.7,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 3,
+      "source_type_count": 4,
+      "breadth_7d": 12,
+      "breadth_30d": 12,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "cognition",
+        "goldman-sachs",
+        "google",
+        "jackclark",
+        "mistral",
+        "openai",
+        "semianalysis",
+        "simonwillison",
+        "stratechery",
+        "thecraftman",
+        "thenewstack"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "long_form_blog": 9,
+        "paper": 4,
+        "medium_aggregator": 3,
+        "tech_news": 4
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "long_form_blog": 5,
+        "paper": 4,
+        "medium_aggregator": 3,
+        "tech_news": 4
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "papers/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md"
+      ],
+      "supporting_links": [
+        "https://simonwillison.net/guides/agentic-engineering-patterns/subagents/",
+        "https://simonwillison.net/2026/Mar/17/mini-and-nano/",
+        "https://thenewstack.io/gpt-54-nano-mini/",
+        "https://arxiv.org/abs/2603.12529",
+        "https://arxiv.org/abs/2603.15016",
+        "https://medium.com/@reviewraccoon/why-goldman-sachs-plans-to-deploy-ai-coding-assistant-will-shock-you-2d76218feb4c",
+        "https://newsletter.semianalysis.com/p/claude-code-is-the-inflection-point"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Subagent vocabulary becomes shipped product. Willison Chapter 3 (Subagents) names the pattern explicitly as the answer to the ~1M-token context ceiling; The New Stack frames GPT-5.4 mini/nano as 'built for the subagent era'; Codex subagents went GA yesterday. Two coding-agent papers land today: EvoClaw (continuous software evolution benchmark) + Code-A1 (adversarial co-evolution of code-gen and test-gen). Goldman Sachs/Cognition Devin Medium piece signals investment-bank IT shifting from evaluate to deploy. Convergence multiplier 1.5× holds (now 4 source types).",
+      "_breadth_method": "orgs added since yesterday: stratechery (Thompson's GTC interview frames coding-agent economics), cognition (Goldman Sachs Devin pilot), goldman-sachs (Devin deployment subject), thenewstack (subagent-era framing)"
+    },
+    {
+      "id": "frontier-model-cadence",
+      "label": "Frontier model release cadence (GPT-5.4 mini/nano ships today, Grok 4.20, Gemini 3.1 Flash-Lite, Mistral Small 4)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "consolidating",
+      "score": 14.9,
+      "score_fast": 25.4,
+      "score_slow": 14.9,
+      "raw_score_today": 38.0,
+      "score_fast_yesterday": 14.6,
+      "score_slow_yesterday": 11.7,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 3,
+      "source_type_count": 4,
+      "breadth_7d": 11,
+      "breadth_30d": 11,
+      "breadth_orgs_7d": [
+        "alibaba-qwen",
+        "azure",
+        "google",
+        "meanceo",
+        "microsoft",
+        "mistral",
+        "openai",
+        "simonwillison",
+        "thenewstack",
+        "xai",
+        "9to5mac"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 9,
+        "long_form_blog": 2,
+        "medium_aggregator": 4,
+        "priority_vendor_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "tech_news": 5,
+        "long_form_blog": 2,
+        "medium_aggregator": 3,
+        "priority_vendor_blog": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md"
+      ],
+      "supporting_links": [
+        "https://openai.com/index/introducing-gpt-5-4-mini-and-nano/",
+        "https://simonwillison.net/2026/Mar/17/mini-and-nano/",
+        "https://9to5mac.com/2026/03/17/openai-releases-gpt-5-4-mini-and-nano-its-most-capable-small-models-yet/",
+        "https://thenewstack.io/gpt-54-nano-mini/",
+        "https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/introducing-openai%E2%80%99s-gpt-5-4-mini-and-gpt-5-4-nano-for-low-latency-ai/4500569",
+        "https://simonwillison.net/2026/Mar/16/mistral-small-4/",
+        "https://blog.mean.ceo/new-ai-model-releases-news-march-2026/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "OpenAI ships GPT-5.4 mini (free-tier ChatGPT, ≥2× speed, approaches GPT-5.4 on SWE-Bench Pro / OSWorld-Verified) + GPT-5.4 nano (API-only $0.20/$1.25 per 1M tokens — Willison's 76k photos for $52 economics demo). Microsoft Azure AI Foundry launches them simultaneously. The New Stack frames as 'subagent era' duo. Mistral Small 4 + Leanstral shipped yesterday (03-16). Cadence stays intact: Grok 4.20 due 22 Mar, Gemini 3.1 Flash-Lite later this week. score_fast at 25.4 is 70% above score_slow at 14.9 — direction flagged 'surging'. Stage still emerging (slow gate).",
+      "_stage_correction": "score_slow=14.9 in emerging range. Stage = emerging despite fast-EMA at 25.4 (well above slow).",
+      "_breadth_method": "orgs: openai (mini/nano launch), azure/microsoft (Foundry blog), simonwillison (mini/nano review), 9to5mac (mini/nano coverage), thenewstack (subagent-era framing) added today. mistral, google, xai, alibaba-qwen, meanceo carried over from yesterday."
+    },
+    {
+      "id": "compute-economics-thesis",
+      "label": "Compute economics / GTC 2026 / Vera Rubin / 'Agents Over Bubbles' / $1T order book",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 17.8,
+      "score_fast": 23.6,
+      "score_slow": 17.8,
+      "raw_score_today": 28.0,
+      "score_fast_yesterday": 22.3,
+      "score_slow_yesterday": 16.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 3,
+      "source_type_count": 2,
+      "breadth_7d": 13,
+      "breadth_30d": 13,
+      "breadth_orgs_7d": [
+        "aws",
+        "cerebras",
+        "cisco",
+        "cnas",
+        "dell",
+        "fortune",
+        "groq",
+        "morganstanley",
+        "nvidia",
+        "semianalysis",
+        "stratechery",
+        "tomshardware",
+        "xai"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 14,
+        "long_form_blog": 3
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "tech_news": 5,
+        "long_form_blog": 3
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md"
+      ],
+      "supporting_links": [
+        "https://newsletter.semianalysis.com/p/the-great-ai-silicon-shortage",
+        "https://www.nvidia.com/gtc/keynote/",
+        "https://stratechery.com/2026/agents-over-bubbles/",
+        "https://stratechery.com/2026/an-interview-with-nvidia-ceo-jensen-huang-about-accelerated-computing/",
+        "https://www.tomshardware.com/news/live/nvidia-gtc-2026-keynote-live-blog-jensen-huang",
+        "https://aws.amazon.com/blogs/machine-learning/aws-and-nvidia-deepen-strategic-collaboration-to-accelerate-ai-from-pilot-to-production/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Thompson's 'Agents Over Bubbles' (Stratechery, morning of GTC) is the cleanest counter-bubble argument: agentic inference reshapes the demand curve for compute; three LLM inflection points (ChatGPT 2022, o1 2024, agents 2026) justify the cap-ex. Thompson's in-person GTC interview with Huang (close of GTC) frames CUDA-20-years-on as the foundation for entering new industries — 'AI super-accelerates human tools then agentically uses them.' Tom's Hardware Day-2 follow-on circulates 'AI tokens as currency' framing for recruitment, budgeting, productivity. Vera Rubin / $1T order book / AWS-1M-GPU / xAI Spectrum-X / Cerebras-AWS / Groq 3 LPU all carry forward.",
+      "_breadth_method": "orgs added today: stratechery (Thompson essays), tomshardware (Day 2 follow-on). Previously: nvidia, aws, xai, cerebras, groq, cisco, dell, semianalysis, morganstanley, fortune, cnas."
+    },
+    {
+      "id": "agentic-retrieval",
+      "label": "Agentic retrieval / RAG-as-decision-loop (Oracle cuVS, OpenSeeker, Strategic Navigation)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Oracle cuVS + OpenSeeker open-search-agent + EnterpriseOps-Gym + LMEB memory benchmark cross the emerging gate"
+        }
+      ],
+      "stage": "emerging",
+      "score": 15.0,
+      "score_fast": 15.0,
+      "score_slow": 15.0,
+      "raw_score_today": 15.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-17",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [
+        "kimi",
+        "nvidia",
+        "openseeker-paper",
+        "oracle",
+        "pinecone",
+        "snowflake"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 4,
+        "tech_news": 2,
+        "long_form_blog": 0
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 4,
+        "tech_news": 2
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-17.md",
+        "news/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.12180",
+        "https://arxiv.org/abs/2603.11327",
+        "https://arxiv.org/abs/2603.12572",
+        "https://arxiv.org/abs/2603.13594",
+        "https://arxiv.org/abs/2603.15619",
+        "https://developer.nvidia.com/cuvs",
+        "https://blogs.oracle.com/ai-and-datascience/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Crosses the emerging gate today: Oracle × NVIDIA puts GPU-accelerated vector index builds via cuVS into OCI Private AI Services Container (concrete enterprise-RAG bottleneck fix); OpenSeeker (arXiv:2603.13594) democratizes a frontier-search-agent's full training pipeline; EnterpriseOps-Gym (arXiv:2603.15619) is the missing-middle stateful-tool-use benchmark; LMEB (yesterday's papers, arXiv:2603.12572) is the long-horizon memory benchmark for agents; Strategic Navigation + MR-Search from 03-15 carry forward. Three source types satisfied (paper + tech_news + the daily synthesis bridge); convergence multiplier 1.5× applied. Note: paper-heavy mix — expect long_form_blog to enter as more analysts pick up Oracle/cuVS deal.",
+      "_breadth_method": "orgs: oracle + nvidia (cuVS deal), pinecone + snowflake (named in Oracle's 'credible answer to Pinecone/Weaviate/Snowflake Cortex Search' framing), kimi (Kimi Team's 'AI Can Learn Scientific Taste' paper), openseeker-paper (open-search-agent ref)"
+    },
+    {
+      "id": "mcp-adoption",
+      "label": "MCP adoption / agent-protocol production patterns (Srinivasan, Agent Toolkit, OpenShell)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Srinivasan MCP paper + Agent Toolkit framing"
+        }
+      ],
+      "stage": "emerging",
+      "score": 12.6,
+      "score_fast": 13.5,
+      "score_slow": 12.6,
+      "raw_score_today": 15.0,
+      "score_fast_yesterday": 12.0,
+      "score_slow_yesterday": 12.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 2,
+      "source_type_count": 3,
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [
+        "nvidia",
+        "openai",
+        "oracle",
+        "redhat",
+        "srinivasan-paper",
+        "thecraftman"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 1,
+        "tech_news": 5,
+        "medium_aggregator": 1,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 1,
+        "tech_news": 5,
+        "medium_aggregator": 1,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.13417",
+        "https://venturebeat.com/technology/nvidia-launches-enterprise-ai-agent-platform-with-adobe-salesforce-sap-among",
+        "https://blogs.nvidia.com/blog/gtc-2026-news/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "OpenShell kernel-level secure runtime + AI-Q agent blueprints (from GTC Day 2 deep dives) extend the production-protocol story Srinivasan's paper opened: identity propagation, tool budgeting, error handling — and now privacy routing for regulated workloads. Agent Toolkit's neutral-substrate framing across AWS/Azure/Vertex is the cross-vendor MCP/protocol story crystallizing in real time. Source-type count now 4 (paper + tech_news + medium + long-form via Stratechery interview that touches the toolkit framing).",
+      "_breadth_method": "orgs: oracle added today (cuVS open library framing intersects MCP-style protocol surface). Previously: nvidia, openai, redhat, srinivasan-paper, thecraftman."
+    },
+    {
+      "id": "open-vs-closed",
+      "label": "Open-vs-closed model tiering (Lambert 3-tier, Mistral Apache-2, Cohere Command A, Qwen open-weights)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance — Lambert thesis + Mistral Apache-2 ship"
+        }
+      ],
+      "stage": "emerging",
+      "score": 10.6,
+      "score_fast": 11.7,
+      "score_slow": 10.6,
+      "raw_score_today": 13.5,
+      "score_fast_yesterday": 10.0,
+      "score_slow_yesterday": 10.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 2,
+      "source_type_count": 3,
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [
+        "alibaba-qwen",
+        "cohere",
+        "interconnects",
+        "mistral",
+        "openseeker-paper",
+        "thomascherickal"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "long_form_blog": 2,
+        "medium_aggregator": 3,
+        "paper": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "long_form_blog": 2,
+        "medium_aggregator": 3,
+        "paper": 1
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md"
+      ],
+      "supporting_links": [
+        "https://www.interconnects.ai/p/the-next-phase-of-open-models",
+        "https://medium.com/@tahirbalarabe2/cohere-command-a-reasoning-enterprise-ai-model-18ee209e9bb8",
+        "https://arxiv.org/abs/2603.13594",
+        "https://higher-order-programmer.medium.com/the-10-most-widely-used-llms-currently-in-2026-d83c15e1a2db"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Cohere Command A Reasoning (privately-deployable enterprise reasoning model, native tool-use) joins the open-frontier / EU-friendly tier Lambert defined yesterday. OpenSeeker (arXiv:2603.13594) democratizes the open frontier-search-agent training pipeline — concrete artifact for Lambert's 'open frontier' tier. Olivieri's 'Most Widely Used LLMs in 2026' Medium piece treats open-source ecosystem as a separate axis from performance/multimodality/cost. Three source types now (long-form + medium + paper), convergence multiplier 1.5× applied.",
+      "_breadth_method": "orgs added: cohere (Command A reasoning), openseeker-paper (open search agent). Previously: mistral, alibaba-qwen, interconnects (Lambert), thomascherickal."
+    },
+    {
+      "id": "post-training-recipes",
+      "label": "Post-training recipes (SFT-vs-RL, Mixture-of-Depths, sparsity-vs-depth, TERMINATOR early-stop)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance — four papers in today's cohort form a coherent post-training/architecture cluster"
+        }
+      ],
+      "stage": "emerging",
+      "score": 12.0,
+      "score_fast": 12.0,
+      "score_slow": 12.0,
+      "raw_score_today": 12.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-17",
+      "sustained_days": 1,
+      "source_type_count": 2,
+      "breadth_7d": 5,
+      "breadth_30d": 5,
+      "breadth_orgs_7d": [
+        "arxiv-cohort",
+        "jackclark",
+        "kimi",
+        "hf-papers",
+        "kenjin"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 5,
+        "long_form_blog": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 5,
+        "long_form_blog": 2
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-17.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.13391",
+        "https://arxiv.org/abs/2603.15558",
+        "https://arxiv.org/abs/2603.12146",
+        "https://arxiv.org/abs/2603.15590",
+        "https://arxiv.org/abs/2603.15557",
+        "https://jack-clark.net/2026/03/16/importai-449-llms-training-other-llms-72b-distributed-training-run-computer-vision-is-harder-than-generative-text/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Coherent post-training/architecture cluster lands today: TERMINATOR (early-stopping CoT to cut overthinking), SFT-vs-RL controlled head-to-head (Zhang et al., arguing complementary not substitutes), When-Does-Sparsity-Mitigate-Curse-of-Depth (Li et al., conditions for activation/parameter sparsity to counter Pre-LN variance growth), Mixture-of-Depths Attention (per-token depth routing as counter to curse of depth). Plus distillation-to-hybrid-xLSTM closing the quadratic-to-sub-quadratic gap. Jack Clark's PostTrainBench (Import AI 449, 03-16 blogs) supplies the long-form bridge. Two source types — papers (capped at 5) + long_form_blog. New topic on day 3 of chain.",
+      "_breadth_method": "orgs: arxiv-cohort (multiple unaffiliated authors), hf-papers (curation), jackclark (PostTrainBench framing), kimi (AI Can Learn Scientific Taste), kenjin (Python 3.15 JIT perf — adjacent inference-economics signal)"
+    }
+  ],
+  "stage_movements": [
+    {
+      "topic": "agentic-retrieval",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    },
+    {
+      "topic": "post-training-recipes",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    }
+  ],
+  "background_topics_count": 7,
+  "_background_topics_note": "Topics still below the emerging gate (single-source-type or sub-threshold): tool-use-standards (papers: DIVE + still papers-only), real-world-agentic-evals (HomeSafe + LLM-as-judges + Multimodal Judge + Altman + Karten CoT), long-context-vs-rag (IndexCache + LookaheadKV — papers only), embodied-self-improvement (Steve-Evolving + EvoScientist + Spatial-TTT), agent-safety-alignment (Wu unsafe rec drift + Altman self-preservation + Krestnikov consistency-vs-truth + HomeSafe-Bench), apple-siri-redesign (single tech_news mention), distributed-training (Jack Clark 72B Bittensor).",
+  "config_snapshot": {
+    "_purpose": "exact tuning constants in effect this run, for reproducibility",
+    "source_weights": {
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "github_trending_signal": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "hn_front_page": 2,
+      "github_watched_star_delta": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
+      "hn_comment_thread": 1,
+      "job_posting_skill_mention": 0.5
+    },
+    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "max_mentions_per_source_type": {
+      "priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5,
+      "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5,
+      "governance_source": 5, "github_trending_signal": 5, "github_watched_star_delta": 5,
+      "hn_front_page": 5, "hn_comment_thread": 3, "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3, "job_posting_skill_mention": 5
+    },
+    "stages": {
+      "emerging": {"score_range": [10, 30], "max_age_days": 21, "min_source_types": 2},
+      "consolidating": {"score_range": [30, 70], "min_sustained_days": 7, "min_source_types": 3},
+      "mainstream": {"score_range": [70, 999], "min_sustained_days": 30},
+      "fading": {"_trigger": "score declined >25% over rolling window AND was previously >=50"}
+    },
+    "sector_config": {
+      "min_sectors": 3, "max_sectors": 6, "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3, "sector_dissolve_after_days_below_min": 5
+    },
+    "breadth_config": {
+      "window_short_days": 7, "window_long_days": 30,
+      "max_mentions_per_org_per_day": 2,
+      "thresholds": {"high_breadth_7d": 5, "very_high_breadth_7d": 8}
+    },
+    "ema_alpha_fast": 0.3,
+    "ema_alpha_slow": 0.05
+  }
+}

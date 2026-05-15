@@ -1,0 +1,1023 @@
+{
+  "date": "2026-03-29",
+  "rolling_window_days": 15,
+  "_rolling_window_note": "Cold-start chain — pipeline brand-new, only 2026-03-15 onwards exists. Window grows daily until it reaches the 30-day target.",
+  "ema_alpha_fast": 0.3,
+  "ema_alpha_slow": 0.05,
+  "prior_radar": "radar/2026/03/2026-03-28.json",
+  "lookback_radar_7d": "radar/2026/03/2026-03-22.json",
+  "lookback_radar_30d": null,
+  "lookback_radar_90d": null,
+  "lookback_radar_180d": null,
+  "_backfilled": true,
+  "_backfill_note": "Historical reconstruction on 2026-05-15. Sunday quiet day — Friday-cohort governance/agent-protocol papers surface as Sunday backfill (HF Papers /date/2026-03-29 redirects to Friday). The dominant signal is the AIP paper's 'all ~2,000 MCP servers lacked authentication' finding plus the AgentRFC + Aegis + Runtime-Governance cohort that defines an emerging 'agent-protocol governance' axis. Slow EMAs hold near yesterday's levels; fast EMAs drop across the board on light Sunday volume.",
+  "sectors": [
+    {
+      "name": "Agents & infrastructure",
+      "topic_ids": [
+        "mcp-adoption",
+        "agent-platforms-enterprise",
+        "ai-coding-agents",
+        "agent-security",
+        "agent-evaluation-observability",
+        "agentic-retrieval"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Agent-protocol governance crystallises as a Sunday subtheme — AIP scans ~2,000 MCP servers and finds zero authentication; AgentRFC delivers the first systematic security framework for MCP / A2A / ANP / ACP; Aegis + Runtime-Governance papers formalise cryptographic / path-evaluated runtime enforcement. Sergey Gromov's Palantir AIP teardown is the production-grade enterprise counterpart to LangGraph patterns. Slack MCP GA pre-stage 31 Mar + ServiceNow Action Fabric pre-stage 2 April still working downstream.",
+      "topic_count": 6,
+      "active_orgs": 92
+    },
+    {
+      "name": "Methods & research",
+      "topic_ids": [
+        "post-training-recipes",
+        "long-context-rot",
+        "compute-economics-thesis"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Sunday quiet — DyMoE (CVPR 2026, drift-aware token assignment for continual VLM learning) + MIT Han Lab FourOverSix (adaptive block-scaled NVFP4 data types) target the engineering layer below frontier deployment — both push the inference-cost story Jensen Huang opened GTC with. CRAFT contrastive reasoning alignment + WALAR translation reward-hacking mitigation extend the post-training thread.",
+      "topic_count": 3,
+      "active_orgs": 31
+    },
+    {
+      "name": "Models & capabilities",
+      "topic_ids": [
+        "frontier-model-cadence",
+        "open-vs-closed",
+        "voice-tts",
+        "mythos-anthropic"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Carry day — OpenAI 'Spud' pretraining-complete signal continues to circulate via The Neuron weekend digest (later launches as GPT-5.5 on 23 April). xAI founder-exodus story carries from Saturday. Mythos international pickup wave settles back; slow EMA still climbing while fast EMA drops on light Sunday volume.",
+      "topic_count": 4,
+      "active_orgs": 41
+    },
+    {
+      "name": "Governance & market",
+      "topic_ids": [
+        "ai-governance",
+        "lab-services-gtm",
+        "workforce-reallocation"
+      ],
+      "first_seen": "2026-03-19",
+      "consecutive_low_days": 0,
+      "description": "Most policy-relevant Sunday of the window — Mind the Gap (statutes conflate model capability with system architecture, miss control points: prompts/API permissions/sandboxing) is direct ammunition for the EU-AI-Act-readiness debate. Aegis + Runtime-Governance + Onto-Relational-Sophic round out the runtime-governance cohort. Anthropic peak-hour Claude Code throttling + 7 April livestream cadence carry as compute-supply-meets-product-comms signal.",
+      "topic_count": 3,
+      "active_orgs": 33
+    }
+  ],
+  "sector_movements": [],
+  "sectors_dissolved_today": [],
+  "sectors_spawned_today": [],
+  "topic_clusters": [
+    {
+      "id": "agent-protocol-stack",
+      "name": "Agent protocol stack",
+      "topic_ids": [
+        "mcp-adoption",
+        "agent-platforms-enterprise"
+      ],
+      "size": 2,
+      "first_seen": "2026-03-18",
+      "cluster_score_slow": 33.06,
+      "cluster_score_fast": 26.79,
+      "cluster_direction": "fading",
+      "cluster_breadth_7d": 60,
+      "members_moving_together": true,
+      "_co_mention_evidence": "Stable across eleven runs. AIP paper's MCP-server auth scan + AgentRFC protocol-conformance framework + Sergey Gromov's Palantir AIP teardown couple MCP standards with enterprise platform deployment. Slack MCP GA pre-stage 31 Mar + ServiceNow Action Fabric pre-stage 2 April carry."
+    },
+    {
+      "id": "open-coding-stack",
+      "name": "Open coding stack",
+      "topic_ids": [
+        "ai-coding-agents",
+        "open-vs-closed"
+      ],
+      "size": 2,
+      "first_seen": "2026-03-20",
+      "cluster_score_slow": 25.04,
+      "cluster_score_fast": 21.72,
+      "cluster_direction": "fading",
+      "cluster_breadth_7d": 40,
+      "members_moving_together": true,
+      "_co_mention_evidence": "DataNorth AI Grok 4.20 guide + Pretext (agent-built browser library) couple coding stacks with open-vs-closed posture. Stanford HAI 2026 Index frontier-gap data carry."
+    },
+    {
+      "id": "agent-safety-cluster",
+      "name": "Agent safety stack",
+      "topic_ids": [
+        "agent-security",
+        "agent-evaluation-observability"
+      ],
+      "size": 2,
+      "first_seen": "2026-03-21",
+      "cluster_score_slow": 33.99,
+      "cluster_score_fast": 29.08,
+      "cluster_direction": "fading",
+      "cluster_breadth_7d": 36,
+      "members_moving_together": true,
+      "_co_mention_evidence": "AIP (~2,000 MCP servers, zero auth) + AgentRFC (first systematic agent-protocol security framework) + Aegis (cryptographic runtime governance) + Runtime-Governance (policies on paths) + Risk-Adjusted Harm Scoring (financial-services red-team weighting) + Hamid Bagheri Responsible AI Weekly (A3 + Databricks coSTAR) couple security and eval today as one Sunday governance-paper cohort."
+    },
+    {
+      "id": "harness-engineering",
+      "name": "Harness engineering",
+      "topic_ids": [
+        "ai-coding-agents",
+        "agent-platforms-enterprise"
+      ],
+      "size": 2,
+      "first_seen": "2026-03-23",
+      "cluster_score_slow": 34.12,
+      "cluster_score_fast": 28.59,
+      "cluster_direction": "fading",
+      "cluster_breadth_7d": 64,
+      "members_moving_together": true,
+      "_co_mention_evidence": "Cheng Lou's Pretext (off-DOM text-wrapping browser library built with Claude Code + Codex against full Gatsby + multi-script ground truth — Willison's pick) is the day's standout artifact for the harness > model thesis. Sergey Gromov's Palantir AIP teardown + Digital Applied / Peterson Tech 'month that changed AI' month-in-review pieces explicitly name harness as the product. Addy Osmani LLM coding workflow primer (folded into 03-30 surface but seeded Sunday)."
+    },
+    {
+      "id": "consultancy-lab-jvs",
+      "name": "Consultancy × lab JVs",
+      "topic_ids": [
+        "lab-services-gtm",
+        "agent-platforms-enterprise"
+      ],
+      "size": 2,
+      "first_seen": "2026-03-25",
+      "cluster_score_slow": 24.88,
+      "cluster_score_fast": 19.97,
+      "cluster_direction": "fading",
+      "cluster_breadth_7d": 42,
+      "members_moving_together": true,
+      "_co_mention_evidence": "Quiet Sunday for the cluster — carries only. Anthropic IPO chatter Oct 2026 + Shield AI / Blackstone $1.5B + Bain × Palantir AIP + Cyber.AI carry."
+    },
+    {
+      "id": "governance-runtime-cluster",
+      "name": "Runtime-governance cohort",
+      "topic_ids": [
+        "agent-security",
+        "ai-governance"
+      ],
+      "size": 2,
+      "first_seen": "2026-03-29",
+      "cluster_score_slow": 33.63,
+      "cluster_score_fast": 30.12,
+      "cluster_direction": "fading",
+      "cluster_breadth_7d": 44,
+      "members_moving_together": true,
+      "_co_mention_evidence": "Sunday papers cohort makes the runtime-governance link explicit and concrete: Aegis (cryptographic runtime governance with autonomous shutdown on policy violation) + Runtime Governance for AI Agents (policies as functions over (identity, partial path, proposed action, org state) → violation probability) + Mind the Gap (statutes miss control points where agentic behaviour is governed) + Onto-Relational-Sophic governance framework. The cluster first emerges this Sunday — appended as a new edge in the co-mention graph alongside the existing Agent safety stack and Agent protocol stack edges."
+    }
+  ],
+  "topics": [
+    {
+      "id": "agent-security",
+      "label": "Agent security (AIP scans ~2,000 MCP servers — ALL lacked authentication; AgentRFC delivers first systematic security framework for MCP/A2A/ANP/ACP with formal architectural model + cross-protocol gap-detection tool; Aegis cryptographic runtime governance + Runtime-Governance policies-on-paths cohort; Risk-Adjusted Harm Scoring for financial-services red-teaming; CRAFT hidden-representation alignment; AgenticCyOps carry)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {"date": "2026-03-18", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+      ],
+      "stage": "consolidating",
+      "score": 35.01,
+      "score_fast": 30.88,
+      "score_slow": 35.01,
+      "raw_score_today": 18.0,
+      "score_fast_yesterday": 36.4,
+      "score_slow_yesterday": 35.9,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-18",
+      "sustained_days": 12,
+      "source_type_count": 2,
+      "breadth_7d": 28,
+      "breadth_30d": 28,
+      "breadth_orgs_7d": ["aip-paper", "agentrfc-paper", "aegis-paper", "runtime-gov-paper", "risk-adjusted-paper", "craft-paper", "agentic-cyops-paper", "coin-flip-paper", "hamid-bagheri", "ai-safety-frontier", "anthropic", "fortune", "newsghana", "techzine", "pankaj-pandey", "spire-tech", "roy-paz", "layerx", "snowflake", "nvidia", "accenture", "litellm", "promptarmor", "callum-mcmahon", "futuresearch", "mas-security-paper", "ssgm-paper", "ac4a-paper"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "paper": 7,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "paper": 5,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-18.md",
+        "papers/2026/03/2026-03-19.md",
+        "papers/2026/03/2026-03-20.md",
+        "papers/2026/03/2026-03-21.md",
+        "papers/2026/03/2026-03-24.md",
+        "papers/2026/03/2026-03-27.md",
+        "papers/2026/03/2026-03-29.md",
+        "blogs/2026/03/2026-03-29.md",
+        "daily/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.24775",
+        "https://arxiv.org/abs/2603.23801",
+        "https://arxiv.org/abs/2603.16938",
+        "https://arxiv.org/abs/2603.16586",
+        "https://arxiv.org/abs/2603.10807",
+        "https://arxiv.org/abs/2603.17305"
+      ],
+      "cluster_id": "agent-safety-cluster",
+      "cluster_history": [
+        {"date": "2026-03-21", "from": null, "to": "Agent safety stack", "reason": "first appearance"}
+      ]
+    },
+    {
+      "id": "mcp-adoption",
+      "label": "MCP adoption (AIP paper — Invocation-Bound Capability Tokens for verifiable delegation across MCP / A2A; scan of ~2,000 MCP servers found ALL lacked authentication; AgentRFC formal architectural model + cross-protocol gap-detection tool; Slack MCP server GA pre-stage 31 Mar + ServiceNow Action Fabric pre-stage 2 April; 97M anchor still working downstream — quiet Sunday on MCP itself)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {"date": "2026-03-16", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+      ],
+      "stage": "consolidating",
+      "score": 32.03,
+      "score_fast": 27.28,
+      "score_slow": 32.03,
+      "raw_score_today": 6.0,
+      "score_fast_yesterday": 36.4,
+      "score_slow_yesterday": 33.4,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": 106.6,
+      "score_7d_ago": 15.5,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 14,
+      "source_type_count": 1,
+      "breadth_7d": 20,
+      "breadth_30d": 20,
+      "breadth_orgs_7d": ["aip-paper", "agentrfc-paper", "anthropic", "anmol-gupta", "bytebridge", "digital-applied", "essa-mamdani", "finmcp-paper", "mcp-maintainer", "nvidia", "openai", "oracle", "redhat", "salesforce", "servicenow", "snowflake", "truthifi", "turion", "webfuse", "x4nent"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "paper": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "paper": 2
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-25.md",
+        "news/2026/03/2026-03-25.md",
+        "papers/2026/03/2026-03-29.md",
+        "daily/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.24775",
+        "https://arxiv.org/abs/2603.23801"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first appearance"}
+      ]
+    },
+    {
+      "id": "agent-platforms-enterprise",
+      "label": "Enterprise agent platforms (Sergey Gromov 'Inside Palantir AIP architecture' production-grade teardown of enterprise AI on open-source foundations; Digital Applied / Peterson Tech month-in-review framing 'harness, not model, is the product'; Slack MCP GA 31 Mar carry; AI Engineering Roadmap carry; Cohere AI investor-lens carry)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {"date": "2026-03-16", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+      ],
+      "stage": "consolidating",
+      "score": 34.08,
+      "score_fast": 26.29,
+      "score_slow": 34.08,
+      "raw_score_today": 9.0,
+      "score_fast_yesterday": 33.7,
+      "score_slow_yesterday": 35.4,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 14,
+      "source_type_count": 3,
+      "breadth_7d": 26,
+      "breadth_30d": 44,
+      "breadth_orgs_7d": ["palantir", "sergey-gromov", "digital-applied", "ptechpartners", "anthropic", "accenture", "oracle", "microsoft", "nvidia", "manus", "meta", "servicenow", "snowflake", "ibm", "sap", "salesforce", "bain", "n8n", "cursor", "cognition", "replit", "perplexity", "cohere", "matt-webb", "sarang-mahatwo", "shankar-ravi"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "long_form_blog": 1,
+        "tech_news": 1,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "long_form_blog": 1,
+        "tech_news": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-25.md",
+        "blogs/2026/03/2026-03-29.md",
+        "news/2026/03/2026-03-29.md",
+        "daily/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://medium.com/@grom_65116/inside-palantirs-agent-platform-architecture-how-to-build-enterprise-ai-on-open-source-b529ec763058",
+        "https://www.digitalapplied.com/blog/march-2026-ai-roundup-month-that-changed-everything",
+        "https://www.ptechpartners.com/2026/04/07/march-2026-ai-news-roundup-breakthroughs-and-the-fights-forecasts-and-fears/"
+      ],
+      "cluster_id": "harness-engineering",
+      "cluster_history": [
+        {"date": "2026-03-23", "from": null, "to": "Harness engineering", "reason": "first appearance"}
+      ]
+    },
+    {
+      "id": "ai-coding-agents",
+      "label": "AI coding agents / agentic engineering (Cheng Lou's Pretext browser library — off-DOM text-wrapping built with weeks of Claude Code + Codex iterating against full Gatsby + Thai/Chinese/Korean/Japanese/Arabic public-domain ground truth — Willison's standout 'agent-assisted hardcore engineering' pick; Digital Applied + Peterson Tech month-in-review name 'harness > model' as the durable thesis; Anthropic Claude Code session-limit + 7 April livestream cadence)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {"date": "2026-03-15", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+      ],
+      "stage": "consolidating",
+      "score": 34.15,
+      "score_fast": 30.88,
+      "score_slow": 34.15,
+      "raw_score_today": 18.0,
+      "score_fast_yesterday": 36.4,
+      "score_slow_yesterday": 35.0,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 15,
+      "source_type_count": 3,
+      "breadth_7d": 24,
+      "breadth_30d": 38,
+      "breadth_orgs_7d": ["cheng-lou", "simonwillison", "digital-applied", "ptechpartners", "anthropic", "openai", "google", "mistral", "cognition", "cursor", "perplexity", "kimi", "futuresearch", "hightower", "addyosmani", "jackclark", "matt-webb", "rustcodeweb", "sarang-mahatwo", "shankar-ravi", "reco", "replit", "tldr-dev", "venturebeat"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "long_form_blog": 1,
+        "tech_news": 2,
+        "priority_vendor_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "long_form_blog": 1,
+        "tech_news": 2,
+        "priority_vendor_blog": 1
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-26.md",
+        "blogs/2026/03/2026-03-28.md",
+        "blogs/2026/03/2026-03-29.md",
+        "news/2026/03/2026-03-29.md",
+        "daily/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://simonwillison.net/2026/Mar/29/pretext/",
+        "https://www.digitalapplied.com/blog/march-2026-ai-roundup-month-that-changed-everything",
+        "https://www.ptechpartners.com/2026/04/07/march-2026-ai-news-roundup-breakthroughs-and-the-fights-forecasts-and-fears/"
+      ],
+      "cluster_id": "harness-engineering",
+      "cluster_history": [
+        {"date": "2026-03-23", "from": null, "to": "Harness engineering", "reason": "first appearance"}
+      ]
+    },
+    {
+      "id": "agent-evaluation-observability",
+      "label": "Agent evaluation & observability (Risk-Adjusted Harm Scoring weights red-team findings by financial-regulatory risk, not jailbreak equivalence; Hamid Bagheri Responsible AI Weekly previews Anthropic Automated Alignment Agent (A3) + Databricks coSTAR for agent testing; AVO / SoK Agentic RAG / Coin Flip for Safety carry)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {"date": "2026-03-18", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+      ],
+      "stage": "consolidating",
+      "score": 32.98,
+      "score_fast": 27.28,
+      "score_slow": 32.98,
+      "raw_score_today": 6.0,
+      "score_fast_yesterday": 36.4,
+      "score_slow_yesterday": 34.4,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-18",
+      "sustained_days": 12,
+      "source_type_count": 2,
+      "breadth_7d": 30,
+      "breadth_30d": 32,
+      "breadth_orgs_7d": ["risk-adjusted-paper", "hamid-bagheri", "ai-safety-frontier", "databricks", "anthropic", "avo-paper", "slopcodebench-paper", "finmcp-paper", "memma-paper", "puri-rl-paper", "sok-arag-paper", "agenticcyops-paper", "coin-flip-paper", "cua-suite-paper", "ui-voyager-paper", "carepilot-paper", "gameplay-qa-paper", "iterative-genopt-paper", "cfo-bench-paper", "eva-paper", "self-distill-paper", "workflow-opt-paper", "speceyes-paper", "memo-paper", "memento-skills-paper", "omni-worldbench-paper", "one-eval-paper", "openresearcher-paper", "pivotrl-paper", "cube-paper"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "paper": 1,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "paper": 1,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-18.md",
+        "papers/2026/03/2026-03-19.md",
+        "papers/2026/03/2026-03-20.md",
+        "papers/2026/03/2026-03-27.md",
+        "papers/2026/03/2026-03-28.md",
+        "papers/2026/03/2026-03-29.md",
+        "blogs/2026/03/2026-03-29.md",
+        "daily/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.10807",
+        "https://airesponsibly.substack.com/p/responsible-ai-weekly-march-29april",
+        "https://aisafetyfrontier.substack.com/p/paper-highlights-of-april-2026"
+      ],
+      "cluster_id": "agent-safety-cluster",
+      "cluster_history": [
+        {"date": "2026-03-21", "from": null, "to": "Agent safety stack", "reason": "first appearance"}
+      ]
+    },
+    {
+      "id": "agentic-retrieval",
+      "label": "Agentic retrieval (Aashish Kumar Top-5 vector DBs 2026 — sharper opinions on pgvector vs Qdrant for sub-10M-vector deployments; Kuriko Iwai math-of-embeddings explainer; SoK Agentic RAG carry; vector-DB stack carry)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {"date": "2026-03-17", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 16.73,
+      "score_fast": 12.5,
+      "score_slow": 16.73,
+      "raw_score_today": 2.0,
+      "score_fast_yesterday": 17.0,
+      "score_slow_yesterday": 17.5,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-17",
+      "sustained_days": 13,
+      "source_type_count": 1,
+      "breadth_7d": 20,
+      "breadth_30d": 20,
+      "breadth_orgs_7d": ["aashish-kumar", "kuriko-iwai", "snowflake", "oracle", "nvidia", "pinecone", "databricks", "qdrant", "langgraph", "adamem-paper", "beaver-paper", "bubblerag-paper", "benchpres-paper", "openseeker-paper", "kimi", "sok-arag-paper", "f2llm-paper", "msa-paper", "bannier-paper", "pgvector"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "medium_aggregator": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "medium_aggregator": 2
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-17.md",
+        "papers/2026/03/2026-03-28.md",
+        "blogs/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://medium.com/the-software-journal/the-top-5-vector-databases-in-2026-6ef733407606",
+        "https://kuriko-iwai.medium.com/the-mathematical-memory-of-ai-understanding-vector-databases-and-embedding-pipelines-85bd5fc13004"
+      ],
+      "cluster_id": null,
+      "cluster_history": []
+    },
+    {
+      "id": "ai-governance",
+      "label": "AI governance (Mind the Gap — current statutes conflate model capability with system architecture and miss control points: prompts/API permissions/sandboxing; direct ammunition for EU-AI-Act-readiness debate; Aegis cryptographic runtime governance + Runtime-Governance policies-on-paths cohort; Onto-Relational-Sophic graded digital personhood; Hamid Bagheri Responsible AI Weekly A3 preview)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {"date": "2026-03-19", "from": null, "to": "Governance & market", "reason": "first appearance"}
+      ],
+      "stage": "consolidating",
+      "score": 32.25,
+      "score_fast": 29.35,
+      "score_slow": 32.25,
+      "raw_score_today": 25.5,
+      "score_fast_yesterday": 31.0,
+      "score_slow_yesterday": 32.6,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-19",
+      "sustained_days": 11,
+      "source_type_count": 3,
+      "breadth_7d": 26,
+      "breadth_30d": 26,
+      "breadth_orgs_7d": ["mind-the-gap-paper", "aegis-paper", "runtime-gov-paper", "onto-relational-paper", "hamid-bagheri", "ai-safety-frontier", "anthropic", "white-house", "us-congress", "hklaw", "sullcrom", "crowell", "ropesgray", "cset-georgetown", "lawfare", "google-deepmind", "lerchner", "ppc-land", "eu-ai-act", "icc-tca", "manish-atri", "mckinsey", "ca-sb53", "iso-42001", "oecd-ai", "stanford-hai"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "paper": 4,
+        "governance_source": 1,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "paper": 4,
+        "governance_source": 1,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-19.md",
+        "blogs/2026/03/2026-03-19.md",
+        "daily/2026/03/2026-03-19.md",
+        "papers/2026/03/2026-03-29.md",
+        "blogs/2026/03/2026-03-29.md",
+        "daily/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.27075",
+        "https://arxiv.org/abs/2603.16938",
+        "https://arxiv.org/abs/2603.16586",
+        "https://arxiv.org/abs/2603.18633",
+        "https://airesponsibly.substack.com/p/responsible-ai-weekly-march-29april"
+      ],
+      "cluster_id": "governance-runtime-cluster",
+      "cluster_history": [
+        {"date": "2026-03-29", "from": null, "to": "Runtime-governance cohort", "reason": "first appearance — Sunday papers cohort makes the runtime-governance link explicit"}
+      ]
+    },
+    {
+      "id": "lab-services-gtm",
+      "label": "Lab × consultancy GTM (carry Sunday — Anthropic IPO chatter Oct 2026; Shield AI / Blackstone $1.5B; Bain × Palantir AIP; Cyber.AI; Cohere AI Cefaratti investor framing on enterprise + sovereign-deploy posture)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {"date": "2026-03-23", "from": null, "to": "Governance & market", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 15.68,
+      "score_fast": 13.65,
+      "score_slow": 15.68,
+      "raw_score_today": 0.0,
+      "score_fast_yesterday": 19.5,
+      "score_slow_yesterday": 16.5,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-23",
+      "sustained_days": 7,
+      "source_type_count": 0,
+      "breadth_7d": 15,
+      "breadth_30d": 15,
+      "breadth_orgs_7d": ["accenture", "anthropic", "bain", "blackstone", "cefaratti", "cohere", "fortune", "goldman-sachs", "jpmorgan", "openai", "palantir", "pankaj-pandey", "servicenow", "shield-ai", "simba-lee"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type])."
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values."
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-23.md",
+        "blogs/2026/03/2026-03-23.md",
+        "news/2026/03/2026-03-25.md"
+      ],
+      "supporting_links": [],
+      "cluster_id": "consultancy-lab-jvs",
+      "cluster_history": [
+        {"date": "2026-03-25", "from": null, "to": "Consultancy × lab JVs", "reason": "first appearance"}
+      ]
+    },
+    {
+      "id": "workforce-reallocation",
+      "label": "Workforce / capital reallocation (Anthropic peak-hour Claude Code session-limit confirmed by The Neuron weekend digest — compute demand outrunning supply even with SpaceX deal in works; xAI structural talent shock carry; Atlassian framing carry)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {"date": "2026-03-24", "from": null, "to": "Governance & market", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 10.74,
+      "score_fast": 8.65,
+      "score_slow": 10.74,
+      "raw_score_today": 2.0,
+      "score_fast_yesterday": 11.5,
+      "score_slow_yesterday": 11.2,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-24",
+      "sustained_days": 6,
+      "source_type_count": 1,
+      "breadth_7d": 11,
+      "breadth_30d": 11,
+      "breadth_orgs_7d": ["anthropic", "the-neuron", "xai", "musk", "andrew-milich", "jason-ginsberg", "devendra-chaplot", "baris-akis", "atlassian", "cloudflare", "crescendo"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "tech_news": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-24.md",
+        "daily/2026/03/2026-03-24.md",
+        "news/2026/03/2026-03-28.md",
+        "news/2026/03/2026-03-29.md",
+        "daily/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://www.theneuron.ai/ai-news-digests/-around-the-horn-digest-everything-that-happened-in-ai-this-weekend-march-28-29-2026/"
+      ],
+      "cluster_id": null,
+      "cluster_history": []
+    },
+    {
+      "id": "post-training-recipes",
+      "label": "Post-training recipes (CRAFT contrastive reasoning alignment from hidden representations — ~4.7% accuracy improvement on R1-Distill / Qwen3-Thinking with smaller safety-vs-reasoning trade-off; WALAR word-and-language alignment for multilingual translation reward-hacking mitigation; DyMoE CVPR 2026 drift-aware MoE for continual VLM learning; Reaching Beyond the Mode + Revisiting On-Policy Distillation + AVO carry)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {"date": "2026-03-17", "from": null, "to": "Methods & research", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 17.84,
+      "score_fast": 17.4,
+      "score_slow": 17.84,
+      "raw_score_today": 9.0,
+      "score_fast_yesterday": 21.0,
+      "score_slow_yesterday": 18.3,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-17",
+      "sustained_days": 13,
+      "source_type_count": 1,
+      "breadth_7d": 22,
+      "breadth_30d": 22,
+      "breadth_orgs_7d": ["craft-paper", "walar-paper", "dymoe-paper", "arxiv-cohort", "hf-papers", "jackclark", "kenjin", "kimi", "muhtar-paper", "online-experiential-paper", "nvidia", "aggarwal-paper", "markov-states-paper", "looprpt-paper", "rlvr-direction-paper", "msft-paper", "longcat-prover-paper", "unigrpo-paper", "token-cot-paper", "sparse-rlvr-paper", "self-distill-paper", "fu-distill-paper"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "paper": 3
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "paper": 3
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-17.md",
+        "papers/2026/03/2026-03-18.md",
+        "papers/2026/03/2026-03-19.md",
+        "papers/2026/03/2026-03-28.md",
+        "papers/2026/03/2026-03-29.md",
+        "news/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.17305",
+        "https://arxiv.org/abs/2603.13045",
+        "https://www.buildfastwithai.com/blogs/ai-models-march-2026-releases"
+      ],
+      "cluster_id": null,
+      "cluster_history": []
+    },
+    {
+      "id": "compute-economics-thesis",
+      "label": "Compute economics / inference physics (MIT Han Lab FourOverSix — adaptive block-scaled data types for more accurate NVFP4 quantisation, makes Blackwell / Vera Rubin native low-precision deliver better production-scale accuracy; Anthropic peak-hour Claude Code throttling carry; Stanford HAI 2026 Index $172B annual US consumer surplus carry; Liquid AI sub-1B agent-tier carry)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {"date": "2026-03-15", "from": null, "to": "Methods & research", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 16.02,
+      "score_fast": 12.45,
+      "score_slow": 16.02,
+      "raw_score_today": 3.0,
+      "score_fast_yesterday": 16.5,
+      "score_slow_yesterday": 16.7,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 15,
+      "source_type_count": 1,
+      "breadth_7d": 24,
+      "breadth_30d": 24,
+      "breadth_orgs_7d": ["four-over-six-paper", "mit-han-lab", "anthropic", "aws", "bruce-li", "cerebras", "cisco", "cnbc", "dell", "fortune", "groq", "liquid-ai", "morganstanley", "ngrok", "networkworld", "nvidia", "sam-rose", "semianalysis", "semiwiki", "stanford-hai", "stratechery", "techradar", "tomshardware", "tsmc"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "paper": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "paper": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://www.buildfastwithai.com/blogs/ai-models-march-2026-releases"
+      ],
+      "cluster_id": null,
+      "cluster_history": []
+    },
+    {
+      "id": "long-context-rot",
+      "label": "Long-context rot (carry only Sunday — Y-Combinator-for-LLMs, BEAVER carries; topic continues to fade)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {"date": "2026-03-23", "from": null, "to": "Methods & research", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 12.26,
+      "score_fast": 5.25,
+      "score_slow": 12.26,
+      "raw_score_today": 0.0,
+      "score_fast_yesterday": 7.5,
+      "score_slow_yesterday": 12.9,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-23",
+      "sustained_days": 7,
+      "source_type_count": 0,
+      "breadth_7d": 6,
+      "breadth_30d": 6,
+      "breadth_orgs_7d": ["beaver-paper", "jackclark", "latent-space", "mario-zechner", "massoli-paper", "y-combinator-paper"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type])."
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values."
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-23.md",
+        "blogs/2026/03/2026-03-23.md",
+        "blogs/2026/03/2026-03-24.md",
+        "blogs/2026/03/2026-03-25.md"
+      ],
+      "supporting_links": [],
+      "cluster_id": null,
+      "cluster_history": []
+    },
+    {
+      "id": "mythos-anthropic",
+      "label": "Mythos / Capybara disclosure (carry Sunday — international pickup wave settles back; Anthropic 'human error' framing continues; security-research bodies signal interest in leaked benchmark numbers; slow EMA still climbing while fast EMA fades on light Sunday volume)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {"date": "2026-03-26", "from": null, "to": "Models & capabilities", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 26.22,
+      "score_fast": 17.15,
+      "score_slow": 26.22,
+      "raw_score_today": 0.0,
+      "score_fast_yesterday": 24.5,
+      "score_slow_yesterday": 27.6,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-26",
+      "sustained_days": 4,
+      "source_type_count": 0,
+      "breadth_7d": 12,
+      "breadth_30d": 12,
+      "breadth_orgs_7d": ["anthropic", "fortune", "layerx", "marketingprofs", "neuriflux", "newsghana", "pankaj-pandey", "pasquale-pillitteri", "roy-paz", "spire-tech", "techzine", "crescendo"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type])."
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values."
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-26.md",
+        "daily/2026/03/2026-03-26.md",
+        "news/2026/03/2026-03-27.md",
+        "news/2026/03/2026-03-28.md",
+        "daily/2026/03/2026-03-28.md"
+      ],
+      "supporting_links": [],
+      "cluster_id": null,
+      "cluster_history": []
+    },
+    {
+      "id": "frontier-model-cadence",
+      "label": "Frontier model release cadence (OpenAI 'Spud' pretraining-complete signal continues to circulate via The Neuron weekend digest — sets empirical anchor for GPT-5.5 release timeline; DataNorth AI Grok 4.20 capability matrix; Sora deprecation tail; xAI founder-exodus carry)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {"date": "2026-03-15", "from": null, "to": "Models & capabilities", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 19.25,
+      "score_fast": 18.3,
+      "score_slow": 19.25,
+      "raw_score_today": 5.0,
+      "score_fast_yesterday": 24.0,
+      "score_slow_yesterday": 20.0,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 15,
+      "source_type_count": 2,
+      "breadth_7d": 30,
+      "breadth_30d": 32,
+      "breadth_orgs_7d": ["openai", "the-neuron", "datanorth-ai", "xai", "microsoft", "google", "mistral", "anthropic", "alibaba-qwen", "kimi", "deepseek", "cursor", "fireworks", "perplexity", "simonwillison", "buildfastwithai", "lm-po", "tech-insider", "thenextweb", "futurum", "crescendo", "ai-flash-report", "meanceo", "siliconangle", "techcrunch", "elevenlabs", "liquid-ai", "lfm-paper", "musk", "andrew-milich"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "tech_news": 2,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "tech_news": 2,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-29.md",
+        "blogs/2026/03/2026-03-29.md",
+        "daily/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://www.theneuron.ai/ai-news-digests/-around-the-horn-digest-everything-that-happened-in-ai-this-weekend-march-28-29-2026/",
+        "https://medium.com/@DataNorthAI/the-complete-guide-to-grok-ai-2026-datanorth-ai-67cd05afca01"
+      ],
+      "cluster_id": null,
+      "cluster_history": []
+    },
+    {
+      "id": "open-vs-closed",
+      "label": "Open-vs-closed model tiering (DataNorth AI Grok 4.20 guide carry; Stanford HAI 2026 Index frontier-gap data carry; Cohere AI Cefaratti investor lens carry; quiet Sunday)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {"date": "2026-03-16", "from": null, "to": "Models & capabilities", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 15.92,
+      "score_fast": 12.55,
+      "score_slow": 15.92,
+      "raw_score_today": 1.0,
+      "score_fast_yesterday": 17.5,
+      "score_slow_yesterday": 16.7,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 14,
+      "source_type_count": 1,
+      "breadth_7d": 23,
+      "breadth_30d": 23,
+      "breadth_orgs_7d": ["datanorth-ai", "huggingface", "mistral", "alibaba-qwen", "deepseek", "kimi", "meta-llama", "google-gemma", "cohere", "minimax", "interconnects", "cursor", "fireworks", "mark-it-ai", "raman-srivastava", "tony-thomas", "danwoods", "shintani", "cefaratti", "openseeker-paper", "hareem-fatima", "iquest-coder-paper", "stanford-hai"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values.",
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-17.md",
+        "blogs/2026/03/2026-03-29.md"
+      ],
+      "supporting_links": [
+        "https://medium.com/@DataNorthAI/the-complete-guide-to-grok-ai-2026-datanorth-ai-67cd05afca01"
+      ],
+      "cluster_id": "open-coding-stack",
+      "cluster_history": [
+        {"date": "2026-03-20", "from": null, "to": "Open coding stack", "reason": "first appearance"}
+      ]
+    },
+    {
+      "id": "voice-tts",
+      "label": "Voice / TTS (carry only Sunday — Voxtral practitioner deployment continues; Le Chat voice-mode rollout window 2 weeks)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {"date": "2026-03-23", "from": null, "to": "Models & capabilities", "reason": "first appearance"}
+      ],
+      "stage": "emerging",
+      "score": 13.97,
+      "score_fast": 10.85,
+      "score_slow": 13.97,
+      "raw_score_today": 0.0,
+      "score_fast_yesterday": 15.5,
+      "score_slow_yesterday": 14.7,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-23",
+      "sustained_days": 7,
+      "source_type_count": 0,
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": ["elevenlabs", "huggingface", "mistral", "openai", "siliconangle", "techcrunch", "voxtral-tech-report", "wikipedia"],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type])."
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these values."
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-23.md",
+        "daily/2026/03/2026-03-23.md",
+        "news/2026/03/2026-03-26.md"
+      ],
+      "supporting_links": [],
+      "cluster_id": null,
+      "cluster_history": []
+    }
+  ],
+  "stage_movements": [],
+  "background_topics_count": 9,
+  "config_snapshot": {
+    "_purpose": "exact tuning constants in effect this run, for reproducibility",
+    "ema_alpha_fast": 0.3,
+    "ema_alpha_slow": 0.05,
+    "rolling_window_days": 30,
+    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "stage_thresholds": {
+      "emerging": [10, 30],
+      "consolidating": [30, 70],
+      "mainstream": [70, 999]
+    },
+    "breadth_high_threshold_7d": 5,
+    "_note": "Topic raw scores remain modest on a Sunday; the slow EMA holds the consolidating cohort above the 30 threshold despite fast EMAs all dropping. The day's distinctive signal is the runtime-governance papers cohort (AIP, AgentRFC, Aegis, Runtime-Gov, Mind the Gap) coupling agent-security with ai-governance — first appearance of the new 'Runtime-governance cohort' cross-topic cluster."
+  }
+}

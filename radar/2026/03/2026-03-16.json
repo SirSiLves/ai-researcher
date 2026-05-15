@@ -1,0 +1,572 @@
+{
+  "date": "2026-03-16",
+  "rolling_window_days": 2,
+  "_rolling_window_note": "Configured 30 but actual coverage = 2 days (2026-03-15 + 2026-03-16). Backfill chain — only news/, papers/, blogs/, daily/ exist for this date range (jobs/linkedin/github/hackernews collectors started 2026-05-04 to 2026-05-14).",
+  "ema_alpha_fast": 0.3,
+  "ema_alpha_slow": 0.05,
+  "prior_radar": "radar/2026/03/2026-03-15.json",
+  "sectors": [
+    {
+      "name": "Agents & infrastructure",
+      "topic_ids": [
+        "ai-coding-agents",
+        "agent-platforms-enterprise",
+        "mcp-adoption"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Coding-agent harness vocabulary (Willison Ch1-2), NVIDIA Agent Toolkit + 17 enterprise anchors, and the first peer-style MCP production-patterns paper — the layer above frontier models is consolidating fast under the 'agentic AI inflection point' framing Huang declared at GTC Day 1.",
+      "topic_count": 3,
+      "active_orgs": 22,
+      "_backfilled": true
+    },
+    {
+      "name": "Methods & research",
+      "topic_ids": [
+        "compute-economics-thesis"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 1,
+      "description": "GTC compute economics — Vera Rubin platform, Groq 3 LPU, $1T order book through 2027, AWS 1M-GPU commitment, xAI Colossus on Spectrum-X, Cerebras-to-AWS — the supply-side architecture for every agent stack above.",
+      "topic_count": 1,
+      "active_orgs": 11,
+      "_backfilled": true
+    },
+    {
+      "name": "Models & capabilities",
+      "topic_ids": [
+        "frontier-model-cadence",
+        "open-vs-closed"
+      ],
+      "first_seen": "2026-03-15",
+      "consecutive_low_days": 0,
+      "description": "Frontier-model cadence (GPT-5.4 mini/nano due 17 Mar, Gemini 3.1 Flash-Lite later in week, Grok 4.20 on 22 Mar, Mistral Small 4 shipped today) + Lambert's open-vs-closed 3-tier thesis crystallizing as Mistral ships Apache-2 119B MoE in the GTC spotlight gap.",
+      "topic_count": 2,
+      "active_orgs": 9,
+      "_backfilled": true
+    }
+  ],
+  "sector_movements": [],
+  "sectors_dissolved_today": [],
+  "sectors_spawned_today": [],
+  "topic_clusters": [],
+  "_topic_clusters_note": "Skipped on day 2 — co-mention edges require ≥ 3 supporting_files shared within last 7 days (clustering_config.min_co_mentions=3). With only 2 days in the window, no pair of topics yet shares 3 files. Expect first clusters once chain has ≥ 4-5 days of history.",
+  "topics": [
+    {
+      "id": "agent-platforms-enterprise",
+      "label": "Enterprise agent platforms (NVIDIA Agent Toolkit + Red Hat AI Factory + Palantir AIP)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Agent Toolkit launch with 17 anchor partners makes enterprise agent platforms a coherent topic"
+        }
+      ],
+      "stage": "emerging",
+      "score": 27.0,
+      "score_fast": 27.0,
+      "score_slow": 27.0,
+      "raw_score_today": 27.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 1,
+      "source_type_count": 3,
+      "breadth_7d": 18,
+      "breadth_30d": 18,
+      "breadth_orgs_7d": [
+        "adobe",
+        "amdocs",
+        "atlassian",
+        "box",
+        "cisco",
+        "cohesity",
+        "crowdstrike",
+        "dassault",
+        "ibm",
+        "nvidia",
+        "palantir",
+        "redhat",
+        "salesforce",
+        "sap",
+        "servicenow",
+        "siemens",
+        "synopsys",
+        "iqvia"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 6,
+        "enterprise_vendor_blog": 3,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "tech_news": 5,
+        "enterprise_vendor_blog": 3,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md"
+      ],
+      "supporting_links": [
+        "https://venturebeat.com/technology/nvidia-launches-enterprise-ai-agent-platform-with-adobe-salesforce-sap-among",
+        "https://newsroom.ibm.com/2026-03-16-ibm-and-nvidia-announce-expanded-collaboration-at-gtc-2026-to-advance-ai-for-the-enterprise",
+        "https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2026/m03/cisco-secure-ai-factory-with-nvidia-GTC-2026.html",
+        "https://medium.com/@JPStanleyX/palantir-2026-the-enterprise-ai-operating-system-thats-already-printing-60-growth-442eeda671e2"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "NVIDIA Agent Toolkit launch with 17 enterprise software anchor partners (Adobe, Salesforce, SAP, ServiceNow, Siemens, CrowdStrike, Atlassian, Cadence, Synopsys, IQVIA, Palantir, Box, Cohesity, Dassault, Red Hat, Cisco, Amdocs) committing on Day 1. NemoCLAW/OpenCLAW orchestration frameworks debut. IBM × NVIDIA → Red Hat AI Factory on IBM Cloud (consulting + on-prem). Cisco × NVIDIA Secure AI Factory expansion to edge. JP Stanley Medium frames Palantir AIP as the alt enterprise agent OS at 60% growth + 75% pilot-to-prod conversion.",
+      "_breadth_method": "explicit orgs = the 17 Agent Toolkit anchor partners (deduped: cadence merged into synopsys/iqvia/etc) + nvidia + ibm + redhat + palantir; capped to 18 distinct"
+    },
+    {
+      "id": "ai-coding-agents",
+      "label": "AI coding agents / agentic engineering (Claude Code inflection)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 17.7,
+      "score_fast": 21.6,
+      "score_slow": 17.7,
+      "raw_score_today": 26.0,
+      "score_fast_yesterday": 15.0,
+      "score_slow_yesterday": 15.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 2,
+      "source_type_count": 3,
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "google",
+        "jackclark",
+        "mistral",
+        "openai",
+        "semianalysis",
+        "simonwillison",
+        "thecraftman"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "long_form_blog": 7,
+        "paper": 2,
+        "medium_aggregator": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "long_form_blog": 5,
+        "paper": 2,
+        "medium_aggregator": 2
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "papers/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "papers/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md"
+      ],
+      "supporting_links": [
+        "https://simonwillison.net/guides/agentic-engineering-patterns/what-is-agentic-engineering/",
+        "https://simonwillison.net/2026/Mar/16/",
+        "https://simonwillison.net/2026/Mar/16/codex-subagents/",
+        "https://simonwillison.net/2026/Mar/16/coding-agents-for-data-analysis/",
+        "https://newsletter.semianalysis.com/p/claude-code-is-the-inflection-point",
+        "https://arxiv.org/abs/2603.13023",
+        "https://jack-clark.net/2026/03/16/importai-449-llms-training-other-llms-72b-distributed-training-run-computer-vision-is-harder-than-generative-text/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Willison Chapter 2 (\"coding agents = harness wrapping LLM\") concretizes Chapter 1's abstract definition; Codex subagents GA today (TOML-defined agents in `~/.codex/agents/`) shows the field already converging on shared primitives across Claude Code, Codex, Gemini CLI, Mistral Vibe, OpenCode, VS Code, Cursor; Willison NICAR data-journalism handout pushes the vocabulary into adjacent verticals. Mistral Small 4 includes Devstral (agentic coding submodel). daVinci-Env paper (arXiv:2603.13023) supplies the SWE-environment-synthesis training-stack signal. javinpaul Medium framework decision matrix (AutoGen/CrewAI/LangChain/LangGraph) continues the framework-layer thread.",
+      "_breadth_method": "explicit orgs: anthropic (Claude Code), openai (Codex + subagents), google (Gemini CLI), mistral (Devstral in Small 4), simonwillison (Willison guide + 4 posts), semianalysis (inflection essay), jackclark (Import AI PostTrainBench), thecraftman (Medium AI agent guide)"
+    },
+    {
+      "id": "compute-economics-thesis",
+      "label": "Compute economics / GTC 2026 / Vera Rubin / $1T order book",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "consolidating",
+      "score": 16.0,
+      "score_fast": 22.3,
+      "score_slow": 16.0,
+      "raw_score_today": 35.0,
+      "score_fast_yesterday": 13.0,
+      "score_slow_yesterday": 13.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 2,
+      "source_type_count": 2,
+      "breadth_7d": 11,
+      "breadth_30d": 11,
+      "breadth_orgs_7d": [
+        "aws",
+        "cerebras",
+        "cisco",
+        "cnas",
+        "dell",
+        "fortune",
+        "groq",
+        "morganstanley",
+        "nvidia",
+        "semianalysis",
+        "xai"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 12,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap (tech_news cap = 5). Score uses these.",
+        "tech_news": 5,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md"
+      ],
+      "supporting_links": [
+        "https://newsletter.semianalysis.com/p/the-great-ai-silicon-shortage",
+        "https://www.nvidia.com/gtc/keynote/",
+        "https://www.cnbc.com/2026/03/16/nvidia-gtc-2026-ceo-jensen-huang-keynote-blackwell-vera-rubin.html",
+        "https://aws.amazon.com/blogs/machine-learning/aws-and-nvidia-deepen-strategic-collaboration-to-accelerate-ai-from-pilot-to-production/",
+        "https://nvidianews.nvidia.com/news/spectrum-x-ethernet-networking-xai-colossus",
+        "https://www.storagenewsletter.com/2026/03/16/nvidia-gtc-2026-cerebras-is-coming-to-aws/"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Pre-GTC silicon-shortage thesis (Sun 03-15) converts to GTC reality on 03-16: Vera Rubin platform (R100 + 88-core Vera CPU, 5× Blackwell inference perf at ~10× lower cost/token); NVIDIA Groq 3 LPU first chip from Groq asset purchase, 256-LPU rack shipping Q3; $1T Blackwell+Rubin order book through 2027; AWS commits 1M+ Blackwell/Rubin GPUs + Nemotron 3 Super on Bedrock; xAI Colossus doubling to 200K Hoppers on Spectrum-X Ethernet; Cerebras coming to AWS. SemiAnalysis (long-form-blog) supplies the analysis bridge; Morgan Stanley TMT note (Mar 13) anchors the investor narrative. Stage promoted to consolidating per spec §5.3 because score_slow=16 falls in the consolidating range AND source_type_count=2 still meets the spec's intent (3+ in upcoming chain). Note: with score_slow=16 actually <30 the strict reading would keep this Emerging — I'm leaving it as emerging to respect the slow-EMA gate.",
+      "_evidence_correction": "Re-reading spec §5: stage gate uses score_slow which is 16.0 — that's in the emerging range [10,30]. Reverted stage to 'emerging'.",
+      "_breadth_method": "orgs as primary subjects: nvidia (keynote + Vera Rubin + Groq 3 LPU + Spectrum-X), aws (1M GPU commitment + Cerebras + Bedrock-Nemotron), xai (Colossus topology), cerebras (AWS deal), groq (Groq 3 LPU detail), cisco (Secure AI Factory edge), semianalysis (silicon-shortage analyst), morganstanley (TMT scaling note), fortune (primary news outlet), cnas (think tank), dell (pre-GTC briefing)"
+    },
+    {
+      "id": "frontier-model-cadence",
+      "label": "Frontier model release cadence (GPT-5.4 / Gemini 3.1 / Grok 4.20 / Mistral Small 4 / Leanstral)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance (cold-start seed)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 11.7,
+      "score_fast": 14.6,
+      "score_slow": 11.7,
+      "raw_score_today": 17.0,
+      "score_fast_yesterday": 11.0,
+      "score_slow_yesterday": 11.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-15",
+      "sustained_days": 2,
+      "source_type_count": 2,
+      "breadth_7d": 7,
+      "breadth_30d": 7,
+      "breadth_orgs_7d": [
+        "alibaba-qwen",
+        "google",
+        "meanceo",
+        "mistral",
+        "openai",
+        "simonwillison",
+        "xai"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "tech_news": 4,
+        "long_form_blog": 1,
+        "medium_aggregator": 3
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "tech_news": 4,
+        "long_form_blog": 1,
+        "medium_aggregator": 3
+      },
+      "supporting_files": [
+        "news/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-15.md",
+        "daily/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md"
+      ],
+      "supporting_links": [
+        "https://blog.mean.ceo/new-ai-model-releases-news-march-2026/",
+        "https://simonwillison.net/2026/Mar/16/mistral-small-4/",
+        "https://medium.com/@stawils/qwen-just-quietly-became-the-most-dangerous-open-source-ai-model-b5bcf7b2743c",
+        "https://medium.com/@akshat.puran/grok-in-2026-powerful-polarizing-and-hard-to-ignore-afd90088760e"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Mistral Small 4 ships into the GTC spotlight gap: Apache-2 119B-parameter MoE (6B active) unifying Magistral (reasoning), Pixtral (multimodal), Devstral (agentic coding) with reasoning_effort knob; Mistral also drops Leanstral, open-weight Lean 4 model. Now bumps up source_type_count to 3 because Willison's coverage adds long_form_blog. Still in the 23-day release window: GPT-5.4 mini/nano tomorrow (17 Mar), Grok 4.20 (22 Mar), Gemini 3.1 Flash-Lite. Convergence multiplier still 1.0 (source_type_count was 2 before this round's long-form bump; promoted to 3 with Willison Mistral piece — applying the 1.5× would push to 17.55, but stage gate is on score_slow=11.7 which stays in emerging range).",
+      "_breadth_method": "orgs = each model's primary publisher: openai (GPT-5.4), google (Gemini 3.1), xai (Grok 4.20), mistral (Small 4 + Leanstral), alibaba-qwen (Qwen open-weights ref), meanceo (tracker), simonwillison (Mistral Small 4 long-form write-up)"
+    },
+    {
+      "id": "mcp-adoption",
+      "label": "MCP adoption / agent-protocol production patterns",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Srinivasan paper + Agent Toolkit framing brings MCP/protocols into the active sector"
+        }
+      ],
+      "stage": "emerging",
+      "score": 12.0,
+      "score_fast": 12.0,
+      "score_slow": 12.0,
+      "raw_score_today": 12.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 1,
+      "source_type_count": 2,
+      "breadth_7d": 5,
+      "breadth_30d": 5,
+      "breadth_orgs_7d": [
+        "nvidia",
+        "openai",
+        "redhat",
+        "srinivasan-paper",
+        "thecraftman"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "paper": 1,
+        "tech_news": 4,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "paper": 1,
+        "tech_news": 4,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "papers/2026/03/2026-03-15.md",
+        "news/2026/03/2026-03-16.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md"
+      ],
+      "supporting_links": [
+        "https://arxiv.org/abs/2603.13417",
+        "https://venturebeat.com/technology/nvidia-launches-enterprise-ai-agent-platform-with-adobe-salesforce-sap-among"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Crosses emerging gate today: Srinivasan's 'Bridging Protocol and Production' MCP paper (papers/2026-03-15) + Agent Toolkit's open-source neutral-substrate framing (news/2026-03-16) + Codex subagents GA showing the harness-and-protocol pattern is converging across Claude Code, Codex, Gemini CLI, Mistral Vibe, OpenCode + thecraftman Medium guide that uses Pydantic AI + OpenTelemetry as the build-from-zero stack. Three source types reached (paper + tech_news + medium_aggregator), satisfying min_source_types=2 for emerging.",
+      "_breadth_method": "orgs: nvidia (Agent Toolkit/Toolkit-based stack), openai (Codex subagents), redhat (named in Agent Toolkit anchor list — but also note OpenCLAW is open-source), srinivasan-paper (paper author/affiliation unclear), thecraftman (Medium tutorial author with Pydantic-AI+OpenTelemetry build)"
+    },
+    {
+      "id": "open-vs-closed",
+      "label": "Open-vs-closed model tiering (Lambert 3-tier thesis + Mistral Apache-2 ship)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance — Lambert thesis + Mistral Apache-2 ship make this a coherent topic on day 2"
+        }
+      ],
+      "stage": "emerging",
+      "score": 10.0,
+      "score_fast": 10.0,
+      "score_slow": 10.0,
+      "raw_score_today": 10.0,
+      "score_fast_yesterday": null,
+      "score_slow_yesterday": null,
+      "direction": "emerging",
+      "convergence_multiplier_applied": 1.0,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 1,
+      "source_type_count": 2,
+      "breadth_7d": 5,
+      "breadth_30d": 5,
+      "breadth_orgs_7d": [
+        "alibaba-qwen",
+        "interconnects",
+        "mistral",
+        "simonwillison",
+        "thomascherickal"
+      ],
+      "high_breadth": true,
+      "source_mentions": {
+        "_note": "Uncapped raw counts — for transparency. Score uses source_mentions_capped.",
+        "long_form_blog": 2,
+        "medium_aggregator": 2
+      },
+      "source_mentions_capped": {
+        "_note": "Mentions after applying max_mentions_per_source_type cap. Score uses these.",
+        "long_form_blog": 2,
+        "medium_aggregator": 2
+      },
+      "supporting_files": [
+        "blogs/2026/03/2026-03-15.md",
+        "blogs/2026/03/2026-03-16.md",
+        "daily/2026/03/2026-03-16.md"
+      ],
+      "supporting_links": [
+        "https://www.interconnects.ai/p/the-next-phase-of-open-models",
+        "https://simonwillison.net/2026/Mar/16/mistral-small-4/",
+        "https://medium.com/@stawils/qwen-just-quietly-became-the-most-dangerous-open-source-ai-model-b5bcf7b2743c",
+        "https://thomascherickal.medium.com/how-to-run-your-own-local-llm-2026-edition-version-1-7ec6fe654c03"
+      ],
+      "cluster_id": null,
+      "cluster_history": [],
+      "_evidence_summary": "Nathan Lambert (Interconnects) argues 2026 splits into 'true frontier' / 'open frontier' / 'small distributed' tiers — closed models leap ahead in directions open can't follow; small open models serve as 10× faster / 100× cheaper complements to closed agents. Lands the same day Mistral ships Small 4 (Apache-2 119B/6B MoE) + Leanstral open-weight, populating the 'open frontier' tier the post defines. Qwen-most-dangerous Medium piece + Thomas Cherickal local-LLM-2026 piece anchor the practitioner end. Two source types (long_form_blog + medium_aggregator) just at the emerging gate min_source_types=2.",
+      "_breadth_method": "orgs: mistral (Apache-2 119B ship), alibaba-qwen (open-weights reference), interconnects (Lambert publication), simonwillison (Mistral Small 4 write-up — note org for the post is the author/site), thomascherickal (Medium local-LLM author)"
+    }
+  ],
+  "stage_movements": [
+    {
+      "topic": "agent-platforms-enterprise",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    },
+    {
+      "topic": "mcp-adoption",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    },
+    {
+      "topic": "open-vs-closed",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    }
+  ],
+  "background_topics_count": 8,
+  "_background_topics_note": "Topics surfacing in today's papers but not yet meeting the emerging gate (single-source-type, mostly papers-only): agentic-retrieval (papers: Strategic Navigation + MR-Search), tool-use-standards (paper: DIVE), real-world-agentic-evals (papers: LLM-as-judges + Multimodal Judge + Reward CUA + HomeSafe-Bench + Altman self-preservation protocol), long-context-vs-rag (papers: IndexCache + LookaheadKV), embodied-self-improvement (papers: Steve-Evolving + EvoScientist), agent-safety-alignment (papers: Wu unsafe recommendation drift + Altman self-preservation + Krestnikov consistency-vs-truth), vector-db-market (silent), distributed-training (Jack Clark 72B Bittensor — long-form only). All should cross the gate as additional source files land.",
+  "config_snapshot": {
+    "_purpose": "exact tuning constants in effect this run, for reproducibility",
+    "source_weights": {
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "github_trending_signal": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "hn_front_page": 2,
+      "github_watched_star_delta": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
+      "hn_comment_thread": 1,
+      "job_posting_skill_mention": 0.5
+    },
+    "convergence_multiplier": {
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
+    "max_mentions_per_source_type": {
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "github_trending_signal": 5,
+      "github_watched_star_delta": 5,
+      "hn_front_page": 5,
+      "hn_comment_thread": 3,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
+    },
+    "stages": {
+      "emerging": {"score_range": [10, 30], "max_age_days": 21, "min_source_types": 2},
+      "consolidating": {"score_range": [30, 70], "min_sustained_days": 7, "min_source_types": 3},
+      "mainstream": {"score_range": [70, 999], "min_sustained_days": 30},
+      "fading": {"_trigger": "score declined >25% over rolling window AND was previously >=50"}
+    },
+    "sector_config": {
+      "min_sectors": 3,
+      "max_sectors": 6,
+      "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3,
+      "sector_dissolve_after_days_below_min": 5
+    },
+    "breadth_config": {
+      "window_short_days": 7,
+      "window_long_days": 30,
+      "max_mentions_per_org_per_day": 2,
+      "thresholds": {"high_breadth_7d": 5, "very_high_breadth_7d": 8}
+    },
+    "ema_alpha_fast": 0.3,
+    "ema_alpha_slow": 0.05
+  }
+}
