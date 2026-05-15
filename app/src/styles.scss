@@ -1,132 +1,481 @@
 @use "primeicons/primeicons.css";
 
+/* ============================================================
+   Editorial palette — warm paper, ink, single rust accent.
+   Type does most of the work. Color does very little.
+   ============================================================ */
 :root {
-  --bg: #ffffff;
-  --surface: #f8fafc;
-  --surface-2: #f1f5f9;
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --text: #0f172a;
-  --text-dim: #475569;
-  --muted: #94a3b8;
-  --accent: #3b82f6;
-  --accent-soft: #dbeafe;
-  --rising: #16a34a;
-  --falling: #dc2626;
-  --warn: #f59e0b;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-  --max-width: 1280px;
-  --nav-height: 60px;
+  /* surfaces */
+  --paper:        #f7f3ea;   /* main background, warm off-white  */
+  --paper-deep:   #efe8d8;   /* deeper paper for the masthead    */
+  --card:         #fdfbf6;   /* card surface, slightly lighter   */
+  --card-soft:    #f3eddc;   /* tonal panel, used sparingly      */
+  --rule:         #d9d2c1;   /* hairline rule                    */
+  --rule-strong:  #b9b0a0;   /* heavier rule                     */
 
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  /* ink */
+  --ink:          #1a1612;   /* primary text, near-black with warmth */
+  --ink-2:        #4a423a;   /* secondary text                   */
+  --ink-3:        #6f6557;   /* tertiary                         */
+  --muted:        #8a7f70;   /* labels, captions                 */
+
+  /* accents (used sparingly) */
+  --accent:       #a14a26;   /* rust — links, highlights         */
+  --accent-deep:  #8a3e1f;
+  --accent-soft:  rgba(161, 74, 38, 0.10);
+  --rising:       #2d6b3a;
+  --falling:      #9a2a2a;
+  --highlight:    #f1e6cf;   /* soft yellow for emphasis         */
+
+  /* sectors (kept restrained, not jarring) */
+  --sector-models:   #6f4d8c;
+  --sector-agents:   #2f6383;
+  --sector-gov:      #9a6a23;
+  --sector-methods:  #2d6b3a;
+
+  /* radii */
+  --radius-sm: 3px;
+  --radius:    6px;
+  --radius-lg: 10px;
+
+  /* shadows (very subtle on warm paper) */
+  --shadow-sm: 0 1px 1px rgba(26, 22, 18, 0.04);
+  --shadow:    0 6px 24px rgba(26, 22, 18, 0.06);
+
+  /* layout */
+  --max-page:    1180px;     /* wide pages (firms grid, reports list) */
+  --max-prose:   780px;      /* prose reading width (Today digest)    */
+  --max-chrome:  1180px;     /* nav, toolbars                         */
+  --gutter:      clamp(1.25rem, 3vw, 2.25rem);
+  --nav-height:  64px;
+
+  /* type */
+  --serif: "Charter", "Iowan Old Style", "Source Serif Pro", "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+  --mono:  ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
 }
 
-* { box-sizing: border-box; }
+/* ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
 
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.55;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "kern", "liga", "onum";
 }
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color .15s, text-decoration-color .15s;
+}
+a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 
-button { font: inherit; cursor: pointer; }
+button { font: inherit; cursor: pointer; color: inherit; background: none; border: 0; padding: 0; }
 
-code, .mono { font-family: var(--font-mono); font-size: 0.92em; }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
 
-.markdown {
-  h1, h2, h3, h4 { line-height: 1.25; margin: 1.4em 0 0.5em; font-weight: 600; }
-  h1 { font-size: 1.8rem; }
-  h2 { font-size: 1.35rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
-  h3 { font-size: 1.1rem; }
-  p { margin: 0.6em 0; }
-  ul, ol { padding-left: 1.4rem; }
-  li { margin: 0.25em 0; }
-  blockquote {
-    margin: 0.8em 0;
-    padding: 0.5em 0.9em;
-    border-left: 3px solid var(--accent);
-    background: var(--surface);
-    color: var(--text-dim);
-  }
-  hr { border: 0; border-top: 1px solid var(--border); margin: 1.4em 0; }
-  code { background: var(--surface-2); padding: 0.1em 0.4em; border-radius: 4px; }
-  pre { background: var(--surface-2); padding: 0.9rem; border-radius: var(--radius); overflow-x: auto; }
-  pre code { background: transparent; padding: 0; }
-  table { border-collapse: collapse; width: 100%; margin: 0.8em 0; }
-  th, td { border: 1px solid var(--border); padding: 0.45em 0.7em; text-align: left; }
-  th { background: var(--surface); font-weight: 600; }
-  img { max-width: 100%; }
+em { font-style: italic; }
+strong { font-weight: 600; }
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 2rem 0;
 }
 
-.page-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 1.5rem 1.75rem 3rem;
-}
-
-.page-title {
-  font-size: 1.6rem;
+/* ============================================================
+   Type scale — used in TS as helper classes too.
+   ============================================================ */
+.eyebrow {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
   font-weight: 600;
-  margin: 0 0 0.25rem;
-  letter-spacing: -0.01em;
 }
 
-.page-subtitle {
-  color: var(--text-dim);
-  margin: 0 0 1.5rem;
-  font-size: 0.95rem;
+.deck {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
 }
 
+.byline {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.title-display {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.012em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.title-section {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.35rem;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  margin: 0 0 0.4rem;
+}
+
+.caption {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ============================================================
+   Page containers
+   ============================================================ */
+.page {
+  padding: 2rem var(--gutter) 4rem;
+  max-width: var(--max-page);
+  margin: 0 auto;
+}
+
+.page--prose {
+  max-width: var(--max-prose);
+}
+
+.page__masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.page__masthead-lede { max-width: 56ch; }
+
+/* ============================================================
+   Editorial markdown rendering (for daily / weekly / monthly MD)
+   ============================================================ */
+.markdown {
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ink);
+
+  h1, h2, h3, h4 {
+    font-family: var(--serif);
+    line-height: 1.2;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+  h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.6rem;
+  }
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 2rem 0 0.6rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 1.4rem 0 0.4rem;
+  }
+  h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 1.1rem 0 0.3rem;
+    text-transform: none;
+  }
+  p { margin: 0.75em 0; }
+  ul, ol { padding-left: 1.3rem; margin: 0.8em 0; }
+  li { margin: 0.35em 0; }
+  li > p { margin: 0.25em 0; }
+  blockquote {
+    margin: 1.2em 0;
+    padding: 0.4em 1.1em;
+    border-left: 3px solid var(--accent);
+    color: var(--ink-2);
+    font-style: italic;
+  }
+  code {
+    background: var(--card-soft);
+    padding: 0.08em 0.4em;
+    border-radius: var(--radius-sm);
+    font-size: 0.85em;
+  }
+  pre {
+    background: #2a241d;
+    color: #f7f3ea;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    line-height: 1.5;
+    margin: 1.2em 0;
+  }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  table { border-collapse: collapse; width: 100%; margin: 1.2em 0; font-size: 0.95em; }
+  th, td { border-bottom: 1px solid var(--rule); padding: 0.5em 0.8em; text-align: left; }
+  th { font-family: var(--sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; background: transparent; border-bottom-color: var(--rule-strong); }
+  img { max-width: 100%; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
+  a { color: var(--ink); text-decoration-color: var(--accent); }
+  a:hover { color: var(--accent); }
+}
+
+/* ============================================================
+   Cards & framing (used outside PrimeNG when a softer card fits)
+   ============================================================ */
 .card {
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--card);
+  border: 1px solid var(--rule);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 1.25rem 1.5rem;
+  padding: 1.4rem 1.6rem;
 }
 
-.skeleton {
-  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
-  background-size: 200% 100%;
+.panel-tone {
+  background: var(--card-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+}
+
+.divider {
+  border-top: 1px solid var(--rule);
+  margin: 1.5rem 0;
+}
+
+/* utility */
+.muted { color: var(--muted); }
+.ink-2 { color: var(--ink-2); }
+.tabular { font-variant-numeric: tabular-nums; }
+.sans { font-family: var(--sans); }
+.serif { font-family: var(--serif); }
+
+.row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.row-tight { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.tone-rising { color: var(--rising); }
+.tone-falling { color: var(--falling); }
+
+/* ============================================================
+   PrimeNG overrides — push the library to feel editorial.
+   Most styling stays in PrimeNG; we only retune surfaces, fonts,
+   and accent colours so it doesn't look "stock blue dashboard".
+   ============================================================ */
+.p-component,
+.p-component * {
+  font-family: var(--sans);
+}
+
+/* Use the warm card surface on PrimeNG inputs */
+.p-inputtext,
+.p-select,
+.p-iconfield input,
+.p-multiselect {
+  background: var(--card) !important;
+  border-color: var(--rule) !important;
+  color: var(--ink) !important;
+  border-radius: var(--radius) !important;
+  font-family: var(--sans);
+  font-size: 0.92rem;
+}
+.p-inputtext:hover,
+.p-select:hover,
+.p-multiselect:hover {
+  border-color: var(--rule-strong) !important;
+}
+.p-inputtext:focus,
+.p-select:focus,
+.p-select.p-focus,
+.p-multiselect.p-focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+  outline: 0;
+}
+
+.p-iconfield .p-inputicon {
+  color: var(--muted);
+}
+
+/* Buttons — link / text variants to match editorial language */
+.p-button.p-button-text {
+  color: var(--ink-2);
+  &:hover { background: var(--card-soft); color: var(--ink); }
+}
+
+/* Tabs — flatter underline style instead of stock pill */
+.p-tabs .p-tablist {
+  background: transparent;
+  border-bottom: 1px solid var(--rule);
+}
+.p-tabs .p-tab {
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
+  font-weight: 500;
+  padding: 0.75rem 1.1rem;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  transition: color .15s, border-color .15s;
+}
+.p-tabs .p-tab:hover { color: var(--ink); }
+.p-tabs .p-tab.p-tab-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.p-tabs .p-tabpanels {
+  background: transparent;
+  padding-top: 1.5rem;
+}
+
+/* Tag */
+.p-tag {
+  background: var(--card-soft);
+  color: var(--ink-2);
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  padding: 0.18rem 0.5rem;
+}
+.p-tag.p-tag-info    { background: rgba(47,99,131,0.12);  color: var(--sector-agents); }
+.p-tag.p-tag-success { background: rgba(45,107,58,0.12);  color: var(--rising); }
+.p-tag.p-tag-warn    { background: rgba(154,106,35,0.14); color: var(--sector-gov); }
+.p-tag.p-tag-secondary { background: var(--card-soft); color: var(--muted); }
+
+/* Chip */
+.p-chip {
+  background: var(--card);
+  color: var(--ink-2);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.18rem 0.6rem;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+/* Drawer */
+.p-drawer-mask {
+  background: rgba(26, 22, 18, 0.30) !important;
+  backdrop-filter: blur(2px);
+}
+.p-drawer {
+  background: var(--paper) !important;
+  border-left: 1px solid var(--rule) !important;
+  box-shadow: -12px 0 36px rgba(26,22,18,0.10) !important;
+}
+
+/* Skeleton */
+.p-skeleton {
+  background: linear-gradient(90deg, var(--card-soft) 0%, var(--card) 50%, var(--card-soft) 100%) !important;
+  background-size: 200% 100% !important;
   animation: shimmer 1.4s infinite linear;
-  border-radius: 4px;
-  display: inline-block;
-  height: 1em;
-  min-width: 80px;
+  border-radius: var(--radius-sm) !important;
 }
-
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-.tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.18rem 0.55rem;
-  background: var(--surface-2);
-  border-radius: 999px;
-  font-size: 0.78rem;
-  color: var(--text-dim);
-  font-weight: 500;
+/* Message */
+.p-message {
+  border-radius: var(--radius) !important;
+  font-family: var(--sans);
+}
+.p-message-error {
+  background: rgba(154,42,42,0.10) !important;
+  border-color: rgba(154,42,42,0.30) !important;
+  color: var(--falling) !important;
 }
 
-.tag.accent { background: var(--accent-soft); color: var(--accent); }
-.tag.rising { background: #dcfce7; color: var(--rising); }
-.tag.falling { background: #fee2e2; color: var(--falling); }
+/* PrimeNG Select overlay */
+.p-select-overlay,
+.p-multiselect-overlay {
+  background: var(--card) !important;
+  border: 1px solid var(--rule) !important;
+  border-radius: var(--radius) !important;
+  font-family: var(--sans);
+}
+.p-select-option,
+.p-multiselect-option {
+  color: var(--ink-2) !important;
+  padding: 0.55rem 0.9rem !important;
+}
+.p-select-option.p-select-option-selected,
+.p-multiselect-option.p-multiselect-option-selected {
+  background: var(--accent-soft) !important;
+  color: var(--ink) !important;
+}
+.p-select-option:hover:not(.p-select-option-selected),
+.p-multiselect-option:hover:not(.p-multiselect-option-selected) {
+  background: var(--card-soft) !important;
+}
 
-/* PrimeNG overrides for Aura light to match palette */
-.p-component { font-family: var(--font-sans); }
+/* Card (PrimeNG p-card) — softer, paper-like */
+.p-card {
+  background: var(--card) !important;
+  border: 1px solid var(--rule) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  color: var(--ink) !important;
+}
+.p-card-title { font-family: var(--serif); font-weight: 600; }
+
+/* Toolbar */
+.p-toolbar {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/* DataView */
+.p-dataview {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+/* ScrollPanel & Tooltip */
+.p-tooltip-text {
+  background: var(--ink) !important;
+  color: var(--paper) !important;
+  border-radius: var(--radius-sm) !important;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+}
+
+/* ============================================================
+   Reading-mode tweaks for narrow screens
+   ============================================================ */
+@media (max-width: 640px) {
+  html, body { font-size: 15px; }
+  .markdown { font-size: 1rem; }
+  .page { padding: 1.25rem 1rem 3rem; }
+}

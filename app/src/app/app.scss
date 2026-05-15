@@ -1,90 +1,136 @@
 :host {
   display: block;
   min-height: 100dvh;
+  background: var(--paper);
 }
 
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid var(--border);
-  height: var(--nav-height);
-  display: flex;
-  align-items: center;
-}
-
-.topbar-inner {
-  width: 100%;
-  max-width: var(--max-width);
+/* ============================================================
+   Masthead — editorial nameplate, date line, primary nav.
+   Three horizontal rules give it newsprint cadence.
+   ============================================================ */
+.masthead {
+  background: var(--paper);
+  padding: 1.25rem var(--gutter) 0;
+  max-width: var(--max-chrome);
   margin: 0 auto;
-  padding: 0 1.75rem;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
 }
 
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
+.masthead__rules {
+  height: 1px;
+  background: var(--rule-strong);
+  margin: 0;
+}
+.masthead__rules--top    { height: 3px; background: var(--ink); }
+.masthead__rules--mid    { height: 1px; background: var(--rule); }
+.masthead__rules--bottom { height: 1px; background: var(--rule); }
+
+.masthead__inner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.9rem 0 0.6rem;
+  flex-wrap: wrap;
+}
+
+.wordmark {
   text-decoration: none;
-}
-
-.brand:hover { color: var(--accent); text-decoration: none; }
-
-.brand-mark {
+  color: var(--ink);
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: var(--text);
-  color: var(--bg);
-  border-radius: 6px;
+  flex-direction: column;
+  line-height: 1;
+}
+.wordmark:hover { color: var(--ink); text-decoration: none; }
+
+.wordmark__name {
+  font-family: var(--serif);
   font-weight: 700;
-  font-size: 0.75rem;
-  letter-spacing: 0;
+  font-size: clamp(1.65rem, 3.2vw, 2.25rem);
+  letter-spacing: -0.015em;
+  font-style: italic;
 }
 
-.brand-name { color: var(--text-dim); font-weight: 500; }
+.wordmark__sub {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
 
-.tabs {
+.masthead__date {
+  font-family: var(--sans);
+  text-align: right;
+}
+.masthead__date .byline {
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.topnav {
+  padding: 0.4rem 0;
+}
+.topnav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  align-items: center;
-  gap: 0.25rem;
+  gap: 1.6rem;
 }
-
-.tab {
+.topnav__link {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.45rem 0.85rem;
-  border-radius: var(--radius);
-  color: var(--text-dim);
-  font-size: 0.88rem;
+  padding: 0.55rem 0.05rem;
+  color: var(--ink-2);
+  font-family: var(--sans);
+  font-size: 0.84rem;
   font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-decoration: none;
-  transition: background-color 0.15s, color 0.15s;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
 }
+.topnav__link i { font-size: 0.78rem; opacity: 0.7; }
+.topnav__link:hover { color: var(--ink); text-decoration: none; }
+.topnav__link.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.topnav__link.is-active i { opacity: 1; }
 
-.tab:hover { background: var(--surface); color: var(--text); text-decoration: none; }
-.tab.active { background: var(--surface-2); color: var(--text); }
-.tab i { font-size: 0.85rem; opacity: 0.85; }
-
+/* main */
 .app-main {
-  min-height: calc(100dvh - var(--nav-height) - 4rem);
+  min-height: calc(100dvh - 200px);
 }
 
-.appfoot {
-  border-top: 1px solid var(--border);
-  padding: 1rem 1.75rem;
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--muted);
+/* footer */
+.appfoot { margin-top: 4rem; }
+.appfoot__rules {
+  height: 1px;
+  background: var(--rule-strong);
+  max-width: var(--max-chrome);
+  margin: 0 auto;
+}
+.appfoot__inner {
+  max-width: var(--max-chrome);
+  margin: 0 auto;
+  padding: 1rem var(--gutter) 2rem;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+@media (max-width: 640px) {
+  .masthead__inner { padding-bottom: 0.4rem; }
+  .topnav ul { gap: 1rem; flex-wrap: wrap; }
+  .appfoot__inner { flex-direction: column; }
 }

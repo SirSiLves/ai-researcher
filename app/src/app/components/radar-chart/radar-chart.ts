@@ -22,14 +22,15 @@ import { RadarTopic } from '../../services/data.service';
 
 Chart.register(BubbleController, LinearScale, PointElement, Tooltip, Legend);
 
+// Editorial sector palette — muted, paper-friendly (matches CSS vars).
 const SECTOR_COLORS: Record<string, { fill: string; stroke: string }> = {
-  'Models & capabilities':    { fill: 'rgba(59, 130, 246, 0.55)',  stroke: 'rgba(59, 130, 246, 1)' },
-  'Agents & infrastructure':  { fill: 'rgba(139, 92, 246, 0.55)',  stroke: 'rgba(139, 92, 246, 1)' },
-  'Governance & market':      { fill: 'rgba(245, 158, 11, 0.55)',  stroke: 'rgba(245, 158, 11, 1)' },
-  'Methods & research':       { fill: 'rgba(16, 185, 129, 0.55)',  stroke: 'rgba(16, 185, 129, 1)' },
+  'Models & capabilities':    { fill: 'rgba(111, 77, 140, 0.55)', stroke: 'rgba(111, 77, 140, 1)' },
+  'Agents & infrastructure':  { fill: 'rgba(47, 99, 131, 0.55)',  stroke: 'rgba(47, 99, 131, 1)' },
+  'Governance & market':      { fill: 'rgba(154, 106, 35, 0.55)', stroke: 'rgba(154, 106, 35, 1)' },
+  'Methods & research':       { fill: 'rgba(45, 107, 58, 0.55)',  stroke: 'rgba(45, 107, 58, 1)' },
 };
 
-const FALLBACK = { fill: 'rgba(100, 116, 139, 0.55)', stroke: 'rgba(100, 116, 139, 1)' };
+const FALLBACK = { fill: 'rgba(138, 127, 112, 0.55)', stroke: 'rgba(138, 127, 112, 1)' };
 
 interface TopicPoint {
   x: number;          // momentum_7d_pct
@@ -72,27 +73,28 @@ export class RadarChart implements AfterViewInit, OnDestroy {
         scales: {
           x: {
             type: 'linear',
-            title: { display: true, text: '7-day momentum (%)', color: '#475569', font: { weight: 500 } },
-            grid: { color: 'rgba(15,23,42,0.05)' },
-            ticks: { color: '#64748b', callback: v => `${v}%` }
+            title: { display: true, text: '7-day momentum (%)', color: '#6f6557', font: { weight: 500, family: 'Inter, sans-serif', size: 12 } },
+            grid: { color: 'rgba(26,22,18,0.05)' },
+            ticks: { color: '#8a7f70', callback: v => `${v}%`, font: { family: 'Inter, sans-serif', size: 11 } }
           },
           y: {
             type: 'linear',
-            title: { display: true, text: 'Sustained days in conversation', color: '#475569', font: { weight: 500 } },
-            grid: { color: 'rgba(15,23,42,0.05)' },
-            ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+            title: { display: true, text: 'Sustained days', color: '#6f6557', font: { weight: 500, family: 'Inter, sans-serif', size: 12 } },
+            grid: { color: 'rgba(26,22,18,0.05)' },
+            ticks: { color: '#8a7f70', stepSize: 1, precision: 0, font: { family: 'Inter, sans-serif', size: 11 } },
             min: 0
           }
         },
         plugins: {
           legend: {
             position: 'top',
-            labels: { color: '#475569', usePointStyle: true, padding: 16 }
+            labels: { color: '#4a423a', usePointStyle: true, padding: 16, font: { family: 'Inter, sans-serif', size: 12 } }
           },
           tooltip: {
-            backgroundColor: '#0f172a',
+            backgroundColor: '#1a1612',
+            titleFont: { family: 'Source Serif 4, Charter, serif', weight: 600, size: 13 },
+            bodyFont: { family: 'Inter, sans-serif', size: 12 },
             padding: 10,
-            titleFont: { weight: 600 },
             callbacks: {
               title: items => {
                 const p = items[0]?.raw as TopicPoint;

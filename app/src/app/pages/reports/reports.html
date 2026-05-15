@@ -1,9 +1,10 @@
-<section class="page-container">
-  <header class="reports-head">
-    <div>
-      <h1 class="page-title">Reports archive</h1>
-      <p class="page-subtitle">
-        {{ entries().length }} reports across {{ cadences().length }} cadences. Click any to read.
+<section class="page reports">
+  <header class="reports__head">
+    <div class="reports__lede">
+      <span class="eyebrow">Archive</span>
+      <h1 class="title-display">Every edition, every dispatch</h1>
+      <p class="deck">
+        {{ entries().length }} reports across {{ cadences().length }} cadences &middot; click any to read
       </p>
     </div>
   </header>
@@ -12,8 +13,8 @@
     <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
   }
 
-  <div class="reports-toolbar">
-    <p-iconfield iconPosition="left" styleClass="reports-search-field">
+  <div class="reports__toolbar">
+    <p-iconfield iconPosition="left" styleClass="reports__search">
       <p-inputicon class="pi pi-search" />
       <input pInputText
              [ngModel]="query()"
@@ -24,16 +25,16 @@
     <div class="cadence-toggles">
       @for (c of cadences(); track c) {
         <button class="cadence-btn"
-                [class.active]="isActive(c)"
+                [class.is-active]="isActive(c)"
                 [style.--c-color]="cadenceColor(c)"
                 (click)="toggle(c, !isActive(c))">
-          <span class="dot"></span>
+          <span class="cadence-btn__dot"></span>
           {{ c.replace('_', ' ') }}
         </button>
       }
       @if (activeCadences().size) {
-        <button class="cadence-btn clear" (click)="clearFilters()">
-          clear filters
+        <button class="cadence-btn cadence-btn--clear" (click)="clearFilters()">
+          clear
         </button>
       }
     </div>
@@ -48,19 +49,19 @@
   } @else {
     <ul class="report-list">
       @for (e of filtered(); track e.cadence + '|' + e.date_id + '|' + e.path) {
-        <li class="report-row" (click)="open(e)">
-          <span class="badge" [style.background-color]="cadenceColor(e.cadence)">
+        <li class="report-row" tabindex="0" (click)="open(e)" (keydown.enter)="open(e)">
+          <span class="report-badge" [style.background-color]="cadenceColor(e.cadence)">
             {{ e.cadence_label }}
           </span>
-          <time class="report-date">{{ e.date_id }}</time>
-          <span class="report-headline">{{ e.headline || 'No headline' }}</span>
+          <time class="report-date tabular">{{ e.date_id }}</time>
+          <span class="report-headline">{{ e.headline || '—' }}</span>
           @if (e.is_versioned) {
-            <span class="tag">versioned</span>
+            <span class="report-versioned">v</span>
           }
-          <i class="pi pi-chevron-right"></i>
+          <i class="pi pi-arrow-right report-chevron"></i>
         </li>
       } @empty {
-        <li class="empty">No reports match your filters.</li>
+        <li class="report-empty">No reports match your filters.</li>
       }
     </ul>
   }
@@ -74,9 +75,9 @@
     <ng-template #headless>
       @if (selected(); as sel) {
         <header class="drawer-head">
-          <div>
-            <span class="badge" [style.background-color]="cadenceColor(sel.cadence)">{{ sel.cadence_label }}</span>
-            <h2>{{ sel.date_id }}</h2>
+          <div class="drawer-head__title">
+            <span class="report-badge" [style.background-color]="cadenceColor(sel.cadence)">{{ sel.cadence_label }}</span>
+            <h2 class="title-section tabular">{{ sel.date_id }}</h2>
           </div>
           <p-button icon="pi pi-times"
                     severity="secondary"
@@ -87,7 +88,7 @@
         </header>
         <div class="drawer-body">
           @if (markdownLoading() && !markdown()) {
-            <p-skeleton width="80%" height="1rem" styleClass="mb-2"></p-skeleton>
+            <p-skeleton width="80%" height="1rem"></p-skeleton>
             <p-skeleton width="100%" height="6rem"></p-skeleton>
           } @else if (markdown()) {
             <app-markdown-viewer [source]="markdown()" />

@@ -1,9 +1,10 @@
-<section class="page-container">
-  <header class="firms-head">
-    <div>
-      <h1 class="page-title">Firms</h1>
-      <p class="page-subtitle">
-        {{ orgs().length }} organizations tracked · sorted by 7-day velocity by default.
+<section class="page firms">
+  <header class="firms__head">
+    <div class="firms__lede">
+      <span class="eyebrow">Firms in coverage</span>
+      <h1 class="title-display">Who's moving the conversation</h1>
+      <p class="deck">
+        {{ orgs().length }} organizations tracked &middot; sorted by 7-day velocity by default
       </p>
     </div>
   </header>
@@ -12,8 +13,8 @@
     <p-message severity="error" [text]="e" styleClass="w-full"></p-message>
   }
 
-  <div class="firms-toolbar">
-    <p-iconfield iconPosition="left" styleClass="firms-search-field">
+  <div class="firms__toolbar">
+    <p-iconfield iconPosition="left" styleClass="firms__search">
       <p-inputicon class="pi pi-search" />
       <input pInputText
              [ngModel]="query()"
@@ -26,7 +27,7 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Tier"
-              [style]="{ minWidth: '14rem' }"
+              [style]="{ minWidth: '13rem' }"
               appendTo="body" />
     <p-select [options]="velocityOptions"
               [ngModel]="velocityFilter()"
@@ -48,35 +49,37 @@
   @if (loading()) {
     <div class="firm-grid">
       @for (i of [1,2,3,4,5,6,7,8]; track i) {
-        <p-skeleton width="100%" height="11rem" styleClass="firm-skel"></p-skeleton>
+        <p-skeleton width="100%" height="11rem"></p-skeleton>
       }
     </div>
   } @else {
     <div class="firm-grid">
       @for (o of filtered(); track o.slug) {
         <button class="firm-card" (click)="open(o.slug)">
-          <header class="firm-head">
-            <span class="firm-slug">{{ o.slug }}</span>
+          <header class="firm-card__head">
+            <span class="firm-card__name">{{ o.slug }}</span>
             @if (o.is_priority) {
-              <span class="tag accent">priority</span>
+              <p-tag value="priority" severity="warn"></p-tag>
             }
           </header>
-          <div class="firm-stats">
-            <span class="stat">
-              <span class="stat-num">{{ o.velocity_7d }}</span>
-              <span class="stat-lbl">7-day</span>
-            </span>
-            <span class="stat">
-              <span class="stat-num">{{ o.total_mentions }}</span>
-              <span class="stat-lbl">total</span>
-            </span>
-            <span class="stat">
-              <span class="stat-num">{{ o.topic_count }}</span>
-              <span class="stat-lbl">topics</span>
-            </span>
-          </div>
-          <footer class="firm-foot">
-            <span class="velocity" [class]="velocityClass(o.velocity_status)">
+
+          <dl class="firm-card__stats">
+            <div>
+              <dt>7-day</dt>
+              <dd class="tabular">{{ o.velocity_7d }}</dd>
+            </div>
+            <div>
+              <dt>Total</dt>
+              <dd class="tabular">{{ o.total_mentions }}</dd>
+            </div>
+            <div>
+              <dt>Topics</dt>
+              <dd class="tabular">{{ o.topic_count }}</dd>
+            </div>
+          </dl>
+
+          <footer class="firm-card__foot">
+            <span class="firm-card__velocity" [class]="velocityClass(o.velocity_status)">
               <i class="pi"
                  [class.pi-arrow-up]="o.velocity_status === 'surging' || o.velocity_status === 'accelerating'"
                  [class.pi-arrow-down]="o.velocity_status === 'cooling'"
@@ -84,13 +87,14 @@
               {{ o.velocity_status }}
             </span>
             @if (o.tier_hint) {
-              <span class="tier-pill">{{ o.tier_hint }}</span>
+              <span class="firm-card__tier">{{ o.tier_hint }}</span>
             }
           </footer>
+
           @if (o.top_topics.length) {
-            <div class="firm-topics">
+            <div class="firm-card__topics">
               @for (t of o.top_topics.slice(0, 3); track t) {
-                <p-chip [label]="t" styleClass="topic-chip-pn" />
+                <p-chip [label]="t" styleClass="firm-card__chip" />
               }
             </div>
           }
@@ -109,7 +113,10 @@
             styleClass="firm-drawer">
     <ng-template #headless>
       <header class="drawer-head">
-        <h2>{{ selectedSlug() }}</h2>
+        <div class="drawer-head__title">
+          <span class="eyebrow">Firm profile</span>
+          <h2 class="title-section">{{ selectedSlug() }}</h2>
+        </div>
         <p-button icon="pi pi-times"
                   severity="secondary"
                   [text]="true"
@@ -120,15 +127,15 @@
 
       @if (detailLoading() && !detail()) {
         <div class="drawer-body">
-          <p-skeleton width="60%" height="1.4rem" styleClass="mb-2"></p-skeleton>
-          <p-skeleton width="80%" height="1rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton width="60%" height="1.4rem"></p-skeleton>
+          <p-skeleton width="80%" height="1rem"></p-skeleton>
           <p-skeleton width="100%" height="6rem"></p-skeleton>
         </div>
       } @else if (detail(); as d) {
         <div class="drawer-body">
           <div class="drawer-meta">
             @if (d.tier_hint) { <p-tag [value]="d.tier_hint" severity="info"></p-tag> }
-            @if (d.region) { <span class="muted">{{ d.region }}</span> }
+            @if (d.region) { <span class="byline">{{ d.region }}</span> }
             @if (d.blog_url_hint) {
               <a [href]="d.blog_url_hint" target="_blank" rel="noopener" class="blog-link">
                 <i class="pi pi-external-link"></i> blog
@@ -136,14 +143,14 @@
             }
           </div>
           <dl class="drawer-stats">
-            <div><dt>Total mentions</dt><dd>{{ d.total_mentions }}</dd></div>
-            <div><dt>Distinct days</dt><dd>{{ d.distinct_days }}</dd></div>
-            <div><dt>First seen</dt><dd>{{ d.first_seen }}</dd></div>
-            <div><dt>Last seen</dt><dd>{{ d.last_seen }}</dd></div>
+            <div><dt>Total mentions</dt><dd class="tabular">{{ d.total_mentions }}</dd></div>
+            <div><dt>Distinct days</dt><dd class="tabular">{{ d.distinct_days }}</dd></div>
+            <div><dt>First seen</dt><dd class="tabular">{{ d.first_seen }}</dd></div>
+            <div><dt>Last seen</dt><dd class="tabular">{{ d.last_seen }}</dd></div>
           </dl>
 
-          <section>
-            <h3>By source type</h3>
+          <section class="drawer-section">
+            <h3 class="drawer-section__title">By source type</h3>
             <ul class="src-list">
               @for (s of topSources(d); track s.key) {
                 <li>
@@ -151,20 +158,20 @@
                   <span class="src-bar">
                     <span class="src-bar-fill" [style.width.%]="(s.value / d.total_mentions) * 100"></span>
                   </span>
-                  <span class="src-val">{{ s.value }}</span>
+                  <span class="src-val tabular">{{ s.value }}</span>
                 </li>
               }
             </ul>
           </section>
 
           @if (d.topics?.length) {
-            <section>
-              <h3>Top topics</h3>
+            <section class="drawer-section">
+              <h3 class="drawer-section__title">Top topics</h3>
               <ul class="topic-strip">
                 @for (t of d.topics!.slice(0, 12); track t.id) {
                   <li>
-                    <span class="topic-strip-label">{{ t.id }}</span>
-                    <span class="topic-strip-num">{{ t.mentions }}</span>
+                    <span class="topic-strip__label">{{ t.id }}</span>
+                    <span class="topic-strip__num tabular">{{ t.mentions }}</span>
                   </li>
                 }
               </ul>
@@ -172,13 +179,13 @@
           }
 
           @if (d.recent_context?.length) {
-            <section>
-              <h3>Recent context</h3>
+            <section class="drawer-section">
+              <h3 class="drawer-section__title">Recent context</h3>
               <ul class="context-list">
                 @for (c of d.recent_context!.slice(0, 6); track c.path + c.date) {
                   <li>
                     <header>
-                      <span class="muted">{{ c.date }} · {{ c.source_type }}</span>
+                      <span class="byline">{{ c.date }} &middot; {{ c.source_type }}</span>
                     </header>
                     <p>{{ c.snippet }}</p>
                   </li>
