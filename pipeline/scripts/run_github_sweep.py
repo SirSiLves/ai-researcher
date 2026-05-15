@@ -34,9 +34,9 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from _lib import upsert_index_marker_line
+from _lib import upsert_index_marker_line, REPO_ROOT, STATE_DIR, DATA_ROOT, INDEX_MD
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = REPO_ROOT  # back-compat for any `path.relative_to(ROOT)` calls
 # Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
 # orchestrator); fall back to wall-clock date for standalone runs.
 TODAY = os.environ.get("TODAY") or date.today().isoformat()
@@ -80,7 +80,7 @@ def main():
     p.add_argument("--dry-run", action="store_true", help="Show classifications without writing")
     args = p.parse_args()
 
-    sources = json.loads((ROOT / "sources.json").read_text())
+    sources = json.loads((STATE_DIR / "sources.json").read_text())
     gc = sources.get("github_collector", {})
     cfg = gc.get("github_sweep_config", {})
     if not cfg.get("enabled", False):
@@ -103,7 +103,7 @@ def main():
     deep_watch_set = set(deep_watch)
 
     # === Step 1: scan github/ files in rolling window ===
-    files = [(p, d) for p, d in iter_github_files(ROOT) if d >= cutoff]
+    files = [(p, d) for p, d in iter_github_files(DATA_ROOT) if d >= cutoff]
     files.sort(key=lambda x: x[1])
     print(f"[github_sweep] scanning {len(files)} files in last {rolling_days}d", file=sys.stderr)
 
@@ -134,7 +134,7 @@ def main():
                 ent["last_seen_in_window"] = file_date
 
     # === Step 2: load github_stars.json (the persistent state) ===
-    stars_path = ROOT / "github_stars.json"
+    stars_path = STATE_DIR / "github_stars.json"
     if stars_path.exists():
         stars_state = json.loads(stars_path.read_text())
     else:
@@ -224,7 +224,7 @@ def main():
     else:
         if not args.dry_run:
             # Per-sweep .bak so concurrent vendor/keyword runs don't clobber.
-            shutil.copy(ROOT / "sources.json", ROOT / "sources.json.github.bak")
+            shutil.copy(STATE_DIR / "sources.json", STATE_DIR / "sources.json.github.bak")
 
         log_lines = []
         applied_count = 0
@@ -375,23 +375,23 @@ def main():
         try:
             json.dumps(sources)
         except Exception as e:
-            shutil.copy(ROOT / "sources.json.github.bak", ROOT / "sources.json")
+            shutil.copy(STATE_DIR / "sources.json.github.bak", STATE_DIR / "sources.json")
             print(f"[github_sweep] JSON validation failed, restored backup: {e}", file=sys.stderr)
-            with (ROOT / "github_changes.log").open("a") as f:
+            with (STATE_DIR / "github_changes.log").open("a") as f:
                 f.write(f'{NOW_ISO} ABORT-INVALID-JSON  -  reason="sources.json would not parse after edits"\n')
             return
         if not args.dry_run:
             # ensure_ascii=False preserves em-dashes / other UTF-8 in source
             # strings; default escaping produces churn-only diffs against
             # hand-edited files. Trailing newline matches hand-edit convention.
-            (ROOT / "sources.json").write_text(json.dumps(sources, indent=2, ensure_ascii=False) + "\n")
+            (STATE_DIR / "sources.json").write_text(json.dumps(sources, indent=2, ensure_ascii=False) + "\n")
             stars_path.write_text(json.dumps(stars_state, indent=2, ensure_ascii=False) + "\n")
             if log_lines:
-                with (ROOT / "github_changes.log").open("a") as f:
+                with (STATE_DIR / "github_changes.log").open("a") as f:
                     f.write("\n".join(log_lines) + "\n")
 
     # === Step 9: write change-log markdown ===
-    out_md = ROOT / "github_candidates" / TODAY[:7].replace("-", "/") / f"{TODAY}.md"
+    out_md = DATA_ROOT / "github_candidates" / TODAY[:7].replace("-", "/") / f"{TODAY}.md"
     out_md.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         f"# GitHub sweep — {TODAY}\n",
@@ -454,7 +454,7 @@ def main():
                       f"applied: {applied_count} promotion(s), {hot_count} hot, {revived_count} revived; "
                       f"pending: {len(pending)}; watch: {len(watch_repos)}; "
                       f"watched_repos: {len(watched)} / deep_watch: {len(deep_watch)}")
-        upsert_index_marker_line(ROOT / "index.md", "GITHUB", TODAY, index_line)
+        upsert_index_marker_line(INDEX_MD, "GITHUB", TODAY, index_line)
     print(f"[github_sweep] done. applied {applied_count} promotions, {hot_count} hot events, "
           f"{revived_count} revivals. {len(appearances)} repos seen. wrote {out_md.relative_to(ROOT)}.",
           file=sys.stderr)

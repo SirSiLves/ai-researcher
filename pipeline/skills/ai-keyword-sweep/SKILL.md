@@ -3,6 +3,8 @@ name: ai-keyword-sweep
 description: Daily keyword/topic-coverage sweep with AUTO-APPLY. Same architecture as ai-vendor-sweep, applied to keywords instead of orgs. Mines today's source files for n-gram phrases NOT yet in any keyword list (news web_search_queries, radar topic_taxonomy_seed, hackernews filter_keywords, linkedin pulse_topic_queries / hashtags). Classifies them, auto-applies promotions to `sources.json`, removes expired entries, writes a daily change log.
 ---
 
+> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+
 You are the **keyword-coverage sweep agent**. The user's complaint that motivated this skill:
 
 > "Currently the keywords which are going to be searched. If we just always use the same words, perhaps we will important things missing too."
@@ -15,7 +17,7 @@ This is the same risk shape as the vendor sweep — frozen lists go stale. The s
 collectors → daily orchestrator → daily/{date}.md
                                 + ai-trend-radar → radar/{date}.json
                                 + ai-vendor-sweep → vendor_candidates/{date}.md (mutates orgs)
-                                + scripts/build_org_view.py → orgs/*.json
+                                + ../pipeline/scripts/build_org_view.py → orgs/*.json
                                 + YOU (ai-keyword-sweep) → keyword_candidates/{date}.md (mutates keywords)
                                 + ai-weekly-digest
 ```
@@ -26,7 +28,7 @@ You read what's on disk; you don't fetch anything. Your inputs are the same sour
 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` `keyword_sweep_config` section for thresholds. If the section doesn't exist yet, the skill bootstraps it with defaults (see §1.5) — write it back to `sources.json` and continue.
-- **Timestamps from the orchestrator footer.** Look for `PIPELINE TIMESTAMPS` and use `TODAY`, `WEEK_ID`, `MONDAY`. Standalone fallback: `eval "$(scripts/now.sh)"`. Do NOT compute the date manually.
+- **Timestamps from the orchestrator footer.** Look for `PIPELINE TIMESTAMPS` and use `TODAY`, `WEEK_ID`, `MONDAY`. Standalone fallback: `eval "$(../pipeline/scripts/now.sh)"`. Do NOT compute the date manually.
 - **Output filename:** `keyword_candidates/{YYYY}/{MM}/{date}.md`. Overwrite if exists on the same day (re-runs replace — one canonical sweep per day, same as the vendor sweep).
 - **State file:** `discovered_keywords.json` at workspace root. Read it; mutate it; write it back.
 - **Audit log:** `keyword_changes.log` at workspace root. Append-only.
@@ -275,7 +277,7 @@ Read `keyword_sweep_config.auto_apply`. If `auto_apply.enabled` is `false`, skip
 
 Otherwise:
 
-**Step A — Backup.** `cp sources.json sources.json.keyword.bak` (overwrites this sweep's previous backup). Per-sweep .bak files (`sources.json.{vendor,keyword,github}.bak`) — successive sweeps no longer clobber each other's rollback target.
+**Step A — Backup.** `cp ../pipeline/state/sources.json ../pipeline/state/sources.json.keyword.bak` (overwrites this sweep's previous backup). Per-sweep .bak files (`sources.json.{vendor,keyword,github}.bak`) — successive sweeps no longer clobber each other's rollback target.
 
 **Step B — Compute the change set:**
 
@@ -355,7 +357,7 @@ After all edits in Step C / C.6, validate the JSON parses. If it doesn't, abort 
 2026-05-14T20:08:00 deep-watch-promote news_web_search_queries      "returning phrase y"                        reason="returned via sustained_promote"
 ```
 
-The `proven-promote` verb is the load-bearing entry — it tells the audit log "this keyword is now PERMANENT, anchored for trend recognition." Search the log with `grep proven-promote keyword_changes.log` to see every keyword that's become proven over time.
+The `proven-promote` verb is the load-bearing entry — it tells the audit log "this keyword is now PERMANENT, anchored for trend recognition." Search the log with `grep proven-promote ../pipeline/state/keyword_changes.log` to see every keyword that's become proven over time.
 
 **Step E — Update discovered_keywords.json.** For every applied candidate set `applied_to_lists` and `applied_on`. For removals set `removed_on` and `removed_reason`.
 
@@ -364,7 +366,7 @@ The `proven-promote` verb is the load-bearing entry — it tells the audit log "
 ```markdown
 # Keyword sweep — {TODAY}
 
-_Daily change log. The pipeline auto-maintains the four keyword lists in sources.json — promotions and hot topics are added directly, expired entries removed. This page describes what happened. Rollback the most recent sweep: `cp sources.json.keyword.bak sources.json`._
+_Daily change log. The pipeline auto-maintains the four keyword lists in sources.json — promotions and hot topics are added directly, expired entries removed. This page describes what happened. Rollback the most recent sweep: `cp ../pipeline/state/sources.json.keyword.bak ../pipeline/state/sources.json`._
 
 ## 📋 What changed in sources.json today
 

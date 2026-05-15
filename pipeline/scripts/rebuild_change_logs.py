@@ -35,7 +35,7 @@ from collections import defaultdict
 from datetime import date, datetime
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from _lib import STATE_DIR
 NOW = datetime.now().astimezone().isoformat(timespec="seconds")
 # Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
 # orchestrator); fall back to wall-clock date for standalone runs.
@@ -266,7 +266,7 @@ def consistency_check_vendor(active_list, deep_watch_list):
     All four discrepancy lists should be empty in a healthy pipeline.
     """
     try:
-        sources = json.loads((ROOT / "sources.json").read_text())
+        sources = json.loads((STATE_DIR / "sources.json").read_text())
     except Exception:
         return None
     nc = sources.get("news_collector", {})
@@ -299,8 +299,8 @@ def consistency_check_vendor(active_list, deep_watch_list):
 
 
 def rebuild_one(log_name, json_name):
-    log_path = ROOT / log_name
-    json_path = ROOT / json_name
+    log_path = STATE_DIR / log_name
+    json_path = STATE_DIR / json_name
     if not log_path.exists():
         # No log → empty JSON skeleton
         empty = {

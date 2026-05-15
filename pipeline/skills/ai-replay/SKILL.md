@@ -1,7 +1,9 @@
 ---
 name: ai-replay
-description: Canonical orchestrator spec for the AI Researcher pipeline. Runs the full daily fan-out on demand. **Today only** — collectors fetch live URLs, all dated outputs use today's date from scripts/now.sh. Same-day re-runs MERGE into existing files rather than producing -v2 variants. THIS FILE IS ALSO THE SPEC THE NIGHTLY CRON SHOULD FOLLOW — paste the §1–§8 procedure into the Cowork scheduled-task prompt.
+description: Canonical orchestrator spec for the AI Researcher pipeline. Runs the full daily fan-out on demand. **Today only** — collectors fetch live URLs, all dated outputs use today's date from ../pipeline/scripts/now.sh. Same-day re-runs MERGE into existing files rather than producing -v2 variants. THIS FILE IS ALSO THE SPEC THE NIGHTLY CRON SHOULD FOLLOW — paste the §1–§8 procedure into the Cowork scheduled-task prompt.
 ---
+
+> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
 You are the **manual replay agent AND the canonical orchestrator spec**. This file plays two roles:
 
@@ -17,7 +19,7 @@ You are the **manual replay agent AND the canonical orchestrator spec**. This fi
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Pull canonical timestamps:
   ```bash
-  eval "$(scripts/now.sh)"
+  eval "$(../pipeline/scripts/now.sh)"
   ```
   This populates `TODAY`, `YYYY`, `MM`, `DD`, `MONTH`, `WEEK_ID`, `MONDAY`, `SUNDAY`, `PREV_WEEK_ID`, `DOW_ISO`, `IS_MONDAY`, `IS_FIRST_MONDAY_OF_MONTH`, `ISO_TS`, `AS_OF`. **All subagents you spawn must trust these values** — pass them in the `PIPELINE TIMESTAMPS` footer.
 - Ensure target folders exist (idempotent):
@@ -49,7 +51,7 @@ Every Agent call you spawn appends this footer to the skill prompt:
 
 ```
 ---
-PIPELINE TIMESTAMPS (from scripts/now.sh — single source of truth):
+PIPELINE TIMESTAMPS (from ../pipeline/scripts/now.sh — single source of truth):
 TODAY={TODAY}
 YYYY={YYYY}
 MM={MM}
@@ -75,13 +77,13 @@ Send ONE message with seven `Agent` tool calls:
 
 | `subagent_type` | `description` | `prompt` |
 |---|---|---|
-| `general-purpose` | `"News collector"` | contents of `skills/ai-news/SKILL.md` + footer |
-| `general-purpose` | `"Papers collector"` | contents of `skills/ai-papers/SKILL.md` + footer |
-| `general-purpose` | `"Blogs collector"` | contents of `skills/ai-blogs/SKILL.md` + footer |
-| `general-purpose` | `"Swiss jobs collector"` | contents of `skills/ai-jobs-ch/SKILL.md` + footer |
-| `general-purpose` | `"LinkedIn collector"` | contents of `skills/ai-linkedin/SKILL.md` + footer |
-| `general-purpose` | `"GitHub collector"` | contents of `skills/ai-github/SKILL.md` + footer |
-| `general-purpose` | `"Hacker News collector"` | contents of `skills/ai-hackernews/SKILL.md` + footer |
+| `general-purpose` | `"News collector"` | contents of `../pipeline/skills/ai-news/SKILL.md` + footer |
+| `general-purpose` | `"Papers collector"` | contents of `../pipeline/skills/ai-papers/SKILL.md` + footer |
+| `general-purpose` | `"Blogs collector"` | contents of `../pipeline/skills/ai-blogs/SKILL.md` + footer |
+| `general-purpose` | `"Swiss jobs collector"` | contents of `../pipeline/skills/ai-jobs-ch/SKILL.md` + footer |
+| `general-purpose` | `"LinkedIn collector"` | contents of `../pipeline/skills/ai-linkedin/SKILL.md` + footer |
+| `general-purpose` | `"GitHub collector"` | contents of `../pipeline/skills/ai-github/SKILL.md` + footer |
+| `general-purpose` | `"Hacker News collector"` | contents of `../pipeline/skills/ai-hackernews/SKILL.md` + footer |
 
 Wait for ALL seven to return. A failed subagent does NOT block the rest — note the failure in the daily file's "Sources scanned" section and continue.
 
@@ -161,7 +163,7 @@ Find `<!-- INDEX_START -->`. **If today's line already exists**, update it in pl
 One Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Trend radar"`
-- `prompt`: contents of `skills/ai-trend-radar/SKILL.md` + footer.
+- `prompt`: contents of `../pipeline/skills/ai-trend-radar/SKILL.md` + footer.
 
 Wait for it. The radar will replace any existing `radar/{YYYY}/{MM}/{TODAY}.{md,json}` in place (its merge rules say "the radar is fully derived; same-day re-run produces an authoritative new snapshot").
 
@@ -170,7 +172,7 @@ Wait for it. The radar will replace any existing `radar/{YYYY}/{MM}/{TODAY}.{md,
 One Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Vendor sweep"`
-- `prompt`: contents of `skills/ai-vendor-sweep/SKILL.md` + footer.
+- `prompt`: contents of `../pipeline/skills/ai-vendor-sweep/SKILL.md` + footer.
 
 Wait for it. The sweep will auto-mutate `sources.json` per its rules (with `sources.json.vendor.bak` rollback and `vendor_changes.log` audit trail).
 
@@ -179,7 +181,7 @@ Wait for it. The sweep will auto-mutate `sources.json` per its rules (with `sour
 Run the org-view generator directly — no subagent needed, it's a pure Python script over on-disk data:
 
 ```bash
-python3 scripts/build_org_view.py
+python3 ../pipeline/scripts/build_org_view.py
 ```
 
 This rebuilds `orgs/index.json` + `orgs/{slug}.json` for every tracked org (discovered orgs + the 6 priority vendors that the sweep skips). The generator scans `discovered_orgs.json`, source files, and radar JSONs — completes in ~8-12 seconds. Idempotent. Drives `orgs.html`.
@@ -193,7 +195,7 @@ Two-step process: a deterministic Python script does the mining + classification
 ### Step 6.8a: run the sweep script
 
 ```bash
-python3 scripts/run_keyword_sweep.py
+python3 ../pipeline/scripts/run_keyword_sweep.py
 ```
 
 This mines today's source files for 2/3-gram phrases (skipping anything covered by existing keyword lists AND anything the agent has already judged as boilerplate, within a 30-day verdict cache), classifies each phrase (already_applied / promote / watch / dormant), promotes phrases that held `promote` tier for ≥2 consecutive days, auto-applies to the four target lists in sources.json, runs proven-promotion for long-history keywords, writes `keyword_candidates/{date}.md`, updates `discovered_keywords.json`, and appends to `keyword_changes.log`.
@@ -222,7 +224,7 @@ Same shape as vendor sweep, but with its own backup file: `sources.json.keyword.
 Pure Python — no subagent needed:
 
 ```bash
-python3 scripts/run_github_sweep.py
+python3 ../pipeline/scripts/run_github_sweep.py
 ```
 
 Mines `github/{YYYY}/{MM}/*.md` (the ai-github collector's daily output) for trending repo appearances over the last 14 days. Repos that trend on ≥3 distinct days AND hold 'promote' tier for ≥2 consecutive sweep runs get auto-added to `news_collector.github_collector.watched_repos`. Repos with a single-day star delta ≥5,000 get a 30-day hot-event TTL. Soft cap at 80 watched repos triggers deep-watch demotion (oldest-silent first; same shape as vendor + keyword sweeps). Manual entries are sacred. Audit trail in `github_changes.log`.
@@ -236,7 +238,7 @@ If the script exits non-zero, log the error but don't block — the rest of the 
 Run the change-log JSON generator directly — pure Python over the append-only logs:
 
 ```bash
-python3 scripts/rebuild_change_logs.py
+python3 ../pipeline/scripts/rebuild_change_logs.py
 ```
 
 This rebuilds `vendor_changes.json` + `keyword_changes.json` + `github_changes.json` by replaying every line of `vendor_changes.log` + `keyword_changes.log` + `github_changes.log`. Each JSON has parsed mutations, counts by verb / month, currently-active set, deep-watch set, expired set, proven set, and (for vendor) a consistency check against `sources.json _auto_added` entries (surfaces drift between the log and what was actually applied).
@@ -252,7 +254,7 @@ ai-weekly-digest runs **every day**, not just Mondays — the file is cumulative
 One Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Weekly rollup"`
-- `prompt`: contents of `skills/ai-weekly-digest/SKILL.md` + footer.
+- `prompt`: contents of `../pipeline/skills/ai-weekly-digest/SKILL.md` + footer.
 
 Wait for it. The skill overwrites `weekly/{YYYY}/{WEEK_ID}.md`.
 
@@ -261,7 +263,7 @@ Wait for it. The skill overwrites `weekly/{YYYY}/{WEEK_ID}.md`.
 If `IS_MONDAY=1`, spawn ONE Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Trends update"`
-- `prompt`: contents of `skills/ai-trends/SKILL.md` + footer + this extra line:
+- `prompt`: contents of `../pipeline/skills/ai-trends/SKILL.md` + footer + this extra line:
   ```
   SOURCE: weekly/{YYYY}/{PREV_WEEK_ID}.md
   ```
@@ -280,7 +282,7 @@ PREV_MONTH=$(python3 -c "from datetime import date, timedelta; t=date.fromisofor
 Spawn ONE Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Monthly rollup"`
-- `prompt`: contents of `skills/ai-monthly-rollup/SKILL.md` + footer + this extra line:
+- `prompt`: contents of `../pipeline/skills/ai-monthly-rollup/SKILL.md` + footer + this extra line:
   ```
   TARGET_MONTH: {PREV_MONTH}
   ```
@@ -306,7 +308,7 @@ Examples:
 
 - **Never overwrite manual user edits.** Every merge step preserves prose, headings, and ordering from the existing file. Only new items get added; existing items always win on conflict.
 - **Never produce `-v2`, `-v3`.** If a skill you spawn returns saying it wrote a `-v2` file, that's a bug in the spawned skill — flag it in §8 and continue. The same-day file is the canonical record.
-- **Trust `scripts/now.sh`.** Don't compute the date in bash arithmetic; that has drifted in the past.
+- **Trust `../pipeline/scripts/now.sh`.** Don't compute the date in bash arithmetic; that has drifted in the past.
 - **Sources scanned, theme balance, vendor coverage** — these meta-sections describe the *run*, not the items. They always get regenerated with this run's numbers, not merged.
 - **Failed subagents don't block.** If `ai-blogs` returns an error, note it in the daily's "Sources scanned" and continue with synthesis.
 - **No partial-run rollback.** If the user cancels mid-pipeline (e.g. KeyboardInterrupt), the already-completed steps stay completed. The next replay run will merge with them.

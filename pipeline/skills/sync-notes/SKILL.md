@@ -3,7 +3,9 @@ name: sync-notes
 description: Sync the AI Researcher Apple Notes folder with the workspace markdown files. Use when the user says "sync notes", "refresh notes", "the notes look stale/wrong", "rebuild notes", "backfill the [date] note", or any time the Apple Notes view appears out of sync with daily/weekly/monthly/trends files on disk. Also use after a manual rename / cleanup operation that bypassed the LaunchAgent's WatchPaths trigger.
 ---
 
-You are running the Apple Notes sync for the AI Researcher pipeline. The workspace lives at `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`. Apple Notes is bridged by `scripts/sync_notes.sh`, which wraps `scripts/add_to_notes.applescript`.
+> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+
+You are running the Apple Notes sync for the AI Researcher pipeline. The workspace lives at `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`. Apple Notes is bridged by `pipeline/scripts/sync_notes.sh`, which wraps `pipeline/scripts/add_to_notes.applescript`.
 
 ## What this skill does
 
@@ -44,9 +46,9 @@ Branch on the result:
 Invoke the wrapper. Pick the mode:
 
 ```bash
-"/Users/yruosch/Documents/Claude/Projects/AI Researcher/scripts/sync_notes.sh"            # refresh
-"/Users/yruosch/Documents/Claude/Projects/AI Researcher/scripts/sync_notes.sh" --all      # sync-all
-"/Users/yruosch/Documents/Claude/Projects/AI Researcher/scripts/sync_notes.sh" daily/2026/05/2026-05-05.md   # backfill
+"/Users/yruosch/Documents/Claude/Projects/AI Researcher/pipeline/scripts/sync_notes.sh"            # refresh
+"/Users/yruosch/Documents/Claude/Projects/AI Researcher/pipeline/scripts/sync_notes.sh" --all      # sync-all
+"/Users/yruosch/Documents/Claude/Projects/AI Researcher/pipeline/scripts/sync_notes.sh" daily/2026/05/2026-05-05.md   # backfill
 ```
 
 Report the script's stdout to the user (it prints `→ doing X…` then `✓ done`). If the first run prompts macOS for "osascript wants access to control Notes," tell the user to click Allow — that's a one-time grant.
@@ -59,7 +61,7 @@ You can't run osascript from here. Do TWO things:
 2. **Tell the user the exact command** to run on their Mac (terminal, not Claude). Format it as a copy-paste block. Recommend the mode that fits the user's intent. Example:
 
    ```
-   "$HOME/Documents/Claude/Projects/AI Researcher/scripts/sync_notes.sh" --all
+   "$HOME/Documents/Claude/Projects/AI Researcher/pipeline/scripts/sync_notes.sh" --all
    ```
 
 Don't apologize for the platform limitation — frame it as "I checked the workspace state; here's the command to run on your Mac to make Notes match." Concise.
@@ -80,7 +82,7 @@ If you ran in Case B (no macOS shell), end with: `Run the command above on your 
 
 ## Constraints
 
-- NEVER edit `scripts/sync_notes.sh` or `scripts/add_to_notes.applescript` from this skill — the user is responsible for that file. If they ask you to modify it, that's a separate task, not part of this skill.
+- NEVER edit `pipeline/scripts/sync_notes.sh` or `pipeline/scripts/add_to_notes.applescript` from this skill — the user is responsible for that file. If they ask you to modify it, that's a separate task, not part of this skill.
 - NEVER touch source `.md` files in `daily/`, `weekly/`, `monthly/`, or `trends.md` — read-only here.
 - NEVER claim Apple Notes was updated unless `osascript` actually ran in this session (Case A).
 - If Case A and the AppleScript errors out (e.g., Notes app not running, permissions denied), surface the error to the user verbatim. Don't silently continue.

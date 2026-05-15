@@ -33,7 +33,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from _lib import STATE_DIR
 # Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
 # orchestrator); fall back to wall-clock date for standalone runs.
 TODAY = os.environ.get("TODAY") or date.today().isoformat()
@@ -55,9 +55,9 @@ def load_archive_config(sources):
 
 
 def archive_orgs(dry_run=False):
-    src_path = ROOT / "discovered_orgs.json"
-    arc_path = ROOT / "discovered_orgs_archive.json"
-    sources = json.loads((ROOT / "sources.json").read_text())
+    src_path = STATE_DIR / "discovered_orgs.json"
+    arc_path = STATE_DIR / "discovered_orgs_archive.json"
+    sources = json.loads((STATE_DIR / "sources.json").read_text())
     thresholds = load_archive_config(sources)["orgs"]
 
     data = json.loads(src_path.read_text())
@@ -126,9 +126,9 @@ def archive_orgs(dry_run=False):
 
 
 def archive_keywords(dry_run=False):
-    src_path = ROOT / "discovered_keywords.json"
-    arc_path = ROOT / "discovered_keywords_archive.json"
-    sources = json.loads((ROOT / "sources.json").read_text())
+    src_path = STATE_DIR / "discovered_keywords.json"
+    arc_path = STATE_DIR / "discovered_keywords_archive.json"
+    sources = json.loads((STATE_DIR / "sources.json").read_text())
     thresholds = load_archive_config(sources)["keywords"]
 
     data = json.loads(src_path.read_text())

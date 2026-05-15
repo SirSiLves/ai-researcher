@@ -33,9 +33,9 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from _lib import iter_source_files, whole_word_pattern
+from _lib import iter_source_files, whole_word_pattern, REPO_ROOT, STATE_DIR, DATA_ROOT
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = REPO_ROOT  # back-compat alias for downstream `path.relative_to(ROOT)` calls
 # Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
 # orchestrator); fall back to wall-clock date for standalone runs.
 TODAY = os.environ.get("TODAY") or date.today().isoformat()
@@ -88,12 +88,12 @@ PRIORITY_VENDORS = {
 }
 
 def load_sources_json():
-    with open(ROOT / "sources.json") as f:
+    with open(STATE_DIR / "sources.json") as f:
         return json.load(f)
 
 
 def load_discovered():
-    with open(ROOT / "discovered_orgs.json") as f:
+    with open(STATE_DIR / "discovered_orgs.json") as f:
         return json.load(f)
 
 
@@ -303,7 +303,7 @@ def main():
     discovered_orgs = discovered.get("orgs", {})
 
     print(f"[build_org_view] indexing source files…", file=sys.stderr)
-    file_index = list(iter_source_files(ROOT))
+    file_index = list(iter_source_files(DATA_ROOT))
     print(f"[build_org_view] {len(file_index)} source files indexed", file=sys.stderr)
 
     print(f"[build_org_view] scanning for priority vendors…", file=sys.stderr)
@@ -316,7 +316,7 @@ def main():
 
     # Load radar JSONs once
     radar_jsons = []
-    radar_dir = ROOT / "radar"
+    radar_dir = DATA_ROOT / "radar"
     if radar_dir.exists():
         for rp in sorted(radar_dir.rglob("*.json")):
             if rp.name == "index.json":
@@ -329,7 +329,7 @@ def main():
     print(f"[build_org_view] building per-org files for {len(all_orgs)} orgs…", file=sys.stderr)
 
     # Ensure orgs/ exists
-    orgs_dir = ROOT / "orgs"
+    orgs_dir = DATA_ROOT / "orgs"
     orgs_dir.mkdir(exist_ok=True)
 
     index_entries = []

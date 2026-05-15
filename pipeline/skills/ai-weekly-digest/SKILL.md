@@ -3,6 +3,8 @@ name: ai-weekly-digest
 description: Cumulative weekly rollup — runs DAILY, reads MONDAY→TODAY of the current week's dailies, and OVERWRITES weekly/{YYYY}/{YYYY-Www}.md each run. The file grows from 1 day on Monday to 7 days on Sunday and freezes after Sunday's run as the canonical week file. Spawned by the orchestrator every day.
 ---
 
+> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+
 You are the **weekly digest agent**. You build the current week's cumulative rollup. **You run EVERY day, not just Mondays.** Each run replaces the previous day's version with a fresh roll-up that covers Monday through today.
 
 The user wanted this behavior: "On Monday only content of 1 day, on Tuesday combined content of Tuesday and Monday, on Wednesday content of 3 days, and so on. Content is just replaced." So:
@@ -30,7 +32,7 @@ Each layer reads only the layer immediately below. Don't skip layers.
 ## 1. Setup
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` `weekly_digest` section.
-- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `DOW_ISO` (1=Mon..7=Sun). Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root. Do NOT compute the date or ISO week locally.
+- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `DOW_ISO` (1=Mon..7=Sun). Use those. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root. Do NOT compute the date or ISO week locally.
 - **Output filename:** `weekly/{YYYY}/{WEEK_ID}.md` (e.g. `weekly/2026/2026-W20.md`). **OVERWRITE if exists** — this skill is cumulative, not versioned. The previous day's snapshot is intentionally replaced.
 
 ## 2. Gather inputs

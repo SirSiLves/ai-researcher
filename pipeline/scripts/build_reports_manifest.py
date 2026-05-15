@@ -9,14 +9,13 @@ Idempotent — safe to re-run. Should be wired into the same cron tail as
 rebuild_radar_manifest.py.
 """
 
-import glob
 import json
 import os
 import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from _lib import DATA_ROOT
 
 CADENCES = [
     ("daily", "Daily", r"(\d{4}-\d{2}-\d{2})"),
@@ -151,8 +150,11 @@ def sort_key(entry: dict) -> tuple:
 def main() -> int:
     entries = []
     for cadence_dir, cadence_label, date_pat in CADENCES:
-        for path in glob.glob(f"{cadence_dir}/**/*.md", recursive=True):
-            base = os.path.basename(path).replace(".md", "")
+        cadence_root = DATA_ROOT / cadence_dir
+        if not cadence_root.exists():
+            continue
+        for path in cadence_root.rglob("*.md"):
+            base = path.stem
             match = re.match(date_pat, base)
             if not match:
                 continue
@@ -165,14 +167,16 @@ def main() -> int:
                 sort_date = f"{date_id}-99"
             else:
                 sort_date = date_id
+            # Stored path is relative to DATA_ROOT — webapp prepends "data/".
+            rel_path = path.relative_to(DATA_ROOT).as_posix()
             entries.append(
                 {
                     "cadence": cadence_dir,
                     "cadence_label": cadence_label,
                     "date_id": date_id,
                     "sort_date": sort_date,
-                    "path": path,
-                    "headline": first_headline(ROOT / path),
+                    "path": rel_path,
+                    "headline": first_headline(path),
                     "is_versioned": "-v" in base,
                 }
             )
@@ -186,7 +190,7 @@ def main() -> int:
         "_note": "Flat dated index of every cadence artifact. Consumed by app.html.",
     }
 
-    out = ROOT / "reports" / "index.json"
+    out = DATA_ROOT / "reports" / "index.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     with open(out, "w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2, ensure_ascii=False)

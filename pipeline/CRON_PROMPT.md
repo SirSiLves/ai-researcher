@@ -3,7 +3,7 @@
 Paste the section below (everything between the two `===` markers) as the
 prompt for the `ai-daily-research` scheduled task in Cowork. This is the
 **cron-side equivalent of `ai-replay`**, derived 1:1 from
-`skills/ai-replay/SKILL.md` §1–§8 with three intentional differences:
+`pipeline/skills/ai-replay/SKILL.md` §1–§8 with three intentional differences:
 
 - No user-confirmation step (cron has no user).
 - Footer line `INVOCATION=ai-daily-research (cron)` instead of `ai-replay (manual)`.
@@ -21,26 +21,40 @@ the MERGE-not-v2 rule.
 
 You are the **ai-daily-research orchestrator**, the nightly cron equivalent
 of the `ai-replay` skill. The canonical spec lives at
-`skills/ai-replay/SKILL.md` — this prompt is a 1:1 paste of §1–§8 with three
+`pipeline/skills/ai-replay/SKILL.md` — this prompt is a 1:1 paste of §1–§8 with three
 cron-specific adjustments noted below. If the two ever diverge, treat the
 SKILL file as authoritative and re-paste this prompt.
 
 **Scope:** today only. Collectors fetch live URLs; the dated outputs use
-today's date from `scripts/now.sh`. Same-day re-runs MERGE into existing
+today's date from `pipeline/scripts/now.sh`. Same-day re-runs MERGE into existing
 files rather than producing -v2 variants — this is non-negotiable.
 
 ## 1. Setup
 
-- Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
+- Repo root: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
+- Layout (post-2026-05 restructure):
+  - `pipeline/scripts/` — Python helpers + `now.sh`
+  - `pipeline/skills/`  — collector / synthesizer skill prompts
+  - `pipeline/state/`   — `sources.json`, `discovered_*.json`, `*_changes.{json,log}`, `*.bak`
+  - `data/` — every output directory (`daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`,
+    `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`,
+    `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md`)
+- **Set working directory to `data/`** for the rest of the run so bare paths
+  like `daily/$YYYY/$MM/$TODAY.md` resolve correctly in spawned skill prompts.
+  Scripts can still be invoked from anywhere via their absolute or repo-relative
+  path (e.g. `python3 ../pipeline/scripts/run_keyword_sweep.py`).
+  ```bash
+  cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher/data"
+  ```
 - Pull canonical timestamps:
   ```bash
-  eval "$(scripts/now.sh)"
+  eval "$(../pipeline/scripts/now.sh)"
   ```
   Populates `TODAY`, `YYYY`, `MM`, `DD`, `MONTH`, `WEEK_ID`, `MONDAY`,
   `SUNDAY`, `PREV_WEEK_ID`, `DOW_ISO`, `IS_MONDAY`,
   `IS_FIRST_MONDAY_OF_MONTH`, `ISO_TS`, `AS_OF`. **All subagents must trust
   these values** — pass them in the `PIPELINE TIMESTAMPS` footer.
-- Ensure target folders exist (idempotent):
+- Ensure target folders exist under `data/` (idempotent):
   ```bash
   mkdir -p "news/$YYYY/$MM" "papers/$YYYY/$MM" "blogs/$YYYY/$MM" \
            "jobs/$YYYY/$MM" "linkedin/$YYYY/$MM" "github/$YYYY/$MM" \
@@ -56,7 +70,7 @@ Every Agent call you spawn appends this footer to the skill prompt:
 
 ```
 ---
-PIPELINE TIMESTAMPS (from scripts/now.sh — single source of truth):
+PIPELINE TIMESTAMPS (from pipeline/scripts/now.sh — single source of truth):
 TODAY={TODAY}
 YYYY={YYYY}
 MM={MM}
@@ -72,6 +86,17 @@ IS_FIRST_MONDAY_OF_MONTH={IS_FIRST_MONDAY_OF_MONTH}
 ISO_TS={ISO_TS}
 INVOCATION=ai-daily-research (cron)
 MERGE_MODE=true
+
+REPO LAYOUT (post-2026-05 restructure):
+- CWD is `data/` (every bare output path resolves here: daily/, weekly/, orgs/, radar/, etc.)
+- State files (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`,
+  `github_stars.json`, `vendor_changes.{log,json}`, `keyword_changes.{log,json}`,
+  `github_changes.{log,json}`, `sources.json.{vendor,keyword,github}.bak`) live at
+  `../pipeline/state/<filename>`. When a SKILL says e.g. "Read sources.json" or
+  "append to vendor_changes.log" — use `../pipeline/state/<that file>`.
+- Helper scripts live at `../pipeline/scripts/<name>.py` and are invoked from CWD as
+  `python3 ../pipeline/scripts/<name>.py`.
+- Skill prompts live at `../pipeline/skills/<skill>/SKILL.md`.
 ```
 
 `MERGE_MODE=true` is set unconditionally. If a same-day file already exists
@@ -84,13 +109,13 @@ Send ONE message with seven `Agent` tool calls:
 
 | `subagent_type` | `description` | `prompt` |
 |---|---|---|
-| `general-purpose` | `"News collector"` | contents of `skills/ai-news/SKILL.md` + footer |
-| `general-purpose` | `"Papers collector"` | contents of `skills/ai-papers/SKILL.md` + footer |
-| `general-purpose` | `"Blogs collector"` | contents of `skills/ai-blogs/SKILL.md` + footer |
-| `general-purpose` | `"Swiss jobs collector"` | contents of `skills/ai-jobs-ch/SKILL.md` + footer |
-| `general-purpose` | `"LinkedIn collector"` | contents of `skills/ai-linkedin/SKILL.md` + footer |
-| `general-purpose` | `"GitHub collector"` | contents of `skills/ai-github/SKILL.md` + footer |
-| `general-purpose` | `"Hacker News collector"` | contents of `skills/ai-hackernews/SKILL.md` + footer |
+| `general-purpose` | `"News collector"` | contents of `pipeline/skills/ai-news/SKILL.md` + footer |
+| `general-purpose` | `"Papers collector"` | contents of `pipeline/skills/ai-papers/SKILL.md` + footer |
+| `general-purpose` | `"Blogs collector"` | contents of `pipeline/skills/ai-blogs/SKILL.md` + footer |
+| `general-purpose` | `"Swiss jobs collector"` | contents of `pipeline/skills/ai-jobs-ch/SKILL.md` + footer |
+| `general-purpose` | `"LinkedIn collector"` | contents of `pipeline/skills/ai-linkedin/SKILL.md` + footer |
+| `general-purpose` | `"GitHub collector"` | contents of `pipeline/skills/ai-github/SKILL.md` + footer |
+| `general-purpose` | `"Hacker News collector"` | contents of `pipeline/skills/ai-hackernews/SKILL.md` + footer |
 
 Wait for ALL seven to return. A failed subagent does NOT block the rest —
 note the failure in the daily file's "Sources scanned" section and continue.
@@ -184,7 +209,7 @@ in place with the new headline. Otherwise insert directly after the marker.
 One Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Trend radar"`
-- `prompt`: contents of `skills/ai-trend-radar/SKILL.md` + footer.
+- `prompt`: contents of `pipeline/skills/ai-trend-radar/SKILL.md` + footer.
 
 Wait for it. The radar replaces any existing
 `radar/{YYYY}/{MM}/{TODAY}.{md,json}` in place (its merge rules say "the
@@ -197,7 +222,7 @@ at the `radar/` root.
 One Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Vendor sweep"`
-- `prompt`: contents of `skills/ai-vendor-sweep/SKILL.md` + footer.
+- `prompt`: contents of `pipeline/skills/ai-vendor-sweep/SKILL.md` + footer.
 
 Wait for it. The sweep auto-mutates `sources.json` per its rules (with
 `sources.json.vendor.bak` rollback and `vendor_changes.log` audit trail).
@@ -207,7 +232,7 @@ Wait for it. The sweep auto-mutates `sources.json` per its rules (with
 Pure Python — no subagent needed:
 
 ```bash
-python3 scripts/build_org_view.py
+python3 ../pipeline/scripts/build_org_view.py
 ```
 
 Rebuilds `orgs/index.json` + `orgs/{slug}.json` for every tracked org.
@@ -221,7 +246,7 @@ Two-step:
 ### 6.8a — run the sweep script
 
 ```bash
-python3 scripts/run_keyword_sweep.py
+python3 ../pipeline/scripts/run_keyword_sweep.py
 ```
 
 Mines today's source files for 2/3-gram phrases, classifies, applies the
@@ -246,7 +271,7 @@ up and applies the decisions.
 Pure Python — no subagent needed:
 
 ```bash
-python3 scripts/run_github_sweep.py
+python3 ../pipeline/scripts/run_github_sweep.py
 ```
 
 Mines github/{YYYY}/{MM}/*.md over the last 14 days, tracks per-repo
@@ -259,7 +284,7 @@ and continue.
 ## 6.9. Rebuild change-log JSONs
 
 ```bash
-python3 scripts/rebuild_change_logs.py
+python3 ../pipeline/scripts/rebuild_change_logs.py
 ```
 
 Rebuilds `vendor_changes.json` + `keyword_changes.json` + `github_changes.json`
@@ -274,7 +299,7 @@ cumulatively rewritten Mon→today.
 One Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Weekly rollup"`
-- `prompt`: contents of `skills/ai-weekly-digest/SKILL.md` + footer.
+- `prompt`: contents of `pipeline/skills/ai-weekly-digest/SKILL.md` + footer.
 
 Wait for it. The skill overwrites `weekly/{YYYY}/{WEEK_ID}.md`.
 
@@ -283,7 +308,7 @@ Wait for it. The skill overwrites `weekly/{YYYY}/{WEEK_ID}.md`.
 If `IS_MONDAY=1`, spawn ONE Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Trends update"`
-- `prompt`: contents of `skills/ai-trends/SKILL.md` + footer + this extra line:
+- `prompt`: contents of `pipeline/skills/ai-trends/SKILL.md` + footer + this extra line:
   ```
   SOURCE: weekly/{YYYY}/{PREV_WEEK_ID}.md
   ```
@@ -302,7 +327,7 @@ PREV_MONTH=$(python3 -c "from datetime import date, timedelta; t=date.fromisofor
 Spawn ONE Agent call:
 - `subagent_type`: `"general-purpose"`
 - `description`: `"Monthly rollup"`
-- `prompt`: contents of `skills/ai-monthly-rollup/SKILL.md` + footer + this extra line:
+- `prompt`: contents of `pipeline/skills/ai-monthly-rollup/SKILL.md` + footer + this extra line:
   ```
   TARGET_MONTH: {PREV_MONTH}
   ```
@@ -326,7 +351,7 @@ ai-daily-research complete for {TODAY}: 7/7 collectors, daily synthesized, radar
 - **Never produce `-v2`, `-v3`.** If a merge step can't recognize the
   existing file's structure, REWRITE in place per §5. NEVER write a
   suffixed variant. The same-day file is the canonical record.
-- **Trust `scripts/now.sh`.** Don't compute the date in bash arithmetic.
+- **Trust `pipeline/scripts/now.sh`.** Don't compute the date in bash arithmetic.
 - **Sources scanned, theme balance, vendor coverage** — derived
   meta-sections always get regenerated with this run's numbers.
 - **Failed subagents don't block.** Note in the daily's "Sources scanned"

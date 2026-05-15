@@ -215,7 +215,9 @@ def backfill_file(json_path: Path, root: Path):
 
 
 def main():
-    root = Path(__file__).resolve().parent.parent  # workspace root
+    from _lib import DATA_ROOT
+    # `root` is what relative_to() uses for display paths below; point at DATA_ROOT.
+    root = DATA_ROOT
     radar_dir = root / "radar"
     json_files = sorted(radar_dir.rglob("*.json"))
     json_files = [p for p in json_files if p.name != "index.json"]

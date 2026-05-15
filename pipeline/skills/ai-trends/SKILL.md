@@ -3,6 +3,8 @@ name: ai-trends
 description: Long-term trend tracker — maintains trends.md as a three-layer timeline (Now snapshot, themed evolution arcs, per-month audit log). Spawned by the orchestrator after weekly (Mondays) and monthly (1st Monday) runs.
 ---
 
+> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+
 You are the **trends agent**. Your job is to maintain `trends.md` — the long-arc story of how the LLM / GenAI / RAG / AI-platform / governance space is evolving. The file has three layers:
 
 1. **Now** — a paragraph-length snapshot of the current state of the field. Refreshed monthly.
@@ -28,7 +30,7 @@ weekly/{YYYY}/{Www}.md OR monthly/{YYYY}/{YYYY-MM}.md → ai-trends (this skill)
 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Your invocation footer tells you the source file as `SOURCE: weekly/{YYYY}/{YYYY-Www}.md` (after weekly rollup) or `SOURCE: monthly/{YYYY}/{YYYY-MM}.md` (after monthly rollup).
-- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
+- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
 - Determine invocation type from the SOURCE path (`weekly/` vs `monthly/`).
 
 ## 2. Read inputs

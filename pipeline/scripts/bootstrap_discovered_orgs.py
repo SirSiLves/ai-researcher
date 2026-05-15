@@ -70,10 +70,17 @@ def collect_source_files(root: Path):
 
 
 def main():
-    root = Path(__file__).resolve().parent.parent
-    seed_path = root / "scripts" / "seed_orgs.json"
-    sources_path = root / "sources.json"
-    out_path = root / "discovered_orgs.json"
+    pipeline_dir = Path(__file__).resolve().parent.parent  # pipeline/
+    repo_root = pipeline_dir.parent
+    data_root = repo_root / "data"
+    state_dir = pipeline_dir / "state"
+    seed_path = pipeline_dir / "scripts" / "seed_orgs.json"
+    sources_path = state_dir / "sources.json"
+    out_path = state_dir / "discovered_orgs.json"
+    # `root` is the directory that contains the source folders (news/, papers/...)
+    # for the file iterator below. After the 2026-05 restructure that's data/,
+    # not the repo root.
+    root = data_root
 
     with open(seed_path) as f:
         seed = json.load(f)

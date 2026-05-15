@@ -1,34 +1,40 @@
 #!/usr/bin/env python3
 """Rebuild radar/index.json manifest from all radar/**/*.json files.
 
-Idempotent — scans the radar tree every time. Consumed by radar.html.
+Idempotent — scans the radar tree every time. Consumed by the webapp.
 Called at the end of every ai-trend-radar run (and any backfill wave)
 so manual additions / deletions / backfills are reflected.
+
+Paths stored in the manifest are RELATIVE TO DATA_ROOT (e.g. `radar/2026/05/
+2026-05-14.json`) — the webapp prepends `data/` when fetching.
 """
 
-import glob
 import json
-import os
 import sys
+
+from _lib import DATA_ROOT
 
 
 def main() -> int:
+    radar_dir = DATA_ROOT / "radar"
     entries = []
-    for path in sorted(glob.glob("radar/**/*.json", recursive=True)):
-        if os.path.basename(path) == "index.json":
+    for path in sorted(radar_dir.rglob("*.json")):
+        if path.name == "index.json":
             continue
-        date_id = os.path.basename(path).replace(".json", "")
+        date_id = path.stem
         try:
             with open(path) as handle:
                 data = json.load(handle)
+            rel_json = path.relative_to(DATA_ROOT).as_posix()
+            rel_md = rel_json.replace(".json", ".md")
             entries.append(
                 {
                     "date_id": date_id,
                     "date": data.get("date", date_id),
                     "topic_count": len(data.get("topics", [])),
                     "stage_movement_count": len(data.get("stage_movements", [])),
-                    "json_path": path,
-                    "md_path": path.replace(".json", ".md"),
+                    "json_path": rel_json,
+                    "md_path": rel_md,
                     "is_versioned": "-v" in date_id,
                 }
             )
@@ -40,9 +46,10 @@ def main() -> int:
     payload = {
         "generated_at": entries[0]["date"] if entries else None,
         "entries": entries,
-        "_note": "Updated by ai-trend-radar at the end of each run. Consumed by radar.html.",
+        "_note": "Updated by ai-trend-radar at the end of each run. Consumed by the webapp.",
     }
-    with open("radar/index.json", "w") as handle:
+    out = radar_dir / "index.json"
+    with open(out, "w") as handle:
         json.dump(payload, handle, indent=2)
 
     newest = entries[0]["date_id"] if entries else "none"

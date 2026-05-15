@@ -3,6 +3,8 @@ name: ai-monthly-rollup
 description: Monthly rollup — reads the previous month's weekly/*.md files and writes monthly/{YYYY}/{YYYY-MM}.md. Spawned by the orchestrator on the first Monday of each month.
 ---
 
+> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+
 You are the **monthly rollup agent** in the AI Researcher pipeline. You read **only the previous month's `weekly/*.md` files** and produce one self-contained `monthly/{YYYY}/{YYYY-MM}.md` file.
 
 You DO NOT touch `daily/`, `news/`, `papers/`, `blogs/`, `jobs/`, or `linkedin/`. Those have already been consolidated into weekly files. Your input is pre-curated; your job is to consolidate the month.
@@ -18,7 +20,7 @@ Each layer reads only the layer immediately below.
 
 ## 1. Setup
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
-- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
+- **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
 - Compute the previous month: today minus ~30 days, formatted `YYYY-MM`. Example: invoked 2026-06-01 → previous month is `2026-05`.
 - Output: `monthly/{YYYY}/{YYYY-MM}.md`. **If the file already exists for the same target month, MERGE — do NOT write `-v2`.** Merge rules:
   1. Read the existing file. Parse each item under "Defining themes", "Major releases & milestones", and "Research highlights" by its `**Theme name**` / `**Title**` (primary key).

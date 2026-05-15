@@ -8,12 +8,26 @@ Three small utilities live here so build_org_view.py and run_keyword_sweep.py
   - iter_source_files(root)              yield (Path, source_type, YYYY-MM-DD) for every dated .md
   - whole_word_pattern(alias)            case-insensitive whole-wordish regex
 
+Layout anchors used by every pipeline script after the 2026-05 restructure:
+
+  - REPO_ROOT    = parent of pipeline/, data/, webapp/, legacy/
+  - PIPELINE_DIR = REPO_ROOT/pipeline       (scripts + skills + CRON_PROMPT.md live here)
+  - STATE_DIR    = REPO_ROOT/pipeline/state (sources.json, discovered_*, *_changes, .bak)
+  - DATA_ROOT    = REPO_ROOT/data           (daily/, weekly/, orgs/, radar/, news/, …)
+  - INDEX_MD     = REPO_ROOT/data/index.md  (human-readable index)
+
 bootstrap_discovered_orgs.py intentionally does NOT import this — it's a
 one-shot historical artifact with a narrower SOURCE_DIRS scope, frozen in
 time so re-runs reproduce the original tally.
 """
 import re
 from pathlib import Path
+
+PIPELINE_DIR = Path(__file__).resolve().parent.parent
+REPO_ROOT    = PIPELINE_DIR.parent
+STATE_DIR    = PIPELINE_DIR / "state"
+DATA_ROOT    = REPO_ROOT / "data"
+INDEX_MD     = DATA_ROOT / "index.md"
 
 SOURCE_DIRS = ["news", "papers", "blogs", "jobs", "linkedin", "daily", "github", "hackernews"]
 

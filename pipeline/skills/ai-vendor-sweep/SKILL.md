@@ -3,6 +3,8 @@ name: ai-vendor-sweep
 description: Daily vendor-coverage sweep with AUTO-APPLY. Reads discovered_orgs.json + today's source files + sources.json vendor lists, classifies every org we've seen into promote / watch / silent / hot-event / already-covered tiers, AUTOMATICALLY MUTATES sources.json (adds promotions and hot events, removes expired ones), and emits vendor_candidates/{YYYY}/{MM}/{date}.md as a CHANGE LOG describing what it did. Runs every day after the radar. Spawned by the orchestrator after ai-trend-radar.
 ---
 
+> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+
 You are the **vendor-coverage sweep agent**. The user's complaints that motivated this skill:
 
 1. *"we cover always the same enterprises"* — the fixed `priority_vendors` (5 labs) + `enterprise_vendors` (8 cos) blind us to emerging companies.
@@ -25,7 +27,7 @@ You read what's already on disk; you don't fetch anything. The radar already ext
 
 - Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
 - Read `sources.json` `vendor_sweep_config` section for thresholds.
-- **Timestamps from the orchestrator footer.** Look for `PIPELINE TIMESTAMPS` and use `TODAY`, `WEEK_ID`, `MONDAY`. Standalone fallback: `eval "$(scripts/now.sh)"`. Do NOT compute the date manually.
+- **Timestamps from the orchestrator footer.** Look for `PIPELINE TIMESTAMPS` and use `TODAY`, `WEEK_ID`, `MONDAY`. Standalone fallback: `eval "$(../pipeline/scripts/now.sh)"`. Do NOT compute the date manually.
 - **Output filename:** `vendor_candidates/{YYYY}/{MM}/{date}.md`. Overwrite if exists on the same day (re-running replaces — there's only ever one canonical sweep per day).
 - **State file:** `discovered_orgs.json` at workspace root. Read it; mutate it; write it back.
 
@@ -152,7 +154,7 @@ This is the new step (added 2026-05-14). Read `radar_config.vendor_sweep_config.
 
 Otherwise:
 
-**Step A — Backup.** If we're about to write to sources.json, first `cp sources.json sources.json.vendor.bak` (overwrites the vendor sweep's previous backup). Per-sweep backups (`sources.json.{vendor,keyword,github}.bak`) keep concurrent or successive sweeps from clobbering each other's rollback target.
+**Step A — Backup.** If we're about to write to sources.json, first `cp ../pipeline/state/sources.json ../pipeline/state/sources.json.vendor.bak` (overwrites the vendor sweep's previous backup). Per-sweep backups (`sources.json.{vendor,keyword,github}.bak`) keep concurrent or successive sweeps from clobbering each other's rollback target.
 
 **Step B — Compute the change set.** Build a `changes` dict with six lists:
 
@@ -258,7 +260,7 @@ This file describes what the auto-applier did today and what's pending. The user
 ```markdown
 # Vendor sweep — {TODAY}
 
-_Daily change log. The pipeline auto-maintains `sources.json` — promotions and hot events are added directly, expired hot events are removed. This page describes what happened. To roll back a single run: `cp sources.json.vendor.bak sources.json`._
+_Daily change log. The pipeline auto-maintains `sources.json` — promotions and hot events are added directly, expired hot events are removed. This page describes what happened. To roll back a single run: `cp ../pipeline/state/sources.json.vendor.bak ../pipeline/state/sources.json`._
 
 ## 📋 What changed in sources.json today
 
@@ -349,7 +351,7 @@ Do NOT post the change log to chat. Do NOT modify any source files (`news/`, `bl
 - **Deep-watch is a holding tier, not a graveyard.** Demoted entries keep their `blog_urls`, `fallback_search`, and `_added_reason` so a future re-promotion is exact (not a re-promotion-as-new). Audit verbs are `deep-watch-demote` and `deep-watch-promote`. Never demote anything without `_auto_added: true`. Demotions never apply to slugs classified `hot_event` or `promote` on the same day.
 - **Hot events are temporary.** They get `_expires_on = TODAY + ttl_days` at insertion. The next sweep that observes an expired hot event removes the entry. If the same org meanwhile crossed sustained promote thresholds, it'd already have been re-added without the expiry — so the removal is harmless.
 - **JSON validity is mandatory.** Before writing sources.json, parse the result. If parsing fails, abort the write, log to `vendor_changes.log` as `ABORT-INVALID-JSON`, and continue with the markdown report only.
-- **Backup before write.** Always `cp sources.json sources.json.vendor.bak` before modifying sources.json. Per-sweep .bak files (`sources.json.{vendor,keyword,github}.bak`) keep concurrent or successive sweeps from clobbering each other's rollback target.
+- **Backup before write.** Always `cp ../pipeline/state/sources.json ../pipeline/state/sources.json.vendor.bak` before modifying sources.json. Per-sweep .bak files (`sources.json.{vendor,keyword,github}.bak`) keep concurrent or successive sweeps from clobbering each other's rollback target.
 - **Audit trail.** Every mutation appends a line to `vendor_changes.log`. The log is append-only — never truncated.
 
 ## How to disable auto-apply

@@ -25,9 +25,9 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from _lib import iter_source_files, upsert_index_marker_line
+from _lib import iter_source_files, upsert_index_marker_line, REPO_ROOT, STATE_DIR, DATA_ROOT, INDEX_MD
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = REPO_ROOT  # back-compat for `path.relative_to(ROOT)` calls
 # Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
 # orchestrator); fall back to wall-clock date for standalone runs.
 TODAY = os.environ.get("TODAY") or date.today().isoformat()
@@ -165,7 +165,7 @@ def get_covered_keywords(sources, taxonomy):
 
 
 def main():
-    sources = json.loads((ROOT / "sources.json").read_text())
+    sources = json.loads((STATE_DIR / "sources.json").read_text())
     cfg = sources["radar_config"]["keyword_sweep_config"]
     if not cfg.get("enabled", False):
         print("[keyword_sweep] disabled in config; exiting", file=sys.stderr)
@@ -181,7 +181,7 @@ def main():
     covered_lc = get_covered_keywords(sources, taxonomy)
 
     # Load existing state
-    discovered_path = ROOT / "discovered_keywords.json"
+    discovered_path = STATE_DIR / "discovered_keywords.json"
     if discovered_path.exists():
         discovered = json.loads(discovered_path.read_text())
     else:
@@ -199,19 +199,19 @@ def main():
     if is_first_run:
         cutoff = (date.fromisoformat(TODAY) - timedelta(days=cfg["rolling_window_days"])).isoformat()
         today_files = [
-            (p, st, fd) for p, st, fd in iter_source_files(ROOT) if fd >= cutoff
+            (p, st, fd) for p, st, fd in iter_source_files(DATA_ROOT) if fd >= cutoff
         ]
         print(f"[keyword_sweep] first run — scanning last {cfg['rolling_window_days']}d "
               f"= {len(today_files)} files (bootstrap window)", file=sys.stderr)
     else:
         today_files = [
-            (p, st, fd) for p, st, fd in iter_source_files(ROOT) if fd == TODAY
+            (p, st, fd) for p, st, fd in iter_source_files(DATA_ROOT) if fd == TODAY
         ]
         if not today_files:
             # No today files? Mine the whole rolling window for catch-up purposes.
             cutoff = (date.fromisoformat(TODAY) - timedelta(days=cfg["rolling_window_days"])).isoformat()
             today_files = [
-                (p, st, fd) for p, st, fd in iter_source_files(ROOT) if fd >= cutoff
+                (p, st, fd) for p, st, fd in iter_source_files(DATA_ROOT) if fd >= cutoff
             ]
             print(f"[keyword_sweep] no files dated {TODAY}; falling back to last {cfg['rolling_window_days']}d "
                   f"= {len(today_files)} files (catch-up mode)", file=sys.stderr)
@@ -421,7 +421,7 @@ def main():
     # Backup sources.json before mutation. Per-sweep .bak so a vendor-sweep
     # rollback can't accidentally clobber a keyword-sweep snapshot (or vice
     # versa) when both have run the same day.
-    shutil.copy(ROOT / "sources.json", ROOT / "sources.json.keyword.bak")
+    shutil.copy(STATE_DIR / "sources.json", STATE_DIR / "sources.json.keyword.bak")
 
     log_lines = []
     applied_count = 0
@@ -561,18 +561,18 @@ def main():
     # Trailing newline matches the convention of hand-edited config files.
     try:
         json.dumps(sources)
-        (ROOT / "sources.json").write_text(json.dumps(sources, indent=2, ensure_ascii=False) + "\n")
+        (STATE_DIR / "sources.json").write_text(json.dumps(sources, indent=2, ensure_ascii=False) + "\n")
     except Exception as e:
         # Restore backup and abort
-        shutil.copy(ROOT / "sources.json.keyword.bak", ROOT / "sources.json")
+        shutil.copy(STATE_DIR / "sources.json.keyword.bak", STATE_DIR / "sources.json")
         print(f"[keyword_sweep] JSON validation failed, restored backup: {e}", file=sys.stderr)
-        with (ROOT / "keyword_changes.log").open("a") as f:
+        with (STATE_DIR / "keyword_changes.log").open("a") as f:
             f.write(f"{NOW_ISO} ABORT-INVALID-JSON  -  reason=\"sources.json would not parse after edits\"\n")
         return
 
     # Append to keyword_changes.log
     if log_lines:
-        with (ROOT / "keyword_changes.log").open("a") as f:
+        with (STATE_DIR / "keyword_changes.log").open("a") as f:
             f.write("\n".join(log_lines) + "\n")
 
     # === Step 8.5: build keyword_judge_request.md for the agent ===
@@ -585,7 +585,7 @@ def main():
         if needs_judgment(ent, TODAY)
     ]
     if needs:
-        request_path = ROOT / "keyword_judge_request.md"
+        request_path = STATE_DIR / "keyword_judge_request.md"
         lines = [
             f"# Keyword boilerplate-judgment request — {TODAY}\n",
             (
@@ -633,7 +633,7 @@ def main():
     # The agent writes keyword_judge_verdicts.json after reviewing the request
     # file. The script picks it up on the next run, applies decisions, and
     # then deletes the verdicts file (so it doesn't re-apply stale decisions).
-    verdicts_path = ROOT / "keyword_judge_verdicts.json"
+    verdicts_path = STATE_DIR / "keyword_judge_verdicts.json"
     applied_verdicts = 0
     if verdicts_path.exists():
         try:
@@ -650,7 +650,7 @@ def main():
                 applied_verdicts += 1
             # Don't delete the verdicts file unless every entry was applied.
             # Move it to .applied so we can audit what came in.
-            (ROOT / f"keyword_judge_verdicts.{TODAY}.applied.json").write_text(verdicts_path.read_text())
+            (STATE_DIR / f"keyword_judge_verdicts.{TODAY}.applied.json").write_text(verdicts_path.read_text())
             verdicts_path.unlink()
             print(f"[keyword_sweep] applied {applied_verdicts} agent verdicts; archived to keyword_judge_verdicts.{TODAY}.applied.json", file=sys.stderr)
         except Exception as e:
@@ -663,7 +663,7 @@ def main():
     discovered_path.write_text(json.dumps(discovered, indent=2, ensure_ascii=False) + "\n")
 
     # === Step 8: write change log markdown ===
-    md_dir = ROOT / f"keyword_candidates/{today_d.year:04d}/{today_d.month:02d}"
+    md_dir = DATA_ROOT / f"keyword_candidates/{today_d.year:04d}/{today_d.month:02d}"
     md_dir.mkdir(parents=True, exist_ok=True)
     md_path = md_dir / f"{TODAY}.md"
 
@@ -726,7 +726,7 @@ def main():
                   f"applied: {applied_count} promotion(s), {len(proven_promotions)} proven-promotion(s); "
                   f"pending: {len(pending)}; watch: {len(watch_phrases)}; "
                   f"tally: {len(discovered['keywords'])} phrases")
-    upsert_index_marker_line(ROOT / "index.md", "KEYWORD", TODAY, index_line)
+    upsert_index_marker_line(INDEX_MD, "KEYWORD", TODAY, index_line)
 
     print(f"[keyword_sweep] done. applied {applied_count} promotions, "
           f"{len(proven_promotions)} proven-promotions. "
