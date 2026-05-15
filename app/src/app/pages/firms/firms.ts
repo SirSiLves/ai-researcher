@@ -2,10 +2,15 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { Select } from 'primeng/select';
 import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
+import { Chip } from 'primeng/chip';
 import { Message } from 'primeng/message';
+import { Drawer } from 'primeng/drawer';
+import { Button } from 'primeng/button';
 
 import { DataService, OrgIndexEntry, OrgDetail } from '../../services/data.service';
 
@@ -19,7 +24,7 @@ const VELOCITY_BADGES: Record<string, string> = {
 @Component({
   selector: 'app-firms',
   standalone: true,
-  imports: [FormsModule, InputText, Select, Skeleton, Tag, Message],
+  imports: [FormsModule, InputText, IconField, InputIcon, Select, Skeleton, Tag, Chip, Message, Drawer, Button],
   templateUrl: './firms.html',
   styleUrl: './firms.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

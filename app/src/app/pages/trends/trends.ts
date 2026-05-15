@@ -8,6 +8,7 @@ import { Tag } from 'primeng/tag';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 
 import { DataService, RadarDay, RadarEntry, RadarTopic, RadarSector } from '../../services/data.service';
+import { RadarChart } from '../../components/radar-chart/radar-chart';
 
 const STAGE_ORDER = ['emerging', 'consolidating', 'mainstream', 'fading'] as const;
 type Stage = typeof STAGE_ORDER[number];
@@ -15,7 +16,7 @@ type Stage = typeof STAGE_ORDER[number];
 @Component({
   selector: 'app-trends',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, Select, Skeleton, Message, Tag, Tabs, TabList, Tab, TabPanels, TabPanel],
+  imports: [FormsModule, DecimalPipe, Select, Skeleton, Message, Tag, Tabs, TabList, Tab, TabPanels, TabPanel, RadarChart],
   templateUrl: './trends.html',
   styleUrl: './trends.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

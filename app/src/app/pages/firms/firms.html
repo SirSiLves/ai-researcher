@@ -13,14 +13,13 @@
   }
 
   <div class="firms-toolbar">
-    <span class="search-wrap">
-      <i class="pi pi-search"></i>
+    <p-iconfield iconPosition="left" styleClass="firms-search-field">
+      <p-inputicon class="pi pi-search" />
       <input pInputText
              [ngModel]="query()"
              (ngModelChange)="query.set($event)"
-             placeholder="Search slug or topic…"
-             class="firms-search" />
-    </span>
+             placeholder="Search slug or topic…" />
+    </p-iconfield>
     <p-select [options]="tierOptions()"
               [ngModel]="tierFilter()"
               (ngModelChange)="tierFilter.set($event)"
@@ -91,7 +90,7 @@
           @if (o.top_topics.length) {
             <div class="firm-topics">
               @for (t of o.top_topics.slice(0, 3); track t) {
-                <span class="topic-chip">{{ t }}</span>
+                <p-chip [label]="t" styleClass="topic-chip-pn" />
               }
             </div>
           }
@@ -102,14 +101,21 @@
     </div>
   }
 
-  @if (selectedSlug(); as slug) {
-    <div class="drawer-backdrop" (click)="close()"></div>
-    <aside class="drawer" role="dialog" aria-labelledby="drawer-title">
+  <p-drawer [visible]="!!selectedSlug()"
+            (visibleChange)="$event || close()"
+            position="right"
+            [style]="{ width: 'min(580px, 100vw)' }"
+            [showCloseIcon]="false"
+            styleClass="firm-drawer">
+    <ng-template #headless>
       <header class="drawer-head">
-        <h2 id="drawer-title">{{ slug }}</h2>
-        <button class="icon-btn" aria-label="Close" (click)="close()">
-          <i class="pi pi-times"></i>
-        </button>
+        <h2>{{ selectedSlug() }}</h2>
+        <p-button icon="pi pi-times"
+                  severity="secondary"
+                  [text]="true"
+                  [rounded]="true"
+                  aria-label="Close"
+                  (onClick)="close()" />
       </header>
 
       @if (detailLoading() && !detail()) {
@@ -124,7 +130,7 @@
             @if (d.tier_hint) { <p-tag [value]="d.tier_hint" severity="info"></p-tag> }
             @if (d.region) { <span class="muted">{{ d.region }}</span> }
             @if (d.blog_url_hint) {
-              <a [href]="d.blog_url_hint" target="_blank" rel="noopener">
+              <a [href]="d.blog_url_hint" target="_blank" rel="noopener" class="blog-link">
                 <i class="pi pi-external-link"></i> blog
               </a>
             }
@@ -182,6 +188,6 @@
           }
         </div>
       }
-    </aside>
-  }
+    </ng-template>
+  </p-drawer>
 </section>

@@ -1,8 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { Skeleton } from 'primeng/skeleton';
 import { Message } from 'primeng/message';
+import { Drawer } from 'primeng/drawer';
+import { Button } from 'primeng/button';
 import { DataService, ReportEntry } from '../../services/data.service';
 import { MarkdownViewer } from '../../components/markdown-viewer/markdown-viewer';
 
@@ -19,7 +23,7 @@ const CADENCE_COLORS: Record<string, string> = {
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [FormsModule, InputText, Skeleton, Message, MarkdownViewer],
+  imports: [FormsModule, InputText, IconField, InputIcon, Skeleton, Message, Drawer, Button, MarkdownViewer],
   templateUrl: './reports.html',
   styleUrl: './reports.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

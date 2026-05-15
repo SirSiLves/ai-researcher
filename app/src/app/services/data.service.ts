@@ -62,9 +62,10 @@ export interface RadarSector {
 }
 
 export interface StageMovement {
-  topic_id: string;
-  from: string;
+  topic: string;
+  from: string | null;
   to: string;
+  first_observed_today?: boolean;
   reason?: string;
 }
 

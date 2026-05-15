@@ -36,13 +36,18 @@
       }
     </div>
   } @else if (day(); as d) {
-    <p-tabs value="stage" scrollable="false">
+    <p-tabs value="radar" scrollable="false">
       <p-tablist>
+        <p-tab value="radar">Radar</p-tab>
         <p-tab value="stage">By stage</p-tab>
         <p-tab value="sector">By sector</p-tab>
         <p-tab value="moves">Stage moves ({{ d.stage_movements.length }})</p-tab>
       </p-tablist>
       <p-tabpanels>
+        <p-tabpanel value="radar">
+          <app-radar-chart [topics]="d.topics" />
+        </p-tabpanel>
+
         <p-tabpanel value="stage">
           <div class="stage-grid">
             @for (stage of stages; track stage) {
@@ -108,11 +113,15 @@
         <p-tabpanel value="moves">
           @if (d.stage_movements.length) {
             <ul class="moves-list">
-              @for (m of d.stage_movements; track m.topic_id) {
+              @for (m of d.stage_movements; track m.topic) {
                 <li class="move">
-                  <strong>{{ m.topic_id }}</strong>
-                  <span class="muted">{{ m.from }} → {{ m.to }}</span>
-                  @if (m.reason) { <span class="reason">{{ m.reason }}</span> }
+                  <strong>{{ m.topic }}</strong>
+                  <span class="muted">{{ m.from ?? 'new' }} → {{ m.to }}</span>
+                  @if (m.first_observed_today) {
+                    <span class="reason">first observed today</span>
+                  } @else if (m.reason) {
+                    <span class="reason">{{ m.reason }}</span>
+                  }
                 </li>
               }
             </ul>

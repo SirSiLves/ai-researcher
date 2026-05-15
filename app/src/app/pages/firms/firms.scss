@@ -10,25 +10,13 @@
   align-items: center;
 }
 
-.search-wrap {
-  position: relative;
+::ng-deep .firms-search-field {
   flex: 1 1 220px;
   max-width: 320px;
-  display: flex;
-  align-items: center;
 
-  i {
-    position: absolute;
-    left: 0.7rem;
-    color: var(--muted);
-    pointer-events: none;
-    font-size: 0.85rem;
+  input {
+    width: 100%;
   }
-}
-
-.firms-search {
-  width: 100%;
-  padding-left: 2.2rem;
 }
 
 .firm-grid {
@@ -127,59 +115,34 @@
   gap: 0.3rem;
 }
 
-.topic-chip {
+::ng-deep .topic-chip-pn .p-chip {
   background: var(--surface);
   color: var(--text-dim);
   font-size: 0.74rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.15rem 0.55rem;
   border: 1px solid var(--border);
 }
 
 .muted { color: var(--muted); }
 
-/* Drawer */
-.drawer-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(15, 23, 42, 0.25);
-  z-index: 100;
-}
-
-.drawer {
-  position: fixed;
-  top: 0; right: 0; bottom: 0;
-  width: min(560px, 100vw);
-  background: var(--bg);
-  border-left: 1px solid var(--border);
-  box-shadow: -8px 0 24px rgba(15, 23, 42, 0.08);
-  z-index: 101;
-  display: flex;
-  flex-direction: column;
-  animation: slide-in 0.18s ease-out;
-}
-
-@keyframes slide-in {
-  from { transform: translateX(40px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
+/* PrimeNG Drawer */
 .drawer-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.4rem;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 
   h2 { margin: 0; font-size: 1.15rem; font-weight: 600; }
 }
 
-.icon-btn {
-  background: transparent;
-  border: 0;
-  color: var(--text-dim);
-  padding: 0.45rem;
-  border-radius: 4px;
-  &:hover { background: var(--surface); color: var(--text); }
+.blog-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--accent);
+  font-size: 0.85rem;
 }
 
 .drawer-body {
