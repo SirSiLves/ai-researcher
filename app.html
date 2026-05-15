@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Researcher</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <style>
+    /* ============================================================
+       Editorial palette — paper + ink + a single rust accent.
+       Inspired by FT/Stratechery/long-form newsletters.
+       Color does very little work; type does most of it.
+       ============================================================ */
+    :root {
+      --paper:     #f7f3ea;          /* warm off-white background  */
+      --paper-2:   #efe9dc;          /* deeper paper for headers   */
+      --card:      #fdfbf6;          /* card background, lighter   */
+      --rule:      #d9d2c1;          /* hairline borders           */
+      --rule-2:    #b9b0a0;          /* stronger borders           */
+      --ink:       #1a1612;          /* primary text — near-black  */
+      --ink-2:     #4a423a;          /* secondary text             */
+      --muted:     #8a7f70;          /* tertiary / labels          */
+      --accent:    #a14a26;          /* rust — used VERY sparingly */
+      --accent-soft: rgba(161, 74, 38, 0.10);
+      --rising:    #2d6b3a;          /* deep green for "up"        */
+      --falling:   #9a2a2a;          /* deep red for "down"        */
+      --highlight: #f1e6cf;          /* soft yellow for emphasis   */
+
+      --serif:     "Charter", "Iowan Old Style", "Source Serif Pro", Georgia, "Times New Roman", serif;
+      --sans:      "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+      --mono:      ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font: 15px/1.6 var(--serif);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--rule-2); text-underline-offset: 2px; }
+    a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+    button { font: inherit; cursor: pointer; color: inherit; }
+    code, .mono { font-family: var(--mono); font-size: 12px; }
+    em { font-style: italic; }
+    strong { font-weight: 600; }
+
+    /* small-caps style labels — used for section eyebrows */
+    .eyebrow {
+      font-family: var(--sans);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ===== top bar — masthead ===== */
+    .topbar {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 22px 40px 14px;
+      background: var(--paper);
+      border-bottom: 2px solid var(--ink);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .topbar h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .topbar h1 .sub {
+      font-size: 11px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--muted);
+      margin-left: 10px;
+    }
+    .topbar .meta {
+      font-family: var(--sans);
+      font-size: 11.5px;
+      color: var(--ink-2);
+      letter-spacing: 0.02em;
+    }
+    .topbar .meta .sep { color: var(--rule-2); margin: 0 8px; }
+    .topbar .spacer { flex: 1; }
+    .topbar select {
+      background: transparent;
+      color: var(--ink);
+      border: none;
+      border-bottom: 1px solid var(--ink);
+      border-radius: 0;
+      padding: 2px 22px 2px 4px;
+      font-family: var(--sans);
+      font-size: 12px;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+                        linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+      background-position: calc(100% - 10px) 50%, calc(100% - 5px) 50%;
+      background-size: 5px 5px;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    /* ===== tabs ===== */
+    .tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 40px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      position: sticky; top: 75px; z-index: 9;
+    }
+    .tab {
+      padding: 12px 20px 12px 0;
+      margin-right: 24px;
+      font-family: var(--sans);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tab:hover { color: var(--ink-2); }
+    .tab.active {
+      color: var(--ink);
+      border-bottom-color: var(--accent);
+    }
+    .tab .count {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 0;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--muted);
+      font-family: var(--mono);
+      letter-spacing: 0;
+    }
+
+    /* ===== layout ===== */
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 40px 80px;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .stack { display: grid; gap: 28px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ===== card / section primitive =====
+       In editorial style cards are mostly just whitespace and a hairline rule.
+       No rounded corners, no shadows, no surface color. */
+    .card {
+      background: transparent;
+      border-top: 1px solid var(--ink);
+      padding-top: 0;
+      overflow: visible;
+    }
+    .card-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 14px 0 16px;
+      gap: 12px;
+    }
+    .card-head h2 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+    }
+    .card-head .hint {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .card-body { padding: 0; }
+    .card-body.padded { padding: 4px 0 12px; }
+
+    .empty {
+      padding: 32px 0;
+      color: var(--muted);
+      font-style: italic;
+      text-align: left;
+      font-size: 14px;
+    }
+    .error {
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      color: var(--ink);
+      padding: 14px 18px;
+      white-space: pre-wrap;
+      font-family: var(--mono);
+      font-size: 12px;
+      margin: 20px 0;
+    }
+
+    /* ===== "what moved today" — newsletter-style item list ===== */
+    .moves { list-style: none; margin: 0; padding: 0; }
+    .moves li {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: baseline;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+    }
+    .moves li:last-child { border-bottom: none; }
+    .moves li:hover .title { color: var(--accent); }
+    .moves .title {
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.005em;
+      color: var(--ink);
+      transition: color 0.1s;
+    }
+    .moves .meta {
+      font-family: var(--sans);
+      color: var(--ink-2);
+      font-size: 12px;
+      margin-top: 4px;
+      letter-spacing: 0.01em;
+    }
+    .moves .tag {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      align-self: start;
+      padding-top: 3px;
+      white-space: nowrap;
+    }
+    .moves .tag.up      { color: var(--rising); }
+    .moves .tag.down    { color: var(--falling); }
+    .moves .tag.new     { color: var(--accent); }
+    .moves .tag.hot     { color: var(--accent); }
+    .moves .tag.shift   { color: var(--ink-2); }
+    .moves .tag.breadth { color: var(--ink-2); }
+
+    /* ===== cluster cards — restrained, paper-on-paper ===== */
+    .clusters {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      padding: 8px 0 0;
+    }
+    .cluster {
+      background: transparent;
+      border-top: 1px solid var(--ink);
+      padding: 14px 0 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cluster:hover .name { color: var(--accent); }
+    .cluster .name {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 19px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      transition: color 0.1s;
+    }
+    .cluster .row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      font-family: var(--sans);
+      font-size: 11.5px;
+      color: var(--ink-2);
+      letter-spacing: 0.01em;
+    }
+    .cluster .row .left { font-variant-numeric: tabular-nums; }
+    .cluster .spark {
+      height: 44px;
+      position: relative;
+    }
+    .cluster .topic-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .topic-chip {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--ink-2);
+      background: transparent;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: 2px 8px;
+      letter-spacing: 0.01em;
+    }
+    .topic-chip.surging,
+    .topic-chip.rising  { color: var(--rising); border-color: var(--rising); }
+    .topic-chip.fading  { color: var(--falling); border-color: var(--falling); }
+    .topic-chip:hover { background: var(--highlight); cursor: pointer; }
+    .dir-pill {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 0;
+      border: none;
+      color: var(--muted);
+    }
+    .dir-pill.rising, .dir-pill.surging { color: var(--rising); }
+    .dir-pill.fading { color: var(--falling); }
+    .dir-pill.steady { color: var(--muted); }
+    .dir-pill::before { content: "·  "; opacity: .6; }
+
+    /* ===== filters bar ===== */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--rule);
+      flex-wrap: wrap;
+    }
+    .toolbar input[type=text], .toolbar select {
+      background: transparent;
+      color: var(--ink);
+      border: none;
+      border-bottom: 1px solid var(--rule-2);
+      border-radius: 0;
+      padding: 4px 4px;
+      font-family: var(--sans);
+      font-size: 13px;
+    }
+    .toolbar input[type=text]::placeholder { color: var(--muted); font-style: italic; }
+    .toolbar input[type=text]:focus, .toolbar select:focus {
+      outline: none; border-bottom-color: var(--accent);
+    }
+    .toolbar input[type=text] { flex: 1; max-width: 280px; }
+    .toolbar select {
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+                        linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+      background-position: calc(100% - 10px) 50%, calc(100% - 5px) 50%;
+      background-size: 5px 5px;
+      background-repeat: no-repeat;
+      padding-right: 22px;
+      cursor: pointer;
+    }
+    .toolbar .clear {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      padding: 4px 6px;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .toolbar .clear:hover { color: var(--accent); }
+    .toolbar .count {
+      margin-left: auto;
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+    }
+
+    /* ===== topics table — newspaper table look ===== */
+    table.topics {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--sans);
+      font-size: 13px;
+    }
+    table.topics th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      padding: 12px 8px 10px;
+      border-bottom: 1px solid var(--ink);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    table.topics th.right { text-align: right; }
+    table.topics th:hover { color: var(--ink); }
+    table.topics td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: baseline;
+    }
+    table.topics td.right { text-align: right; font-variant-numeric: tabular-nums; }
+    table.topics .label-cell {
+      font-family: var(--serif);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.35;
+      padding-right: 12px;
+    }
+    table.topics col.col-label { width: 46%; }
+    table.topics .dir.rising, table.topics .dir.surging { color: var(--rising); font-weight: 600; }
+    table.topics .dir.fading { color: var(--falling); font-weight: 600; }
+    table.topics .dir.steady { color: var(--muted); }
+    table.topics tr:hover { background: var(--highlight); cursor: pointer; }
+
+    /* collapsible long-tail header */
+    .collapsible-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 14px 0 16px;
+      cursor: pointer;
+      user-select: none;
+      border-top: 1px solid var(--ink);
+    }
+    .collapsible-head h2 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .collapsible-head .caret {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      transition: transform 0.15s;
+    }
+    .collapsible-head.open .caret { transform: rotate(90deg); }
+    .collapsible-body { display: none; }
+    .collapsible-body.open { display: block; }
+
+    /* ===== firms grid ===== */
+    .firms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      padding: 16px 0 0;
+    }
+    .firm {
+      background: transparent;
+      border-top: 1px solid var(--rule);
+      padding: 12px 0 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .firm:hover .name { color: var(--accent); }
+    .firm.priority { border-top-color: var(--ink); }
+    .firm .name {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: -0.005em;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      transition: color 0.1s;
+    }
+    .firm .priority-dot {
+      width: 5px; height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+      transform: translateY(-2px);
+    }
+    .firm .stats {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-family: var(--sans);
+      font-size: 11.5px;
+      color: var(--ink-2);
+    }
+    .firm .vel {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .firm .vel.surging,
+    .firm .vel.accelerating { color: var(--rising); }
+    .firm .vel.steady       { color: var(--muted); }
+    .firm .vel.cooling      { color: var(--falling); }
+    .firm .topics {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-style: italic;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .firm .spark { height: 32px; position: relative; margin-top: 2px; }
+
+    /* ===== firm drawer ===== */
+    .drawer-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(26, 22, 18, 0.30);
+      z-index: 100;
+      display: none;
+    }
+    .drawer-backdrop.open { display: block; }
+    .drawer {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 560px;
+      max-width: calc(100vw - 40px);
+      background: var(--card);
+      border-left: 1px solid var(--ink);
+      z-index: 101;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.2s ease-out;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 18px 24px 14px;
+      border-bottom: 2px solid var(--ink);
+      background: var(--card);
+      position: sticky; top: 0;
+    }
+    .drawer-head h3 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .drawer-head .close {
+      margin-left: auto;
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      padding: 4px 8px;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .drawer-head .close:hover { color: var(--accent); }
+    .drawer-body { padding: 20px 24px 60px; }
+    .drawer-body h4 {
+      margin: 24px 0 10px;
+      font-family: var(--sans);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 6px;
+    }
+    .drawer-body h4:first-child { margin-top: 0; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0;
+      border-top: 1px solid var(--rule);
+    }
+    .stat {
+      background: transparent;
+      border-bottom: 1px solid var(--rule);
+      border-right: 1px solid var(--rule);
+      padding: 10px 12px;
+    }
+    .stat:last-child { border-right: none; }
+    .stat .l {
+      font-family: var(--sans);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .stat .v {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+    .drawer .chart-wrap {
+      position: relative;
+      height: 160px;
+      padding: 6px 0;
+    }
+    .drawer .ctx {
+      font-family: var(--serif);
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--ink-2);
+      padding: 10px 0 10px 14px;
+      border-left: 2px solid var(--accent);
+      margin: 8px 0;
+      font-style: italic;
+    }
+    .drawer .ctx-meta {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-style: normal;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ===== reports timeline ===== */
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .chip {
+      background: transparent;
+      color: var(--ink-2);
+      border: none;
+      border-bottom: 1px solid transparent;
+      padding: 4px 10px 4px 0;
+      margin-right: 14px;
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .chip:hover { color: var(--accent); }
+    .chip.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .chip span { font-family: var(--mono); font-weight: 400; letter-spacing: 0; opacity: .6; }
+
+    .timeline { list-style: none; margin: 0; padding: 0; }
+    .timeline li {
+      display: grid;
+      grid-template-columns: 110px 110px 1fr;
+      gap: 18px;
+      align-items: baseline;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .timeline li:last-child { border-bottom: none; }
+    .timeline li:hover { background: var(--highlight); }
+    .timeline .date {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ink-2);
+    }
+    .timeline .cadence {
+      font-family: var(--sans);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .timeline .headline {
+      font-family: var(--serif);
+      font-size: 14.5px;
+      color: var(--ink);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .timeline .headline a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .timeline .headline a:hover { color: var(--accent); }
+
+    /* ===== today tab — daily report inline ===== */
+    .today-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 40px;
+    }
+    @media (max-width: 1000px) { .today-grid { grid-template-columns: 1fr; gap: 28px; } }
+    .today-headlines {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+    .today-headlines .item {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .today-headlines .item:last-child { border-bottom: none; }
+    .today-headlines .num {
+      font-family: var(--serif);
+      color: var(--accent);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      font-style: italic;
+    }
+    .today-headlines .body {
+      font-family: var(--serif);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--ink);
+    }
+    .today-headlines .body strong { color: var(--ink); }
+    .today-headlines .body em { color: var(--ink-2); font-style: italic; }
+    .today-headlines .body a { text-decoration-thickness: 1px; }
+    .today-headlines .why {
+      font-family: var(--serif);
+      font-size: 13.5px;
+      color: var(--ink-2);
+      margin-top: 6px;
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .today-link {
+      padding: 16px 0 0;
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .today-link a { text-decoration: none; color: var(--accent); }
+    .today-link a:hover { text-decoration: underline; }
+
+    /* Drop-cap style first letter on the daily-report headlines is overkill;
+       skip it. The numeric italic feels more like FT.com. */
+
+    /* ===== report viewer (markdown rendered inside the drawer) ===== */
+    .report-view {
+      font-family: var(--serif);
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+    .report-view h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 4px;
+      line-height: 1.2;
+    }
+    .report-view h2 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.005em;
+      margin: 24px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .report-view h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 18px 0 6px;
+    }
+    .report-view h4, .report-view h5, .report-view h6 {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 14px 0 4px;
+      color: var(--ink-2);
+    }
+    .report-view p { margin: 8px 0; }
+    .report-view ul, .report-view ol {
+      margin: 8px 0;
+      padding-left: 22px;
+    }
+    .report-view li { margin: 4px 0; }
+    .report-view a {
+      color: var(--ink);
+      text-decoration: underline;
+      text-decoration-color: var(--rule-2);
+      text-underline-offset: 2px;
+    }
+    .report-view a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+    .report-view strong { font-weight: 600; }
+    .report-view em { font-style: italic; color: var(--ink-2); }
+    .report-view code {
+      background: var(--paper-2);
+      padding: 1px 4px;
+      border-radius: 2px;
+      font-size: 12.5px;
+    }
+    .report-view pre {
+      background: var(--paper-2);
+      padding: 10px 12px;
+      border-radius: 3px;
+      overflow-x: auto;
+      font-size: 12.5px;
+      margin: 10px 0;
+    }
+    .report-view pre code { background: none; padding: 0; }
+    .report-view blockquote {
+      border-left: 2px solid var(--accent);
+      margin: 10px 0;
+      padding: 4px 0 4px 14px;
+      color: var(--ink-2);
+      font-style: italic;
+    }
+    .report-view hr {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 18px 0;
+    }
+    .report-view table {
+      border-collapse: collapse;
+      font-family: var(--sans);
+      font-size: 12.5px;
+      margin: 10px 0;
+    }
+    .report-view th, .report-view td {
+      border-bottom: 1px solid var(--rule);
+      padding: 6px 10px;
+      text-align: left;
+    }
+    .report-view th { font-weight: 600; color: var(--muted); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .report-view .meta-italic {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 4px 0 14px;
+    }
+    .drawer-body .raw-link {
+      display: inline-block;
+      margin-top: 18px;
+      font-family: var(--sans);
+      font-size: 10.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .drawer-body .raw-link:hover { color: var(--accent); }
+
+    /* button reset for moves rows (they were divs, now buttons) */
+    .moves button.row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: baseline;
+      padding: 14px 0;
+      border: none;
+      border-bottom: 1px solid var(--rule);
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+    }
+    .moves button.row:last-child { border-bottom: none; }
+    .moves button.row:hover .title { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>AI Researcher <span class="sub" aria-hidden="true">· a daily reading</span></h1>
+    <div class="meta" id="meta-line"></div>
+    <div class="spacer"></div>
+    <label class="meta">Snapshot
+      <select id="date-select" style="margin-left:6px;"></select>
+    </label>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="today">Today</button>
+    <button class="tab" data-tab="trends">Trends <span class="count" id="cnt-trends"></span></button>
+    <button class="tab" data-tab="firms">Firms <span class="count" id="cnt-firms"></span></button>
+    <button class="tab" data-tab="reports">Reports <span class="count" id="cnt-reports"></span></button>
+  </div>
+
+  <main id="main">
+    <div id="error-host"></div>
+
+    <!-- ===== TODAY ===== -->
+    <section class="panel active" id="panel-today">
+      <div class="today-grid">
+        <div class="card">
+          <div class="card-head">
+            <h2>What moved today</h2>
+            <span class="hint" id="moves-count"></span>
+          </div>
+          <div class="card-body">
+            <ul class="moves" id="moves-list"></ul>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h2>Top reading priorities</h2>
+            <span class="hint" id="today-headline-hint"></span>
+          </div>
+          <div class="today-headlines" id="today-headlines"></div>
+          <div class="today-link" id="today-link"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TRENDS ===== -->
+    <section class="panel" id="panel-trends">
+      <div class="stack">
+        <div class="card">
+          <div class="card-head">
+            <h2>Active mega-trends</h2>
+            <span class="hint" id="clusters-hint"></span>
+          </div>
+          <div class="clusters" id="clusters-grid"></div>
+        </div>
+
+        <div class="card">
+          <div class="collapsible-head" id="all-topics-head">
+            <span class="caret">▸</span>
+            <h2>All topics</h2>
+            <span class="hint" id="topics-count"></span>
+          </div>
+          <div class="collapsible-body" id="all-topics-body">
+            <div class="toolbar">
+              <input type="text" id="topic-search" placeholder="Search topics…">
+              <select id="sector-filter"><option value="">All sectors</option></select>
+              <button class="clear" id="clear-filters">Clear</button>
+              <span class="count" id="topic-filtered-count"></span>
+            </div>
+            <table class="topics" id="topics-table">
+              <colgroup>
+                <col class="col-label">
+                <col style="width:22%">
+                <col style="width:8%">
+                <col style="width:6%">
+                <col style="width:10%">
+                <col style="width:8%">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th data-sort="label">Topic</th>
+                  <th data-sort="sector">Sector</th>
+                  <th class="right" data-sort="score_slow">Score</th>
+                  <th class="right" data-sort="direction">Dir</th>
+                  <th class="right" data-sort="breadth_7d">Breadth</th>
+                  <th class="right" data-sort="sustained_days">Days</th>
+                </tr>
+              </thead>
+              <tbody id="topics-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FIRMS ===== -->
+    <section class="panel" id="panel-firms">
+      <div class="card">
+        <div class="card-head">
+          <h2>Firms</h2>
+          <span class="hint" id="firms-hint"></span>
+        </div>
+        <div class="toolbar">
+          <input type="text" id="firm-search" placeholder="Search firms…">
+          <select id="firm-tier"><option value="">All tiers</option></select>
+          <select id="firm-sort">
+            <option value="velocity">Velocity ratio (priority first)</option>
+            <option value="mentions">Total mentions</option>
+            <option value="recent">Most recently seen</option>
+            <option value="topics">Topic count</option>
+            <option value="alpha">A → Z</option>
+          </select>
+          <button class="clear" id="firms-clear">Clear</button>
+          <span class="count" id="firms-count"></span>
+        </div>
+        <div class="firms-grid" id="firms-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===== REPORTS ===== -->
+    <section class="panel" id="panel-reports">
+      <div class="card">
+        <div class="card-head">
+          <h2>Reports</h2>
+          <span class="hint" id="reports-hint"></span>
+        </div>
+        <div class="filter-chips" id="reports-chips"></div>
+        <ul class="timeline" id="reports-timeline"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- Side drawer (used for firm details and report viewer) -->
+  <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Detail panel">
+    <div class="drawer-head">
+      <h3 id="drawer-title">—</h3>
+      <button class="close" id="drawer-close">Close</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+  </aside>
+
+  <script>
+  // ======================================================================
+  // State
+  // ======================================================================
+  const state = {
+    radarManifest: null,
+    orgsIndex: null,
+    reportsIndex: null,
+    radarCache: new Map(),     // date_id -> radar json
+    orgCache:   new Map(),     // slug    -> org json
+    currentTab: 'today',
+    currentDate: null,
+    current: null,             // radar snapshot for currentDate
+    prior: null,               // previous radar snapshot (for breadth jumps)
+    expandedClusters: new Set(),
+    sectorFilter: '',
+    topicSearch: '',
+    sortBy: 'score_slow',
+    sortDir: 'desc',
+    allTopicsOpen: false,
+    firmFilter: { q: '', tier: '', sort: 'velocity' },
+    reportFilter: new Set(),   // cadence keys; empty = all
+    clusterCharts: new Map(),
+    firmCharts: new Map(),
+    drawerChart: null,
+  };
+
+  const STAGE_RANK = { fading: 0, emerging: 1, consolidating: 2, mainstream: 3 };
+  const DIR_RANK   = { fading: 0, steady: 1, rising: 2, surging: 3 };
+  const PALETTE    = ['#6aa9ff', '#ffb84d', '#b48aff', '#5cd0d0', '#58c97f', '#ff8a8a', '#b8bdc8', '#ffa17a'];
+
+  // ======================================================================
+  // Boot
+  // ======================================================================
+  async function init() {
+    try {
+      const [radar, orgs, reports] = await Promise.all([
+        fetch('radar/index.json').then(r => r.ok ? r.json() : Promise.reject(`radar/index.json HTTP ${r.status}`)),
+        fetch('orgs/index.json').then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch('reports/index.json').then(r => r.ok ? r.json() : null).catch(() => null),
+      ]);
+      state.radarManifest = radar;
+      state.orgsIndex = orgs;
+      state.reportsIndex = reports;
+    } catch (e) {
+      showError(`Failed to load: ${e}\n\nIf you opened this via file://, serve over localhost first.\n  python3 -m http.server 8000`);
+      return;
+    }
+
+    if (!state.radarManifest.entries || !state.radarManifest.entries.length) {
+      showError('No radar entries in radar/index.json.');
+      return;
+    }
+
+    // populate date selector
+    const sel = document.getElementById('date-select');
+    state.radarManifest.entries.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.date_id;
+      opt.textContent = `${e.date_id} · ${e.topic_count} topics`;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => loadDate(sel.value));
+
+    // tab navigation
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    bindTrendsControls();
+    bindFirmsControls();
+    bindReportsControls();
+    bindDrawerControls();
+
+    // Load default snapshot (newest) BEFORE applying hash routing — otherwise
+    // direct nav to #trends/#firms/#reports tries to render against null state.
+    await loadDate(state.radarManifest.entries[0].date_id);
+
+    // hash routing — #firms, #trends, etc., plus #firm=anthropic
+    const hash = window.location.hash;
+    if (hash) handleHash(hash);
+    // background pre-fetch the rest of the snapshots (so sparklines have data)
+    preloadAllRadars();
+
+    // update tab counts
+    document.getElementById('cnt-firms').textContent =
+      state.orgsIndex ? state.orgsIndex.total_orgs : '';
+    document.getElementById('cnt-reports').textContent =
+      state.reportsIndex ? state.reportsIndex.entries.length : '';
+  }
+
+  function handleHash(hash) {
+    const parts = hash.replace('#', '').split('&');
+    let tab = null;
+    for (const p of parts) {
+      const [k, v] = p.split('=');
+      if (k === 'tab' && v) tab = v;
+      else if (!v && ['today', 'trends', 'firms', 'reports'].includes(k)) tab = k;
+      else if (k === 'firm' && v) { setTimeout(() => openFirmDrawer(v), 200); }
+      else if (k === 'date' && v) { setTimeout(() => loadDate(v), 0); }
+    }
+    if (tab) switchTab(tab);
+  }
+
+  function switchTab(name) {
+    state.currentTab = name;
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${name}`));
+    // lazy-render on first switch
+    if (name === 'firms')   renderFirms();
+    if (name === 'reports') renderReports();
+    if (name === 'trends')  renderTrends();
+    if (name === 'today')   renderToday();
+  }
+
+  // ======================================================================
+  // Data loading
+  // ======================================================================
+  async function loadRadar(date_id) {
+    if (state.radarCache.has(date_id)) return state.radarCache.get(date_id);
+    const entry = state.radarManifest.entries.find(e => e.date_id === date_id);
+    if (!entry) throw new Error(`${date_id} not in manifest`);
+    const r = await fetch(entry.json_path);
+    if (!r.ok) throw new Error(`${entry.json_path} HTTP ${r.status}`);
+    const data = await r.json();
+    state.radarCache.set(date_id, data);
+    return data;
+  }
+
+  async function loadDate(date_id) {
+    state.currentDate = date_id;
+    state.current = await loadRadar(date_id);
+    state.prior = null;
+    if (state.current.prior_radar) {
+      const priorId = state.current.prior_radar.split('/').pop().replace('.json', '');
+      try { state.prior = await loadRadar(priorId); } catch (_) {}
+    }
+    state.expandedClusters.clear();
+    renderMeta();
+    renderActiveTab();
+  }
+
+  async function preloadAllRadars() {
+    await Promise.allSettled(state.radarManifest.entries.map(e => loadRadar(e.date_id)));
+    // Once sparklines have data, redraw if user is on trends
+    if (state.currentTab === 'trends') renderTrends();
+    if (state.currentTab === 'firms')  renderFirms();
+  }
+
+  function renderActiveTab() {
+    switchTab(state.currentTab);
+  }
+
+  // ======================================================================
+  // Meta line
+  // ======================================================================
+  function renderMeta() {
+    const d = state.current;
+    const sectorCount = (d.sectors || []).length;
+    const topicCount = (d.topics || []).length;
+    const parts = [d.date, `${topicCount} topics`, `${sectorCount} sectors`];
+    document.getElementById('meta-line').innerHTML =
+      parts.map(escHtml).join('<span class="sep">·</span>');
+    document.getElementById('cnt-trends').textContent = topicCount;
+  }
+
+  // ======================================================================
+  // TODAY — "what moved" + daily-report top-5
+  // ======================================================================
+  function renderToday() {
+    renderMoves();
+    renderTodayHeadlines();
+  }
+
+  function renderMoves() {
+    const d = state.current;
+    const topicById = new Map((d.topics || []).map(t => [t.id, t]));
+    const items = [];
+    const seen = new Set();
+
+    (d.stage_movements || []).forEach(m => {
+      const t = topicById.get(m.topic);
+      if (!t) return;
+      seen.add(t.id);
+      const isFade = m.to === 'fading';
+      const fromLabel = m.from || 'new';
+      items.push({
+        weight: isFade ? 90 : 100,
+        title: t.label || t.id,
+        meta: `${fromLabel} → ${m.to} · ${t.sector || 'no sector'}`,
+        tag: isFade ? 'Fade' : (m.from ? 'Stage' : 'First seen'),
+        tagClass: isFade ? 'down' : (STAGE_RANK[m.to] > STAGE_RANK[m.from] ? 'up' : 'shift'),
+        topicId: t.id,
+      });
+    });
+
+    (d.topics || []).forEach(t => {
+      if (seen.has(t.id)) return;
+      const fast = t.score_fast ?? t.score;
+      const slow = t.score_slow ?? t.score;
+      const surge = t.direction === 'surging' || (slow > 0 && fast / slow >= 1.5);
+      if (!surge) return;
+      seen.add(t.id);
+      const pct = slow > 0 ? Math.round((fast / slow - 1) * 100) : null;
+      items.push({
+        weight: 75,
+        title: t.label || t.id,
+        meta: `${t.sector || 'no sector'} · fast ${fast.toFixed(1)} / slow ${slow.toFixed(1)}${pct != null ? ` (+${pct}%)` : ''}`,
+        tag: 'Surge',
+        tagClass: 'up',
+        topicId: t.id,
+      });
+    });
+
+    (d.sectors_spawned_today || []).forEach(name => {
+      items.push({ weight: 85, title: name, meta: 'New sector clustered today', tag: 'New sector', tagClass: 'new' });
+    });
+    (d.sectors_dissolved_today || []).forEach(name => {
+      items.push({ weight: 70, title: name, meta: 'Topics scattered to other sectors', tag: 'Dissolved', tagClass: 'down' });
+    });
+
+    (d.sector_movements || []).forEach(m => {
+      const t = topicById.get(m.topic);
+      if (!t || seen.has(t.id)) return;
+      seen.add(t.id);
+      items.push({
+        weight: 80,
+        title: t.label || t.id,
+        meta: `${m.from || '—'} → ${m.to || '?'}${m.reason ? ' · ' + m.reason : ''}`,
+        tag: 'Sector shift', tagClass: 'shift', topicId: t.id,
+      });
+    });
+
+    if (state.prior) {
+      const priorById = new Map((state.prior.topics || []).map(t => [t.id, t]));
+      (d.topics || []).forEach(t => {
+        if (seen.has(t.id)) return;
+        const prior = priorById.get(t.id);
+        if (!prior) return;
+        const now = t.breadth_7d || 0;
+        const was = prior.breadth_7d || 0;
+        if (now >= 5 && now >= was * 1.5 && now - was >= 2) {
+          seen.add(t.id);
+          const pct = Math.round((now / Math.max(was, 1) - 1) * 100);
+          items.push({
+            weight: 60,
+            title: t.label || t.id,
+            meta: `${was} → ${now} orgs (+${pct}%) · ${t.sector || 'no sector'}`,
+            tag: 'Breadth', tagClass: 'breadth', topicId: t.id,
+          });
+        }
+      });
+    }
+
+    items.sort((a, b) => b.weight - a.weight);
+    const top = items.slice(0, 12);
+
+    const el = document.getElementById('moves-list');
+    document.getElementById('moves-count').textContent = top.length ? `${top.length} of ${items.length}` : '';
+    if (!top.length) {
+      el.innerHTML = `<li><div class="empty">Quiet day. No promotions, surges, or sector changes.</div></li>`;
+      return;
+    }
+    el.innerHTML = top.map(it => {
+      const inner = `<div>
+          <div class="title">${escHtml(it.title)}</div>
+          <div class="meta">${escHtml(it.meta)}</div>
+        </div>
+        <div class="tag ${it.tagClass}">${escHtml(it.tag)}</div>`;
+      return it.topicId
+        ? `<li><button type="button" class="row" data-topic="${escAttr(it.topicId)}">${inner}</button></li>`
+        : `<li><div class="row" style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:baseline;padding:14px 0;">${inner}</div></li>`;
+    }).join('');
+
+    el.querySelectorAll('button.row[data-topic]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchTab('trends');
+        state.allTopicsOpen = true;
+        document.getElementById('all-topics-head').classList.add('open');
+        document.getElementById('all-topics-body').classList.add('open');
+        requestAnimationFrame(() => {
+          renderTopics();
+          const row = document.querySelector(`tr[data-topic="${CSS.escape(btn.dataset.topic)}"]`);
+          if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+    });
+  }
+
+  // Pull top-5 from today's daily markdown if available
+  async function renderTodayHeadlines() {
+    const host = document.getElementById('today-headlines');
+    const linkHost = document.getElementById('today-link');
+    const hint = document.getElementById('today-headline-hint');
+    host.innerHTML = `<div class="empty">Loading…</div>`;
+    linkHost.innerHTML = '';
+    hint.textContent = '';
+
+    const dailyPath = `daily/${state.currentDate.slice(0,4)}/${state.currentDate.slice(5,7)}/${state.currentDate}.md`;
+    let md = '';
+    try {
+      const r = await fetch(dailyPath);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      md = await r.text();
+    } catch (e) {
+      host.innerHTML = `<div class="empty">No daily report for ${state.currentDate}.</div>`;
+      return;
+    }
+
+    // Find the "Top-5" / "🎯 Top-5 reading priorities" block and extract its ordered list items.
+    const lines = md.split('\n');
+    let inBlock = false;
+    const items = [];
+    for (const line of lines) {
+      const isTop5Header = /^##\s+.*Top[\-\s]?5/i.test(line) || /reading priorit/i.test(line) && line.startsWith('##');
+      if (isTop5Header) { inBlock = true; continue; }
+      if (inBlock && line.startsWith('## ')) break;
+      if (inBlock) {
+        const m = line.match(/^\d+\.\s+(.*)$/);
+        if (m) items.push(m[1]);
+        else if (items.length && line.trim() && !line.startsWith('#')) {
+          // continuation line
+          items[items.length - 1] += ' ' + line.trim();
+        }
+      }
+    }
+
+    if (!items.length) {
+      host.innerHTML = `<div class="empty">No top-5 block found in today's daily report.</div>`;
+      linkHost.innerHTML = `<a href="${escAttr(dailyPath)}" data-md="${escAttr(dailyPath)}" data-label="Daily · ${escAttr(state.currentDate)}">Open full daily →</a>`;
+      return;
+    }
+
+    hint.textContent = `from ${dailyPath.split('/').pop()}`;
+    host.innerHTML = items.slice(0, 5).map((raw, idx) => {
+      // Pull the leading **[link](url)** off the front, then split the remainder
+      // at the first em-dash. This keeps em-dashes inside link text intact.
+      const linkMatch = raw.match(/^(\s*\*\*\[[^\]]+\]\([^)]+\)\*\*[^—]*)\s+—\s+(.*)$/);
+      let head, why;
+      if (linkMatch) {
+        head = renderInlineMd(linkMatch[1].trim());
+        why  = renderInlineMd(linkMatch[2].trim());
+      } else {
+        const i = raw.search(/\s+—\s+/);
+        head = renderInlineMd(i > 0 ? raw.slice(0, i) : raw);
+        why  = i > 0 ? renderInlineMd(raw.slice(i).replace(/^\s+—\s+/, '')) : '';
+      }
+      return `<div class="item">
+        <div class="num">${idx + 1}.</div>
+        <div>
+          <div class="body">${head}</div>
+          ${why ? `<div class="why">${why}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+    linkHost.innerHTML = `<a href="${escAttr(dailyPath)}" data-md="${escAttr(dailyPath)}" data-label="Daily · ${escAttr(state.currentDate)}">Open full daily report →</a>`;
+  }
+
+  // Tiny inline-markdown renderer: handles **bold**, *em*, [text](url).
+  function renderInlineMd(s) {
+    let out = escHtml(s);
+    // links — process before bold because escHtml turned ] into &#93; etc no — actually we used basic escaping
+    out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, txt, url) =>
+      `<a href="${escAttr(url)}" target="_blank" rel="noopener">${txt}</a>`);
+    out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    out = out.replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<em>$2</em>$3');
+    return out;
+  }
+
+  // ======================================================================
+  // TRENDS — clusters + all-topics
+  // ======================================================================
+  function bindTrendsControls() {
+    document.getElementById('topic-search').addEventListener('input', e => {
+      state.topicSearch = e.target.value.toLowerCase().trim();
+      renderTopics();
+    });
+    document.getElementById('sector-filter').addEventListener('change', e => {
+      state.sectorFilter = e.target.value;
+      renderTopics();
+    });
+    document.getElementById('clear-filters').addEventListener('click', () => {
+      state.topicSearch = ''; state.sectorFilter = '';
+      document.getElementById('topic-search').value = '';
+      document.getElementById('sector-filter').value = '';
+      renderTopics();
+    });
+    document.querySelectorAll('#topics-table th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.sort;
+        if (state.sortBy === col) state.sortDir = state.sortDir === 'desc' ? 'asc' : 'desc';
+        else { state.sortBy = col; state.sortDir = (col === 'label' || col === 'sector') ? 'asc' : 'desc'; }
+        renderTopics();
+      });
+    });
+    const head = document.getElementById('all-topics-head');
+    head.addEventListener('click', () => {
+      state.allTopicsOpen = !state.allTopicsOpen;
+      head.classList.toggle('open', state.allTopicsOpen);
+      document.getElementById('all-topics-body').classList.toggle('open', state.allTopicsOpen);
+      if (state.allTopicsOpen) renderTopics();
+    });
+  }
+
+  function renderTrends() {
+    renderSectorFilterOptions();
+    renderClusters();
+    if (state.allTopicsOpen) renderTopics();
+  }
+
+  function renderSectorFilterOptions() {
+    const sel = document.getElementById('sector-filter');
+    const current = state.sectorFilter;
+    const names = (state.current.sectors || []).map(s => s.name).sort();
+    sel.innerHTML = '<option value="">All sectors</option>' +
+      names.map(n => `<option value="${escAttr(n)}"${n === current ? ' selected' : ''}>${escHtml(n)}</option>`).join('');
+  }
+
+  function renderClusters() {
+    const grid = document.getElementById('clusters-grid');
+    const clusters = (state.current.topic_clusters || []).slice()
+      .sort((a, b) => (b.cluster_score_fast || 0) - (a.cluster_score_fast || 0));
+    document.getElementById('clusters-hint').textContent =
+      clusters.length ? `${clusters.length} clusters` : '';
+
+    // destroy old charts
+    state.clusterCharts.forEach(c => c.destroy());
+    state.clusterCharts.clear();
+
+    // also include an "Other / loose topics" pseudo-cluster for orphans
+    const claimedIds = new Set();
+    clusters.forEach(c => (c.topic_ids || []).forEach(id => claimedIds.add(id)));
+    const orphans = (state.current.topics || []).filter(t => !claimedIds.has(t.id));
+    const renderList = clusters.slice();
+    if (orphans.length) {
+      renderList.push({
+        id: '__orphans',
+        name: 'Loose topics',
+        topic_ids: orphans.map(t => t.id),
+        size: orphans.length,
+        cluster_score_slow: orphans.reduce((s, t) => s + (t.score_slow || 0), 0),
+        cluster_score_fast: orphans.reduce((s, t) => s + (t.score_fast || 0), 0),
+        cluster_direction: 'steady',
+        cluster_breadth_7d: null,
+        _is_orphan: true,
+      });
+    }
+
+    if (!renderList.length) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1">No clusters in this snapshot.</div>`;
+      return;
+    }
+
+    const topicById = new Map((state.current.topics || []).map(t => [t.id, t]));
+
+    grid.innerHTML = renderList.map(c => {
+      const ids = (c.topic_ids || []);
+      const chips = ids.map(id => {
+        const t = topicById.get(id);
+        const label = t ? (t.label || t.id) : id;
+        const dir = t ? t.direction : '';
+        const short = label.split(/[\(–—]/)[0].trim().slice(0, 28);
+        return `<span class="topic-chip ${escAttr(dir)}" data-topic="${escAttr(id)}" title="${escAttr(label)}">${escHtml(short)}</span>`;
+      }).join('');
+      const slow = (c.cluster_score_slow || 0).toFixed(1);
+      const fast = (c.cluster_score_fast || 0).toFixed(1);
+      const dir = c.cluster_direction || 'steady';
+      const breadth = c.cluster_breadth_7d != null
+        ? `<span style="color:var(--text-dim)">${c.cluster_breadth_7d} orgs</span>`
+        : '';
+      return `<div class="cluster" data-id="${escAttr(c.id)}">
+        <div class="name">${escHtml(c.name)}</div>
+        <div class="row">
+          <span class="left">${ids.length} topic${ids.length === 1 ? '' : 's'} · slow ${slow} / fast ${fast}</span>
+          <span class="dir-pill ${escAttr(dir)}">${escHtml(dir)}</span>
+        </div>
+        <div class="spark"><canvas data-cluster-spark="${escAttr(c.id)}"></canvas></div>
+        ${breadth ? `<div class="row"><span class="left">${breadth}</span></div>` : ''}
+        <div class="topic-chips">${chips}</div>
+      </div>`;
+    }).join('');
+
+    // chip → topics-table jump
+    grid.querySelectorAll('.topic-chip').forEach(chip => {
+      chip.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = chip.dataset.topic;
+        state.topicSearch = '';
+        document.getElementById('topic-search').value = '';
+        state.allTopicsOpen = true;
+        document.getElementById('all-topics-head').classList.add('open');
+        document.getElementById('all-topics-body').classList.add('open');
+        renderTopics();
+        requestAnimationFrame(() => {
+          const row = document.querySelector(`tr[data-topic="${CSS.escape(id)}"]`);
+          if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+    });
+
+    // sparklines
+    renderList.forEach(c => renderClusterSpark(c));
+  }
+
+  function renderClusterSpark(cluster) {
+    const canvas = document.querySelector(`canvas[data-cluster-spark="${CSS.escape(cluster.id)}"]`);
+    if (!canvas) return;
+    const runs = [...state.radarCache.values()].sort((a, b) => a.date.localeCompare(b.date));
+    if (runs.length < 2) return;
+
+    // Cluster taxonomy changed on 2026-05-14 — most IDs don't exist in history.
+    // So instead of looking up a pre-computed cluster_score, synthesize the
+    // cluster's trend by summing its member topics' score_slow per snapshot.
+    // (Works for orphans too — same code path.)
+    const memberIds = new Set(cluster.topic_ids || []);
+    const series = runs.map(r => {
+      let sum = 0, hit = 0;
+      (r.topics || []).forEach(t => {
+        if (memberIds.has(t.id)) {
+          sum += (t.score_slow != null ? t.score_slow : (t.score || 0));
+          hit++;
+        }
+      });
+      return hit ? sum : null;
+    });
+
+    const validCount = series.filter(v => v != null).length;
+    if (validCount < 2) return;
+
+    const isAccent = !cluster._is_orphan && (cluster.cluster_direction === 'rising' || cluster.cluster_direction === 'surging');
+    const line = cluster._is_orphan ? '#8a7f70' : (isAccent ? '#a14a26' : '#4a423a');
+    const fillRgba = cluster._is_orphan
+      ? 'rgba(138,127,112,0.10)'
+      : (isAccent ? 'rgba(161,74,38,0.10)' : 'rgba(74,66,58,0.08)');
+
+    const chart = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: runs.map(r => r.date),
+        datasets: [{
+          data: series,
+          borderColor: line,
+          backgroundColor: fillRgba,
+          tension: 0.3,
+          fill: true,
+          spanGaps: true,
+          pointRadius: 0,
+          borderWidth: 1.5,
+        }],
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false } },
+        elements: { point: { radius: 0 } },
+      },
+    });
+    state.clusterCharts.set(cluster.id, chart);
+  }
+
+  function renderTopics() {
+    const tbody = document.getElementById('topics-body');
+    let topics = (state.current.topics || []).slice();
+    if (state.sectorFilter) topics = topics.filter(t => t.sector === state.sectorFilter);
+    if (state.topicSearch) {
+      topics = topics.filter(t =>
+        (t.label || '').toLowerCase().includes(state.topicSearch) ||
+        (t.id || '').toLowerCase().includes(state.topicSearch));
+    }
+    const dir = state.sortDir === 'desc' ? -1 : 1;
+    const k = state.sortBy;
+    topics.sort((a, b) => {
+      let av, bv;
+      if (k === 'direction') { av = DIR_RANK[a.direction] ?? -1; bv = DIR_RANK[b.direction] ?? -1; }
+      else if (k === 'label' || k === 'sector') {
+        av = (a[k] || '').toLowerCase(); bv = (b[k] || '').toLowerCase();
+        return av < bv ? -1 * dir : (av > bv ? dir : 0);
+      } else {
+        av = a[k] ?? -Infinity; bv = b[k] ?? -Infinity;
+      }
+      return (av - bv) * dir;
+    });
+
+    document.getElementById('topics-count').textContent =
+      `${(state.current.topics || []).length} total`;
+    document.getElementById('topic-filtered-count').textContent =
+      `${topics.length} of ${(state.current.topics || []).length}`;
+
+    if (!topics.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty">No topics match.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = topics.map(t => {
+      const dir = t.direction || 'steady';
+      const arrow = { surging: '↑↑', rising: '↑', steady: '→', fading: '↓' }[dir] || '→';
+      const score = (t.score_slow != null ? t.score_slow : t.score) || 0;
+      return `<tr data-topic="${escAttr(t.id)}">
+        <td class="label-cell">${escHtml(t.label || t.id)}</td>
+        <td>${escHtml(t.sector || '—')}</td>
+        <td class="right">${score.toFixed(1)}</td>
+        <td class="right dir ${dir}">${arrow}</td>
+        <td class="right">${t.breadth_7d != null ? t.breadth_7d : '—'}</td>
+        <td class="right">${t.sustained_days != null ? t.sustained_days : '—'}</td>
+      </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('tr[data-topic]').forEach(tr => {
+      tr.addEventListener('click', () => openTopicDrawer(tr.dataset.topic));
+    });
+  }
+
+  // ======================================================================
+  // TOPIC DRAWER
+  // ======================================================================
+  function openTopicDrawer(topicId) {
+    const topic = (state.current.topics || []).find(t => t.id === topicId);
+    if (!topic) return;
+    openDrawer();
+    document.getElementById('drawer-title').textContent = topic.label || topic.id;
+    const body = document.getElementById('drawer-body');
+
+    const dir = topic.direction || 'steady';
+    const arrow = { surging: '↑↑', rising: '↑', steady: '→', fading: '↓' }[dir] || '→';
+    const score = (topic.score_slow != null ? topic.score_slow : topic.score) || 0;
+    const fast  = topic.score_fast != null ? topic.score_fast : score;
+
+    const orgs = (topic.breadth_orgs_7d || []);
+    const links = (topic.supporting_links || []);
+    const files = (topic.supporting_files || []);
+    const sectorHistory = topic.sector_history || [];
+
+    // Build supporting-files list with in-app viewer triggers
+    const filesHtml = files.length
+      ? files.map(f => `<li style="margin:4px 0;font-size:12.5px;"><a href="${escAttr(f)}" data-md="${escAttr(f)}" data-label="${escAttr(f.split('/').pop())}">${escHtml(f)}</a></li>`).join('')
+      : '<li style="color:var(--muted);font-style:italic;">none</li>';
+
+    const orgChips = orgs.length
+      ? orgs.map(slug => {
+          const meta = state.orgsIndex
+            ? state.orgsIndex.entries.find(e => e.slug === slug)
+            : null;
+          const cls = meta && meta.is_priority ? 'topic-chip' : 'topic-chip';
+          return `<button type="button" class="${cls}" data-org="${escAttr(slug)}" style="cursor:pointer;">${escHtml(slug)}</button>`;
+        }).join(' ')
+      : '<span style="color:var(--muted);font-style:italic;">no orgs yet</span>';
+
+    const linksHtml = links.length
+      ? '<ul style="margin:6px 0;padding-left:18px;">' + links.map(u =>
+          `<li style="margin:3px 0;font-size:12.5px;word-break:break-all;"><a href="${escAttr(u)}" target="_blank" rel="noopener">${escHtml(u)}</a></li>`).join('') + '</ul>'
+      : '<div style="color:var(--muted);font-style:italic;">none</div>';
+
+    body.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat"><div class="l">Score (slow)</div><div class="v">${score.toFixed(1)}</div></div>
+        <div class="stat"><div class="l">Score (fast)</div><div class="v">${fast.toFixed(1)}</div></div>
+        <div class="stat"><div class="l">Direction</div><div class="v" style="font-size:14px;">${arrow} <span class="dir-pill ${escAttr(dir)}" style="vertical-align:middle;">${escHtml(dir)}</span></div></div>
+        <div class="stat"><div class="l">Stage</div><div class="v" style="font-size:14px;">${escHtml(topic.stage || '—')}</div></div>
+        <div class="stat"><div class="l">Breadth (7d)</div><div class="v">${topic.breadth_7d != null ? topic.breadth_7d : '—'}</div></div>
+        <div class="stat"><div class="l">Sustained</div><div class="v">${topic.sustained_days != null ? topic.sustained_days + 'd' : '—'}</div></div>
+        <div class="stat"><div class="l">Sector</div><div class="v" style="font-size:12px;">${escHtml(topic.sector || '—')}</div></div>
+        <div class="stat"><div class="l">First seen</div><div class="v" style="font-size:12px;">${escHtml(topic.first_seen || '—')}</div></div>
+      </div>
+
+      <h4>Score history</h4>
+      <div class="chart-wrap"><canvas id="topic-history-chart"></canvas></div>
+
+      <h4>Orgs talking about this (7d)</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">${orgChips}</div>
+
+      <h4>Supporting links</h4>
+      ${linksHtml}
+
+      <h4>Supporting source files</h4>
+      <ul style="margin:6px 0;padding-left:18px;">${filesHtml}</ul>
+
+      ${sectorHistory.length ? `<h4>Sector history</h4>
+        <ul style="margin:6px 0;padding-left:18px;font-size:12px;color:var(--ink-2);">
+          ${sectorHistory.map(h => `<li style="margin:3px 0;">${escHtml(h.date)}: ${escHtml(h.from || '—')} → ${escHtml(h.to)}${h.reason ? ' <em style="color:var(--muted)">(' + escHtml(h.reason) + ')</em>' : ''}</li>`).join('')}
+        </ul>` : ''}
+    `;
+    body.scrollTop = 0;
+
+    // Render score history chart from cached radar snapshots
+    const runs = [...state.radarCache.values()].sort((a, b) => a.date.localeCompare(b.date));
+    if (runs.length >= 2) {
+      const labels = runs.map(r => r.date);
+      const slow = runs.map(r => {
+        const m = (r.topics || []).find(x => x.id === topicId);
+        return m ? (m.score_slow != null ? m.score_slow : m.score) : null;
+      });
+      const breadth = runs.map(r => {
+        const m = (r.topics || []).find(x => x.id === topicId);
+        return m ? (m.breadth_7d || 0) : null;
+      });
+      if (state.drawerChart) state.drawerChart.destroy();
+      const canvas = document.getElementById('topic-history-chart');
+      state.drawerChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Score (slow)', data: slow, borderColor: '#a14a26', backgroundColor: 'rgba(161,74,38,0.10)', tension: 0.25, spanGaps: true, fill: true, borderWidth: 1.6, pointRadius: 0, yAxisID: 'y' },
+            { label: 'Breadth (orgs 7d)', data: breadth, borderColor: '#4a423a', backgroundColor: 'transparent', tension: 0.25, spanGaps: true, borderDash: [4, 4], borderWidth: 1.4, pointRadius: 0, yAxisID: 'y1' },
+          ],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { color: '#4a423a', font: { size: 10 }, boxWidth: 8, usePointStyle: true, pointStyle: 'line' } } },
+          scales: {
+            x: { ticks: { color: '#8a7f70', font: { size: 9 }, maxTicksLimit: 8 }, grid: { display: false } },
+            y:  { position: 'left',  beginAtZero: true, ticks: { color: '#a14a26', font: { size: 9 } }, grid: { color: '#d9d2c1' } },
+            y1: { position: 'right', beginAtZero: true, ticks: { color: '#4a423a', font: { size: 9 } }, grid: { display: false } },
+          },
+        },
+      });
+    }
+
+    // Wire up org chip clicks → open the firm drawer
+    body.querySelectorAll('button[data-org]').forEach(btn => {
+      btn.addEventListener('click', () => openFirmDrawer(btn.dataset.org));
+    });
+  }
+
+  // ======================================================================
+  // FIRMS
+  // ======================================================================
+  function bindFirmsControls() {
+    document.getElementById('firm-search').addEventListener('input', e => {
+      state.firmFilter.q = e.target.value.toLowerCase().trim();
+      renderFirms();
+    });
+    document.getElementById('firm-tier').addEventListener('change', e => {
+      state.firmFilter.tier = e.target.value;
+      renderFirms();
+    });
+    document.getElementById('firm-sort').addEventListener('change', e => {
+      state.firmFilter.sort = e.target.value;
+      renderFirms();
+    });
+    document.getElementById('firms-clear').addEventListener('click', () => {
+      state.firmFilter = { q: '', tier: '', sort: 'velocity' };
+      document.getElementById('firm-search').value = '';
+      document.getElementById('firm-tier').value = '';
+      document.getElementById('firm-sort').value = 'velocity';
+      renderFirms();
+    });
+  }
+
+  function renderFirms() {
+    if (!state.orgsIndex) {
+      document.getElementById('firms-grid').innerHTML =
+        `<div class="empty" style="grid-column:1/-1">orgs/index.json not available.</div>`;
+      return;
+    }
+    // tier options
+    const tierSel = document.getElementById('firm-tier');
+    if (tierSel.options.length <= 1) {
+      const tiers = [...new Set(state.orgsIndex.entries.map(e => e.tier_hint).filter(Boolean))].sort();
+      tiers.forEach(t => {
+        const o = document.createElement('option'); o.value = t; o.textContent = t;
+        tierSel.appendChild(o);
+      });
+    }
+
+    let entries = state.orgsIndex.entries.slice();
+    const { q, tier, sort } = state.firmFilter;
+    if (q) {
+      entries = entries.filter(e =>
+        e.slug.toLowerCase().includes(q) ||
+        (e.top_topics || []).some(t => (t || '').toLowerCase().includes(q)));
+    }
+    if (tier) entries = entries.filter(e => e.tier_hint === tier);
+    const cmp = {
+      velocity: (a, b) => (b.velocity_ratio || 0) - (a.velocity_ratio || 0) || (b.total_mentions || 0) - (a.total_mentions || 0),
+      mentions: (a, b) => (b.total_mentions || 0) - (a.total_mentions || 0),
+      recent:   (a, b) => (b.last_seen || '').localeCompare(a.last_seen || ''),
+      topics:   (a, b) => (b.topic_count || 0) - (a.topic_count || 0),
+      alpha:    (a, b) => a.slug.localeCompare(b.slug),
+    }[sort];
+    if (sort === 'velocity') {
+      entries.sort((a, b) => ((b.is_priority?1:0) - (a.is_priority?1:0)) || cmp(a, b));
+    } else {
+      entries.sort(cmp);
+    }
+
+    document.getElementById('firms-count').textContent =
+      `${entries.length} of ${state.orgsIndex.entries.length}`;
+    document.getElementById('firms-hint').textContent =
+      `${state.orgsIndex.total_orgs} total · ${state.orgsIndex.priority_count} priority`;
+
+    const grid = document.getElementById('firms-grid');
+    state.firmCharts.forEach(c => c.destroy());
+    state.firmCharts.clear();
+
+    grid.innerHTML = entries.slice(0, 200).map(e => {
+      const velRaw = e.velocity_ratio != null ? `${e.velocity_ratio.toFixed(1)}×` : '—';
+      const topics = (e.top_topics || []).slice(0, 2).join(', ');
+      return `<div class="firm ${e.is_priority ? 'priority' : ''}" data-slug="${escAttr(e.slug)}">
+        <div class="name">
+          ${e.is_priority ? '<span class="priority-dot"></span>' : ''}
+          ${escHtml(e.slug)}
+        </div>
+        <div class="stats">
+          <span class="vel ${escAttr(e.velocity_status || '')}">${velRaw}</span>
+          <span>${e.total_mentions || 0} mentions</span>
+          <span style="margin-left:auto">${e.distinct_days || 0}d</span>
+        </div>
+        <div class="spark"><canvas data-firm-spark="${escAttr(e.slug)}"></canvas></div>
+        ${topics ? `<div class="topics">${escHtml(topics)}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.firm').forEach(card => {
+      card.addEventListener('click', () => openFirmDrawer(card.dataset.slug));
+    });
+
+    // background fetch sparklines for the first ~60 firms
+    entries.slice(0, 60).forEach(e => fetchFirmSpark(e.slug));
+  }
+
+  async function fetchFirmSpark(slug) {
+    try {
+      const data = state.orgCache.get(slug) || await fetch(`orgs/${slug}.json`).then(r => r.ok ? r.json() : null);
+      if (!data) return;
+      state.orgCache.set(slug, data);
+      const canvas = document.querySelector(`canvas[data-firm-spark="${CSS.escape(slug)}"]`);
+      if (!canvas) return;
+      const dates = Object.keys(data.mentions_by_date || {}).sort();
+      if (dates.length < 2) return;
+      const values = dates.map(d => data.mentions_by_date[d]);
+      const chart = new Chart(canvas, {
+        type: 'line',
+        data: { labels: dates, datasets: [{
+          data: values,
+          borderColor: data.is_priority ? '#a14a26' : '#8a7f70',
+          backgroundColor: data.is_priority ? 'rgba(161,74,38,0.10)' : 'rgba(138,127,112,0.08)',
+          tension: 0.25, fill: true, pointRadius: 0, borderWidth: 1.4,
+        }]},
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: { x: { display: false }, y: { display: false } },
+          elements: { point: { radius: 0 } },
+        },
+      });
+      state.firmCharts.set(slug, chart);
+    } catch (_) {}
+  }
+
+  // ======================================================================
+  // FIRM DRAWER
+  // ======================================================================
+  function bindDrawerControls() {
+    document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+    document.getElementById('drawer-backdrop').addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+    // Global delegation: any link with data-md opens the in-app report viewer
+    document.body.addEventListener('click', e => {
+      const link = e.target.closest('a[data-md]');
+      if (!link) return;
+      e.preventDefault();
+      openReportViewer(link.dataset.md, link.dataset.label || link.textContent.trim());
+    });
+  }
+
+  function closeDrawer() {
+    const d = document.getElementById('drawer');
+    const b = document.getElementById('drawer-backdrop');
+    d.classList.remove('open');
+    b.classList.remove('open');
+    d.setAttribute('aria-hidden', 'true');
+    b.setAttribute('aria-hidden', 'true');
+    if (state.drawerChart) { state.drawerChart.destroy(); state.drawerChart = null; }
+  }
+  function openDrawer() {
+    const d = document.getElementById('drawer');
+    const b = document.getElementById('drawer-backdrop');
+    d.classList.add('open');
+    b.classList.add('open');
+    d.setAttribute('aria-hidden', 'false');
+    b.setAttribute('aria-hidden', 'false');
+  }
+
+  async function openReportViewer(path, title) {
+    openDrawer();
+    document.getElementById('drawer-title').textContent = title || path.split('/').pop();
+    const body = document.getElementById('drawer-body');
+    body.innerHTML = `<div class="empty">Loading report…</div>`;
+    let md;
+    try {
+      const r = await fetch(path);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      md = await r.text();
+    } catch (e) {
+      body.innerHTML = `<div class="error">Could not load ${escHtml(path)}: ${escHtml(String(e))}</div>`;
+      return;
+    }
+
+    // Render markdown. marked is available globally.
+    let html;
+    try {
+      html = window.marked.parse(md, { breaks: false, gfm: true });
+    } catch (e) {
+      body.innerHTML = `<div class="error">Markdown render failed: ${escHtml(String(e))}</div>
+        <pre style="white-space:pre-wrap; font-size:11px;">${escHtml(md.slice(0, 4000))}</pre>`;
+      return;
+    }
+
+    body.innerHTML = `<div class="report-view">${html}</div>
+      <a class="raw-link" href="${escAttr(path)}" target="_blank" rel="noopener">View raw markdown ↗</a>`;
+    // Open external links in new tabs
+    body.querySelectorAll('.report-view a[href^="http"]').forEach(a => {
+      a.target = '_blank';
+      a.rel = 'noopener';
+    });
+    // Internal-relative links (other .md files) reopen the viewer instead of leaving the SPA
+    body.querySelectorAll('.report-view a[href$=".md"]').forEach(a => {
+      if (a.href.startsWith('http')) return; // already external — leave alone
+      a.addEventListener('click', ev => {
+        ev.preventDefault();
+        openReportViewer(a.getAttribute('href'), a.textContent.trim());
+      });
+    });
+    // Scroll drawer body to top
+    body.scrollTop = 0;
+  }
+
+  async function openFirmDrawer(slug) {
+    openDrawer();
+    document.getElementById('drawer-title').textContent = slug;
+    const body = document.getElementById('drawer-body');
+    body.innerHTML = `<div class="empty">Loading…</div>`;
+    let data;
+    try {
+      data = state.orgCache.get(slug) || await fetch(`orgs/${slug}.json`).then(r => r.json());
+      state.orgCache.set(slug, data);
+    } catch (e) {
+      body.innerHTML = `<div class="error">Couldn't load orgs/${escHtml(slug)}.json</div>`;
+      return;
+    }
+    const topics = data.topic_mix || {};
+    const topTopics = Object.entries(topics).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const vel = data.velocity || {};
+    const tier = data.tier_hint || '—';
+    const region = data.region || '—';
+
+    body.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat"><div class="l">Total mentions</div><div class="v">${data.total_mentions || 0}</div></div>
+        <div class="stat"><div class="l">Distinct days</div><div class="v">${data.distinct_days || 0}</div></div>
+        <div class="stat"><div class="l">Velocity ratio</div><div class="v">${vel.velocity_ratio != null ? vel.velocity_ratio.toFixed(2) + '×' : '—'}</div></div>
+        <div class="stat"><div class="l">Status</div><div class="v">${escHtml(vel.velocity_status || '—')}</div></div>
+        <div class="stat"><div class="l">Tier</div><div class="v" style="font-size:12px">${escHtml(tier)}</div></div>
+        <div class="stat"><div class="l">Region</div><div class="v" style="font-size:12px">${escHtml(region)}</div></div>
+      </div>
+
+      <h4>Mention timeline</h4>
+      <div class="chart-wrap"><canvas id="drawer-chart"></canvas></div>
+
+      <h4>Top topics</h4>
+      <div>${topTopics.map(([t, n]) =>
+        `<span class="topic-chip" title="${escAttr(t)}">${escHtml(t)} <span style="opacity:.6">·${n}</span></span>`).join(' ')}</div>
+
+      ${(data.context_samples || []).length ? `
+        <h4>Recent context</h4>
+        ${(data.context_samples || []).slice(0, 4).map(s => {
+          // Samples can be plain strings or {text/snippet, date, source_type}
+          let body, date = '', srcType = '';
+          if (typeof s === 'string') {
+            body = s;
+            // Many samples end with a trailing "  (news/2026/MM/YYYY-MM-DD.md)" provenance
+            const provMatch = body.match(/\(([a-z_]+)\/(\d{4})\/(\d{2})\/(\d{4}-\d{2}-\d{2})[^)]*\)\s*$/);
+            if (provMatch) {
+              srcType = provMatch[1];
+              date = provMatch[4];
+              body = body.slice(0, provMatch.index).trim();
+            }
+          } else {
+            body = s.text || s.snippet || '';
+            date = s.date || '';
+            srcType = s.source_type || '';
+          }
+          // Clean up leading "…" stutter and trim
+          body = body.replace(/^…\s*/, '').slice(0, 320);
+          return `<div class="ctx">${escHtml(body)}<div class="ctx-meta">${escHtml(date)}${srcType ? ' · ' + escHtml(srcType) : ''}</div></div>`;
+        }).join('')}
+      ` : ''}
+
+      ${data.blog_url_hint ? `<h4>Links</h4><a href="${escAttr(data.blog_url_hint)}" target="_blank" rel="noopener">${escHtml(data.blog_url_hint)}</a>` : ''}
+    `;
+
+    const canvas = document.getElementById('drawer-chart');
+    const dates = Object.keys(data.mentions_by_date || {}).sort();
+    if (dates.length >= 2) {
+      const values = dates.map(d => data.mentions_by_date[d]);
+      state.drawerChart = new Chart(canvas, {
+        type: 'bar',
+        data: { labels: dates, datasets: [{
+          data: values,
+          backgroundColor: '#a14a26',
+          borderColor: '#a14a26',
+          borderWidth: 0,
+        }]},
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#8a7f70', font: { size: 9 }, maxTicksLimit: 8 }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: '#8a7f70', font: { size: 9 } }, grid: { color: '#d9d2c1' } },
+          },
+        },
+      });
+    }
+  }
+
+  // ======================================================================
+  // REPORTS
+  // ======================================================================
+  function bindReportsControls() {
+    // chips bound when rendered
+  }
+
+  function renderReports() {
+    if (!state.reportsIndex) {
+      document.getElementById('reports-timeline').innerHTML =
+        `<li><div class="empty">reports/index.json not built yet. Run scripts/build_reports_manifest.py.</div></li>`;
+      return;
+    }
+    const chipsHost = document.getElementById('reports-chips');
+    const cadences = state.reportsIndex.cadences || [];
+    const counts = {};
+    (state.reportsIndex.entries || []).forEach(e => counts[e.cadence] = (counts[e.cadence] || 0) + 1);
+    chipsHost.innerHTML = [
+      `<button class="chip ${state.reportFilter.size === 0 ? 'active' : ''}" data-c="">All <span style="opacity:.6">${state.reportsIndex.entries.length}</span></button>`,
+      ...cadences.map(c =>
+        `<button class="chip ${state.reportFilter.has(c) ? 'active' : ''}" data-c="${escAttr(c)}">${escHtml(c.replace(/_/g, ' '))} <span style="opacity:.6">${counts[c] || 0}</span></button>`)
+    ].join('');
+
+    chipsHost.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const c = btn.dataset.c;
+        if (!c) state.reportFilter.clear();
+        else if (state.reportFilter.has(c)) state.reportFilter.delete(c);
+        else state.reportFilter.add(c);
+        renderReports();
+      });
+    });
+
+    let entries = state.reportsIndex.entries.slice();
+    if (state.reportFilter.size) {
+      entries = entries.filter(e => state.reportFilter.has(e.cadence));
+    }
+
+    document.getElementById('reports-hint').textContent =
+      `${entries.length} of ${state.reportsIndex.entries.length}`;
+
+    const list = document.getElementById('reports-timeline');
+    if (!entries.length) {
+      list.innerHTML = `<li><div class="empty">No reports match.</div></li>`;
+      return;
+    }
+    list.innerHTML = entries.slice(0, 500).map(e => {
+      const text = e.headline
+        ? escHtml(e.headline)
+        : `<em style="color:var(--muted)">(no headline) · ${escHtml(e.path)}</em>`;
+      return `<li>
+        <span class="date">${escHtml(e.date_id)}</span>
+        <span class="cadence">${escHtml(e.cadence_label)}</span>
+        <span class="headline"><a href="${escAttr(e.path)}" data-md="${escAttr(e.path)}" data-label="${escAttr(e.cadence_label + ' · ' + e.date_id)}">${text}</a></span>
+      </li>`;
+    }).join('');
+  }
+
+  // ======================================================================
+  // Helpers
+  // ======================================================================
+  function showError(msg) {
+    document.getElementById('error-host').innerHTML =
+      `<div class="error">${escHtml(msg)}</div>`;
+  }
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function escAttr(s) { return escHtml(s); }
+
+  init();
+  </script>
+</body>
+</html>
