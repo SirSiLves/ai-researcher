@@ -1,0 +1,59 @@
+<section class="page archive">
+  <app-page-header
+      title="Archive"
+      subtitle="Every daily edition the pipeline has published, by month."
+      [model]="[{label:'Briefing'}, {label:'Archive'}]">
+    <span class="muted">{{ totalLabel() }}</span>
+  </app-page-header>
+
+  <div class="archive__search">
+    <p-iconfield iconPosition="left" styleClass="archive__field">
+      <p-inputicon class="pi pi-search" />
+      <input pInputText
+             type="search"
+             name="archive-search"
+             [ngModel]="query()"
+             (ngModelChange)="query.set($event)"
+             placeholder="Search by date or headline" />
+    </p-iconfield>
+  </div>
+
+  @if (error(); as e) {
+    <p class="archive__error">{{ e }}</p>
+  }
+
+  @if (loading()) {
+    <div class="archive__skeleton">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <p-skeleton width="100%" height="3rem"></p-skeleton>
+      }
+    </div>
+  } @else if (grouped().length === 0) {
+    <p class="archive__empty muted italic">No editions match.</p>
+  } @else {
+    <div class="archive__months">
+      @for (m of grouped(); track m.monthKey) {
+        <section class="archive__month">
+          <header class="archive__month-head">
+            <h2 class="archive__month-title">{{ m.monthLabel }}</h2>
+            <span class="archive__month-count muted">{{ m.entries.length }} editions</span>
+          </header>
+          <ol class="archive__list">
+            @for (e of m.entries; track e.date_id) {
+              <li class="archive__item">
+                <a [routerLink]="['/today', e.date_id]" class="archive__row">
+                  <span class="archive__date">
+                    <span class="archive__day tabular">{{ dayOnly(e.date_id) }}</span>
+                    <span class="archive__weekday">{{ weekday(e.date_id) }}</span>
+                  </span>
+                  <span class="archive__headline">{{ e.headline || '—' }}</span>
+                  <span class="archive__cta" aria-hidden="true">Read →</span>
+                </a>
+              </li>
+            }
+          </ol>
+        </section>
+      }
+    </div>
+  }
+</section>

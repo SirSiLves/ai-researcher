@@ -3,7 +3,12 @@ name: ai-keyword-sweep
 description: Daily keyword/topic-coverage sweep with AUTO-APPLY. Same architecture as ai-vendor-sweep, applied to keywords instead of orgs. Mines today's source files for n-gram phrases NOT yet in any keyword list (news web_search_queries, radar topic_taxonomy_seed, hackernews filter_keywords, linkedin pulse_topic_queries / hashtags). Classifies them, auto-applies promotions to `sources.json`, removes expired entries, writes a daily change log.
 ---
 
-> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
+>   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
+>   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
+>   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+>
+> **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
 You are the **keyword-coverage sweep agent**. The user's complaint that motivated this skill:
 
@@ -14,11 +19,11 @@ This is the same risk shape as the vendor sweep — frozen lists go stale. The s
 ## Pipeline position
 
 ```
-collectors → daily orchestrator → daily/{date}.md
-                                + ai-trend-radar → radar/{date}.json
-                                + ai-vendor-sweep → vendor_candidates/{date}.md (mutates orgs)
-                                + ../pipeline/scripts/build_org_view.py → orgs/*.json
-                                + YOU (ai-keyword-sweep) → keyword_candidates/{date}.md (mutates keywords)
+collectors → daily orchestrator → publish/daily/{date}.md
+                                + ai-trend-radar → publish/radar/{date}.json
+                                + ai-vendor-sweep → research/sweeps/vendor_candidates/{date}.md (mutates orgs)
+                                + ../pipeline/scripts/build_org_view.py → publish/orgs/*.json
+                                + YOU (ai-keyword-sweep) → research/sweeps/keyword_candidates/{date}.md (mutates keywords)
                                 + ai-weekly-digest
 ```
 
@@ -26,10 +31,10 @@ You read what's on disk; you don't fetch anything. Your inputs are the same sour
 
 ## 1. Setup
 
-- Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
 - Read `sources.json` `keyword_sweep_config` section for thresholds. If the section doesn't exist yet, the skill bootstraps it with defaults (see §1.5) — write it back to `sources.json` and continue.
 - **Timestamps from the orchestrator footer.** Look for `PIPELINE TIMESTAMPS` and use `TODAY`, `WEEK_ID`, `MONDAY`. Standalone fallback: `eval "$(../pipeline/scripts/now.sh)"`. Do NOT compute the date manually.
-- **Output filename:** `keyword_candidates/{YYYY}/{MM}/{date}.md`. Overwrite if exists on the same day (re-runs replace — one canonical sweep per day, same as the vendor sweep).
+- **Output filename:** `research/sweeps/keyword_candidates/{YYYY}/{MM}/{date}.md`. Overwrite if exists on the same day (re-runs replace — one canonical sweep per day, same as the vendor sweep).
 - **State file:** `discovered_keywords.json` at workspace root. Read it; mutate it; write it back.
 - **Audit log:** `keyword_changes.log` at workspace root. Append-only.
 
@@ -234,10 +239,10 @@ Set `current_tier` and append to `classification_history` (cap at last 14 entrie
 
 For each candidate classified `promote` or `hot_topic`, determine which lists it should be added to using `target_lists.*.tier_hint_match`:
 
-- **news_web_search_queries** — if ≥ 50% of its mentions are in `news/` files.
+- **news_web_search_queries** — if ≥ 50% of its mentions are in `research/sources/news/` files.
 - **radar_topic_taxonomy** — if it appears across ≥ 3 distinct source types (cross-source convergence).
-- **hackernews_filter_keywords** — if it appears in `hackernews/` files OR (in `news/` AND has ≥ 2 distinct days).
-- **linkedin_pulse_queries** — if it appears in `linkedin/` files.
+- **hackernews_filter_keywords** — if it appears in `research/sources/hackernews/` files OR (in `research/sources/news/` AND has ≥ 2 distinct days).
+- **linkedin_pulse_queries** — if it appears in `research/sources/linkedin/` files.
 
 A single candidate can match multiple targets — promote to all that match. Record in `applied_to_lists`.
 
@@ -361,7 +366,7 @@ The `proven-promote` verb is the load-bearing entry — it tells the audit log "
 
 **Step E — Update discovered_keywords.json.** For every applied candidate set `applied_to_lists` and `applied_on`. For removals set `removed_on` and `removed_reason`.
 
-## 8. Write `keyword_candidates/{YYYY}/{MM}/{TODAY}.md` — change log
+## 8. Write `research/sweeps/keyword_candidates/{YYYY}/{MM}/{TODAY}.md` — change log
 
 ```markdown
 # Keyword sweep — {TODAY}
@@ -422,13 +427,13 @@ Update `last_updated: {TODAY}`. Write the full tally. Sort `keywords` keys alpha
 Find `<!-- KEYWORD_START -->` (create the section if missing — see vendor sweep for the same pattern). **Replace-don't-append behavior**: if today's entry exists, update it.
 
 ```markdown
-- [{TODAY}](keyword_candidates/{YYYY}/{MM}/{TODAY}.md) — applied: {N} promotions, {N} hot, {N} expired; pending: {N}; watch: {N}
+- [{TODAY}](research/sweeps/keyword_candidates/{YYYY}/{MM}/{TODAY}.md) — applied: {N} promotions, {N} hot, {N} expired; pending: {N}; watch: {N}
 ```
 
 ## 11. Finish
 
 One-line confirmation:
-`Saved keyword_candidates/{YYYY}/{MM}/{TODAY}.md. Auto-applied: +{N_promote_added} promotions, +{N_hot_added} hot topics, -{N_expired} expired. Tally has {total_keywords} phrases tracked. sources.json {modified|unchanged}.`
+`Saved research/sweeps/keyword_candidates/{YYYY}/{MM}/{TODAY}.md. Auto-applied: +{N_promote_added} promotions, +{N_hot_added} hot topics, -{N_expired} expired. Tally has {total_keywords} phrases tracked. sources.json {modified|unchanged}.`
 
 Do NOT post the change log to chat. Do NOT modify any source files or radar/sweep/firm-view outputs — those are read-only inputs.
 

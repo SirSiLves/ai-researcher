@@ -33,16 +33,17 @@
         <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/pipeline/scripts/add_to_notes.applescript</string>
     </array>
 
-    <!-- React to any change in the four cadence locations.
-         The AppleScript itself rebuilds all four notes regardless of which
-         path fired, so any single change is enough to refresh everything.
-         (Paths reflect the 2026-05 restructure: cadence dirs live under data/.) -->
+    <!-- React to any change in the cadence locations.
+         The AppleScript itself rebuilds all notes regardless of which path
+         fired, so any single change is enough to refresh everything.
+         (Paths reflect the 2026-05-16 publish/research restructure: published
+         cadences live under data/publish/.) -->
     <key>WatchPaths</key>
     <array>
-        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/daily</string>
-        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/weekly</string>
-        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/monthly</string>
-        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/trends.md</string>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/publish/daily</string>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/publish/weekly</string>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/publish/monthly</string>
+        <string>/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/publish/trends.md</string>
     </array>
 
     <!-- Don't fire faster than once every 10s if the orchestrator writes in bursts -->

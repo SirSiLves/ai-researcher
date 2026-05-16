@@ -24,19 +24,23 @@ A self-maintaining daily research pipeline for the LLM / Generative AI / RAG / a
 │   │                    keyword_changes.{json,log}, github_changes.{json,log}, *.bak.
 │   └── CRON_PROMPT.md   Canonical orchestrator prompt for the Cowork scheduled task.
 │
-├── data/        Everything the cron writes for downstream consumption (and what the app reads)
-│   ├── daily/   weekly/   monthly/   radar/      Cadence reports (.md + .json where applicable)
-│   ├── orgs/    {slug}.json + index.json         Firm-level coverage view
-│   ├── reports/ index.json                        Flat dated index of every cadence artifact
-│   ├── news/ papers/ blogs/ jobs/ linkedin/ github/ hackernews/    Raw collector outputs
-│   ├── vendor_candidates/ keyword_candidates/ github_candidates/   Sweep change logs
-│   └── index.md                                   Human-readable index (legacy)
+├── data/                    Split into publish/ (what humans read) and research/ (raw + internal):
+│   ├── publish/             What the web app reads + what gets published.
+│   │   ├── daily/  weekly/  monthly/  radar/   Cadence reports (.md + .json where applicable).
+│   │   ├── orgs/  {slug}.json + index.json     Firm-level coverage view.
+│   │   ├── reports/ index.json                  Flat dated index of every published cadence artifact.
+│   │   └── index.md                             Human-readable TOC (legacy).
+│   └── research/            Inputs the orchestrator reads, plus pipeline-internal change logs.
+│       ├── sources/         Raw collector outputs — never surfaced in the web app.
+│       │   └── news/  papers/  blogs/  jobs/  linkedin/  github/  hackernews/
+│       └── sweeps/          Sweep change logs (auto-applied vs `state/sources.json`).
+│           └── vendor_candidates/  keyword_candidates/  github_candidates/
 │
 └── legacy/      Pre-Angular standalone HTML (app.html, orgs.html, radar.html) kept as reference
                  for the redesign. Will be deleted once the SPA reaches feature parity.
 ```
 
-The pipeline scripts use `_lib.py`'s `REPO_ROOT / PIPELINE_DIR / STATE_DIR / DATA_ROOT` constants as the single source of truth for layout — change those if you move things again. The cron orchestrator (`pipeline/CRON_PROMPT.md`) `cd`s into `data/` first so bare paths like `daily/$YYYY/$MM/$TODAY.md` resolve correctly across every skill prompt.
+The pipeline scripts use `_lib.py`'s `PUBLISH_DIR / RESEARCH_DIR / SOURCES_DIR / SWEEPS_DIR` constants (plus per-cadence aliases like `DAILY_DIR / RADAR_DIR / ORGS_DIR`) as the single source of truth for layout — change those if you move things again. The Angular `DataService` knows the publish/sweeps split and routes requests to the right base.
 
 ## Running the app locally
 
@@ -47,9 +51,9 @@ npx ng serve           # → http://localhost:4200 — hot reload, serves data/ 
 npx ng build           # production build → app/dist/app/
 ```
 
-> **Note on the LaunchAgent.** `pipeline/scripts/com.yves.ai-digest-to-notes.plist` watches `data/daily`, `data/weekly`, `data/monthly`, `data/trends.md` (paths updated after the 2026-05 restructure). The installed copy at `~/Library/LaunchAgents/com.yves.ai-digest-to-notes.plist` still has the OLD paths — re-copy + reload after the restructure: `launchctl unload ~/Library/LaunchAgents/com.yves.ai-digest-to-notes.plist && cp pipeline/scripts/com.yves.ai-digest-to-notes.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.yves.ai-digest-to-notes.plist`.
+> **Note on the LaunchAgent.** `pipeline/scripts/com.yves.ai-digest-to-notes.plist` watches `data/publish/daily`, `data/publish/weekly`, `data/publish/monthly`, `data/publish/trends.md` (post-2026-05-16 restructure). After updating, re-copy + reload the installed plist: `launchctl unload ~/Library/LaunchAgents/com.yves.ai-digest-to-notes.plist && cp pipeline/scripts/com.yves.ai-digest-to-notes.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.yves.ai-digest-to-notes.plist`.
 
-> **The sections below describe the pipeline in detail.** Path examples (`daily/...`, `scripts/now.sh`, `sources.json`) still use the pre-restructure form for historical reasons; mentally substitute `data/daily/...`, `pipeline/scripts/now.sh`, `pipeline/state/sources.json`. The scripts and SKILL files themselves are already updated.
+> **The sections below describe the pipeline in detail.** Path examples (`daily/...`, `radar/...`) are written cadence-relative; substitute `data/publish/daily/...` for the publish-side and `data/research/sources/news/...` / `data/research/sweeps/vendor_candidates/...` for the research-side.
 
 The whole point: **be a step ahead.** Reactive ingestion (news, papers, blogs, jobs, LinkedIn) is necessary but not sufficient. The pipeline adds earlier signals (GitHub trending, Hacker News, vendor velocity) and analytical layers (radar with dual-EMA persistence + cross-source breadth + co-mention clusters) so the long-term shifts are visible alongside the daily news.
 

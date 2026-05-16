@@ -9,9 +9,11 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ButtonModule } from 'primeng/button';
+import { Tag } from 'primeng/tag';
 
 import { DataService, ReportEntry } from '../../services/data.service';
 import { MarkdownViewer } from '../../components/markdown-viewer/markdown-viewer';
+import { PageHeader } from '../../components/page-header/page-header';
 
 @Component({
   selector: 'app-reports',
@@ -20,8 +22,8 @@ import { MarkdownViewer } from '../../components/markdown-viewer/markdown-viewer
     FormsModule,
     TableModule, Skeleton, Drawer,
     MultiSelect, InputText, IconField, InputIcon,
-    ToggleSwitch, ButtonModule,
-    MarkdownViewer
+    ToggleSwitch, ButtonModule, Tag,
+    MarkdownViewer, PageHeader
   ],
   templateUrl: './reports.html',
   styleUrl: './reports.scss',
@@ -41,11 +43,23 @@ export class ReportsPage {
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
 
+  // Library is the published-content archive. Pipeline-internal sweep change-logs
+  // (vendor/keyword/github candidates) are excluded — those live on the Sweeps page.
+  private static readonly PUBLISH_CADENCES = new Set(['daily', 'weekly', 'monthly', 'radar']);
+
+  readonly publishEntries = computed(() =>
+    this.entries().filter(e => ReportsPage.PUBLISH_CADENCES.has(e.cadence))
+  );
+
+  readonly publishCadences = computed(() =>
+    this.cadences().filter(c => ReportsPage.PUBLISH_CADENCES.has(c))
+  );
+
   readonly filtered = computed(() => {
     const q = this.query().toLowerCase().trim();
     const cads = this.activeCadences();
     const showVer = this.showVersioned();
-    return this.entries().filter(e => {
+    return this.publishEntries().filter(e => {
       if (!showVer && e.is_versioned) return false;
       if (cads.length && !cads.includes(e.cadence)) return false;
       if (!q) return true;
@@ -54,7 +68,7 @@ export class ReportsPage {
   });
 
   readonly cadenceOptions = computed(() =>
-    this.cadences().map(c => ({ label: this.cadenceLabel(c), value: c }))
+    this.publishCadences().map(c => ({ label: this.cadenceLabel(c), value: c }))
   );
 
   constructor() {

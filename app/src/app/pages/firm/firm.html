@@ -1,0 +1,230 @@
+<section class="page firm">
+  @if (loading() && !detail()) {
+    <p-skeleton width="40%" height="2.5rem"></p-skeleton>
+    <p-skeleton width="20%" height="0.9rem"></p-skeleton>
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+  }
+
+  @if (error(); as e) {
+    <p class="firm__error">{{ e }}</p>
+    <p><a routerLink="/firms" class="firm__back">← Back to Firms</a></p>
+  }
+
+  @if (detail(); as d) {
+    <app-page-header
+        [title]="d.slug"
+        [subtitle]="firmSubtitle(d)"
+        [model]="breadcrumb()">
+      @if (d.velocity; as v) {
+        <div class="firm__velo-meta">
+          <div class="stat">
+            <span class="stat__label">Velocity 7d</span>
+            <span class="stat__value tabular">{{ v.velocity_7d }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat__label">28d avg</span>
+            <span class="stat__value tabular">{{ v.velocity_28d_avg | number:'1.1-1' }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat__label">Ratio</span>
+            <span class="stat__value tabular">{{ v.velocity_ratio | number:'1.2-2' }}×</span>
+          </div>
+          <p-tag [value]="statusLabel(v.velocity_status)"
+                 [severity]="statusSeverity(v.velocity_status)" />
+        </div>
+      }
+    </app-page-header>
+
+    @if (aliases().length) {
+      <p class="firm__aliases">
+        <span class="firm__aliases-label">also known as</span>
+        @for (a of aliases(); track a) {
+          <span class="firm__alias">{{ a }}</span>
+        }
+      </p>
+    }
+
+    <!-- Mentions over full window -->
+    @if (mentionsSeries().length > 1) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Mentions per day</h2>
+          <span class="section__hint">{{ mentionsBars().days }} days · max {{ mentionsBars().max }} mentions in a day</span>
+        </header>
+        <div class="firm__chart">
+          <svg [attr.viewBox]="'0 0 ' + mentionsBars().w + ' ' + mentionsBars().h"
+               preserveAspectRatio="none" class="firm__bars-svg" aria-hidden="true">
+            @for (b of mentionsBars().rects; track b.date) {
+              <rect [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h" rx="1" class="firm__bar"
+                    [attr.data-date]="b.date" [attr.data-n]="b.n">
+                <title>{{ b.date }} · {{ b.n }}</title>
+              </rect>
+            }
+          </svg>
+          <div class="firm__chart-axis">
+            <span class="tabular">{{ mentionsSeries()[0].date }}</span>
+            <span class="tabular">{{ mentionsSeries()[mentionsSeries().length - 1].date }}</span>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- Velocity over time -->
+    @if (velocitySeries().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Velocity over time</h2>
+          <span class="section__hint">{{ velocitySeries().length }} days · mentions/7d (dark) and velocity ratio (warm)</span>
+        </header>
+        <div class="firm__chart">
+          <svg viewBox="0 0 320 70" preserveAspectRatio="none" class="firm__chart-svg">
+            <path class="firm__line firm__line--v7" [attr.d]="velocityPath()" />
+            <path class="firm__line firm__line--ratio" [attr.d]="ratioPath()" />
+          </svg>
+          <div class="firm__chart-axis">
+            <span class="tabular">{{ velocitySeries()[0].date }}</span>
+            <span class="tabular">{{ velocitySeries()[velocitySeries().length - 1].date }}</span>
+          </div>
+          <p class="firm__sparkstr tabular">{{ velocitySparkStr() }}</p>
+        </div>
+      </section>
+    }
+
+    @if (storiesForFirm().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Active in stories</h2>
+          <span class="section__hint">themes where this firm appears today, ranked by topic overlap</span>
+        </header>
+        <ul class="firm__stories">
+          @for (s of storiesForFirm(); track s.id) {
+            <li>
+              <a [routerLink]="['/stories', s.id]" class="firm__story">
+                <i class="pi pi-sitemap"></i>
+                <span class="firm__story-name">{{ s.name }}</span>
+                <span class="firm__story-meta tabular">{{ s.topicCount }} topic{{ s.topicCount === 1 ? '' : 's' }}</span>
+                <i class="pi pi-arrow-right firm__story-arrow"></i>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <div class="cols-2">
+      @if (sourceMeter().length) {
+        <section class="section">
+          <header class="section__head">
+            <h2 class="section__title">Source mix</h2>
+            <span class="section__hint">what kinds of sources cover this firm</span>
+          </header>
+          <p-metergroup [value]="sourceMeter()" labelPosition="end" />
+        </section>
+      }
+
+      @if (topicMixSorted().length) {
+        <section class="section">
+          <header class="section__head">
+            <h2 class="section__title">Topic mix</h2>
+            <span class="section__hint">top topics co-occurring with this firm</span>
+          </header>
+          <ul class="firm__topics">
+            @for (t of topicMixSorted(); track t.topic) {
+              <li>
+                <span class="firm__topic-name" [title]="t.topic">{{ t.topic }}</span>
+                <p-progressbar
+                    [value]="(t.n / topicMixSorted()[0].n) * 100"
+                    [showValue]="false"
+                    styleClass="firm__topic-bar" />
+                <span class="tabular muted">{{ t.n }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+
+    @if (radarAppearances().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Radar appearances</h2>
+          <span class="section__hint">days this firm showed in a topic's 7-day breadth</span>
+        </header>
+        <ul class="firm__appearances">
+          @for (a of radarAppearances().slice(0, 7); track a.date) {
+            <li class="firm__appear">
+              <span class="tabular firm__appear-date">{{ a.date }}</span>
+              <ul class="firm__appear-topics">
+                @for (t of a.topics.slice(0, 4); track t.topic_id) {
+                  <li>
+                    <a [routerLink]="['/radar/topic', t.topic_id]" class="firm__topic-link">
+                      {{ t.topic_label }}
+                    </a>
+                    @if (t.sector) {
+                      <span class="muted"> · {{ t.sector }}</span>
+                    }
+                  </li>
+                }
+                @if (a.topics.length > 4) {
+                  <li class="muted italic">+{{ a.topics.length - 4 }} more</li>
+                }
+              </ul>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (hotEvents().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Hot events</h2>
+          <span class="section__hint">days flagged by the velocity surge or hot-keyword path</span>
+        </header>
+        <ul class="firm__hot">
+          @for (e of hotEvents(); track e.date) {
+            <li class="firm__hot-row">
+              <span class="tabular">{{ e.date }}</span>
+              @if (e.ratio) {
+                <p-tag [value]="(e.ratio | number:'1.1-1') + '× surge'" severity="success" />
+              }
+              <span class="muted italic">{{ e.reason }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (classificationHistory().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Classification history</h2>
+          <span class="section__hint">last sweep verdicts</span>
+        </header>
+        <ul class="firm__classifications">
+          @for (c of classificationHistory().slice(0, 10); track c.date) {
+            <li class="firm__class-row">
+              <span class="tabular">{{ c.date }}</span>
+              <p-tag [value]="c.tier ?? ''" severity="secondary" />
+              <span class="muted italic">{{ c.reason }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (d.context_samples?.length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Recent context</h2>
+          <span class="section__hint">snippets from source files</span>
+        </header>
+        <ul class="firm__context">
+          @for (c of d.context_samples!; track $index) {
+            <li>{{ c }}</li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</section>

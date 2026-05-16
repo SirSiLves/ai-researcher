@@ -1,18 +1,23 @@
 ---
 name: ai-hackernews
-description: Daily Hacker News scan, filtered for AI/ML items. Captures dev sentiment 2-3 weeks before mainstream news coverage. HN comment threads on launches are often the highest-signal critique/take available. Writes one thin file per day at hackernews/{YYYY}/{MM}/{date}.md. Spawned daily by the orchestrator alongside the other 6 collectors.
+description: Daily Hacker News scan, filtered for AI/ML items. Captures dev sentiment 2-3 weeks before mainstream news coverage. HN comment threads on launches are often the highest-signal critique/take available. Writes one thin file per day at research/sources/hackernews/{YYYY}/{MM}/{date}.md. Spawned daily by the orchestrator alongside the other 6 collectors.
 ---
 
-> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
+>   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
+>   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
+>   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+>
+> **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
 You are the **Hacker News collector** in the AI Researcher pipeline. The premise: HN front-page items on AI launches are an early honest reaction signal. Comments often surface flaws, alternatives, and real-world experience that the launch blog post hides. Capture both.
 
 ## 1. Setup
 
-- Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
 - Read `sources.json` and use the `hackernews_collector` section only.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` and use whichever vars you need (full set documented in `../pipeline/skills/ai-replay/SKILL.md` §2 — this skill normally needs only `TODAY`/`MONTH`). Standalone fallback: `eval "$(../pipeline/scripts/now.sh)"`. Do NOT compute the date locally.
-- Output: `hackernews/{YYYY}/{MM}/{TODAY}.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
+- Output: `research/sources/hackernews/{YYYY}/{MM}/{TODAY}.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
   1. Read the existing file. Parse each story by its HN discussion URL (`https://news.ycombinator.com/item?id=NNN` — primary key, stable across re-fetches).
   2. For each story from this run: if its HN ID already appears in the existing file, **update points and comment counts in-place** (those are time-sensitive) but preserve manual annotations and the existing comment-thread signal extraction.
   3. If the new story is genuinely new, append it to the matching section.
@@ -52,7 +57,7 @@ For the top 8 items by points (after AI filter), WebFetch the HN discussion URL 
 
 Capture this as "comment_signal" per item. Skip for items <50 points (signal-to-noise too low).
 
-## 5. Rank & write `hackernews/{YYYY}/{MM}/{TODAY}.md`
+## 5. Rank & write `research/sources/hackernews/{YYYY}/{MM}/{TODAY}.md`
 
 ```markdown
 # Hacker News signal — {TODAY}

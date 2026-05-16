@@ -1,0 +1,11 @@
+.month {
+  &__error { color: var(--neg); }
+  &__skeleton { display: grid; gap: 1rem; }
+  :host ::ng-deep .month__picker .p-select-label {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    padding: 0.4rem 0.65rem;
+  }
+  :host ::ng-deep .month__picker { min-width: 11rem; }
+}

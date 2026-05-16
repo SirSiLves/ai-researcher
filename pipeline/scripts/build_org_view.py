@@ -33,7 +33,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from _lib import iter_source_files, whole_word_pattern, REPO_ROOT, STATE_DIR, DATA_ROOT
+from _lib import iter_source_files, whole_word_pattern, REPO_ROOT, STATE_DIR, DATA_ROOT, RADAR_DIR, ORGS_DIR
 
 ROOT = REPO_ROOT  # back-compat alias for downstream `path.relative_to(ROOT)` calls
 # Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
@@ -316,7 +316,7 @@ def main():
 
     # Load radar JSONs once
     radar_jsons = []
-    radar_dir = DATA_ROOT / "radar"
+    radar_dir = RADAR_DIR
     if radar_dir.exists():
         for rp in sorted(radar_dir.rglob("*.json")):
             if rp.name == "index.json":
@@ -329,8 +329,8 @@ def main():
     print(f"[build_org_view] building per-org files for {len(all_orgs)} orgs…", file=sys.stderr)
 
     # Ensure orgs/ exists
-    orgs_dir = DATA_ROOT / "orgs"
-    orgs_dir.mkdir(exist_ok=True)
+    orgs_dir = ORGS_DIR
+    orgs_dir.mkdir(parents=True, exist_ok=True)
 
     index_entries = []
     for slug, entry in all_orgs.items():

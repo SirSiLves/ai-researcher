@@ -23,9 +23,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APPLESCRIPT="$SCRIPT_DIR/add_to_notes.applescript"
-# After the 2026-05 restructure the daily/weekly/monthly markdown lives under
-# data/. SCRIPT_DIR/../.. lands on the repo root; data/ is its child.
-WORKSPACE="$(cd "$SCRIPT_DIR/../../data" && pwd)"
+# After the 2026-05-16 publish/research restructure, daily/weekly/monthly
+# markdown lives under data/publish/. SCRIPT_DIR/../.. lands on the repo
+# root; data/publish/ is its child.
+WORKSPACE="$(cd "$SCRIPT_DIR/../../data/publish" && pwd)"
 
 if [[ ! -f "$APPLESCRIPT" ]]; then
   echo "error: $APPLESCRIPT not found" >&2

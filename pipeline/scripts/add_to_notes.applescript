@@ -22,11 +22,11 @@
 -- layout pass). Notes operations are cheap; skipping logic isn't.
 
 on run argv
-	-- After the 2026-05 restructure: cadence files live under data/, and
-	-- scripts live under pipeline/scripts/. workspaceFolder is the cadence
-	-- root that callers pass relative paths against (daily/…, weekly/…).
+	-- After the 2026-05-16 publish/research restructure: published cadences
+	-- live under data/publish/. workspaceFolder is the cadence root that
+	-- callers pass relative paths against (daily/…, weekly/…, monthly/…).
 	set repoFolder to (POSIX path of (path to home folder)) & "Documents/Claude/Projects/AI Researcher/"
-	set workspaceFolder to repoFolder & "data/"
+	set workspaceFolder to repoFolder & "data/publish/"
 	set renderScript to repoFolder & "pipeline/scripts/render_for_notes.sh"
 
 	tell application "Notes"

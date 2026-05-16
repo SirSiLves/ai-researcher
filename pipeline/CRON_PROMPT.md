@@ -32,15 +32,19 @@ files rather than producing -v2 variants — this is non-negotiable.
 ## 1. Setup
 
 - Repo root: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
-- Layout (post-2026-05 restructure):
+- Layout (post-2026-05-16 publish/research restructure):
   - `pipeline/scripts/` — Python helpers + `now.sh`
   - `pipeline/skills/`  — collector / synthesizer skill prompts
   - `pipeline/state/`   — `sources.json`, `discovered_*.json`, `*_changes.{json,log}`, `*.bak`
-  - `data/` — every output directory (`daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`,
-    `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`,
-    `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md`)
-- **Set working directory to `data/`** for the rest of the run so bare paths
-  like `daily/$YYYY/$MM/$TODAY.md` resolve correctly in spawned skill prompts.
+  - `data/publish/`     — what humans read + what the web app loads:
+    `daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`, `reports/`, `index.md`
+  - `data/research/sources/` — raw collector dumps (NEVER published):
+    `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`
+  - `data/research/sweeps/`  — pipeline-internal change logs:
+    `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`
+- **Set working directory to `data/`** for the rest of the run. Each spawned
+  skill writes into the right subtree by prefixing its bare path with
+  `publish/`, `research/sources/`, or `research/sweeps/`.
   Scripts can still be invoked from anywhere via their absolute or repo-relative
   path (e.g. `python3 ../pipeline/scripts/run_keyword_sweep.py`).
   ```bash
@@ -54,13 +58,27 @@ files rather than producing -v2 variants — this is non-negotiable.
   `SUNDAY`, `PREV_WEEK_ID`, `DOW_ISO`, `IS_MONDAY`,
   `IS_FIRST_MONDAY_OF_MONTH`, `ISO_TS`, `AS_OF`. **All subagents must trust
   these values** — pass them in the `PIPELINE TIMESTAMPS` footer.
-- Ensure target folders exist under `data/` (idempotent):
+- Ensure target folders exist (idempotent):
   ```bash
-  mkdir -p "news/$YYYY/$MM" "papers/$YYYY/$MM" "blogs/$YYYY/$MM" \
-           "jobs/$YYYY/$MM" "linkedin/$YYYY/$MM" "github/$YYYY/$MM" \
-           "hackernews/$YYYY/$MM" "daily/$YYYY/$MM" "radar/$YYYY/$MM" \
-           "vendor_candidates/$YYYY/$MM" "keyword_candidates/$YYYY/$MM" \
-           "github_candidates/$YYYY/$MM" "weekly/$YYYY" "monthly/$YYYY" "orgs"
+  # research-side: raw collector dumps
+  mkdir -p "research/sources/news/$YYYY/$MM" \
+           "research/sources/papers/$YYYY/$MM" \
+           "research/sources/blogs/$YYYY/$MM" \
+           "research/sources/jobs/$YYYY/$MM" \
+           "research/sources/linkedin/$YYYY/$MM" \
+           "research/sources/github/$YYYY/$MM" \
+           "research/sources/hackernews/$YYYY/$MM"
+  # research-side: sweep change logs
+  mkdir -p "research/sweeps/vendor_candidates/$YYYY/$MM" \
+           "research/sweeps/keyword_candidates/$YYYY/$MM" \
+           "research/sweeps/github_candidates/$YYYY/$MM"
+  # publish-side: cadence reports + firm view
+  mkdir -p "publish/daily/$YYYY/$MM" \
+           "publish/radar/$YYYY/$MM" \
+           "publish/weekly/$YYYY" \
+           "publish/monthly/$YYYY" \
+           "publish/orgs" \
+           "publish/reports"
   ```
 - **No user confirmation step** (cron has no user). Proceed directly to §2.
 
@@ -87,8 +105,12 @@ ISO_TS={ISO_TS}
 INVOCATION=ai-daily-research (cron)
 MERGE_MODE=true
 
-REPO LAYOUT (post-2026-05 restructure):
-- CWD is `data/` (every bare output path resolves here: daily/, weekly/, orgs/, radar/, etc.)
+REPO LAYOUT (post-2026-05-16 publish/research restructure):
+- CWD is `data/`. Output paths resolve under one of three subtrees:
+  - `publish/`           — daily/, weekly/, monthly/, radar/, orgs/, reports/, index.md
+  - `research/sources/`  — news/, papers/, blogs/, jobs/, linkedin/, github/, hackernews/
+  - `research/sweeps/`   — vendor_candidates/, keyword_candidates/, github_candidates/
+  Always prefix the SKILL's bare cadence path with the correct subtree.
 - State files (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`,
   `github_stars.json`, `vendor_changes.{log,json}`, `keyword_changes.{log,json}`,
   `github_changes.{log,json}`, `sources.json.{vendor,keyword,github}.bak`) live at

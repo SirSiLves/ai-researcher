@@ -1,65 +1,144 @@
 <section class="page today">
-  <header class="page-head">
-    <div>
-      <h1 class="page-head__title">Today</h1>
-      <p class="page-head__sub">Daily AI research briefing · one ranked digest per day</p>
+  <app-page-header
+      title="Today's briefing"
+      [subtitle]="formattedDate() + ' · daily digest'"
+      [model]="[{label:'Today'}, {label:'Briefing'}]">
+    <button pButton type="button" text size="small"
+            (click)="prev()" [disabled]="!canPrev()" aria-label="Older edition">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+    <p-datepicker [ngModel]="selectedDateValue()"
+                  (ngModelChange)="pickFromCalendar($event)"
+                  [minDate]="minDateValue()!"
+                  [maxDate]="maxDateValue()!"
+                  [dateFormat]="'yy-mm-dd'"
+                  [readonlyInput]="true"
+                  [showIcon]="true"
+                  appendTo="body"
+                  styleClass="today__datepicker"
+                  inputId="today-date" />
+    <button pButton type="button" text size="small"
+            (click)="next()" [disabled]="!canNext()" aria-label="Newer edition">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+    <a routerLink="/archive" pButton outlined size="small">Archive</a>
+    <app-maturity-badge [compact]="true" />
+  </app-page-header>
+
+  @if (kpis(); as k) {
+    <div class="today__kpis">
+      <app-stat-card label="Topics tracked"
+                     [value]="k.topics.value"
+                     icon="compass"
+                     tone="accent"
+                     [delta]="k.topics.delta"
+                     [sparkline]="k.topics.spark" />
+      <app-stat-card label="Surging"
+                     [value]="k.surging.value"
+                     icon="arrow-up-right"
+                     tone="success"
+                     [delta]="k.surging.delta"
+                     [sparkline]="k.surging.spark" />
+      <app-stat-card label="Rising direction"
+                     [value]="k.rising.value"
+                     icon="chart-line"
+                     tone="info"
+                     [delta]="k.rising.delta"
+                     [sparkline]="k.rising.spark" />
+      <app-stat-card label="High breadth"
+                     [value]="k.breadth.value"
+                     icon="users"
+                     tone="warn"
+                     [delta]="k.breadth.delta"
+                     [sparkline]="k.breadth.spark" />
     </div>
-    @if (current(); as c) {
-      <div class="page-head__meta">
-        <span class="tabular">{{ c.date_id }}</span>
-        <span>·</span>
-        <span>{{ formattedDate() }}</span>
-        <span>·</span>
-        <span><strong>{{ dailies().length }}</strong> editions</span>
-      </div>
-    }
-  </header>
+  }
 
-  <div class="today__layout">
-    <aside class="today__sidebar" aria-label="Edition archive">
-      <div class="today__sidebar-head">
-        <span class="today__sidebar-label">{{ dailies().length }} editions</span>
-        <div class="today__nav">
-          <button class="btn btn--ghost" (click)="next()" [disabled]="!canNext()" type="button" aria-label="Newer edition">↑</button>
-          <button class="btn btn--ghost" (click)="prev()" [disabled]="!canPrev()" type="button" aria-label="Older edition">↓</button>
+  @if (stageShifts().length) {
+    <section class="today__shifts surface">
+      <header class="today__shifts-head">
+        <h2 class="today__shifts-title">Stage shifts</h2>
+        <p class="today__shifts-deck muted">Topics that crossed a stage threshold today.</p>
+      </header>
+      <ul class="today__shifts-list">
+        @for (s of stageShifts(); track s.topic) {
+          <li class="today__shift">
+            <span class="today__shift-topic">{{ s.topic }}</span>
+            <span class="today__shift-arrow">
+              <em class="muted">{{ s.from }}</em>
+              <i class="pi pi-arrow-right"></i>
+              <strong>{{ s.to }}</strong>
+            </span>
+            @if (s.reason) { <span class="today__shift-reason muted italic">{{ s.reason }}</span> }
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (stories().length) {
+    <section class="today__stories-block surface">
+      <header class="today__stories-head">
+        <div>
+          <h2 class="today__stories-title">Today's stories</h2>
+          <p class="today__stories-deck muted">Themes the radar is grouping. Click for the full thread.</p>
         </div>
+        <a routerLink="/stories" class="today__stories-all">All stories →</a>
+      </header>
+      <div class="today__stories-grid">
+        @for (s of stories(); track s.cluster.id) {
+          <a class="today__story"
+             [routerLink]="['/stories', s.cluster.id]">
+            <div class="today__story-head">
+              <h3 class="today__story-title">{{ s.cluster.name }}</h3>
+              <span class="today__story-delta"
+                    [class.is-pos]="s.delta > 0"
+                    [class.is-neg]="s.delta < 0">
+                @if (s.delta > 0) { <i class="pi pi-arrow-up-right"></i> }
+                @else if (s.delta < 0) { <i class="pi pi-arrow-down-right"></i> }
+                {{ s.delta > 0 ? '+' : '' }}{{ s.delta | number:'1.0-1' }}
+              </span>
+            </div>
+            <p class="today__story-meta">
+              <span class="tabular">{{ s.topics.length }} topics</span>
+              <span class="muted">·</span>
+              <span class="tabular">{{ s.cluster.cluster_breadth_7d }} orgs</span>
+            </p>
+            @if (s.spark.length > 1) {
+              <svg viewBox="0 0 120 28" preserveAspectRatio="none" class="today__story-spark" aria-hidden="true">
+                <path [attr.d]="sparkPath(s.spark, 120, 28)"
+                      fill="none"
+                      stroke="var(--accent)"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round" />
+              </svg>
+            }
+            @if (s.topFirms.length) {
+              <div class="today__story-firms">
+                @for (f of s.topFirms.slice(0, 4); track f) {
+                  <span class="today__story-firm">{{ f }}</span>
+                }
+              </div>
+            }
+          </a>
+        }
       </div>
+    </section>
 
-      <p-listbox [options]="dailies()"
-                 [ngModel]="selectedDate()"
-                 (ngModelChange)="onPick($event)"
-                 optionLabel="date_id"
-                 optionValue="date_id"
-                 [filter]="true"
-                 filterPlaceholder="Filter dates"
-                 styleClass="today__listbox"
-                 [listStyle]="{ 'max-height': 'calc(100vh - 240px)' }">
-        <ng-template #item let-d>
-          <div class="today__listitem" [class.is-current]="d.date_id === selectedDate()">
-            <span class="today__listdate tabular">{{ d.date_id.slice(5) }}</span>
-            <span class="today__listheadline">{{ d.headline || '—' }}</span>
-          </div>
-        </ng-template>
-      </p-listbox>
-    </aside>
+  }
 
-    <article class="today__article">
-      @if (error(); as e) {
-        <p class="today__error">{{ e }}</p>
+  @if (error(); as e) {
+    <p class="today__error">{{ e }}</p>
+  }
+
+  @if (loading() && !markdown()) {
+    <div class="today__skeleton-grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <p-skeleton width="100%" height="9rem"></p-skeleton>
       }
-
-      @if (loading() && !markdown()) {
-        <div class="today__skeleton">
-          <p-skeleton width="50%" height="1.6rem"></p-skeleton>
-          <p-skeleton width="32%" height="0.85rem"></p-skeleton>
-          <p-skeleton width="100%" height="0.9rem"></p-skeleton>
-          <p-skeleton width="93%" height="0.9rem"></p-skeleton>
-          <p-skeleton width="97%" height="0.9rem"></p-skeleton>
-          <p-skeleton width="80%" height="0.9rem"></p-skeleton>
-        </div>
-      } @else if (markdown()) {
-        <app-markdown-viewer [source]="markdown()" />
-      }
-    </article>
-  </div>
+    </div>
+  } @else if (markdown()) {
+    <app-article-cards [source]="markdown()" />
+  }
 </section>

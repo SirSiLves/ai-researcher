@@ -8,13 +8,18 @@ Three small utilities live here so build_org_view.py and run_keyword_sweep.py
   - iter_source_files(root)              yield (Path, source_type, YYYY-MM-DD) for every dated .md
   - whole_word_pattern(alias)            case-insensitive whole-wordish regex
 
-Layout anchors used by every pipeline script after the 2026-05 restructure:
+Layout anchors after the 2026-05-16 publish/research restructure:
 
-  - REPO_ROOT    = parent of pipeline/, data/, webapp/, legacy/
-  - PIPELINE_DIR = REPO_ROOT/pipeline       (scripts + skills + CRON_PROMPT.md live here)
-  - STATE_DIR    = REPO_ROOT/pipeline/state (sources.json, discovered_*, *_changes, .bak)
-  - DATA_ROOT    = REPO_ROOT/data           (daily/, weekly/, orgs/, radar/, news/, …)
-  - INDEX_MD     = REPO_ROOT/data/index.md  (human-readable index)
+  - REPO_ROOT    = parent of pipeline/, data/, app/, legacy/
+  - PIPELINE_DIR = REPO_ROOT/pipeline                       (scripts + skills + CRON_PROMPT.md)
+  - STATE_DIR    = REPO_ROOT/pipeline/state                 (sources.json, discovered_*, .bak)
+  - DATA_ROOT    = REPO_ROOT/data                           (top-level data dir)
+  - PUBLISH_DIR  = REPO_ROOT/data/publish                   (what the web app reads + humans publish)
+  - RESEARCH_DIR = REPO_ROOT/data/research                  (raw inputs + pipeline-internal change logs)
+  - SOURCES_DIR  = REPO_ROOT/data/research/sources          (raw collector dumps)
+  - SWEEPS_DIR   = REPO_ROOT/data/research/sweeps           (vendor/keyword/github sweep change logs)
+  - DAILY_DIR    = PUBLISH_DIR/daily   WEEKLY_DIR/MONTHLY_DIR/RADAR_DIR/ORGS_DIR/REPORTS_DIR analogous
+  - INDEX_MD     = PUBLISH_DIR/index.md                     (human-readable TOC)
 
 bootstrap_discovered_orgs.py intentionally does NOT import this — it's a
 one-shot historical artifact with a narrower SOURCE_DIRS scope, frozen in
@@ -27,8 +32,26 @@ PIPELINE_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT    = PIPELINE_DIR.parent
 STATE_DIR    = PIPELINE_DIR / "state"
 DATA_ROOT    = REPO_ROOT / "data"
-INDEX_MD     = DATA_ROOT / "index.md"
+PUBLISH_DIR  = DATA_ROOT / "publish"
+RESEARCH_DIR = DATA_ROOT / "research"
+SOURCES_DIR  = RESEARCH_DIR / "sources"
+SWEEPS_DIR   = RESEARCH_DIR / "sweeps"
+DAILY_DIR    = PUBLISH_DIR / "daily"
+WEEKLY_DIR   = PUBLISH_DIR / "weekly"
+MONTHLY_DIR  = PUBLISH_DIR / "monthly"
+RADAR_DIR    = PUBLISH_DIR / "radar"
+ORGS_DIR     = PUBLISH_DIR / "orgs"
+REPORTS_DIR  = PUBLISH_DIR / "reports"
+INDEX_MD     = PUBLISH_DIR / "index.md"
 
+# Publish-side cadences (what humans read)
+PUBLISH_CADENCES = ["daily", "weekly", "monthly", "radar"]
+
+# Research-side sweeps (pipeline-internal change logs)
+SWEEP_CADENCES   = ["vendor_candidates", "keyword_candidates", "github_candidates"]
+
+# Folders the source-mining helpers walk. Note: `daily` lives in PUBLISH_DIR; the
+# others live in SOURCES_DIR. iter_source_files() handles the split.
 SOURCE_DIRS = ["news", "papers", "blogs", "jobs", "linkedin", "daily", "github", "hackernews"]
 
 SOURCE_TYPE_FROM_DIR = {
@@ -45,14 +68,23 @@ SOURCE_TYPE_FROM_DIR = {
 _DATE_PREFIX_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})")
 
 
-def iter_source_files(root: Path):
+def _source_dir_path(top: str) -> Path:
+    """`daily/` is publish-side; everything else is research-side."""
+    if top == "daily":
+        return DAILY_DIR
+    return SOURCES_DIR / top
+
+
+def iter_source_files(root: Path | None = None):
     """Yield (path, source_type, file_date_iso) for every dated source markdown.
 
     Handles both `YYYY-MM-DD.md` and `YYYY-MM-DD-vN.md` naming. Skips files
-    whose name doesn't match — e.g. README.md inside a source dir.
+    whose name doesn't match — e.g. README.md inside a source dir. The `root`
+    argument is kept for backwards compatibility (callers pass DATA_ROOT) but
+    the resolved per-folder paths come from the publish/research split.
     """
     for top in SOURCE_DIRS:
-        base = root / top
+        base = _source_dir_path(top)
         if not base.exists():
             continue
         for p in base.rglob("*.md"):

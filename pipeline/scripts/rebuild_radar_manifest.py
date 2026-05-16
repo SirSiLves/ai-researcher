@@ -5,18 +5,19 @@ Idempotent — scans the radar tree every time. Consumed by the webapp.
 Called at the end of every ai-trend-radar run (and any backfill wave)
 so manual additions / deletions / backfills are reflected.
 
-Paths stored in the manifest are RELATIVE TO DATA_ROOT (e.g. `radar/2026/05/
-2026-05-14.json`) — the webapp prepends `data/` when fetching.
+Paths stored in the manifest are RELATIVE TO PUBLISH_DIR (e.g. `radar/2026/05/
+2026-05-14.json`) — the webapp's DataService prepends `data/publish/` when
+fetching publish-side artefacts.
 """
 
 import json
 import sys
 
-from _lib import DATA_ROOT
+from _lib import PUBLISH_DIR, RADAR_DIR
 
 
 def main() -> int:
-    radar_dir = DATA_ROOT / "radar"
+    radar_dir = RADAR_DIR
     entries = []
     for path in sorted(radar_dir.rglob("*.json")):
         if path.name == "index.json":
@@ -25,7 +26,7 @@ def main() -> int:
         try:
             with open(path) as handle:
                 data = json.load(handle)
-            rel_json = path.relative_to(DATA_ROOT).as_posix()
+            rel_json = path.relative_to(PUBLISH_DIR).as_posix()
             rel_md = rel_json.replace(".json", ".md")
             entries.append(
                 {

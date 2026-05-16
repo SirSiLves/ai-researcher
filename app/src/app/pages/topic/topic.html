@@ -1,0 +1,158 @@
+<section class="page topic">
+  @if (loading() && !topic()) {
+    <p-skeleton width="40%" height="2.5rem"></p-skeleton>
+    <p-skeleton width="20%" height="0.9rem"></p-skeleton>
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+  }
+
+  @if (error(); as e) {
+    <p class="topic__error">{{ e }}</p>
+    <p><a routerLink="/radar" class="topic__back">← Back to Radar</a></p>
+  }
+
+  @if (topic(); as t) {
+    <app-page-header
+        [title]="t.label"
+        [model]="breadcrumb()">
+      <span class="muted">first seen <strong class="tabular">{{ t.first_seen }}</strong></span>
+      <span class="muted"><strong>{{ t.sustained_days }}d</strong> sustained</span>
+      <span class="muted"><strong>{{ t.breadth_7d }}</strong> orgs · 7d</span>
+    </app-page-header>
+    <p class="topic__deck">
+      <span class="dot" [ngClass]="directionDot(t.direction)"></span>
+      {{ t.direction }} · stage {{ t.stage }} · loudness <strong>{{ t.score_fast | number:'1.0-1' }}</strong>
+    </p>
+
+    @if (t.cluster_id) {
+      <a class="topic__story-pill" [routerLink]="['/stories', t.cluster_id]">
+        <i class="pi pi-sitemap"></i>
+        <span>Part of story</span>
+        <strong>{{ clusterName() }}</strong>
+        <i class="pi pi-arrow-right"></i>
+      </a>
+    }
+
+    <!-- Time lens: dual-axis chart over loaded history -->
+    <section class="section">
+      <header class="section__head">
+        <h2 class="section__title">Persistence + breadth, over time</h2>
+        <span class="section__hint">{{ series().length }} radar snapshots loaded · fast EMA (dark) + slow EMA (faded) on the left, breadth orgs on the right</span>
+      </header>
+
+      <div class="topic__chart" role="img" aria-label="Persistence and breadth over time">
+        <svg viewBox="0 0 320 80" preserveAspectRatio="none" class="topic__chart-svg">
+          <path class="topic__line topic__line--slow" [attr.d]="slowPath()" />
+          <path class="topic__line topic__line--fast" [attr.d]="seriesPath()" />
+          <path class="topic__line topic__line--breadth" [attr.d]="breadthPath()" />
+        </svg>
+        <div class="topic__chart-axis">
+          @if (series().length) {
+            <span class="tabular">{{ series()[0].date }}</span>
+            <span class="tabular">{{ series()[series().length - 1].date }}</span>
+          }
+        </div>
+        <ul class="topic__legend">
+          <li><span class="topic__swatch topic__swatch--fast"></span> fast EMA · score_fast</li>
+          <li><span class="topic__swatch topic__swatch--slow"></span> slow EMA · score_slow (drives stage)</li>
+          <li><span class="topic__swatch topic__swatch--breadth"></span> breadth_7d · distinct orgs</li>
+        </ul>
+      </div>
+
+      <div class="topic__windows">
+        <div class="stat topic__window">
+          <span class="stat__label">
+            7d ago
+            <span class="chip" [ngClass]="windowChip(windowStatus().d7)">{{ windowStatus().d7 }}</span>
+          </span>
+          <span class="stat__value">
+            @if (t.score_7d_ago != null) { {{ t.score_7d_ago | number:'1.0-1' }} } @else { — }
+          </span>
+        </div>
+        <div class="stat topic__window">
+          <span class="stat__label">
+            30d ago
+            <span class="chip" [ngClass]="windowChip(windowStatus().d30)">{{ windowStatus().d30 }}</span>
+          </span>
+          <span class="stat__value">
+            @if (t.score_30d_ago != null) { {{ t.score_30d_ago | number:'1.0-1' }} } @else { — }
+          </span>
+        </div>
+        <div class="stat topic__window">
+          <span class="stat__label">
+            90d ago
+            <span class="chip" [ngClass]="windowChip(windowStatus().d90)">{{ windowStatus().d90 }}</span>
+          </span>
+          <span class="stat__value">
+            @if (t.score_90d_ago != null) { {{ t.score_90d_ago | number:'1.0-1' }} } @else { — }
+          </span>
+        </div>
+        <div class="stat topic__window">
+          <span class="stat__label">
+            180d ago
+            <span class="chip" [ngClass]="windowChip(windowStatus().d180)">{{ windowStatus().d180 }}</span>
+          </span>
+          <span class="stat__value">
+            @if (t.score_180d_ago != null) { {{ t.score_180d_ago | number:'1.0-1' }} } @else { — }
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lifeline — sector + cluster history -->
+    @if (lifeline().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Lifeline</h2>
+          <span class="section__hint">how this topic has been classified</span>
+        </header>
+        <ol class="topic__lifeline">
+          @for (ev of lifeline(); track ev.entry.date + ev.kind) {
+            <li class="topic__life-event" [attr.data-kind]="ev.kind">
+              <span class="topic__life-date tabular">{{ ev.entry.date }}</span>
+              <span class="topic__life-kind">{{ ev.kind === 'sector' ? 'sector' : 'cluster' }}</span>
+              <span class="topic__life-body">
+                <em class="muted">{{ ev.entry.from ?? 'none' }}</em>
+                <span class="topic__life-arrow">→</span>
+                <strong>{{ ev.entry.to }}</strong>
+                @if (ev.entry.reason) {
+                  <span class="muted italic"> · {{ ev.entry.reason }}</span>
+                }
+              </span>
+            </li>
+          }
+        </ol>
+      </section>
+    }
+
+    <!-- Firms talking about this topic -->
+    @if (t.breadth_orgs_7d?.length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Firms talking · last 7 days</h2>
+          <span class="section__hint">{{ t.breadth_orgs_7d.length }} distinct orgs</span>
+        </header>
+        <ul class="topic__orgs">
+          @for (org of t.breadth_orgs_7d; track org) {
+            <li>
+              <a [routerLink]="['/firms', org]" class="topic__org-chip">{{ org }}</a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (t.supporting_links?.length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Evidence</h2>
+          <span class="section__hint">{{ t.supporting_links.length }} links</span>
+        </header>
+        <ul class="topic__links">
+          @for (link of t.supporting_links.slice(0, 12); track link) {
+            <li><a [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a></li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</section>

@@ -1,20 +1,31 @@
 <div class="shell">
-  <header class="topbar">
-    <div class="topbar__inner">
-      <a routerLink="/today" class="brand" aria-label="AI Researcher home">
-        <span class="brand__mark" aria-hidden="true"></span>
-        <span class="brand__text">AI&nbsp;Researcher</span>
-      </a>
+  <aside class="sidebar" aria-label="Primary">
+    <a routerLink="/today" class="brand" aria-label="AI Researcher home">
+      <span class="brand__mark" aria-hidden="true">AI</span>
+      <span class="brand__text">Researcher</span>
+    </a>
 
-      <nav class="nav" aria-label="Primary">
-        @for (tab of tabs; track tab.path) {
-          <a [routerLink]="tab.path"
-             routerLinkActive="is-active"
-             class="nav__link">{{ tab.label }}</a>
-        }
-      </nav>
+    <nav class="sidenav">
+      @for (group of navGroups; track group.label) {
+        <div class="sidenav__group">
+          <div class="sidenav__group-label">{{ group.label }}</div>
+          @for (tab of group.items; track tab.path) {
+            <a [routerLink]="tab.path"
+               routerLinkActive="is-active"
+               class="sidenav__link">
+              <i class="pi" [class]="'pi-' + tab.icon" aria-hidden="true"></i>
+              <span>{{ tab.label }}</span>
+            </a>
+          }
+        </div>
+      }
+    </nav>
+  </aside>
 
-      <div class="topbar__right">
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar__inner">
+        <span class="topbar__date tabular">{{ todayLabel }}</span>
         <button pButton
                 type="button"
                 text
@@ -27,18 +38,20 @@
           <i class="pi" [class.pi-sun]="theme() === 'dark'" [class.pi-moon]="theme() === 'light'"></i>
         </button>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="app-shell">
-    <router-outlet />
-  </main>
+    <main class="app-shell">
+      <router-outlet />
+    </main>
 
-  <footer class="site-footer">
-    <span>AI Researcher</span>
-    <span class="muted">·</span>
-    <span class="muted">Local feed</span>
-    <span class="muted">·</span>
-    <span class="muted">© {{ year }}</span>
-  </footer>
+    <footer class="colophon">
+      <span class="colophon__title">AI//Researcher</span>
+      <span class="colophon__sep">·</span>
+      <span class="muted">v{{ volume }}.{{ issue }}</span>
+      <span class="colophon__sep">·</span>
+      <span class="muted">local feed</span>
+      <span class="colophon__sep">·</span>
+      <span class="muted">© {{ year }}</span>
+    </footer>
+  </div>
 </div>

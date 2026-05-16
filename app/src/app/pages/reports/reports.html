@@ -1,17 +1,15 @@
 <section class="page reports">
-  <header class="page-head">
-    <div>
-      <h1 class="page-head__title">Reports</h1>
-      <p class="page-head__sub">Every report the pipeline has produced — dailies, weeklies, monthlies, sweeps</p>
-    </div>
-    <div class="page-head__meta">
-      <span><strong>{{ entries().length }}</strong> entries</span>
-      <span><strong>{{ cadences().length }}</strong> cadences</span>
-      <span>showing <strong>{{ filtered().length }}</strong></span>
-    </div>
-  </header>
+  <app-page-header
+      title="Library"
+      subtitle="Every report the pipeline has produced — dailies, weeklies, monthlies, sweeps."
+      [model]="[{label:'Coverage'}, {label:'Library'}]">
+    <span class="muted"><strong>{{ publishEntries().length }}</strong> entries</span>
+    <span class="muted"><strong>{{ publishCadences().length }}</strong> cadences</span>
+    <span class="muted">showing <strong>{{ filtered().length }}</strong></span>
+  </app-page-header>
 
-  <div class="reports__filters">
+  <div class="surface reports__panel">
+    <div class="reports__filters">
     <p-iconfield iconPosition="left" styleClass="reports__search">
       <p-inputicon class="pi pi-search" />
       <input pInputText
@@ -70,8 +68,8 @@
             [class.is-selected]="selected()?.path === e.path"
             (click)="open(e)">
           <td>
-            <span class="chip" [class.chip--accent]="e.cadence === 'daily'">{{ cadenceLabel(e.cadence) }}</span>
-            @if (e.is_versioned) { <span class="chip reports__ver">v</span> }
+            <p-tag [value]="cadenceLabel(e.cadence)" [severity]="e.cadence === 'daily' ? 'info' : 'secondary'" />
+            @if (e.is_versioned) { <p-tag value="v" severity="warn" /> }
           </td>
           <td class="tabular muted">{{ e.date_id }}</td>
           <td class="reports__headline">{{ e.headline || '—' }}</td>
@@ -82,6 +80,7 @@
       </ng-template>
     </p-table>
   }
+  </div>
 
   <p-drawer [visible]="!!selected()"
             (visibleChange)="$event || close()"

@@ -1,28 +1,33 @@
 ---
 name: ai-monthly-rollup
-description: Monthly rollup — reads the previous month's weekly/*.md files and writes monthly/{YYYY}/{YYYY-MM}.md. Spawned by the orchestrator on the first Monday of each month.
+description: Monthly rollup — reads the previous month's publish/weekly/*.md files and writes publish/monthly/{YYYY}/{YYYY-MM}.md. Spawned by the orchestrator on the first Monday of each month.
 ---
 
-> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
+>   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
+>   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
+>   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+>
+> **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
-You are the **monthly rollup agent** in the AI Researcher pipeline. You read **only the previous month's `weekly/*.md` files** and produce one self-contained `monthly/{YYYY}/{YYYY-MM}.md` file.
+You are the **monthly rollup agent** in the AI Researcher pipeline. You read **only the previous month's `publish/weekly/*.md` files** and produce one self-contained `publish/monthly/{YYYY}/{YYYY-MM}.md` file.
 
-You DO NOT touch `daily/`, `news/`, `papers/`, `blogs/`, `jobs/`, or `linkedin/`. Those have already been consolidated into weekly files. Your input is pre-curated; your job is to consolidate the month.
+You DO NOT touch `publish/daily/`, `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, or `research/sources/linkedin/`. Those have already been consolidated into weekly files. Your input is pre-curated; your job is to consolidate the month.
 
 Architectural pyramid:
 ```
-collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md (one per day)
-daily/{YYYY}/{MM}/{date}.md (×7) → ai-weekly-digest → weekly/{YYYY}/{Monday}.md (one per week)
-weekly/{YYYY}/{Monday}.md (×4-5) → ai-monthly-rollup (this skill) → monthly/{YYYY}/{YYYY-MM}.md (one per month)
+collectors → daily orchestrator → publish/daily/{YYYY}/{MM}/{date}.md (one per day)
+publish/daily/{YYYY}/{MM}/{date}.md (×7) → ai-weekly-digest → publish/weekly/{YYYY}/{Monday}.md (one per week)
+publish/weekly/{YYYY}/{Monday}.md (×4-5) → ai-monthly-rollup (this skill) → publish/monthly/{YYYY}/{YYYY-MM}.md (one per month)
 ```
 
 Each layer reads only the layer immediately below.
 
 ## 1. Setup
-- Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
 - Compute the previous month: today minus ~30 days, formatted `YYYY-MM`. Example: invoked 2026-06-01 → previous month is `2026-05`.
-- Output: `monthly/{YYYY}/{YYYY-MM}.md`. **If the file already exists for the same target month, MERGE — do NOT write `-v2`.** Merge rules:
+- Output: `publish/monthly/{YYYY}/{YYYY-MM}.md`. **If the file already exists for the same target month, MERGE — do NOT write `-v2`.** Merge rules:
   1. Read the existing file. Parse each item under "Defining themes", "Major releases & milestones", and "Research highlights" by its `**Theme name**` / `**Title**` (primary key).
   2. For each item from this run: if the same theme/title already appears in the existing file, **drop the new version** — the existing entry wins (preserves manual editorial work in the monthly synthesis).
   3. If the new item is genuinely new (a theme or release the prior run didn't surface), append it to the matching section.
@@ -49,13 +54,13 @@ for f in files:
     sun = mon + timedelta(days=6)
     # include if any day of the week falls in the target month
     if (mon.year == ty and mon.month == tm) or (sun.year == ty and sun.month == tm):
-        print(f"weekly/{f}")
+        print(f"publish/weekly/{f}")
 PY
 ```
 
 Read each printed file with the Read tool, in parallel where possible. A typical month yields 4 weekly files; some yield 5.
 
-For "What changed vs. last month", read the most recent prior `monthly/*.md` file:
+For "What changed vs. last month", read the most recent prior `publish/monthly/*.md` file:
 
 ```bash
 find monthly -type f -name '*.md' | sort | tail -2 | head -1
@@ -79,14 +84,14 @@ Apply this filter:
 
 Target: ~150-220 lines for the monthly file.
 
-## 4. Write `monthly/{YYYY}/{YYYY-MM}.md`
+## 4. Write `publish/monthly/{YYYY}/{YYYY-MM}.md`
 
 Use this exact structure (consistency = greppable across months):
 
 ```markdown
 # AI Monthly — {Month Name YYYY}
 
-_Consolidated from weekly rollups: weekly/2026/2026-W19.md, weekly/2026/2026-W20.md, …_
+_Consolidated from weekly rollups: publish/weekly/2026/2026-W19.md, publish/weekly/2026/2026-W20.md, …_
 
 ## TL;DR
 - 5–7 bullets, the things that defined this month at a 30-day altitude.
@@ -110,11 +115,11 @@ Backing weeks: [YYYY-Www](../weekly/YYYY-Www.md), …
 
 ## What changed vs. last month
 3–5 bullets: durable shifts only — what's now in the conversation that wasn't, what's faded.
-If no prior `monthly/*.md` exists: "First monthly rollup — no comparison available."
+If no prior `publish/monthly/*.md` exists: "First monthly rollup — no comparison available."
 
 ## Sources read this month
-- weekly/: list of files actually read (e.g., `weekly/2026/2026-W19.md`, …)
-  Note any gaps (e.g., `weekly/2026/2026-W21.md` missing — weekly digest failed that Monday).
+- weekly/: list of files actually read (e.g., `publish/weekly/2026/2026-W19.md`, …)
+  Note any gaps (e.g., `publish/weekly/2026/2026-W21.md` missing — weekly digest failed that Monday).
 ```
 
 ## 5. Update `index.md`
@@ -123,7 +128,7 @@ Open `index.md` with Read. Find `<!-- MONTHLY_START -->` and use Edit to insert 
 
 ```
 <!-- MONTHLY_START -->
-- [{Month Name YYYY}](monthly/{YYYY}/{YYYY-MM}.md) — {one-line headline summary, ~80 chars}
+- [{Month Name YYYY}](publish/monthly/{YYYY}/{YYYY-MM}.md) — {one-line headline summary, ~80 chars}
 ```
 
 (Use `replace_all: false`; the marker appears exactly once.) Do NOT touch the rest of the file.
@@ -131,9 +136,9 @@ Open `index.md` with Read. Find `<!-- MONTHLY_START -->` and use Edit to insert 
 If the marker doesn't yet exist (older `index.md`), open the file and add a `## Monthly summaries` section with the markers before writing.
 
 ## 6. Finish
-- One-line confirmation: `Saved monthly/{YYYY}/{YYYY-MM}.md ({N} themes, {K} releases). Index updated.`
+- One-line confirmation: `Saved publish/monthly/{YYYY}/{YYYY-MM}.md ({N} themes, {K} releases). Index updated.`
 - Do NOT post the full content to chat.
-- Do NOT touch any `daily/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, or `weekly/` files. Read-only.
+- Do NOT touch any `publish/daily/`, `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, or `publish/weekly/` files. Read-only.
 - Do NOT touch `trends.md` — deprecated.
 
 ## Constraints & quality bar

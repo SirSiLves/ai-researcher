@@ -25,7 +25,7 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from _lib import iter_source_files, upsert_index_marker_line, REPO_ROOT, STATE_DIR, DATA_ROOT, INDEX_MD
+from _lib import iter_source_files, upsert_index_marker_line, REPO_ROOT, STATE_DIR, DATA_ROOT, SWEEPS_DIR, INDEX_MD
 
 ROOT = REPO_ROOT  # back-compat for `path.relative_to(ROOT)` calls
 # Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
@@ -663,7 +663,7 @@ def main():
     discovered_path.write_text(json.dumps(discovered, indent=2, ensure_ascii=False) + "\n")
 
     # === Step 8: write change log markdown ===
-    md_dir = DATA_ROOT / f"keyword_candidates/{today_d.year:04d}/{today_d.month:02d}"
+    md_dir = SWEEPS_DIR / "keyword_candidates" / f"{today_d.year:04d}" / f"{today_d.month:02d}"
     md_dir.mkdir(parents=True, exist_ok=True)
     md_path = md_dir / f"{TODAY}.md"
 

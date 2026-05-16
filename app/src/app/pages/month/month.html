@@ -1,0 +1,40 @@
+<section class="page month">
+  <app-page-header
+      title="Monthly digest"
+      [subtitle]="current()?.headline || 'First-Monday rollup synthesising the prior month\'s weeklies'"
+      [model]="[{label:'Briefing'}, {label:'Monthly'}]">
+    <button pButton type="button" text size="small"
+            (click)="prev()" [disabled]="!canPrev()" aria-label="Older month">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+    <p-select [options]="options()"
+              [ngModel]="selected()"
+              (ngModelChange)="selected.set($event)"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="month__picker" />
+    <button pButton type="button" text size="small"
+            (click)="next()" [disabled]="!canNext()" aria-label="Newer month">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+    <a routerLink="/library" pButton outlined size="small">Library</a>
+  </app-page-header>
+
+  @if (error(); as e) {
+    <p class="month__error">{{ e }}</p>
+  }
+
+  @if (monthAnchor(); as anchor) {
+    <app-trend-summary [anchor]="anchor" [days]="30" title="Momentum · this month" />
+  }
+
+  @if (loading() && !markdown()) {
+    <div class="month__skeleton">
+      <p-skeleton width="100%" height="9rem"></p-skeleton>
+      <p-skeleton width="100%" height="9rem"></p-skeleton>
+    </div>
+  } @else if (markdown()) {
+    <app-article-cards [source]="markdown()" />
+  }
+</section>

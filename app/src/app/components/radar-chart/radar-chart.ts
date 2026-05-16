@@ -6,6 +6,7 @@ import {
   effect,
   inject,
   input,
+  output,
   OnDestroy,
   viewChild
 } from '@angular/core';
@@ -31,6 +32,8 @@ interface TopicPoint {
 
 const FONT = '"Inter", system-ui, sans-serif';
 
+const DIRECTIONS: Array<RadarTopic['direction']> = ['surging', 'rising', 'steady', 'fading'];
+
 function readVar(name: string, fallback: string): string {
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return v || fallback;
@@ -47,10 +50,19 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function sectorColor(i: number): { fill: string; stroke: string } {
-  const slot = (i % 4) + 1;
-  const c = readVar(`--sector-${slot}`, '#888');
-  return { fill: hexToRgba(c, 0.22), stroke: c };
+function directionColor(dir: string): { fill: string; stroke: string } {
+  // surging → accent strong; rising → accent; steady → mid grey; fading → warn
+  switch (dir) {
+    case 'surging': return colorPair(readVar('--accent-strong', '#2563eb'), 0.32);
+    case 'rising':  return colorPair(readVar('--accent',        '#3b82f6'), 0.22);
+    case 'steady':  return colorPair(readVar('--fg-4',          '#71717a'), 0.18);
+    case 'fading':  return colorPair(readVar('--warn',          '#f59e0b'), 0.20);
+    default:        return colorPair(readVar('--fg-5',          '#a1a1a6'), 0.18);
+  }
+}
+
+function colorPair(c: string, alpha: number) {
+  return { fill: hexToRgba(c, alpha), stroke: c };
 }
 
 @Component({
@@ -62,6 +74,7 @@ function sectorColor(i: number): { fill: string; stroke: string } {
 })
 export class RadarChart implements AfterViewInit, OnDestroy {
   readonly topics = input.required<RadarTopic[]>();
+  readonly topicSelect = output<RadarTopic>();
   readonly hostRef = inject(ElementRef);
 
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
@@ -87,12 +100,23 @@ export class RadarChart implements AfterViewInit, OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 220 },
+        onHover: (e, els) => {
+          const target = (e.native?.target as HTMLElement | undefined);
+          if (target && 'style' in target) target.style.cursor = els.length ? 'pointer' : 'default';
+        },
+        onClick: (_e, elements) => {
+          const el = elements[0];
+          if (!el) return;
+          const ds = this.chart!.data.datasets[el.datasetIndex] as any;
+          const point = ds.data[el.index] as TopicPoint;
+          if (point?.topic) this.topicSelect.emit(point.topic);
+        },
         scales: {
           x: {
             type: 'linear',
             title: {
               display: true,
-              text: '7-day momentum (%)',
+              text: 'Loudness (score · fast EMA)',
               color: palette.axis,
               font: { weight: 600, family: FONT, size: 11 }
             },
@@ -108,7 +132,7 @@ export class RadarChart implements AfterViewInit, OnDestroy {
             type: 'linear',
             title: {
               display: true,
-              text: 'Sustained days',
+              text: 'Breadth · distinct orgs (7d)',
               color: palette.axis,
               font: { weight: 600, family: FONT, size: 11 }
             },
@@ -147,13 +171,14 @@ export class RadarChart implements AfterViewInit, OnDestroy {
               label: item => {
                 const p = item.raw as TopicPoint;
                 const t = p.topic;
+                const dirArrow = arrowFor(t.direction);
                 return [
-                  `Sector: ${t.sector}`,
-                  `Stage: ${t.stage}`,
-                  `7d momentum: ${t.momentum_7d_pct.toFixed(1)}%`,
+                  `${dirArrow} ${t.direction}`,
+                  `Score: ${t.score_fast.toFixed(1)} (slow ${t.score_slow.toFixed(1)})`,
+                  `Breadth 7d: ${t.breadth_7d} orgs${t.high_breadth ? ' · high' : ''}`,
                   `Sustained: ${t.sustained_days}d`,
-                  `Breadth: ${t.breadth_7d}${t.high_breadth ? ' (high)' : ''}`,
-                  `Score: ${t.score.toFixed(1)}`
+                  `Sector: ${t.sector}`,
+                  '— click for details —'
                 ];
               }
             }
@@ -209,29 +234,47 @@ export class RadarChart implements AfterViewInit, OnDestroy {
   }
 
   private renderTo(chart: Chart, topics: RadarTopic[]) {
-    const bySector = new Map<string, TopicPoint[]>();
+    const byDir = new Map<string, TopicPoint[]>();
     for (const t of topics) {
       const point: TopicPoint = {
-        x: t.momentum_7d_pct,
-        y: t.sustained_days,
-        r: 5 + Math.min(t.breadth_7d, 14) * 1.1,
+        x: t.score_fast,
+        y: t.breadth_7d,
+        r: 5 + Math.min(t.sustained_days, 12) * 1.0,
         topic: t
       };
-      if (!bySector.has(t.sector)) bySector.set(t.sector, []);
-      bySector.get(t.sector)!.push(point);
+      const dir = DIRECTIONS.includes(t.direction as any) ? t.direction : 'steady';
+      if (!byDir.has(dir)) byDir.set(dir, []);
+      byDir.get(dir)!.push(point);
     }
-    const datasets = [...bySector.entries()].map(([sector, points], i) => {
-      const c = sectorColor(i);
-      return {
-        label: sector,
-        data: points,
-        backgroundColor: c.fill,
-        borderColor: c.stroke,
-        borderWidth: 1.5,
-        hoverBorderWidth: 2.5
-      };
-    });
+    // Stable order so the legend reads surging → fading.
+    const datasets = DIRECTIONS
+      .filter(d => byDir.has(d as string))
+      .map(d => {
+        const c = directionColor(d as string);
+        return {
+          label: capitalize(d as string),
+          data: byDir.get(d as string)!,
+          backgroundColor: c.fill,
+          borderColor: c.stroke,
+          borderWidth: 1.5,
+          hoverBorderWidth: 2.5
+        };
+      });
     chart.data.datasets = datasets;
     chart.update('none');
   }
+}
+
+function arrowFor(dir: string): string {
+  switch (dir) {
+    case 'surging': return '▲▲';
+    case 'rising':  return '▲';
+    case 'fading':  return '▼';
+    case 'steady':  return '·';
+    default: return '·';
+  }
+}
+
+function capitalize(s: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 }

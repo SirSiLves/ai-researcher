@@ -1,9 +1,14 @@
 ---
 name: ai-vendor-sweep
-description: Daily vendor-coverage sweep with AUTO-APPLY. Reads discovered_orgs.json + today's source files + sources.json vendor lists, classifies every org we've seen into promote / watch / silent / hot-event / already-covered tiers, AUTOMATICALLY MUTATES sources.json (adds promotions and hot events, removes expired ones), and emits vendor_candidates/{YYYY}/{MM}/{date}.md as a CHANGE LOG describing what it did. Runs every day after the radar. Spawned by the orchestrator after ai-trend-radar.
+description: Daily vendor-coverage sweep with AUTO-APPLY. Reads discovered_orgs.json + today's source files + sources.json vendor lists, classifies every org we've seen into promote / watch / silent / hot-event / already-covered tiers, AUTOMATICALLY MUTATES sources.json (adds promotions and hot events, removes expired ones), and emits research/sweeps/vendor_candidates/{YYYY}/{MM}/{date}.md as a CHANGE LOG describing what it did. Runs every day after the radar. Spawned by the orchestrator after ai-trend-radar.
 ---
 
-> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
+>   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
+>   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
+>   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+>
+> **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
 You are the **vendor-coverage sweep agent**. The user's complaints that motivated this skill:
 
@@ -15,9 +20,9 @@ So this skill does TWO things: (a) classifies every org we've ever seen, and (b)
 ## Pipeline position
 
 ```
-collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md
-                                + ai-trend-radar → radar/{date}.json (has breadth_orgs_7d per topic)
-                                + YOU (ai-vendor-sweep) → vendor_candidates/{date}.md  ← this skill
+collectors → daily orchestrator → publish/daily/{YYYY}/{MM}/{date}.md
+                                + ai-trend-radar → publish/radar/{date}.json (has breadth_orgs_7d per topic)
+                                + YOU (ai-vendor-sweep) → research/sweeps/vendor_candidates/{date}.md  ← this skill
                                 + ai-weekly-digest
 ```
 
@@ -25,10 +30,10 @@ You read what's already on disk; you don't fetch anything. The radar already ext
 
 ## 1. Setup
 
-- Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
 - Read `sources.json` `vendor_sweep_config` section for thresholds.
 - **Timestamps from the orchestrator footer.** Look for `PIPELINE TIMESTAMPS` and use `TODAY`, `WEEK_ID`, `MONDAY`. Standalone fallback: `eval "$(../pipeline/scripts/now.sh)"`. Do NOT compute the date manually.
-- **Output filename:** `vendor_candidates/{YYYY}/{MM}/{date}.md`. Overwrite if exists on the same day (re-running replaces — there's only ever one canonical sweep per day).
+- **Output filename:** `research/sweeps/vendor_candidates/{YYYY}/{MM}/{date}.md`. Overwrite if exists on the same day (re-running replaces — there's only ever one canonical sweep per day).
 - **State file:** `discovered_orgs.json` at workspace root. Read it; mutate it; write it back.
 
 ## 2. Read state
@@ -50,7 +55,7 @@ In parallel (single message, multiple Read/bash calls):
 
 For each of today's source files:
 
-- Identify which source type it represents from its top directory (`news/` → `tech_news`, `papers/` → `paper`, `blogs/` → `long_form_blog`, `jobs/` → `job_posting_skill_mention`, `linkedin/` → `linkedin_network_post`, `daily/` → `daily_synthesis`).
+- Identify which source type it represents from its top directory (`research/sources/news/` → `tech_news`, `research/sources/papers/` → `paper`, `research/sources/blogs/` → `long_form_blog`, `research/sources/jobs/` → `job_posting_skill_mention`, `research/sources/linkedin/` → `linkedin_network_post`, `publish/daily/` → `daily_synthesis`).
 - Read content. Extract org mentions. Two paths:
   - **Known orgs (already in `discovered_orgs.json.orgs`):** detect via case-insensitive substring of any known alias from the seed (and any aliases the skill has added historically). Increment counters.
   - **New orgs (not in tally):** LLM-extract by reading the file. A "new org" is any company / lab / research institution / public sector body name that appears at least 2 times in the file and that's NOT already in the tally. Add it with `coverage: "uncovered"`, `tier_hint: null` (you'll classify in step 4), `aliases: [the canonical name]`, `discovered_on: {TODAY}`.
@@ -74,7 +79,7 @@ For each of today's source files:
   ```
   Append-only. Cap at 10 hot events per org (drop oldest).
 
-**Also pull breadth-derived orgs from radar JSONs.** For each radar JSON in the last 30 days, take every `topic.breadth_orgs_7d` entry — if a slug there isn't yet in `discovered_orgs.json.orgs`, add it with `tier_hint: null, coverage: "uncovered"`, `discovered_from: "radar/{date}.json"`. This is how the radar's first-class org extraction feeds back into vendor coverage.
+**Also pull breadth-derived orgs from radar JSONs.** For each radar JSON in the last 30 days, take every `topic.breadth_orgs_7d` entry — if a slug there isn't yet in `discovered_orgs.json.orgs`, add it with `tier_hint: null, coverage: "uncovered"`, `discovered_from: "publish/radar/{date}.json"`. This is how the radar's first-class org extraction feeds back into vendor coverage.
 
 ## 3.5. Compute velocity per org
 
@@ -253,7 +258,7 @@ ISO timestamp + verb + slug + payload (always `blog_urls=[...]` for adds; option
 
 **Step E — Update discovered_orgs.json.** For every org we just promoted, set `coverage: "enterprise"` and `auto_applied_on: "{TODAY}"`. For deep-watch demotions, set `coverage: "deep_watch"` and `auto_applied_on: "{TODAY}"`. For deep-watch re-promotions, set `coverage: "enterprise"` and `auto_applied_on: "{TODAY}"`. For removals, set back to `coverage: "uncovered"` (or `"informal_url_list"` if the host matches a URL list) and note `removed_on: "{TODAY}"` with the reason.
 
-## 5. Write `vendor_candidates/{YYYY}/{MM}/{TODAY}.md` — a CHANGE LOG
+## 5. Write `research/sweeps/vendor_candidates/{YYYY}/{MM}/{TODAY}.md` — a CHANGE LOG
 
 This file describes what the auto-applier did today and what's pending. The user reads it for situational awareness, NOT to take action.
 
@@ -326,7 +331,7 @@ Update `last_updated: {TODAY}`. Write the full tally including any updates from 
 Find `<!-- VENDOR_START -->`. Insert (or replace today's existing line) directly after the marker:
 
 ```markdown
-- [{TODAY}](vendor_candidates/{YYYY}/{MM}/{TODAY}.md) — applied: {N} promotions, {N} hot, {N} expired; pending: {N}; watch: {N}; silent: {N}
+- [{TODAY}](research/sweeps/vendor_candidates/{YYYY}/{MM}/{TODAY}.md) — applied: {N} promotions, {N} hot, {N} expired; pending: {N}; watch: {N}; silent: {N}
 ```
 
 **Replace-don't-append behavior:** if there's already an entry for `{TODAY}` in the vendor section, update that line in-place. Otherwise insert directly after the start marker (newest first).
@@ -334,9 +339,9 @@ Find `<!-- VENDOR_START -->`. Insert (or replace today's existing line) directly
 ## 8. Finish
 
 One-line confirmation:
-`Saved vendor_candidates/{YYYY}/{MM}/{TODAY}.md. Auto-applied: +{N_promote_added} promotions, +{N_hot_added} hot events, -{N_expired} expired. Tally has {total_orgs} orgs ({N_enterprise_auto} auto-added of {N_enterprise_total} enterprise). sources.json {modified|unchanged}.`
+`Saved research/sweeps/vendor_candidates/{YYYY}/{MM}/{TODAY}.md. Auto-applied: +{N_promote_added} promotions, +{N_hot_added} hot events, -{N_expired} expired. Tally has {total_orgs} orgs ({N_enterprise_auto} auto-added of {N_enterprise_total} enterprise). sources.json {modified|unchanged}.`
 
-Do NOT post the change log to chat. Do NOT modify any source files (`news/`, `blogs/`, etc.) or the radar / weekly outputs — those are read-only inputs.
+Do NOT post the change log to chat. Do NOT modify any source files (`research/sources/news/`, `research/sources/blogs/`, etc.) or the radar / weekly outputs — those are read-only inputs.
 
 ## Constraints & quality bar
 

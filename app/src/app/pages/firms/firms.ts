@@ -1,19 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { Skeleton } from 'primeng/skeleton';
-import { Drawer } from 'primeng/drawer';
 import { SelectButton } from 'primeng/selectbutton';
 import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
-import { MeterGroup } from 'primeng/metergroup';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ButtonModule } from 'primeng/button';
+import { Tag } from 'primeng/tag';
 
 import { DataService, OrgIndexEntry, OrgDetail } from '../../services/data.service';
+import { PageHeader } from '../../components/page-header/page-header';
 
 const SPARK_BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
 
@@ -21,10 +20,10 @@ const SPARK_BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
   selector: 'app-firms',
   standalone: true,
   imports: [
-    FormsModule, DecimalPipe,
-    TableModule, Skeleton, Drawer,
-    SelectButton, InputText, IconField, InputIcon, MeterGroup,
-    ToggleSwitch, ButtonModule
+    FormsModule,
+    TableModule, Skeleton,
+    SelectButton, InputText, IconField, InputIcon,
+    ToggleSwitch, ButtonModule, Tag, PageHeader
   ],
   templateUrl: './firms.html',
   styleUrl: './firms.scss',
@@ -32,7 +31,6 @@ const SPARK_BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
 })
 export class FirmsPage {
   private readonly data = inject(DataService);
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   readonly orgs = signal<OrgIndexEntry[]>([]);
@@ -41,10 +39,6 @@ export class FirmsPage {
   readonly priorityOnly = signal<boolean>(false);
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
-
-  readonly selectedSlug = signal<string | null>(null);
-  readonly detail = signal<OrgDetail | null>(null);
-  readonly detailLoading = signal<boolean>(false);
 
   private readonly historyCache = new Map<string, number[]>();
   readonly historyVersion = signal<number>(0);
@@ -67,8 +61,6 @@ export class FirmsPage {
       .filter(o => !pri || o.is_priority);
   });
 
-  readonly maxVelocity = computed(() => Math.max(1, ...this.orgs().map(o => o.velocity_7d)));
-
   readonly stats = computed(() => {
     const orgs = this.orgs();
     if (!orgs.length) return null;
@@ -80,62 +72,17 @@ export class FirmsPage {
     };
   });
 
-  readonly detailSpark = computed<number[]>(() => {
-    const d = this.detail();
-    if (!d?.velocity_history?.length) return [];
-    return d.velocity_history.map(p => p.velocity_7d);
-  });
-
-  readonly topicMixSorted = computed(() => {
-    const d = this.detail();
-    if (!d?.topic_mix) return [] as Array<{ topic: string; n: number }>;
-    return Object.entries(d.topic_mix)
-      .map(([topic, n]) => ({ topic, n: n as number }))
-      .sort((a, b) => b.n - a.n)
-      .slice(0, 12);
-  });
-
-  readonly sourceMeter = computed(() => {
-    const d = this.detail();
-    if (!d?.mentions_by_source_type) return [];
-    const total = d.total_mentions || 1;
-    return Object.entries(d.mentions_by_source_type)
-      .filter(([_, v]) => (v as number) > 0)
-      .sort((a, b) => (b[1] as number) - (a[1] as number))
-      .map(([key, value]) => ({
-        label: key,
-        value: ((value as number) / total) * 100,
-        raw: value as number
-      }));
-  });
-
-  readonly detailVelocity = computed(() => this.detail()?.velocity ?? null);
-
   constructor() {
     this.data.loadOrgsIndex()
       .then(idx => {
         this.orgs.set(idx.entries);
         this.loading.set(false);
-        const slug = this.route.snapshot.paramMap.get('slug');
-        if (slug) this.selectedSlug.set(slug);
         this.warmupSparklines(idx.entries);
       })
       .catch(err => {
         this.error.set(`Couldn't load orgs index: ${err.message ?? err}`);
         this.loading.set(false);
       });
-
-    effect(() => {
-      const slug = this.selectedSlug();
-      if (!slug) { this.detail.set(null); return; }
-      this.detailLoading.set(true);
-      this.data.loadOrgDetail(slug)
-        .then(d => { this.detail.set(d); this.detailLoading.set(false); this.cacheHistory(slug, d); })
-        .catch(err => {
-          this.error.set(`Couldn't load orgs/${slug}.json: ${err.message ?? err}`);
-          this.detailLoading.set(false);
-        });
-    });
   }
 
   private cacheHistory(slug: string, d: OrgDetail) {
@@ -171,27 +118,20 @@ export class FirmsPage {
     return arr.map(v => SPARK_BLOCKS[Math.min(7, Math.floor(((v - min) / range) * 7.999))]).join('');
   }
 
-  detailSparkStr(): string {
-    return this.sparkFromArr(this.detailSpark());
-  }
-
   open(slug: string) {
-    this.selectedSlug.set(slug);
-    this.router.navigate(['/firms', slug], { replaceUrl: !this.route.snapshot.paramMap.get('slug') });
-  }
-
-  close() {
-    this.selectedSlug.set(null);
-    this.router.navigate(['/firms']);
+    this.router.navigate(['/firms', slug]);
   }
 
   statusLabel(status: string): string { return status || '—'; }
 
-  bar(value: number, max: number, width = 10): string {
-    if (!max) return '';
-    const pct = Math.min(1, Math.abs(value) / max);
-    const cells = Math.round(pct * width);
-    return cells === 0 ? '·' : '▇'.repeat(cells);
+  statusSeverity(status: string | undefined): 'success' | 'info' | 'warn' | 'secondary' | 'danger' {
+    switch (status) {
+      case 'surging':      return 'success';
+      case 'accelerating': return 'info';
+      case 'steady':       return 'secondary';
+      case 'cooling':      return 'warn';
+      default:             return 'secondary';
+    }
   }
 
   clearFilters() {

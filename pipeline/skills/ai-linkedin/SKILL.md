@@ -3,7 +3,12 @@ name: ai-linkedin
 description: Daily LinkedIn deep-dive (browser-based) — Pulse / long-form articles, hashtag content searches, home feed, saved jobs. Topic-driven, not author-driven. Auto-skips when Chrome is unavailable.
 ---
 
-> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
+>   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
+>   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
+>   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+>
+> **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
 You are the **LinkedIn collector** in the AI Researcher pipeline. Your job is to surface today's substantive LinkedIn content in the user's focus areas: LLMs / generative AI, RAG techniques, AI platforms and capabilities (agent frameworks), agent interoperability protocols (MCP, A2A), and AI governance / responsible AI. You require a connected Chrome browser; if none is reachable, you skip silently and exit.
 
@@ -12,10 +17,10 @@ You are the **LinkedIn collector** in the AI Researcher pipeline. Your job is to
 **Long-form first.** LinkedIn Pulse / Newsletter articles (URL pattern `/pulse/{slug}`) are the priority layer. Home feed and hashtag scans are secondary — most short posts under hashtags are engagement-bait and should be dropped.
 
 ## 1. Setup
-- Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
 - Read `sources.json` and use the `linkedin_collector` section. Note `pulse_topic_queries`, `min_substance_chars`, `languages_allowed`, `url_capture_rule`.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — the full set is documented in `../pipeline/skills/ai-replay/SKILL.md` §2 (TODAY, YYYY, MM, DD, MONTH, WEEK_ID, MONDAY, SUNDAY, PREV_WEEK_ID, DOW_ISO, IS_MONDAY, IS_FIRST_MONDAY_OF_MONTH, ISO_TS, INVOCATION, MERGE_MODE). Use whichever subset you need; `TODAY`/`WEEK_ID`/`MONTH`/`MONDAY` cover most cases. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
-- Output: `linkedin/{YYYY}/{MM}/YYYY-MM-DD.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
+- Output: `research/sources/linkedin/{YYYY}/{MM}/YYYY-MM-DD.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
   1. Read the existing file. Parse each item by its LinkedIn URL (Pulse permalink, post URL, hashtag-post URL — primary key). For items without a URL (rare), use normalized `{author-or-tag} — {first-50-chars}`.
   2. For each item from this run: if its URL already appears in the existing file, **drop the new version** — the existing entry wins (preserves manual annotations).
   3. If the new item is genuinely new, append it to the matching section.
@@ -128,8 +133,8 @@ A captured link of `linkedin.com/feed/`, `linkedin.com/search/...`, or `linkedin
 **Engagement-bait drop list.** Drop posts that are: congratulations on a promotion / new job, "I'm so excited to share…", AI-tool sales pitches with no substance, listicles ("10 ways…"), pure quote-screenshot-of-Andrej-Karpathy posts.
 
 ## 7. Finish
-- One-line confirmation: `Saved linkedin/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} pulse, {M} hashtag, {J} home, {K} jobs).` — or `skipped: {reason}` if stub.
-- Do NOT touch `index.md`, `trends.md`, or `daily/`.
+- One-line confirmation: `Saved research/sources/linkedin/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} pulse, {M} hashtag, {J} home, {K} jobs).` — or `skipped: {reason}` if stub.
+- Do NOT touch `index.md`, `trends.md`, or `publish/daily/`.
 - Do NOT overwrite previous day files.
 - Never attempt sign-in or any account-modifying actions.
 

@@ -1,0 +1,102 @@
+<section class="page story">
+  @if (loading() && !cluster()) {
+    <p-skeleton width="50%" height="2rem"></p-skeleton>
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+  }
+
+  @if (error(); as e) {
+    <p class="story__error">{{ e }}</p>
+    <p><a routerLink="/stories">← Back to Stories</a></p>
+  }
+
+  @if (cluster(); as c) {
+    <app-page-header
+        [title]="c.name"
+        [subtitle]="topics().length + ' topics · ' + c.cluster_breadth_7d + ' orgs · ' + sectors().join(' / ')"
+        [model]="breadcrumb()">
+      <span class="story__delta-row">
+        <span class="muted">loudness</span>
+        <span class="tabular"><strong>{{ c.cluster_score_fast | number:'1.0-1' }}</strong></span>
+        <span class="story__delta"
+              [class.is-pos]="delta() > 0"
+              [class.is-neg]="delta() < 0">
+          @if (delta() > 0) { <i class="pi pi-arrow-up-right"></i> }
+          @else if (delta() < 0) { <i class="pi pi-arrow-down-right"></i> }
+          {{ delta() > 0 ? '+' : '' }}{{ delta() | number:'1.0-1' }} Δ
+        </span>
+      </span>
+    </app-page-header>
+
+    <section class="section">
+      <header class="section__head">
+        <h2 class="section__title">Momentum · last 14 days</h2>
+        <span class="section__hint">cluster fast-score over the loaded window</span>
+      </header>
+      <svg viewBox="0 0 600 100" preserveAspectRatio="none" class="story__chart" aria-hidden="true">
+        <defs>
+          <linearGradient id="storyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="var(--accent)" stop-opacity="0.28"></stop>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        <path [attr.d]="areaPath()"   fill="url(#storyGrad)" stroke="none" />
+        <path [attr.d]="sparkPath()"  fill="none" stroke="var(--accent)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h2 class="section__title">Topics in this story</h2>
+        <span class="section__hint">{{ topics().length }} member topics, sorted by loudness</span>
+      </header>
+      <ul class="story__topics">
+        @for (t of topics(); track t.id) {
+          <li class="story__topic">
+            <a [routerLink]="['/radar/topic', t.id]" class="story__topic-link">
+              <span class="dot" [ngClass]="directionDotClass(t.direction)"></span>
+              <span class="story__topic-label">{{ t.label }}</span>
+              <span class="story__topic-meta">
+                <span class="story__topic-sector">{{ t.sector }}</span>
+                <span class="muted tabular">{{ t.score_fast | number:'1.0-0' }}</span>
+                <span class="muted tabular">{{ t.breadth_7d }} orgs</span>
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+
+    @if (firms().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Firms in this story</h2>
+          <span class="section__hint">orgs talking about ≥1 topic, ranked by overlap</span>
+        </header>
+        <ul class="story__firms">
+          @for (f of firms().slice(0, 16); track f.slug) {
+            <li class="story__firm">
+              <a [routerLink]="['/firms', f.slug]" class="story__firm-link">
+                <span class="story__firm-slug">{{ f.slug }}</span>
+                <span class="story__firm-meta tabular">{{ f.topicCount }} · topic{{ f.topicCount === 1 ? '' : 's' }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+@if (evidence().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Evidence</h2>
+          <span class="section__hint">supporting links from member topics</span>
+        </header>
+        <ul class="story__evidence">
+          @for (link of evidence(); track link) {
+            <li><a [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a></li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</section>

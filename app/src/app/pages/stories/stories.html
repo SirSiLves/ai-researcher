@@ -1,0 +1,94 @@
+<section class="page stories">
+  <app-page-header
+      title="Stories"
+      subtitle="Themes the radar is grouping together — sorted by acceleration. Click for the full story."
+      [model]="[{label:'Narrative'}, {label:'Stories'}]">
+    @if (stats(); as s) {
+      <span class="muted"><strong>{{ s.stories }}</strong> stories</span>
+      <span class="muted"><strong>{{ s.topics }}</strong> topics</span>
+      <span class="muted"><strong>{{ s.firms }}</strong> firms</span>
+    }
+  </app-page-header>
+
+  @if (error(); as e) {
+    <p class="stories__error">{{ e }}</p>
+  }
+
+  @if (loading()) {
+    <div class="stories__grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <p-skeleton width="100%" height="13rem"></p-skeleton>
+      }
+    </div>
+  } @else {
+    <div class="stories__grid">
+      @for (s of stories(); track s.cluster.id) {
+        <a class="stories__card surface surface--hover"
+           [routerLink]="['/stories', s.cluster.id]"
+           [attr.data-direction]="s.cluster.cluster_direction">
+          <header class="stories__card-head">
+            <div class="stories__card-title-row">
+              <h2 class="stories__card-title">{{ s.cluster.name }}</h2>
+              <span class="stories__card-delta"
+                    [class.is-pos]="s.delta > 0"
+                    [class.is-neg]="s.delta < 0">
+                @if (s.delta > 0) { <i class="pi pi-arrow-up-right"></i> }
+                @else if (s.delta < 0) { <i class="pi pi-arrow-down-right"></i> }
+                {{ s.delta > 0 ? '+' : '' }}{{ s.delta | number:'1.0-1' }}
+              </span>
+            </div>
+            <div class="stories__card-meta">
+              <span class="tabular">{{ s.cluster.cluster_score_fast | number:'1.0-0' }} loudness</span>
+              <span class="muted">·</span>
+              <span class="tabular">{{ s.cluster.cluster_breadth_7d }} orgs</span>
+              <span class="muted">·</span>
+              <span class="tabular">{{ s.topics.length }} topics</span>
+            </div>
+          </header>
+
+          @if (s.spark.length > 1) {
+            <svg viewBox="0 0 120 32" preserveAspectRatio="none" class="stories__spark" aria-hidden="true">
+              <path [attr.d]="sparkPath(s.spark)"
+                    stroke="var(--accent)"
+                    stroke-width="1.6"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+          }
+
+          <ul class="stories__topics">
+            @for (t of s.topics.slice(0, 3); track t.id) {
+              <li class="stories__topic">
+                <span class="stories__topic-dot" [attr.data-dir]="t.direction"></span>
+                <span class="stories__topic-label">{{ t.label }}</span>
+              </li>
+            }
+            @if (s.topics.length > 3) {
+              <li class="stories__topic stories__topic--more">
+                +{{ s.topics.length - 3 }} more
+              </li>
+            }
+          </ul>
+
+          @if (s.topFirms.length) {
+            <div class="stories__firms">
+              <span class="stories__firms-label">firms</span>
+              @for (f of s.topFirms; track f) {
+                <span class="stories__firm">{{ f }}</span>
+              }
+            </div>
+          }
+
+          @if (s.sectors.length) {
+            <div class="stories__sectors">
+              @for (sec of s.sectors; track sec) {
+                <p-tag [value]="sec" severity="secondary" />
+              }
+            </div>
+          }
+        </a>
+      }
+    </div>
+  }
+</section>

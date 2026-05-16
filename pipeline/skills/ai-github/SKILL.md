@@ -1,9 +1,14 @@
 ---
 name: ai-github
-description: Daily GitHub trending + watched-repos collector. Captures earlier signal than blogs/news — dev mindshare shows up on GitHub trending and star deltas weeks before mainstream coverage. Writes one thin file per day at github/{YYYY}/{MM}/{date}.md. Spawned daily by the orchestrator alongside the other 6 collectors.
+description: Daily GitHub trending + watched-repos collector. Captures earlier signal than blogs/news — dev mindshare shows up on GitHub trending and star deltas weeks before mainstream coverage. Writes one thin file per day at research/sources/github/{YYYY}/{MM}/{date}.md. Spawned daily by the orchestrator alongside the other 6 collectors.
 ---
 
-> **Path resolution (post-2026-05 restructure).** CWD when this skill runs is `data/`, so bare paths like `daily/$YYYY/$MM/$TODAY.md`, `weekly/$YYYY/$WEEK_ID.md`, `radar/$YYYY/$MM/$TODAY.md`, `orgs/$slug.json`, `index.md`, `news/`, `papers/`, etc. resolve correctly. **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
+> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
+>   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
+>   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
+>   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+>
+> **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
 You are the **GitHub collector** in the AI Researcher pipeline. The premise: open-source AI infrastructure surfaces *first* on GitHub. By the time a tool gets a blog post or news mention, it's already been trending for 1-3 weeks. Capturing that delta is the user's primary "be a step ahead" lever.
 
@@ -14,10 +19,10 @@ You produce TWO signals per day:
 
 ## 1. Setup
 
-- Workspace folder: `/Users/yruosch/Documents/Claude/Projects/AI Researcher/`
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
 - Read `sources.json` and use the `github_collector` section only.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` and use whichever vars you need (full set documented in `../pipeline/skills/ai-replay/SKILL.md` §2 — `TODAY`, `WEEK_ID`, `MONTH` cover this skill's normal use). Standalone fallback: `eval "$(../pipeline/scripts/now.sh)"`. Do NOT compute the date locally.
-- Output: `github/{YYYY}/{MM}/{TODAY}.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
+- Output: `research/sources/github/{YYYY}/{MM}/{TODAY}.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
   1. Read the existing file. Parse "Trending now" repos by `owner/name` (primary key). Parse "Watched-repo movers" by `owner/name` too.
   2. For each repo from this run: if its `owner/name` already appears in the existing file, **update the metrics in-place** (today's star count and delta are time-sensitive and the latest run has the freshest values) but preserve any manual commentary line below the metric row.
   3. If the repo is genuinely new (not in the existing file), append to the matching section.
@@ -53,7 +58,7 @@ Watched repos are short (50 URLs); parallelize where possible but it's fine if t
 - **Trending signal:** for each trending repo, signal_score = `min(stars_today, 1000)` + `0.1 × total_stars`. Sort descending. Cap at top 25.
 - **Watched-repo movers:** for each, sort by `delta_today` descending. Cap at top 15 movers. Skip repos with `delta_today < 50` (noise floor) unless their trailing-7-day delta also accelerated.
 
-## 5. Write `github/{YYYY}/{MM}/{TODAY}.md`
+## 5. Write `research/sources/github/{YYYY}/{MM}/{TODAY}.md`
 
 ```markdown
 # GitHub signal — {TODAY}
