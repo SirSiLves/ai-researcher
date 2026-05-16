@@ -10,15 +10,33 @@ interface Section {
   html: SafeHtml;
   bodyText: string;
   itemCount: number;
+  kind: 'news' | 'research' | 'blogs' | 'github' | 'hn' | 'jobs' | 'linkedin' | 'diff' | 'meta' | 'other';
 }
 
-// Sections we deliberately do NOT show on Today.
-// (Already represented elsewhere: Stories block, Sweeps page, etc.)
-const HIDDEN = [
-  'sources scanned',
-  'what changed vs. yesterday',
-  'github momentum'
+// Top-5 reading priorities is handled by the standalone PriorityCards component.
+// "Sources scanned" is the pipeline meta block — keep it off the surface.
+const HIDDEN_TITLES = [
+  'top-5 reading priorities',
+  'sources scanned'
 ];
+
+const KIND_RULES: { match: RegExp; kind: Section['kind']; icon: string }[] = [
+  { match: /(what changed|delta)/i,       kind: 'diff',     icon: 'pi-history' },
+  { match: /(github|repos|repositories)/i, kind: 'github',   icon: 'pi-github' },
+  { match: /(hacker news|^hn |hn pulse)/i, kind: 'hn',       icon: 'pi-comments' },
+  { match: /research|paper/i,              kind: 'research', icon: 'pi-book' },
+  { match: /(blog|reads)/i,                kind: 'blogs',    icon: 'pi-bookmark' },
+  { match: /(job|hiring|swiss)/i,          kind: 'jobs',     icon: 'pi-briefcase' },
+  { match: /linkedin|pulse/i,              kind: 'linkedin', icon: 'pi-users' },
+  { match: /(news|release|major)/i,        kind: 'news',     icon: 'pi-megaphone' }
+];
+
+function classify(title: string): { kind: Section['kind']; icon: string } {
+  for (const rule of KIND_RULES) {
+    if (rule.match.test(title)) return { kind: rule.kind, icon: rule.icon };
+  }
+  return { kind: 'other', icon: 'pi-circle' };
+}
 
 @Component({
   selector: 'app-article-cards',
@@ -26,43 +44,36 @@ const HIDDEN = [
   imports: [Tabs, TabList, Tab, TabPanels, TabPanel],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (lead(); as l) {
-      <header class="article-cards__lead">
-        <h1 class="article-cards__lead-title">{{ l.title }}</h1>
-        @if (l.subtitle) { <p class="article-cards__lead-sub muted italic">{{ l.subtitle }}</p> }
-      </header>
-    }
-
-    @if (hero(); as h) {
-      <article class="article-cards__card article-cards__card--hero">
-        <header class="article-cards__head">
-          @if (h.emoji) { <span class="article-cards__emoji article-cards__emoji--lg">{{ h.emoji }}</span> }
-          <h2 class="article-cards__title article-cards__title--lg">{{ h.title }}</h2>
-          @if (h.itemCount > 0) {
-            <span class="article-cards__count">{{ h.itemCount }} items</span>
-          }
+    @if (diff(); as d) {
+      <article class="cards__diff">
+        <header class="cards__diff-head">
+          <div class="cards__diff-eyebrow">
+            <i class="pi pi-history" aria-hidden="true"></i>
+            <span>What changed vs. yesterday</span>
+          </div>
+          <h2 class="cards__diff-title">{{ d.title }}</h2>
         </header>
-        <div class="markdown article-cards__body article-cards__body--hero" [innerHTML]="h.html"></div>
+        <div class="markdown cards__diff-body" [innerHTML]="d.html"></div>
       </article>
     }
 
     @if (tabbedSections().length) {
-      <section class="article-cards__deep surface">
-        <header class="article-cards__deep-head">
+      <section class="cards__deep surface">
+        <header class="cards__deep-head">
           <div>
-            <h2 class="article-cards__deep-title">Dive deeper</h2>
-            <p class="article-cards__deep-sub muted">Pick a section. The day's full briefing, broken out by theme.</p>
+            <h2 class="cards__deep-title">Dive deeper</h2>
+            <p class="cards__deep-sub muted">Every section of today's briefing, broken out by theme.</p>
           </div>
         </header>
 
-        <p-tabs [value]="active()" (valueChange)="active.set($any($event))">
+        <p-tabs [value]="active()" (valueChange)="active.set($any($event))" scrollable="true">
           <p-tablist>
             @for (s of tabbedSections(); track s.id) {
               <p-tab [value]="s.id">
-                @if (s.emoji) { <span class="article-cards__tab-emoji">{{ s.emoji }}</span> }
-                {{ s.title }}
+                <i class="pi" [class]="iconFor(s)" aria-hidden="true"></i>
+                <span class="cards__tab-label">{{ s.title }}</span>
                 @if (s.itemCount > 0) {
-                  <span class="article-cards__tab-count">{{ s.itemCount }}</span>
+                  <span class="cards__tab-count">{{ s.itemCount }}</span>
                 }
               </p-tab>
             }
@@ -70,7 +81,7 @@ const HIDDEN = [
           <p-tabpanels>
             @for (s of tabbedSections(); track s.id) {
               <p-tabpanel [value]="s.id">
-                <div class="markdown article-cards__panel-body" [innerHTML]="s.html"></div>
+                <div class="markdown cards__panel-body" [innerHTML]="s.html"></div>
               </p-tabpanel>
             }
           </p-tabpanels>
@@ -81,108 +92,71 @@ const HIDDEN = [
   styles: [`
     :host { display: block; }
 
-    .article-cards__lead {
-      padding: 0 0 1.25rem;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid var(--hairline);
-    }
-    .article-cards__lead-title {
-      margin: 0;
-      font-size: 1.85rem;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      line-height: 1.2;
-      color: var(--fg);
-    }
-    .article-cards__lead-sub {
-      margin: 0.5rem 0 0;
-      font-size: 0.9rem;
-    }
-
-    /* === Hero card =========================================== */
-    .article-cards__card--hero {
-      background: linear-gradient(180deg,
-        color-mix(in srgb, var(--accent) 5%, var(--panel)) 0%,
-        var(--panel) 100%);
-      border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--hairline));
+    /* === "What changed" card === */
+    .cards__diff {
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+      border-left: 3px solid var(--accent);
       border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem 1.4rem;
       box-shadow: var(--shadow-card);
-      padding: 1.75rem 2rem 2rem;
       margin-bottom: 1.25rem;
+    }
+    .cards__diff-head {
       display: flex;
       flex-direction: column;
-      gap: 0.85rem;
-      min-width: 0;
-    }
-    .article-cards__head {
-      display: flex;
-      align-items: baseline;
-      gap: 0.55rem;
-      padding-bottom: 0.65rem;
+      gap: 0.25rem;
+      padding-bottom: 0.6rem;
       border-bottom: 1px solid var(--hairline);
+      margin-bottom: 0.9rem;
     }
-    .article-cards__emoji { font-size: 1rem; line-height: 1; }
-    .article-cards__emoji--lg { font-size: 1.35rem; }
-    .article-cards__title {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: -0.012em;
-      color: var(--fg);
-      flex: 1;
-    }
-    .article-cards__title--lg {
-      font-size: 1.2rem;
-      letter-spacing: -0.018em;
-    }
-    .article-cards__count {
-      font-family: var(--mono);
+    .cards__diff-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--sans);
       font-size: 0.7rem;
-      color: var(--fg-4);
-      background: var(--bg-soft);
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
     }
-    /* Cards/markdown inside this component fill the column.
-       Override the global .markdown max-width which would otherwise leave
-       large blank space on the right of wide cards. */
-    :host ::ng-deep .markdown { max-width: none !important; }
-
-    .article-cards__body {
-      max-width: none;
-      font-size: 0.9rem;
-    }
-    .article-cards__body--hero {
-      font-size: 0.95rem;
-    }
-
-    /* === Tabbed "Dive deeper" ================================ */
-    .article-cards__deep {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1.5rem 1.75rem 1.75rem;
-    }
-    .article-cards__deep-head { padding-bottom: 0.25rem; }
-    .article-cards__deep-title {
+    .cards__diff-eyebrow i { font-size: 0.78rem; }
+    .cards__diff-title {
       margin: 0;
       font-size: 1.05rem;
       font-weight: 600;
       letter-spacing: -0.018em;
       color: var(--fg);
     }
-    .article-cards__deep-sub { margin: 0.25rem 0 0; font-size: 0.85rem; }
+    .cards__diff-body { font-size: 0.9rem; max-width: none; }
+    .cards__diff-body :host ::ng-deep ul { padding-inline-start: 1.25rem; }
+    .cards__diff-body :host ::ng-deep li { margin: 0.45em 0; }
+    .cards__diff-body :host ::ng-deep strong { color: var(--fg); }
 
-    :host ::ng-deep .article-cards__deep .p-tablist {
+    /* === Tabbed "Dive deeper" === */
+    .cards__deep {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1.4rem 1.6rem 1.6rem;
+    }
+    .cards__deep-head { padding-bottom: 0.25rem; }
+    .cards__deep-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.018em;
+      color: var(--fg);
+    }
+    .cards__deep-sub { margin: 0.25rem 0 0; font-size: 0.85rem; }
+
+    :host ::ng-deep .cards__deep .p-tablist {
       overflow-x: auto;
       scrollbar-width: thin;
     }
-    :host ::ng-deep .article-cards__deep .p-tablist::-webkit-scrollbar {
-      height: 4px;
-    }
-    :host ::ng-deep .article-cards__deep .p-tab {
+    :host ::ng-deep .cards__deep .p-tablist::-webkit-scrollbar { height: 4px; }
+    :host ::ng-deep .cards__deep .p-tab {
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
@@ -190,11 +164,15 @@ const HIDDEN = [
       min-width: 0;
       padding: 0.85rem 1rem !important;
     }
-    :host ::ng-deep .article-cards__deep .p-tablist-nav-button {
-      display: none !important; /* native scroll, no buttons */
+    :host ::ng-deep .cards__deep .p-tab > i {
+      font-size: 0.85rem;
+      color: var(--fg-4);
     }
-    .article-cards__tab-emoji { font-size: 0.9rem; line-height: 1; }
-    .article-cards__tab-count {
+    :host ::ng-deep .cards__deep .p-tab[aria-selected="true"] > i { color: var(--accent-strong); }
+    :host ::ng-deep .cards__deep .p-tablist-nav-button { display: none !important; }
+
+    .cards__tab-label { font-weight: inherit; }
+    .cards__tab-count {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -209,26 +187,26 @@ const HIDDEN = [
       border-radius: 999px;
       font-variant-numeric: tabular-nums;
     }
-    .article-cards__panel-body {
+
+    .cards__panel-body {
       padding-top: 0.85rem;
       column-gap: 2.5rem;
       column-rule: 1px solid var(--hairline);
+      max-width: none;
     }
     @media (min-width: 1100px) {
-      .article-cards__panel-body { column-count: 2; }
+      .cards__panel-body { column-count: 2; }
     }
-    /* Keep semantic blocks (paragraph + heading + list) from breaking mid-column */
-    .article-cards__panel-body :host ::ng-deep h3,
-    .article-cards__panel-body :host ::ng-deep h4,
-    .article-cards__panel-body :host ::ng-deep p,
-    .article-cards__panel-body :host ::ng-deep li,
-    .article-cards__panel-body :host ::ng-deep ul,
-    .article-cards__panel-body :host ::ng-deep ol {
+    .cards__panel-body :host ::ng-deep h3,
+    .cards__panel-body :host ::ng-deep h4,
+    .cards__panel-body :host ::ng-deep p,
+    .cards__panel-body :host ::ng-deep li,
+    .cards__panel-body :host ::ng-deep ul,
+    .cards__panel-body :host ::ng-deep ol {
       break-inside: avoid;
     }
-    .article-cards__panel-body :host ::ng-deep h3 {
-      margin-top: 0;
-    }
+    .cards__panel-body :host ::ng-deep h3 { margin-top: 0; }
+    :host ::ng-deep .markdown { max-width: none !important; }
   `]
 })
 export class ArticleCards {
@@ -237,31 +215,11 @@ export class ArticleCards {
   private readonly sanitizer: DomSanitizer;
   constructor(sanitizer: DomSanitizer) { this.sanitizer = sanitizer; }
 
-  readonly lead = computed<{ title: string; subtitle: string } | null>(() => {
-    const src = this.source() ?? '';
-    if (!src) return null;
-    const lines = src.split('\n');
-    let title = '';
-    let subtitle = '';
-    for (let i = 0; i < lines.length; i++) {
-      const m1 = lines[i].match(/^#\s+(.+)$/);
-      if (m1 && !title) { title = m1[1].trim(); continue; }
-      if (title && !subtitle) {
-        const t = lines[i].trim();
-        if (!t) continue;
-        if (/^#{1,6}\s/.test(t)) break;
-        subtitle = t.replace(/^_+|_+$/g, '').replace(/^\*+|\*+$/g, '');
-        break;
-      }
-    }
-    return title ? { title, subtitle } : null;
-  });
-
   private readonly allSections = computed<Section[]>(() => {
     const src = this.source() ?? '';
     if (!src) return [];
 
-    // Strip the H1 + the first paragraph
+    // Strip the H1 + the first non-heading paragraph (the synthesis subtitle).
     const stripped = (() => {
       const lines = src.split('\n');
       let i = 0;
@@ -294,30 +252,41 @@ export class ArticleCards {
       const html = marked.parse(b.body, { async: false }) as string;
       const bodyText = b.body.replace(/[*_`#>~\-\[\](){}]/g, '').trim();
       const itemCount = (b.body.match(/^\s*([-*+]|\d+\.)\s+/gm) || []).length;
+      const { kind } = classify(titleClean);
       return {
         id: 'sec-' + idx + '-' + titleClean.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         title: titleClean,
         emoji,
         html: this.sanitizer.bypassSecurityTrustHtml(html),
         bodyText,
-        itemCount
+        itemCount,
+        kind
       };
     }).filter(s => s.bodyText.length > 0);
   });
 
-  readonly hero = computed<Section | null>(() => {
-    const all = this.allSections();
-    return all[0] ?? null;       // First H2 (Top-5 reading priorities) is always the hero
+  /** "What changed vs. yesterday" lives outside the tabs as a callout. */
+  readonly diff = computed<Section | null>(() => {
+    return this.allSections().find(s => s.kind === 'diff') ?? null;
   });
 
   readonly tabbedSections = computed<Section[]>(() => {
     const all = this.allSections();
-    const out = all.slice(1).filter(s => !HIDDEN.some(h => s.title.toLowerCase().startsWith(h)));
-    // Initialise active tab if not set yet
+    const out = all.filter(s =>
+      s.kind !== 'diff'
+      && !HIDDEN_TITLES.some(h => s.title.toLowerCase().startsWith(h))
+    );
+    // Preferred ordering — news → research → blogs → github → hn → linkedin → jobs → other
+    const order: Section['kind'][] = ['news', 'research', 'blogs', 'github', 'hn', 'linkedin', 'jobs', 'other', 'meta'];
+    out.sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind));
     if (out.length && !this.active()) {
-      // defer the set so signal write happens after read
       queueMicrotask(() => { if (!this.active()) this.active.set(out[0].id); });
     }
     return out;
   });
+
+  iconFor(s: Section): string {
+    const rule = KIND_RULES.find(r => r.kind === s.kind);
+    return rule?.icon ?? 'pi-circle';
+  }
 }

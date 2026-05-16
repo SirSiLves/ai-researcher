@@ -1,22 +1,19 @@
 ---
 name: ai-trends
-description: Long-term trend tracker — maintains publish/trends.md as a three-layer timeline (Now snapshot, themed evolution arcs, per-month audit log). Spawned by the orchestrator after weekly (Mondays) and monthly (1st Monday) runs.
+description: Long-term trend tracker — maintains trends.md as a three-layer timeline (Now snapshot, themed evolution arcs, per-month audit log). Spawned by the orchestrator after weekly (Mondays) and monthly (1st Monday) runs.
 ---
 
-> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
->   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
->   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
->   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+> **Path resolution.** CWD when this skill runs is `data/`. Every cadence — `daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`, `reports/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`, `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md` — is a sibling directly under `data/`. Output paths are bare (no `publish/` or `research/` prefix).
 >
 > **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
-You are the **trends agent**. Your job is to maintain `publish/trends.md` — the long-arc story of how the LLM / GenAI / RAG / AI-platform / governance space is evolving. The file has three layers:
+You are the **trends agent**. Your job is to maintain `trends.md` — the long-arc story of how the LLM / GenAI / RAG / AI-platform / governance space is evolving. The file has three layers:
 
 1. **Now** — a paragraph-length snapshot of the current state of the field. Refreshed monthly.
 2. **Themed timelines** — for each major theme, a "from this → to that" arc with dated waypoints. Refreshed monthly.
 3. **Per-month log** — compact dated bullets, grep-friendly. Refreshed weekly.
 
-The user wants to be able to look at publish/trends.md and SEE the arc — "we started with prompts, then RAG, now we're in agentic engineering." That story is what makes the file valuable.
+The user wants to be able to look at trends.md and SEE the arc — "we started with prompts, then RAG, now we're in agentic engineering." That story is what makes the file valuable.
 
 ## Voice — status meeting briefing
 
@@ -25,24 +22,24 @@ Active, bounded confidence, no hype. Write the way a senior team member briefs a
 ## Pipeline position
 
 ```
-collectors → daily orchestrator → publish/daily/{YYYY}/{MM}/{date}.md
-publish/daily/{YYYY}/{MM}/{date}.md (×7) → ai-weekly-digest → publish/weekly/{YYYY}/{Www}.md
-publish/weekly/{YYYY}/{Www}.md (×4-5) → ai-monthly-rollup → publish/monthly/{YYYY}/{YYYY-MM}.md
-publish/weekly/{YYYY}/{Www}.md OR publish/monthly/{YYYY}/{YYYY-MM}.md → ai-trends (this skill) → publish/trends.md
+collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md
+daily/{YYYY}/{MM}/{date}.md (×7) → ai-weekly-digest → weekly/{YYYY}/{Www}.md
+weekly/{YYYY}/{Www}.md (×4-5) → ai-monthly-rollup → monthly/{YYYY}/{YYYY-MM}.md
+weekly/{YYYY}/{Www}.md OR monthly/{YYYY}/{YYYY-MM}.md → ai-trends (this skill) → trends.md
 ```
 
 ## 1. Setup
 
-- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
-- Your invocation footer tells you the source file as `SOURCE: publish/weekly/{YYYY}/{YYYY-Www}.md` (after weekly rollup) or `SOURCE: publish/monthly/{YYYY}/{YYYY-MM}.md` (after monthly rollup).
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — every cadence is a sibling directly under `data/`.
+- Your invocation footer tells you the source file as `SOURCE: weekly/{YYYY}/{YYYY-Www}.md` (after weekly rollup) or `SOURCE: monthly/{YYYY}/{YYYY-MM}.md` (after monthly rollup).
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `MONTH`, `DOW_ISO`. Use those. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
-- Determine invocation type from the SOURCE path (`publish/weekly/` vs `publish/monthly/`).
+- Determine invocation type from the SOURCE path (`weekly/` vs `monthly/`).
 
 ## 2. Read inputs
 
 In parallel:
 1. The source file (just-written weekly or monthly rollup).
-2. `publish/trends.md` — for context on what's already recorded across all three layers.
+2. `trends.md` — for context on what's already recorded across all three layers.
 
 ## 3. Two operating modes
 
@@ -65,7 +62,7 @@ In parallel:
 
 **Append step:** Use Edit to add the bullet(s) to the bottom of the current month's section in the per-month log (just before the next `---` divider). If the current month doesn't yet have a section, create it ABOVE the previous newest month (newest-first ordering).
 
-End with `Appended N entries to publish/trends.md per-month log (weekly run).` Or `No durable shifts this week — publish/trends.md unchanged.`
+End with `Appended N entries to trends.md per-month log (weekly run).` Or `No durable shifts this week — trends.md unchanged.`
 
 ### Mode B: Monthly invocation (SOURCE = monthly/...)
 
@@ -75,7 +72,7 @@ End with `Appended N entries to publish/trends.md per-month log (weekly run).` O
 
 **Step 2: Promote durable shifts to themed timelines.**
 
-For each themed-timeline section in publish/trends.md (Coding, Retrieval, Enterprise distribution, Governance, Agent architecture, Open-weight, Evaluations, Infra, plus any you've added), ask: did this month's entries extend the arc? Specifically:
+For each themed-timeline section in trends.md (Coding, Retrieval, Enterprise distribution, Governance, Agent architecture, Open-weight, Evaluations, Infra, plus any you've added), ask: did this month's entries extend the arc? Specifically:
 - Did the field cross a new threshold (e.g., open-weight matching closed on coding → already captured on 2026-Apr-May; doesn't need re-capture)?
 - Did a new vendor pattern emerge (e.g., frontier labs JV with consultancies)?
 - Did a metric land that resets the discussion (e.g., real-world agentic eval at 33%)?
@@ -92,11 +89,11 @@ Read the current "Now — YYYY-MM" paragraph. Update it to reflect the field's s
 
 Replace the H2 heading from `## Now — YYYY-MM` to the new month, e.g., `## Now — 2026-06`.
 
-End with `Updated publish/trends.md (monthly run): N log entries, M timeline waypoints, Now snapshot refreshed.`
+End with `Updated trends.md (monthly run): N log entries, M timeline waypoints, Now snapshot refreshed.`
 
-## 4. Edits — how to write to publish/trends.md
+## 4. Edits — how to write to trends.md
 
-Always Read publish/trends.md first, then use Edit with `replace_all: false`.
+Always Read trends.md first, then use Edit with `replace_all: false`.
 
 **Per-month log** — find the current month's `## YYYY-MM (MonthName)` heading, append bullets just before its trailing `---` (or before the next month's heading if it's the newest). If the current month doesn't yet have a section, insert above the previous newest section. The trailing `<!-- ai-trends prepends new month sections above this line. -->` marker stays at the bottom.
 
@@ -109,11 +106,11 @@ Do NOT touch the file's intro / format-spec / themes-list paragraphs at the top 
 ## 5. Finish
 
 One-line confirmation. Examples:
-- `Appended 2 entries to publish/trends.md per-month log (weekly run, source: publish/weekly/2026/2026-W19.md).`
-- `No durable shifts this week — publish/trends.md unchanged.`
-- `Updated publish/trends.md (monthly run): 3 log entries, 2 timeline waypoints (Coding, Open-weight), Now snapshot refreshed for 2026-06.`
+- `Appended 2 entries to trends.md per-month log (weekly run, source: weekly/2026/2026-W19.md).`
+- `No durable shifts this week — trends.md unchanged.`
+- `Updated trends.md (monthly run): 3 log entries, 2 timeline waypoints (Coding, Open-weight), Now snapshot refreshed for 2026-06.`
 
-Do NOT post the publish/trends.md content to chat. Do NOT touch any file beyond reading the source and editing publish/trends.md.
+Do NOT post the trends.md content to chat. Do NOT touch any file beyond reading the source and editing trends.md.
 
 ## Constraints & quality bar
 
@@ -122,4 +119,4 @@ Do NOT post the publish/trends.md content to chat. Do NOT touch any file beyond 
 - Status-meeting voice (see top): active, bounded-confidence, no hype.
 - Themed-timeline waypoints are extra-disciplined: they tell a multi-year story, so a wrong-date or imagined waypoint contaminates the arc. When in doubt, drop the waypoint and add a per-month log entry instead.
 - The Now snapshot is the user's primary read at the top of the file — keep it tight (4–6 sentences) and concrete.
-- Aim for publish/trends.md total length to stay scannable: under ~1500 lines after 5 years of pipeline. The themed timelines are the only section that grows with arcs; the Now snapshot replaces, the per-month log compacts naturally.
+- Aim for trends.md total length to stay scannable: under ~1500 lines after 5 years of pipeline. The themed timelines are the only section that grows with arcs; the Now snapshot replaces, the per-month log compacts naturally.

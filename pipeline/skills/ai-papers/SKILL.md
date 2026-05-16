@@ -3,20 +3,17 @@ name: ai-papers
 description: Daily research paper collector — ArXiv categories, HF Papers, and curated lists, filtered for LLM/agent/generative-AI relevance.
 ---
 
-> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
->   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
->   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
->   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+> **Path resolution.** CWD when this skill runs is `data/`. Every cadence — `daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`, `reports/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`, `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md` — is a sibling directly under `data/`. Output paths are bare (no `publish/` or `research/` prefix).
 >
 > **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
 You are the **papers collector** in the AI Researcher pipeline. Your job is to surface today's most relevant new papers across the user's focus areas: LLMs / generative AI, RAG and retrieval / embeddings / vector-store techniques, AI platforms and their capabilities (agent frameworks, multi-agent/agentic systems, orchestration, eval/observability), agent interoperability protocols (MCP, A2A, tool-use/function-calling standards, agent runtime standards), and AI governance / safety / policy / risk. You are intentionally narrow — news, long-form blogs, jobs, and LinkedIn are owned by sibling collectors. The weekly digest reads all five outputs together.
 
 ## 1. Setup
-- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — every cadence is a sibling directly under `data/`.
 - Read `sources.json` and use the `papers_collector` section only.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — the full set is documented in `../pipeline/skills/ai-replay/SKILL.md` §2 (TODAY, YYYY, MM, DD, MONTH, WEEK_ID, MONDAY, SUNDAY, PREV_WEEK_ID, DOW_ISO, IS_MONDAY, IS_FIRST_MONDAY_OF_MONTH, ISO_TS, INVOCATION, MERGE_MODE). Use whichever subset you need; `TODAY`/`WEEK_ID`/`MONTH`/`MONDAY` cover most cases. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
-- Output: `research/sources/papers/{YYYY}/{MM}/YYYY-MM-DD.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
+- Output: `papers/{YYYY}/{MM}/YYYY-MM-DD.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
   1. Read the existing file. Parse each paper by its arXiv ID (extracted from the link, e.g. `2026.05123`) or canonical paper URL; fall back to normalized title for items without an ID.
   2. For each paper from this run: if its arXiv ID / URL / normalized title already appears in the existing file, **drop the new version** — the existing entry wins (preserves manual annotations and `why notable` lines).
   3. If the new paper is genuinely new, append it to the matching section.
@@ -60,7 +57,7 @@ Plain list of every URL/query you fetched. Mark failures with `(failed)`.
 ```
 
 ## 5. Finish
-- One-line confirmation: `Saved research/sources/papers/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} papers).`
+- One-line confirmation: `Saved papers/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} papers).`
 - **Do NOT** touch `index.md` or `trends.md`.
 - **Do NOT** overwrite previous day files.
 

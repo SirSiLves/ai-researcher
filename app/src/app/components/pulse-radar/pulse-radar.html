@@ -1,0 +1,441 @@
+<div class="pulse-radar"
+     [class.has-filters]="hasActiveFilters()"
+     [class.is-focused]="sectorFilter() !== null">
+
+  <!-- ── Stat strip (top of dashboard) ────────────────────────────── -->
+  @if (stats(); as s) {
+    <div class="pulse-radar__stats">
+      <div class="pulse-radar__stat">
+        <span class="pulse-radar__stat-value tabular">{{ s.total }}</span>
+        <span class="pulse-radar__stat-label">topics tracked</span>
+      </div>
+      <div class="pulse-radar__stat pulse-radar__stat--surge">
+        <span class="pulse-radar__stat-value tabular">{{ s.surging }}</span>
+        <span class="pulse-radar__stat-label">surging</span>
+      </div>
+      <div class="pulse-radar__stat">
+        <span class="pulse-radar__stat-value tabular">{{ s.rising }}</span>
+        <span class="pulse-radar__stat-label">rising</span>
+      </div>
+      @if (s.fading > 0) {
+        <div class="pulse-radar__stat pulse-radar__stat--fade">
+          <span class="pulse-radar__stat-value tabular">{{ s.fading }}</span>
+          <span class="pulse-radar__stat-label">fading</span>
+        </div>
+      }
+      @if (biggestMover(); as m) {
+        <button type="button" class="pulse-radar__stat pulse-radar__stat--hl"
+                (click)="topicSelect.emit(m)" [title]="m.label">
+          <span class="pulse-radar__stat-eyebrow">Biggest mover</span>
+          <span class="pulse-radar__stat-name">{{ m.label }}</span>
+        </button>
+      }
+      @if (hottestSector(); as h) {
+        <button type="button" class="pulse-radar__stat pulse-radar__stat--hl"
+                (click)="toggleSector(h.name)">
+          <span class="pulse-radar__stat-eyebrow">Hottest sector</span>
+          <span class="pulse-radar__stat-name">{{ h.name }}
+            <span class="pulse-radar__stat-meta">{{ h.rising }}/{{ h.total }} ↗</span>
+          </span>
+        </button>
+      }
+    </div>
+  }
+
+  <!-- ── Filter toolbar ──────────────────────────────────────────── -->
+  <div class="pulse-radar__filters" role="toolbar" aria-label="Radar filters">
+    <div class="pulse-radar__group" role="group" aria-label="Sector">
+      <span class="pulse-radar__group-label">Sector</span>
+      @for (q of quadrants(); track q.sector; let i = $index) {
+        <button type="button"
+                class="pulse-radar__chip"
+                [class.is-active]="sectorFilter() === q.sector"
+                (click)="toggleSector(q.sector)">
+          <span class="pulse-radar__chip-mark" [attr.data-quad]="i"></span>
+          {{ q.sector }}
+        </button>
+      }
+    </div>
+
+    <div class="pulse-radar__group" role="group" aria-label="Direction">
+      <span class="pulse-radar__group-label">Direction</span>
+      @for (d of DIRECTIONS; track d) {
+        <button type="button"
+                class="pulse-radar__chip pulse-radar__chip--dir"
+                [attr.data-dir]="d"
+                [class.is-active]="directionFilter().has(d)"
+                (click)="toggleDirection(d)">
+          <span class="pulse-radar__chip-dot"></span>{{ d }}
+        </button>
+      }
+    </div>
+
+    <div class="pulse-radar__group" role="group" aria-label="Stage">
+      <span class="pulse-radar__group-label">Stage</span>
+      @for (r of RING_KEYS; track r) {
+        <button type="button"
+                class="pulse-radar__chip"
+                [class.is-active]="stageFilter().has(r)"
+                (click)="toggleStage(r)">
+          {{ RING_LABELS[r] }}
+        </button>
+      }
+    </div>
+
+    @if (clusters().length) {
+      <div class="pulse-radar__group" role="group" aria-label="Cluster">
+        <span class="pulse-radar__group-label">Cluster</span>
+        @for (c of clusters(); track c.id) {
+          <button type="button"
+                  class="pulse-radar__chip pulse-radar__chip--cluster"
+                  [class.is-active]="clusterFilter() === c.id"
+                  (click)="toggleCluster(c.id)"
+                  [title]="c.size + ' topics'">
+            <i class="pi pi-sitemap" aria-hidden="true"></i>
+            {{ c.name }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="pulse-radar__group pulse-radar__group--search" role="group" aria-label="Search">
+      <i class="pi pi-search pulse-radar__search-icon" aria-hidden="true"></i>
+      <input class="pulse-radar__search"
+             type="search"
+             placeholder="Find a topic…"
+             [ngModel]="search()"
+             (ngModelChange)="search.set($event)"
+             aria-label="Search topics" />
+      @if (hasActiveFilters()) {
+        <button type="button"
+                class="pulse-radar__clear"
+                (click)="clearFilters()"
+                title="Clear all filters">
+          <i class="pi pi-times" aria-hidden="true"></i> Clear
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── Canvas + Side rail ──────────────────────────────────────── -->
+  <div class="pulse-radar__main">
+    <div class="pulse-radar__canvas">
+      <svg class="pulse-radar__svg"
+           [attr.viewBox]="activeViewBox()"
+           preserveAspectRatio="xMidYMid meet"
+           role="img"
+           aria-label="Topic radar — quadrants are sectors, rings are maturity stages">
+
+        <defs>
+          @for (q of quadrants(); track q.sector; let i = $index) {
+            <radialGradient [attr.id]="'pulse-quad-' + i"
+                            [attr.cx]="CENTER" [attr.cy]="CENTER" [attr.r]="RADIUS"
+                            gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   class="pulse-quad-stop-0" [attr.data-quad]="i" />
+              <stop offset="100%" class="pulse-quad-stop-1" [attr.data-quad]="i" />
+            </radialGradient>
+          }
+          <linearGradient id="pulse-sweep" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   class="pulse-sweep-stop-0" />
+            <stop offset="100%" class="pulse-sweep-stop-1" />
+          </linearGradient>
+          <filter id="pulse-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="b" />
+            <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+
+        @for (q of quadrants(); track q.sector; let i = $index) {
+          <path class="pulse-radar__quad"
+                [attr.d]="quadrantPath(q)"
+                [attr.fill]="'url(#pulse-quad-' + i + ')'"
+                [class.is-active]="sectorFilter() === q.sector"
+                [class.is-dimmed]="sectorFilter() && sectorFilter() !== q.sector" />
+        }
+
+        <g class="pulse-radar__sweep" aria-hidden="true">
+          <path class="pulse-radar__sweep-arm"
+                [attr.d]="'M ' + CENTER + ' ' + CENTER + ' L ' + (CENTER + RADIUS) + ' ' + CENTER + ' A ' + RADIUS + ' ' + RADIUS + ' 0 0 1 ' + (CENTER + RADIUS * 0.95) + ' ' + (CENTER + RADIUS * 0.31) + ' Z'" />
+        </g>
+
+        @for (r of RING_KEYS; track r) {
+          <circle class="pulse-radar__ring"
+                  [attr.cx]="CENTER" [attr.cy]="CENTER" [attr.r]="ringR(r)"
+                  [class.is-dimmed]="stageFilter().size > 0 && !stageFilter().has(r)" />
+        }
+
+        @for (q of quadrants(); track q.sector) {
+          <line class="pulse-radar__divider"
+                [attr.x1]="CENTER" [attr.y1]="CENTER"
+                [attr.x2]="q.edgeX" [attr.y2]="q.edgeY" />
+        }
+
+        <!-- Cluster connection lines (drawn under blips) -->
+        @for (l of clusterLines(); track l.x1 + '-' + l.x2 + '-' + l.y1 + '-' + l.y2) {
+          <line class="pulse-radar__cluster-line"
+                [class.is-active]="clusterFilter() === l.clusterId"
+                [class.is-dimmed]="clusterFilter() !== null && clusterFilter() !== l.clusterId"
+                [attr.x1]="l.x1" [attr.y1]="l.y1"
+                [attr.x2]="l.x2" [attr.y2]="l.y2" />
+        }
+
+        <!-- Ring labels -->
+        @for (r of RING_KEYS; track r) {
+          <text class="pulse-radar__ring-label"
+                [attr.x]="CENTER" [attr.y]="ringLabelY(r)">{{ RING_LABELS[r] }}</text>
+        }
+
+        <!-- Sector arc labels with rising/total chip -->
+        @for (q of quadrants(); track q.sector; let i = $index) {
+          <path [attr.id]="q.pathId" [attr.d]="q.labelArcPath" fill="none" stroke="none" />
+          <text class="pulse-radar__sector-label">
+            <textPath [attr.href]="'#' + q.pathId" startOffset="50%" text-anchor="middle">
+              {{ q.sector }}
+              @if (sectorRows()[i]; as srow) {
+                · {{ srow.rising }}/{{ srow.total }} ↗
+              }
+            </textPath>
+          </text>
+        }
+
+        <!-- Motion trails: each blip's 7-day-ago position → today -->
+        @for (t of trails(); track t.topicId) {
+          <line class="pulse-radar__trail"
+                [class.is-dimmed]="hasActiveFilters() && !visibleIds().has(t.topicId)"
+                [class.is-active]="hover()?.topic?.id === t.topicId"
+                [attr.x1]="t.x1" [attr.y1]="t.y1"
+                [attr.x2]="t.x2" [attr.y2]="t.y2" />
+          <circle class="pulse-radar__trail-tail"
+                  [class.is-dimmed]="hasActiveFilters() && !visibleIds().has(t.topicId)"
+                  [attr.cx]="t.x1" [attr.cy]="t.y1" r="1.5" />
+        }
+
+        <!-- Hover guide line -->
+        @if (guideLine(); as g) {
+          <line class="pulse-radar__guide"
+                [attr.x1]="g.x1" [attr.y1]="g.y1"
+                [attr.x2]="g.x2" [attr.y2]="g.y2" />
+        }
+
+        <!-- Blips -->
+        @for (b of blips(); track b.topic.id) {
+          <g class="pulse-radar__blip"
+             [ngClass]="directionDot(b.direction)"
+             [class.is-active]="hover()?.topic?.id === b.topic.id"
+             [class.is-dimmed]="hasActiveFilters() && !visibleIds().has(b.topic.id)"
+             [class.is-surging]="b.direction === 'surging'"
+             [style.--blip-i]="b.i"
+             (mouseenter)="onBlipEnter(b)"
+             (mouseleave)="onBlipLeave()"
+             (click)="onBlipClick(b)"
+             [attr.tabindex]="0"
+             (keydown.enter)="onBlipClick(b)"
+             (keydown.space)="onBlipClick(b)">
+            @if (b.direction === 'surging') {
+              <circle class="pulse-radar__echo"
+                      [attr.cx]="b.cx" [attr.cy]="b.cy" [attr.r]="b.r" />
+            }
+            <circle class="pulse-radar__dot"
+                    [attr.cx]="b.cx" [attr.cy]="b.cy" [attr.r]="b.r" />
+            <!-- Sequential blip number inside the dot. -->
+            <text class="pulse-radar__num"
+                  [attr.x]="b.cx"
+                  [attr.y]="b.cy + 3"
+                  text-anchor="middle">{{ b.i }}</text>
+          </g>
+        }
+
+        @if (hasActiveFilters() && visibleCount() === 0) {
+          <g class="pulse-radar__empty" aria-hidden="true">
+            <text [attr.x]="CENTER" [attr.y]="CENTER - 4" text-anchor="middle">No topics match</text>
+            <text [attr.x]="CENTER" [attr.y]="CENTER + 16" text-anchor="middle"
+                  class="pulse-radar__empty-sub">Clear a filter</text>
+          </g>
+        }
+      </svg>
+
+      <!-- Rich tooltip -->
+      @if (hover(); as h) {
+        <div class="pulse-radar__tip"
+             [style.left.%]="(h.cx / SIZE) * 100"
+             [style.top.%]="(h.cy / SIZE) * 100">
+          <div class="pulse-radar__tip-head">
+            <span class="pulse-radar__tip-dot" [ngClass]="directionDot(h.direction)"></span>
+            <div class="pulse-radar__tip-title">{{ h.topic.label }}</div>
+          </div>
+          <div class="pulse-radar__tip-meta">
+            <span>{{ h.sector }}</span>
+            <span class="pulse-radar__tip-sep">·</span>
+            <span>{{ RING_LABELS[h.ring] }}</span>
+            <span class="pulse-radar__tip-sep">·</span>
+            <span>{{ h.direction }}</span>
+          </div>
+          <div class="pulse-radar__tip-stats">
+            <span><strong>{{ h.topic.score_fast.toFixed(1) }}</strong> loud</span>
+            <span><strong>{{ h.topic.breadth_7d }}</strong> orgs</span>
+            <span><strong>{{ h.topic.sustained_days }}</strong>d</span>
+          </div>
+          @if (sparkOf(h.topic.id).length > 1) {
+            <svg class="pulse-radar__tip-spark" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
+              <path [attr.d]="sparkPath(sparkOf(h.topic.id), 120, 28)"
+                    fill="none" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          }
+          @if (h.topic.breadth_orgs_7d.length) {
+            <div class="pulse-radar__tip-firms">
+              @for (f of h.topic.breadth_orgs_7d.slice(0, 4); track f) {
+                <span class="pulse-radar__tip-firm">{{ f }}</span>
+              }
+              @if (h.topic.breadth_orgs_7d.length > 4) {
+                <span class="pulse-radar__tip-firm muted-firm">+{{ h.topic.breadth_orgs_7d.length - 4 }}</span>
+              }
+            </div>
+          }
+          @if (clusterNameOf(h.topic); as cname) {
+            <div class="pulse-radar__tip-cluster">
+              <i class="pi pi-sitemap" aria-hidden="true"></i>
+              {{ cname }}
+            </div>
+          }
+          <div class="pulse-radar__tip-hint">click for full detail →</div>
+        </div>
+      }
+    </div>
+
+    <!-- ── Side: what changed today + numbered topic list ─── -->
+    <aside class="pulse-radar__rail" aria-label="Numbered topic list">
+      @if (changedToday().length) {
+        <section class="pulse-radar__changed">
+          <header class="pulse-radar__changed-head">
+            <span class="pulse-radar__changed-title">What changed today</span>
+            <span class="pulse-radar__changed-count tabular">{{ changedToday().length }}</span>
+          </header>
+          <ul class="pulse-radar__changed-list">
+            @for (c of changedToday(); track c.label + c.kind) {
+              <li class="pulse-radar__changed-item"
+                  [attr.data-kind]="c.kind"
+                  (mouseenter)="c.topic ? onLegendEnter(c.topic.id) : null"
+                  (mouseleave)="onBlipLeave()"
+                  (click)="c.topic ? topicSelect.emit(c.topic) : null"
+                  [class.is-clickable]="!!c.topic">
+                <span class="pulse-radar__changed-kind">
+                  @switch (c.kind) {
+                    @case ('new') { New }
+                    @case ('in')  { Moved in }
+                    @case ('out') { Moved out }
+                  }
+                </span>
+                <span class="pulse-radar__changed-label">{{ c.label }}</span>
+                <span class="pulse-radar__changed-stage">
+                  @if (c.from) {
+                    {{ c.from }} → <strong>{{ c.to }}</strong>
+                  } @else {
+                    <strong>{{ c.to }}</strong>
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+      @for (g of legendByRing(); track g.ring) {
+        <section class="pulse-radar__ring-group">
+          <header class="pulse-radar__ring-head">
+            <span class="pulse-radar__ring-name">{{ g.label }}</span>
+            <span class="pulse-radar__ring-count tabular">{{ g.entries.length }}</span>
+          </header>
+          <ul class="pulse-radar__ring-list">
+            @for (b of g.entries; track b.topic.id) {
+              <li class="pulse-radar__ring-item"
+                  [attr.data-topic-id]="b.topic.id"
+                  [class.is-active]="hover()?.topic?.id === b.topic.id"
+                  [class.is-dimmed]="hasActiveFilters() && !visibleIds().has(b.topic.id)"
+                  [ngClass]="directionDot(b.direction)"
+                  (mouseenter)="onLegendEnter(b.topic.id)"
+                  (mouseleave)="onBlipLeave()"
+                  (click)="topicSelect.emit(b.topic)"
+                  tabindex="0">
+                <span class="pulse-radar__ring-num">{{ b.i }}</span>
+                <span class="pulse-radar__ring-label">{{ b.topic.label }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </aside>
+  </div>
+
+  <!-- ── Scrubber (time-travel) ─────────────────────────────────── -->
+  @if (availableDates().length > 1) {
+    <div class="pulse-radar__scrubber" role="group" aria-label="Day picker">
+      <span class="pulse-radar__scrubber-label">Last days</span>
+      <div class="pulse-radar__scrubber-track">
+        @for (d of availableDates().slice(0, 14); track d) {
+          <button type="button"
+                  class="pulse-radar__tick"
+                  [class.is-active]="selectedDate() === d"
+                  [attr.title]="d"
+                  (click)="dateSelect.emit(d)">
+            <span class="pulse-radar__tick-day">{{ d.slice(-2) }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ── Scale legend ────────────────────────────────────────── -->
+  <footer class="pulse-radar__scale">
+    <span class="pulse-radar__scale-item pulse--surging"><span class="pulse-radar__scale-dot"></span>Surging</span>
+    <span class="pulse-radar__scale-item pulse--rising"><span class="pulse-radar__scale-dot"></span>Rising</span>
+    <span class="pulse-radar__scale-item pulse--steady"><span class="pulse-radar__scale-dot"></span>Steady</span>
+    <span class="pulse-radar__scale-item pulse--fading"><span class="pulse-radar__scale-dot"></span>Fading</span>
+    <span class="pulse-radar__scale-sep">·</span>
+    <span class="muted">outer rim · edge of attention &nbsp;→&nbsp; centre · entrenched</span>
+    @if (stageMovements().length) {
+      <span class="pulse-radar__scale-sep">·</span>
+      <span class="muted">{{ stageMovements().length }} stage shift{{ stageMovements().length === 1 ? '' : 's' }} today</span>
+    }
+  </footer>
+
+  <!-- ── Collapsible legend, if enabled ─────────────────────────── -->
+  @if (showTopicList()) {
+    <section class="pulse-radar__list" aria-label="Topic inventory">
+      <header class="pulse-radar__list-head">
+        <h3 class="pulse-radar__list-title">All topics</h3>
+        <span class="pulse-radar__list-count tabular">
+          <strong>{{ hasActiveFilters() ? visibleCount() : blips().length }}</strong>
+          @if (hasActiveFilters()) { / {{ blips().length }} }
+          shown
+        </span>
+      </header>
+      @for (g of legendGroups(); track g.sector) {
+        @if (g.entries.length) {
+          <details class="pulse-radar__leg-group">
+            <summary class="pulse-radar__leg-sector">
+              <span class="pulse-radar__leg-sector-name">{{ g.sector }}</span>
+              <span class="pulse-radar__leg-sector-count">{{ g.entries.length }}</span>
+            </summary>
+            <ul class="pulse-radar__leg-list">
+              @for (e of g.entries; track e.topic.id) {
+                <li class="pulse-radar__leg-item"
+                    [attr.data-topic-id]="e.topic.id"
+                    [class.is-active]="hover()?.topic?.id === e.topic.id"
+                    [class.is-dimmed]="hasActiveFilters() && !visibleIds().has(e.topic.id)"
+                    [ngClass]="directionDot(e.direction)"
+                    (mouseenter)="onLegendEnter(e.topic.id)"
+                    (mouseleave)="onBlipLeave()"
+                    (click)="topicSelect.emit(e.topic)"
+                    tabindex="0">
+                  <span class="pulse-radar__leg-dot"></span>
+                  <span class="pulse-radar__leg-label">{{ e.topic.label }}</span>
+                  <span class="pulse-radar__leg-dir">{{ e.direction }}</span>
+                </li>
+              }
+            </ul>
+          </details>
+        }
+      }
+    </section>
+  }
+</div>

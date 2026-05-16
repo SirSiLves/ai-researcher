@@ -3,10 +3,7 @@ name: sync-notes
 description: Sync the AI Researcher Apple Notes folder with the workspace markdown files. Use when the user says "sync notes", "refresh notes", "the notes look stale/wrong", "rebuild notes", "backfill the [date] note", or any time the Apple Notes view appears out of sync with daily/weekly/monthly/trends files on disk. Also use after a manual rename / cleanup operation that bypassed the LaunchAgent's WatchPaths trigger.
 ---
 
-> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
->   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
->   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
->   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+> **Path resolution.** CWD when this skill runs is `data/`. Every cadence — `daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`, `reports/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`, `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md` — is a sibling directly under `data/`. Output paths are bare (no `publish/` or `research/` prefix).
 >
 > **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
@@ -17,7 +14,7 @@ You are running the Apple Notes sync for the AI Researcher pipeline. The workspa
 Three jobs depending on the user's intent:
 
 1. **Refresh** — rebuild the four "newest" notes (Digest / Weekly / Monthly / Trends).
-2. **Sync-all** — ensure every archived `.md` in `publish/daily/`, `publish/weekly/`, `publish/monthly/` plus `publish/trends.md` has a corresponding note. Idempotent. Use after rename/cleanup or when notes obviously diverged.
+2. **Sync-all** — ensure every archived `.md` in `daily/`, `weekly/`, `monthly/` plus `trends.md` has a corresponding note. Idempotent. Use after rename/cleanup or when notes obviously diverged.
 3. **Backfill one** — render a specific file into its note. Use for "create the missing 2026-05-05 note."
 
 Pick the mode from the user's wording. If ambiguous, default to **sync-all** and say so.
@@ -27,7 +24,7 @@ Pick the mode from the user's wording. If ambiguous, default to **sync-all** and
 Run a single bash check from the workspace folder:
 
 ```bash
-cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/publish" && \
+cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher/data" && \
   echo "--- daily/"  && find daily   -type f -name '*.md' 2>/dev/null && \
   echo "--- weekly/" && find weekly  -type f -name '*.md' 2>/dev/null && \
   echo "--- monthly/" && find monthly -type f -name '*.md' 2>/dev/null && \
@@ -53,7 +50,7 @@ Invoke the wrapper. Pick the mode:
 ```bash
 "/Users/yruosch/Documents/Claude/Projects/AI Researcher/pipeline/scripts/sync_notes.sh"            # refresh
 "/Users/yruosch/Documents/Claude/Projects/AI Researcher/pipeline/scripts/sync_notes.sh" --all      # sync-all
-"/Users/yruosch/Documents/Claude/Projects/AI Researcher/pipeline/scripts/sync_notes.sh" publish/daily/2026/05/2026-05-05.md   # backfill
+"/Users/yruosch/Documents/Claude/Projects/AI Researcher/pipeline/scripts/sync_notes.sh" daily/2026/05/2026-05-05.md   # backfill
 ```
 
 Report the script's stdout to the user (it prints `→ doing X…` then `✓ done`). If the first run prompts macOS for "osascript wants access to control Notes," tell the user to click Allow — that's a one-time grant.
@@ -88,6 +85,6 @@ If you ran in Case B (no macOS shell), end with: `Run the command above on your 
 ## Constraints
 
 - NEVER edit `pipeline/scripts/sync_notes.sh` or `pipeline/scripts/add_to_notes.applescript` from this skill — the user is responsible for that file. If they ask you to modify it, that's a separate task, not part of this skill.
-- NEVER touch source `.md` files in `publish/daily/`, `publish/weekly/`, `publish/monthly/`, or `publish/trends.md` — read-only here.
+- NEVER touch source `.md` files in `daily/`, `weekly/`, `monthly/`, or `trends.md` — read-only here.
 - NEVER claim Apple Notes was updated unless `osascript` actually ran in this session (Case A).
 - If Case A and the AppleScript errors out (e.g., Notes app not running, permissions denied), surface the error to the user verbatim. Don't silently continue.

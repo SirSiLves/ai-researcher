@@ -215,10 +215,10 @@ def backfill_file(json_path: Path, root: Path):
 
 
 def main():
-    from _lib import PUBLISH_DIR, RADAR_DIR
-    # `root` is what relative_to() uses for display paths below; point at PUBLISH_DIR
-    # so paths like `radar/2026/05/2026-05-15.json` render the way the manifest stores them.
-    root = PUBLISH_DIR
+    from _lib import DATA_ROOT, RADAR_DIR
+    # `root` is what relative_to() uses for display paths below; point at DATA_ROOT
+    # so paths render as `radar/2026/05/...` (manifest is relative to DATA_ROOT).
+    root = DATA_ROOT
     radar_dir = RADAR_DIR
     json_files = sorted(radar_dir.rglob("*.json"))
     json_files = [p for p in json_files if p.name != "index.json"]

@@ -71,5 +71,5 @@ export class PageHeader {
   readonly title = input.required<string>();
   readonly subtitle = input<string>();
   readonly model = input<MenuItem[]>([]);
-  readonly home: MenuItem = { icon: 'pi pi-home', routerLink: '/today' };
+  readonly home: MenuItem = { icon: 'pi pi-home', routerLink: '/pulse' };
 }

@@ -1,120 +1,98 @@
 import { Routes } from '@angular/router';
 
+/**
+ * Four-page red thread:
+ *   /pulse     — what's happening now (today's radar + what changed)
+ *   /momentum  — how it's moving (7d / 30d / 90d trend)
+ *   /map       — what the landscape looks like (sectors × topics × firms)
+ *   /archive   — everything published, faceted by cadence + date
+ *
+ * Detail routes hang off these as siblings (topic, story, firm).
+ * Legacy paths redirect into the new shell.
+ */
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'today' },
+  { path: '', pathMatch: 'full', redirectTo: 'pulse' },
 
+  // ── 1. PULSE ────────────────────────────────────────────────
   {
-    path: 'today',
+    path: 'pulse',
     loadComponent: () => import('./pages/today/today').then(m => m.TodayPage),
-    data: { label: 'Today' }
+    data: { label: 'Pulse' }
   },
   {
-    path: 'today/:date',
+    path: 'pulse/:date',
     loadComponent: () => import('./pages/today/today').then(m => m.TodayPage),
-    data: { label: 'Today' }
+    data: { label: 'Pulse' }
   },
 
+  // ── 2. MOMENTUM ─────────────────────────────────────────────
+  {
+    path: 'momentum',
+    loadComponent: () => import('./pages/momentum/momentum').then(m => m.MomentumPage),
+    data: { label: 'Momentum' }
+  },
+  {
+    path: 'momentum/:window',
+    loadComponent: () => import('./pages/momentum/momentum').then(m => m.MomentumPage),
+    data: { label: 'Momentum' }
+  },
+
+  // ── 3. MAP ──────────────────────────────────────────────────
+  {
+    path: 'map',
+    loadComponent: () => import('./pages/map/map').then(m => m.MapPage),
+    data: { label: 'Map' }
+  },
+  {
+    path: 'map/topic/:id',
+    loadComponent: () => import('./pages/topic/topic').then(m => m.TopicPage),
+    data: { label: 'Topic' }
+  },
+  {
+    path: 'map/firm/:slug',
+    loadComponent: () => import('./pages/firm/firm').then(m => m.FirmPage),
+    data: { label: 'Firm' }
+  },
+  {
+    path: 'map/story/:id',
+    loadComponent: () => import('./pages/story/story').then(m => m.StoryPage),
+    data: { label: 'Story' }
+  },
+  {
+    path: 'map/at/:date',
+    loadComponent: () => import('./pages/map/map').then(m => m.MapPage),
+    data: { label: 'Map' }
+  },
+
+  // ── 4. ARCHIVE ──────────────────────────────────────────────
   {
     path: 'archive',
     loadComponent: () => import('./pages/archive/archive').then(m => m.ArchivePage),
     data: { label: 'Archive' }
   },
-  {
-    path: 'week',
-    loadComponent: () => import('./pages/week/week').then(m => m.WeekPage),
-    data: { label: 'Week' }
-  },
-  {
-    path: 'week/:id',
-    loadComponent: () => import('./pages/week/week').then(m => m.WeekPage),
-    data: { label: 'Week' }
-  },
-  {
-    path: 'month',
-    loadComponent: () => import('./pages/month/month').then(m => m.MonthPage),
-    data: { label: 'Month' }
-  },
-  {
-    path: 'month/:id',
-    loadComponent: () => import('./pages/month/month').then(m => m.MonthPage),
-    data: { label: 'Month' }
-  },
 
-  {
-    path: 'stories',
-    loadComponent: () => import('./pages/stories/stories').then(m => m.StoriesPage),
-    data: { label: 'Stories' }
-  },
-  {
-    path: 'stories/:id',
-    loadComponent: () => import('./pages/story/story').then(m => m.StoryPage),
-    data: { label: 'Story' }
-  },
+  // ── Legacy redirects ────────────────────────────────────────
+  { path: 'today',          redirectTo: 'pulse' },
+  { path: 'today/:date',    redirectTo: 'pulse/:date' },
+  { path: 'priorities',     redirectTo: 'pulse' },
+  { path: 'priorities/:date', redirectTo: 'pulse/:date' },
+  { path: 'trends',         redirectTo: 'map' },
+  { path: 'radar',          redirectTo: 'map' },
+  { path: 'radar/:date',    redirectTo: 'map' },
+  { path: 'radar/topic/:id', redirectTo: 'map/topic/:id' },
+  { path: 'sectors',        redirectTo: 'map' },
+  { path: 'sectors/:date',  redirectTo: 'map' },
+  { path: 'firms',          redirectTo: 'map' },
+  { path: 'firms/:slug',    redirectTo: 'map/firm/:slug' },
+  { path: 'stories',        redirectTo: 'momentum' },
+  { path: 'stories/:id',    redirectTo: 'map/story/:id' },
+  { path: 'week',           redirectTo: 'momentum/7d' },
+  { path: 'week/:id',       redirectTo: 'momentum/7d' },
+  { path: 'month',          redirectTo: 'momentum/30d' },
+  { path: 'month/:id',      redirectTo: 'momentum/30d' },
+  { path: 'reports',        redirectTo: 'archive' },
+  { path: 'library',        redirectTo: 'archive' },
+  { path: 'sweeps',         redirectTo: 'archive' },
 
-  { path: 'trends', pathMatch: 'full', redirectTo: 'radar' },
-
-  {
-    path: 'radar',
-    loadComponent: () => import('./pages/trends/trends').then(m => m.TrendsPage),
-    data: { label: 'Radar' }
-  },
-  {
-    path: 'radar/topic/:id',
-    loadComponent: () => import('./pages/topic/topic').then(m => m.TopicPage),
-    data: { label: 'Topic' }
-  },
-  {
-    path: 'radar/:date',
-    loadComponent: () => import('./pages/trends/trends').then(m => m.TrendsPage),
-    data: { label: 'Radar' }
-  },
-
-  {
-    path: 'sectors',
-    loadComponent: () => import('./pages/sectors/sectors').then(m => m.SectorsPage),
-    data: { label: 'Sectors' }
-  },
-  {
-    path: 'sectors/:date',
-    loadComponent: () => import('./pages/sectors/sectors').then(m => m.SectorsPage),
-    data: { label: 'Sectors' }
-  },
-
-  {
-    path: 'movements',
-    loadComponent: () => import('./pages/movements/movements').then(m => m.MovementsPage),
-    data: { label: 'Movements' }
-  },
-  {
-    path: 'movements/:date',
-    loadComponent: () => import('./pages/movements/movements').then(m => m.MovementsPage),
-    data: { label: 'Movements' }
-  },
-
-  {
-    path: 'firms',
-    loadComponent: () => import('./pages/firms/firms').then(m => m.FirmsPage),
-    data: { label: 'Firms' }
-  },
-  {
-    path: 'firms/:slug',
-    loadComponent: () => import('./pages/firm/firm').then(m => m.FirmPage),
-    data: { label: 'Firm' }
-  },
-
-  {
-    path: 'sweeps',
-    loadComponent: () => import('./pages/sweeps/sweeps').then(m => m.SweepsPage),
-    data: { label: 'Sweeps' }
-  },
-
-  { path: 'reports', pathMatch: 'full', redirectTo: 'library' },
-
-  {
-    path: 'library',
-    loadComponent: () => import('./pages/reports/reports').then(m => m.ReportsPage),
-    data: { label: 'Library' }
-  },
-
-  { path: '**', redirectTo: 'today' }
+  { path: '**', redirectTo: 'pulse' }
 ];

@@ -7,7 +7,7 @@
 
   @if (error(); as e) {
     <p class="topic__error">{{ e }}</p>
-    <p><a routerLink="/radar" class="topic__back">← Back to Radar</a></p>
+    <p><a routerLink="/map" class="topic__back">← Back to Map</a></p>
   }
 
   @if (topic(); as t) {
@@ -24,7 +24,7 @@
     </p>
 
     @if (t.cluster_id) {
-      <a class="topic__story-pill" [routerLink]="['/stories', t.cluster_id]">
+      <a class="topic__story-pill" [routerLink]="['/map/story', t.cluster_id]">
         <i class="pi pi-sitemap"></i>
         <span>Part of story</span>
         <strong>{{ clusterName() }}</strong>
@@ -125,7 +125,7 @@
     }
 
     <!-- Firms talking about this topic -->
-    @if (t.breadth_orgs_7d?.length) {
+    @if (t.breadth_orgs_7d.length) {
       <section class="section">
         <header class="section__head">
           <h2 class="section__title">Firms talking · last 7 days</h2>
@@ -134,14 +134,14 @@
         <ul class="topic__orgs">
           @for (org of t.breadth_orgs_7d; track org) {
             <li>
-              <a [routerLink]="['/firms', org]" class="topic__org-chip">{{ org }}</a>
+              <a [routerLink]="['/map/firm', org]" class="topic__org-chip">{{ org }}</a>
             </li>
           }
         </ul>
       </section>
     }
 
-    @if (t.supporting_links?.length) {
+    @if (t.supporting_links.length) {
       <section class="section">
         <header class="section__head">
           <h2 class="section__title">Evidence</h2>

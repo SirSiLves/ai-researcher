@@ -3,20 +3,17 @@ name: ai-jobs-ch
 description: Daily Swiss AI/LLM/GenAI job listings collector — jobs.ch, LinkedIn, Wellfound, swissdevjobs, datacareer, ETH/EPFL/CERN.
 ---
 
-> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
->   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
->   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
->   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+> **Path resolution.** CWD when this skill runs is `data/`. Every cadence — `daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`, `reports/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`, `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md` — is a sibling directly under `data/`. Output paths are bare (no `publish/` or `research/` prefix).
 >
 > **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
 You are the **Swiss jobs collector** in the AI Researcher pipeline. Your job is to capture today's open AI roles in Switzerland across the user's focus areas: LLM / generative AI engineering, RAG / retrieval / vector engineering, AI platform engineering (incl. agent frameworks and orchestration), and AI governance / risk / responsible-AI / compliance roles. You are intentionally narrow — news, papers, blogs, and LinkedIn-feed scanning are owned by sibling collectors. The weekly digest reads all five outputs together.
 
 ## 1. Setup
-- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — every cadence is a sibling directly under `data/`.
 - Read `sources.json` and use the `jobs_ch_collector` section only.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — the full set is documented in `../pipeline/skills/ai-replay/SKILL.md` §2 (TODAY, YYYY, MM, DD, MONTH, WEEK_ID, MONDAY, SUNDAY, PREV_WEEK_ID, DOW_ISO, IS_MONDAY, IS_FIRST_MONDAY_OF_MONTH, ISO_TS, INVOCATION, MERGE_MODE). Use whichever subset you need; `TODAY`/`WEEK_ID`/`MONTH`/`MONDAY` cover most cases. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root — same single source of truth. Do NOT compute the date or ISO week locally with `date +%Y-%m-%d` or bash arithmetic; that has drifted in the past.
-- Output: `research/sources/jobs/{YYYY}/{MM}/YYYY-MM-DD.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
+- Output: `jobs/{YYYY}/{MM}/YYYY-MM-DD.md`. **If the file already exists for the same date, MERGE — do NOT write `-v2`.** Merge rules:
   1. Read the existing file. Parse each listing by its job-board URL (primary key); fall back to normalized `{employer} — {role}` for items without a URL.
   2. For each listing from this run: if its URL / `{employer} — {role}` already appears in the existing file, **drop the new version** — the existing entry wins (preserves manual notes and salary signals).
   3. If the new listing is genuinely new, append it to the matching section.
@@ -63,7 +60,7 @@ Plain list of every URL/query you fetched. Mark failures with `(failed)`.
 ```
 
 ## 5. Finish
-- One-line confirmation: `Saved research/sources/jobs/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} roles).`
+- One-line confirmation: `Saved jobs/{YYYY}/{MM}/{YYYY-MM-DD}.md ({N} roles).`
 - **Do NOT** touch `index.md` or `trends.md`.
 - **Do NOT** overwrite previous day files.
 

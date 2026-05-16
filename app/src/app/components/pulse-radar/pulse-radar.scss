@@ -1,0 +1,1053 @@
+/* ============================================================
+   Pulse Radar — modern interactive topic dashboard.
+   Geometry: 4 quadrants × 4 rings. Blips are pure dots.
+   Color = direction; size = √loudness; glow = surging.
+   ============================================================ */
+
+:host { display: block; width: 100%; }
+
+.pulse-radar {
+  --pulse-accent:        var(--accent);
+  --pulse-accent-strong: var(--accent-strong);
+  --pulse-rise:   var(--accent);
+  --pulse-surge:  var(--accent-strong);
+  --pulse-steady: var(--fg-4);
+  --pulse-fade:   var(--warn);
+
+  /* Sector palette (clockwise from top-right) */
+  --pulse-q0: var(--accent);
+  --pulse-q1: #8b5cf6;   /* violet */
+  --pulse-q2: #10b981;   /* emerald */
+  --pulse-q3: #f59e0b;   /* amber */
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "stats"
+    "filters"
+    "main"
+    "scrubber"
+    "scale"
+    "list";
+  gap: 1rem;
+  align-items: start;
+}
+
+/* ============================================================
+   Stat strip (top of dashboard)
+   ============================================================ */
+.pulse-radar__stats {
+  grid-area: stats;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+.pulse-radar__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.75rem 0.95rem;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  text-align: left;
+  cursor: default;
+  transition: background .15s var(--ease), border-color .15s var(--ease);
+}
+button.pulse-radar__stat { cursor: pointer; }
+button.pulse-radar__stat:hover {
+  background: var(--bg-soft);
+  border-color: var(--hairline-2);
+}
+.pulse-radar__stat-value {
+  font-family: var(--sans);
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.pulse-radar__stat-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+  font-weight: 500;
+}
+.pulse-radar__stat--surge .pulse-radar__stat-value { color: var(--accent-strong); }
+.pulse-radar__stat--surge .pulse-radar__stat-label { color: var(--accent-strong); }
+.pulse-radar__stat--fade .pulse-radar__stat-value { color: var(--warn-text); }
+.pulse-radar__stat--fade .pulse-radar__stat-label { color: var(--warn-text); }
+.pulse-radar__stat--hl {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 5%, var(--panel)) 0%,
+    var(--panel) 100%);
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--hairline));
+}
+.pulse-radar__stat-eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+.pulse-radar__stat-name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.pulse-radar__stat-meta {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--fg-4);
+  font-weight: 500;
+}
+
+/* ============================================================
+   Main grid: canvas + side rail
+   ============================================================ */
+.pulse-radar__main {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(220px, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+@media (max-width: 1080px) {
+  .pulse-radar__main { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Toolbar
+   ============================================================ */
+.pulse-radar__filters {
+  grid-area: filters;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.9rem;
+  padding: 0.7rem 0.9rem;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg-soft) 80%, var(--panel)) 0%,
+    var(--bg-soft) 100%);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+}
+.pulse-radar__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.pulse-radar__group--search {
+  position: relative;
+  margin-left: auto;
+}
+.pulse-radar__group-label {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+  padding-right: 0.15rem;
+}
+.pulse-radar__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--fg-3);
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: background .15s var(--ease), color .15s var(--ease),
+              border-color .15s var(--ease), transform .12s var(--ease);
+}
+.pulse-radar__chip:hover {
+  color: var(--fg);
+  border-color: var(--hairline-2);
+  transform: translateY(-1px);
+}
+.pulse-radar__chip.is-active {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--hairline));
+  font-weight: 600;
+}
+/* Sector chip — colored swatch matches the quadrant gradient */
+.pulse-radar__chip-mark {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 2px;
+}
+.pulse-radar__chip-mark[data-quad="0"] { background: var(--pulse-q0); }
+.pulse-radar__chip-mark[data-quad="1"] { background: var(--pulse-q1); }
+.pulse-radar__chip-mark[data-quad="2"] { background: var(--pulse-q2); }
+.pulse-radar__chip-mark[data-quad="3"] { background: var(--pulse-q3); }
+
+/* Direction chip dot */
+.pulse-radar__chip--dir .pulse-radar__chip-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--fg-5);
+}
+.pulse-radar__chip--dir[data-dir="surging"] .pulse-radar__chip-dot { background: var(--pulse-surge); }
+.pulse-radar__chip--dir[data-dir="rising"]  .pulse-radar__chip-dot { background: var(--pulse-rise); }
+.pulse-radar__chip--dir[data-dir="steady"]  .pulse-radar__chip-dot { background: var(--pulse-steady); }
+.pulse-radar__chip--dir[data-dir="fading"]  .pulse-radar__chip-dot { background: var(--pulse-fade); }
+
+.pulse-radar__chip--dir[data-dir="surging"].is-active {
+  color: var(--pulse-surge);
+  background: color-mix(in srgb, var(--pulse-surge) 14%, transparent);
+  border-color: var(--pulse-surge);
+}
+.pulse-radar__chip--dir[data-dir="fading"].is-active {
+  color: var(--warn-text);
+  background: var(--warn-soft);
+  border-color: var(--pulse-fade);
+}
+
+/* Search */
+.pulse-radar__search-icon {
+  position: absolute;
+  left: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.78rem;
+  color: var(--fg-4);
+  pointer-events: none;
+}
+.pulse-radar__search {
+  font: inherit;
+  font-size: 0.82rem;
+  width: 14rem;
+  padding: 0.42rem 0.7rem 0.42rem 1.9rem;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.pulse-radar__search::placeholder { color: var(--fg-5); }
+.pulse-radar__search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+.pulse-radar__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font: inherit;
+  font-size: 0.74rem;
+  color: var(--fg-3);
+  padding: 0.25rem 0.55rem;
+  margin-left: 0.35rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.pulse-radar__clear:hover { background: var(--bg-soft-2); color: var(--fg); }
+
+/* ============================================================
+   Canvas
+   ============================================================ */
+.pulse-radar__canvas {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+}
+.pulse-radar__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  /* Subtle inner shadow effect via filter */
+  filter: drop-shadow(0 6px 24px rgba(15, 23, 42, 0.04));
+}
+
+/* Quadrant gradients — applied via inline <stop> classes so they react to theme */
+.pulse-quad-stop-0[data-quad="0"] { stop-color: color-mix(in srgb, var(--pulse-q0) 14%, transparent); }
+.pulse-quad-stop-1[data-quad="0"] { stop-color: color-mix(in srgb, var(--pulse-q0) 3%, transparent); }
+.pulse-quad-stop-0[data-quad="1"] { stop-color: color-mix(in srgb, var(--pulse-q1) 14%, transparent); }
+.pulse-quad-stop-1[data-quad="1"] { stop-color: color-mix(in srgb, var(--pulse-q1) 3%, transparent); }
+.pulse-quad-stop-0[data-quad="2"] { stop-color: color-mix(in srgb, var(--pulse-q2) 14%, transparent); }
+.pulse-quad-stop-1[data-quad="2"] { stop-color: color-mix(in srgb, var(--pulse-q2) 3%, transparent); }
+.pulse-quad-stop-0[data-quad="3"] { stop-color: color-mix(in srgb, var(--pulse-q3) 14%, transparent); }
+.pulse-quad-stop-1[data-quad="3"] { stop-color: color-mix(in srgb, var(--pulse-q3) 3%, transparent); }
+
+.pulse-radar__quad {
+  transition: opacity .25s var(--ease);
+}
+.pulse-radar__quad.is-active { opacity: 1.25; }
+.pulse-radar__quad.is-dimmed { opacity: 0.25; }
+
+/* Concentric rings */
+.pulse-radar__ring {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 0;
+  transition: opacity .2s var(--ease), stroke .2s var(--ease);
+}
+.pulse-radar__ring.is-dimmed { opacity: 0.25; }
+
+.pulse-radar__divider {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+  opacity: 0.6;
+}
+
+/* Sweep arm — rotates slowly */
+@keyframes pulse-sweep-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.pulse-radar__sweep {
+  transform-origin: 50% 50%;
+  animation: pulse-sweep-rotate 22s linear infinite;
+  pointer-events: none;
+}
+.pulse-radar__sweep-arm {
+  fill: url(#pulse-sweep);
+  opacity: 0.45;
+}
+.pulse-sweep-stop-0 { stop-color: color-mix(in srgb, var(--accent) 22%, transparent); stop-opacity: 0.4; }
+.pulse-sweep-stop-1 { stop-color: color-mix(in srgb, var(--accent) 0%, transparent); stop-opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .pulse-radar__sweep { animation: none; opacity: 0; }
+}
+
+/* Ring labels */
+.pulse-radar__ring-label {
+  font-family: var(--sans);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--fg-4);
+  text-anchor: middle;
+  /* Halo over the ring stroke so text reads cleanly */
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3;
+}
+
+/* Sector arc labels */
+.pulse-radar__sector-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  fill: var(--fg-2);
+}
+
+/* Hover guide line from centre to active blip */
+.pulse-radar__guide {
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
+/* ============================================================
+   Blips
+   ============================================================ */
+@keyframes pulse-blip-in {
+  from { opacity: 0; transform: scale(0.4); }
+  60%  { opacity: 1; transform: scale(1.12); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.pulse-radar__blip {
+  cursor: pointer;
+  transform-origin: center;
+  transform-box: fill-box;
+  transition: opacity .25s var(--ease);
+  animation: pulse-blip-in 0.42s var(--ease) both;
+  animation-delay: calc(var(--blip-i, 0) * 14ms);
+}
+.pulse-radar__blip:focus-visible { outline: none; }
+.pulse-radar__blip:focus-visible .pulse-radar__dot {
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 6px var(--accent-ring));
+}
+.pulse-radar__blip:hover .pulse-radar__dot,
+.pulse-radar__blip.is-active .pulse-radar__dot {
+  stroke-width: 2.5;
+}
+
+.pulse-radar__dot {
+  stroke-width: 1.5;
+  transition: stroke-width 0.12s var(--ease);
+}
+
+/* Number inside the blip — small, mono, halo for contrast over fill */
+.pulse-radar__num {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  fill: var(--fg);
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 2;
+  pointer-events: none;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Direction palette: fill = tinted, stroke = brand */
+.pulse--surging .pulse-radar__dot {
+  fill: color-mix(in srgb, var(--pulse-surge) 38%, transparent);
+  stroke: var(--pulse-surge);
+}
+.pulse--rising .pulse-radar__dot {
+  fill: color-mix(in srgb, var(--pulse-rise) 28%, transparent);
+  stroke: var(--pulse-rise);
+}
+.pulse--steady .pulse-radar__dot {
+  fill: color-mix(in srgb, var(--pulse-steady) 24%, transparent);
+  stroke: var(--pulse-steady);
+}
+.pulse--fading .pulse-radar__dot {
+  fill: color-mix(in srgb, var(--pulse-fade) 26%, transparent);
+  stroke: var(--pulse-fade);
+}
+
+/* Surging echo halo */
+@keyframes pulse-echo {
+  0%   { r: var(--echo-r); opacity: 0.5; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+.pulse-radar__echo {
+  fill: none;
+  stroke: var(--pulse-surge);
+  stroke-width: 1.5;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: pulse-echo 2.2s ease-out infinite;
+  animation-delay: calc(var(--blip-i, 0) * 14ms + 600ms);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-radar__echo { animation: none; opacity: 0; }
+  .pulse-radar__blip { animation: none; }
+}
+
+/* Dim non-matching blips when filters active */
+.pulse-radar__blip.is-dimmed {
+  opacity: 0.1;
+  pointer-events: none;
+}
+.pulse-radar__blip.is-dimmed .pulse-radar__echo { display: none; }
+
+/* When any blip is hovered, dim the others slightly to direct focus */
+.pulse-radar__canvas:has(.pulse-radar__blip:hover) .pulse-radar__blip:not(:hover):not(.is-active) {
+  opacity: 0.42;
+}
+
+/* ============================================================
+   Tooltip
+   ============================================================ */
+.pulse-radar__tip {
+  position: absolute;
+  transform: translate(12px, 12px);
+  pointer-events: none;
+  background: var(--fg);
+  color: var(--bg);
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  min-width: 220px;
+  max-width: 320px;
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.35), 0 2px 8px -2px rgba(0, 0, 0, 0.2);
+  font-size: 0.78rem;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.pulse-radar__tip-title {
+  font-weight: 600;
+  font-size: 0.88rem;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+}
+.pulse-radar__tip-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  text-transform: capitalize;
+  color: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+.pulse-radar__tip-sep { color: color-mix(in srgb, var(--bg) 35%, transparent); }
+.pulse-radar__tip-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+.pulse-radar__tip-dot.pulse--surging { background: var(--pulse-surge); }
+.pulse-radar__tip-dot.pulse--rising  { background: var(--pulse-rise); }
+.pulse-radar__tip-dot.pulse--steady  { background: var(--pulse-steady); }
+.pulse-radar__tip-dot.pulse--fading  { background: var(--pulse-fade); }
+.pulse-radar__tip-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+.pulse-radar__tip-stats strong { color: var(--bg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pulse-radar__tip-hint {
+  font-size: 0.62rem;
+  color: color-mix(in srgb, var(--bg) 50%, transparent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Empty-state */
+.pulse-radar__empty {
+  fill: var(--fg-3);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+}
+.pulse-radar__empty-sub {
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  fill: var(--fg-4) !important;
+}
+
+/* ============================================================
+   Motion trails — each blip's 7-day-ago position to today
+   ============================================================ */
+.pulse-radar__trail {
+  stroke: color-mix(in srgb, var(--accent) 30%, transparent);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  fill: none;
+  pointer-events: none;
+  transition: stroke .15s var(--ease), stroke-width .15s var(--ease), opacity .2s var(--ease);
+}
+.pulse-radar__trail.is-active {
+  stroke: var(--accent-strong);
+  stroke-width: 1.8;
+}
+.pulse-radar__trail.is-dimmed { opacity: 0.06; }
+.pulse-radar__trail-tail {
+  fill: color-mix(in srgb, var(--accent) 40%, transparent);
+  pointer-events: none;
+}
+.pulse-radar__trail-tail.is-dimmed { opacity: 0.06; }
+
+/* ============================================================
+   Cluster connection lines
+   ============================================================ */
+.pulse-radar__cluster-line {
+  stroke: color-mix(in srgb, var(--accent) 22%, transparent);
+  stroke-width: 0.8;
+  stroke-dasharray: 2 3;
+  fill: none;
+  pointer-events: none;
+  transition: stroke .2s var(--ease), stroke-width .2s var(--ease), opacity .2s var(--ease);
+}
+.pulse-radar__cluster-line.is-active {
+  stroke: var(--accent-strong);
+  stroke-width: 1.4;
+  stroke-dasharray: 0;
+  opacity: 0.9;
+}
+.pulse-radar__cluster-line.is-dimmed { opacity: 0.05; }
+
+/* Cluster chip */
+.pulse-radar__chip--cluster i {
+  font-size: 0.7rem;
+  color: var(--fg-4);
+}
+.pulse-radar__chip--cluster.is-active i { color: var(--accent-strong); }
+
+/* ============================================================
+   "What changed today" panel (sidebar)
+   ============================================================ */
+.pulse-radar__changed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.65rem 0.85rem 0.75rem;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+}
+.pulse-radar__changed-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.pulse-radar__changed-title {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+.pulse-radar__changed-count {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--fg-3);
+}
+.pulse-radar__changed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.pulse-radar__changed-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 0.45rem;
+  row-gap: 0.05rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--fg-2);
+  border-left: 2px solid var(--hairline);
+  transition: background .12s var(--ease);
+}
+.pulse-radar__changed-item.is-clickable {
+  cursor: pointer;
+}
+.pulse-radar__changed-item.is-clickable:hover { background: var(--bg-soft); }
+.pulse-radar__changed-item[data-kind="new"]  { border-left-color: var(--accent-strong); }
+.pulse-radar__changed-item[data-kind="in"]   { border-left-color: var(--accent); }
+.pulse-radar__changed-item[data-kind="out"]  { border-left-color: var(--warn); }
+.pulse-radar__changed-kind {
+  grid-column: 1;
+  grid-row: 1;
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-right: 0.35rem;
+}
+.pulse-radar__changed-item[data-kind="new"] .pulse-radar__changed-kind  { color: var(--accent-strong); }
+.pulse-radar__changed-item[data-kind="in"]  .pulse-radar__changed-kind  { color: var(--accent); }
+.pulse-radar__changed-item[data-kind="out"] .pulse-radar__changed-kind  { color: var(--warn-text); }
+.pulse-radar__changed-label {
+  grid-column: 2;
+  grid-row: 1;
+  font-weight: 500;
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: -0.005em;
+}
+.pulse-radar__changed-stage {
+  grid-column: 2;
+  grid-row: 2;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--fg-4);
+  text-transform: capitalize;
+}
+.pulse-radar__changed-stage strong { color: var(--fg-2); font-weight: 600; }
+
+/* ============================================================
+   Side rail — numbered topic list grouped by ring
+   ============================================================ */
+.pulse-radar__rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-height: 640px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+.pulse-radar__ring-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.pulse-radar__ring-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--hairline);
+}
+.pulse-radar__ring-name {
+  font-family: var(--sans);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+}
+.pulse-radar__ring-count {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--fg-3);
+}
+.pulse-radar__ring-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.pulse-radar__ring-item {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.32rem 0.45rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .12s var(--ease), opacity .2s var(--ease);
+  font-size: 0.8rem;
+  color: var(--fg-2);
+  min-width: 0;
+}
+.pulse-radar__ring-item:hover,
+.pulse-radar__ring-item.is-active,
+.pulse-radar__ring-item:focus-visible {
+  background: var(--bg-soft);
+  outline: none;
+}
+.pulse-radar__ring-item.is-dimmed { opacity: 0.32; }
+
+.pulse-radar__ring-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+  background: var(--bg-soft-2);
+  border: 1px solid transparent;
+  transition: background .15s var(--ease), border-color .15s var(--ease);
+}
+.pulse-radar__ring-item.pulse--surging .pulse-radar__ring-num {
+  background: color-mix(in srgb, var(--pulse-surge) 30%, transparent);
+  border-color: var(--pulse-surge);
+  color: var(--pulse-surge);
+}
+.pulse-radar__ring-item.pulse--rising .pulse-radar__ring-num {
+  background: color-mix(in srgb, var(--pulse-rise) 22%, transparent);
+  border-color: var(--pulse-rise);
+  color: var(--accent-strong);
+}
+.pulse-radar__ring-item.pulse--steady .pulse-radar__ring-num {
+  background: color-mix(in srgb, var(--pulse-steady) 18%, transparent);
+  border-color: var(--pulse-steady);
+  color: var(--fg-2);
+}
+.pulse-radar__ring-item.pulse--fading .pulse-radar__ring-num {
+  background: color-mix(in srgb, var(--pulse-fade) 22%, transparent);
+  border-color: var(--pulse-fade);
+  color: var(--warn-text);
+}
+.pulse-radar__ring-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: -0.005em;
+}
+
+/* ============================================================
+   Scrubber
+   ============================================================ */
+.pulse-radar__scrubber {
+  grid-area: scrubber;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+}
+.pulse-radar__scrubber-label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+  white-space: nowrap;
+}
+.pulse-radar__scrubber-track {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: flex-start;
+}
+.pulse-radar__tick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 1.8rem;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+  transition: background .12s var(--ease), color .12s var(--ease), border-color .12s var(--ease);
+}
+.pulse-radar__tick:hover { color: var(--fg); border-color: var(--hairline-2); }
+.pulse-radar__tick.is-active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+/* ============================================================
+   Tooltip extensions (sparkline, firms, cluster)
+   ============================================================ */
+.pulse-radar__tip-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.pulse-radar__tip-dot {
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  margin-top: 0.32rem;
+  display: inline-block;
+}
+.pulse-radar__tip-dot.pulse--surging { background: var(--pulse-surge); }
+.pulse-radar__tip-dot.pulse--rising  { background: var(--pulse-rise); }
+.pulse-radar__tip-dot.pulse--steady  { background: var(--pulse-steady); }
+.pulse-radar__tip-dot.pulse--fading  { background: var(--pulse-fade); }
+
+.pulse-radar__tip-spark {
+  width: 100%;
+  height: 28px;
+  display: block;
+  color: color-mix(in srgb, var(--bg) 70%, transparent);
+  margin-top: 0.15rem;
+}
+.pulse-radar__tip-firms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+}
+.pulse-radar__tip-firm {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  padding: 1px 5px;
+  background: color-mix(in srgb, var(--bg) 22%, transparent);
+  color: color-mix(in srgb, var(--bg) 85%, transparent);
+  border-radius: 3px;
+}
+.pulse-radar__tip-firm.muted-firm {
+  background: transparent;
+  color: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+.pulse-radar__tip-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: color-mix(in srgb, var(--bg) 75%, transparent);
+}
+.pulse-radar__tip-cluster i { font-size: 0.7rem; }
+
+/* ============================================================
+   Topic list — shown below the radar when [showTopicList] is true.
+   Lays out as a responsive multi-column grid grouped by sector.
+   ============================================================ */
+.pulse-radar__list {
+  grid-area: list;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.1rem 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--hairline);
+}
+.pulse-radar__list-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: -0.35rem;
+}
+.pulse-radar__list-title {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+}
+.pulse-radar__list-count {
+  font-size: 0.74rem;
+  color: var(--fg-4);
+}
+.pulse-radar__list-count strong { color: var(--fg); font-weight: 600; }
+
+.pulse-radar__leg-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+}
+.pulse-radar__leg-group[open] { background: var(--bg-soft); }
+.pulse-radar__leg-sector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+}
+.pulse-radar__leg-sector::-webkit-details-marker { display: none; }
+.pulse-radar__leg-sector::before {
+  content: '▸';
+  font-size: 0.7rem;
+  color: var(--fg-4);
+  margin-right: 0.4rem;
+  transition: transform .15s var(--ease);
+  display: inline-block;
+}
+.pulse-radar__leg-group[open] .pulse-radar__leg-sector::before { transform: rotate(90deg); }
+.pulse-radar__leg-sector-name { flex: 1; }
+.pulse-radar__leg-sector-count {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--fg-4);
+}
+.pulse-radar__leg-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.pulse-radar__leg-item {
+  display: grid;
+  grid-template-columns: 0.85rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .12s var(--ease), opacity .2s var(--ease);
+  font-size: 0.82rem;
+  color: var(--fg-2);
+  min-width: 0;
+}
+.pulse-radar__leg-item:hover,
+.pulse-radar__leg-item.is-active,
+.pulse-radar__leg-item:focus-visible {
+  background: var(--bg-soft);
+  outline: none;
+}
+.pulse-radar__leg-item.is-dimmed { opacity: 0.35; }
+.pulse-radar__leg-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--fg-5);
+}
+.pulse-radar__leg-item.pulse--surging .pulse-radar__leg-dot { background: var(--pulse-surge); box-shadow: 0 0 0 2px color-mix(in srgb, var(--pulse-surge) 22%, transparent); }
+.pulse-radar__leg-item.pulse--rising .pulse-radar__leg-dot  { background: var(--pulse-rise); }
+.pulse-radar__leg-item.pulse--steady .pulse-radar__leg-dot  { background: var(--pulse-steady); }
+.pulse-radar__leg-item.pulse--fading .pulse-radar__leg-dot  { background: var(--pulse-fade); }
+.pulse-radar__leg-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: -0.005em;
+}
+.pulse-radar__leg-dir {
+  font-size: 0.68rem;
+  text-transform: capitalize;
+  color: var(--fg-4);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Footer scale legend
+   ============================================================ */
+.pulse-radar__scale {
+  grid-area: scale;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  padding: 0.65rem 0.4rem 0;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.74rem;
+  color: var(--fg-3);
+}
+.pulse-radar__scale-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.pulse-radar__scale-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+}
+.pulse-radar__scale-item.pulse--surging .pulse-radar__scale-dot { background: var(--pulse-surge); }
+.pulse-radar__scale-item.pulse--rising .pulse-radar__scale-dot  { background: var(--pulse-rise); }
+.pulse-radar__scale-item.pulse--steady .pulse-radar__scale-dot  { background: var(--pulse-steady); }
+.pulse-radar__scale-item.pulse--fading .pulse-radar__scale-dot  { background: var(--pulse-fade); }
+.pulse-radar__scale-sep { color: var(--fg-5); }

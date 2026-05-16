@@ -1,0 +1,136 @@
+<section class="page momentum">
+
+  <header class="momentum-hero">
+    <div class="momentum-hero__top">
+      <div>
+        <span class="momentum-hero__eyebrow">Momentum</span>
+        <h1 class="momentum-hero__title">How the radar moved</h1>
+        <p class="momentum-hero__deck">
+          Topics ranked by how much they rose or cooled across your chosen window.
+        </p>
+      </div>
+      <div class="momentum-hero__window">
+        <span class="momentum-hero__window-label">Window</span>
+        <div class="momentum-windowctl">
+          @for (w of windows; track w) {
+            <button type="button"
+                    class="momentum-windowctl__btn"
+                    [class.is-active]="window() === w"
+                    (click)="pickWindow(w)">
+              {{ w }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="momentum-hero__sub tabular">{{ windowLabel() }}</div>
+  </header>
+
+  <!-- ── TREND SUMMARY (chart + 4 KPI tiles) ──────────────────── -->
+  <app-trend-summary
+    [anchor]="latestRadarDate()"
+    [days]="windowDays()"
+    title="Surging · rising · breadth over the window" />
+
+  <!-- ── MOVERS TABLE ─────────────────────────────────────────── -->
+  <section class="momentum-movers">
+    <header class="momentum-movers__head">
+      <div>
+        <span class="momentum-hero__eyebrow">Top movers</span>
+        <h2 class="momentum-movers__title">Topics with the biggest shift</h2>
+        <p class="momentum-hero__deck">
+          Δ = today's fast score minus the score {{ windowDays() }} day{{ windowDays() === 1 ? '' : 's' }} ago.
+          Click a row to open the topic page.
+        </p>
+      </div>
+      <div class="momentum-movers__filter">
+        <button type="button" class="momentum-windowctl__btn"
+                [class.is-active]="direction() === 'all'" (click)="toggleDirection('all')">All</button>
+        <button type="button" class="momentum-windowctl__btn"
+                [class.is-active]="direction() === 'rising'" (click)="toggleDirection('rising')">
+          <i class="pi pi-arrow-up-right" aria-hidden="true"></i> Rising
+        </button>
+        <button type="button" class="momentum-windowctl__btn"
+                [class.is-active]="direction() === 'falling'" (click)="toggleDirection('falling')">
+          <i class="pi pi-arrow-down-right" aria-hidden="true"></i> Falling
+        </button>
+      </div>
+    </header>
+
+    @if (loading()) {
+      <p-skeleton width="100%" height="20rem" />
+    } @else if (movers().length === 0) {
+      <p class="momentum-empty muted">No movers in this direction over the window.</p>
+    } @else {
+      <table class="movers-table tabular">
+        <thead>
+          <tr>
+            <th class="movers-table__rank">#</th>
+            <th class="movers-table__topic">Topic</th>
+            <th class="movers-table__sector">Sector</th>
+            <th class="movers-table__num">Now</th>
+            <th class="movers-table__num">Then</th>
+            <th class="movers-table__delta">Δ</th>
+            <th class="movers-table__num">% change</th>
+            <th class="movers-table__trend">Trend</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of movers(); track m.topic.id; let i = $index) {
+            <tr (click)="goToTopic(m.topic)" tabindex="0" (keydown.enter)="goToTopic(m.topic)">
+              <td class="movers-table__rank">{{ i + 1 }}</td>
+              <td class="movers-table__topic">
+                <div class="movers-table__topic-label">{{ m.topic.label }}</div>
+                <div class="movers-table__topic-meta">
+                  <span class="movers-table__stage" [attr.data-stage]="m.topic.stage">{{ m.topic.stage }}</span>
+                  @if (m.topic.high_breadth) {
+                    <span class="movers-table__breadth"><i class="pi pi-users"></i> breadth {{ m.topic.breadth_7d }}</span>
+                  }
+                </div>
+              </td>
+              <td class="movers-table__sector">{{ m.sector }}</td>
+              <td class="movers-table__num">{{ m.scoreNow | number:'1.1-1' }}</td>
+              <td class="movers-table__num muted-2">{{ m.scoreThen | number:'1.1-1' }}</td>
+              <td class="movers-table__delta">
+                <span class="movers-table__delta-pill"
+                      [class.is-pos]="m.delta > 0"
+                      [class.is-neg]="m.delta < 0">
+                  {{ m.delta > 0 ? '+' : '' }}{{ m.delta | number:'1.1-1' }}
+                </span>
+              </td>
+              <td class="movers-table__num">
+                <span [class.muted-2]="Math.abs(m.pctDelta) < 5">
+                  {{ m.pctDelta > 0 ? '+' : '' }}{{ m.pctDelta | number:'1.0-0' }}%
+                </span>
+              </td>
+              <td class="movers-table__trend">
+                <svg viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
+                  <path [attr.d]="trendPath(m.trend, 120, 28)"
+                        fill="none"
+                        [attr.stroke]="m.delta > 0 ? 'var(--pos)' : m.delta < 0 ? 'var(--warn)' : 'var(--fg-4)'"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+
+  <!-- ── COMPANION MARKDOWN (weekly/monthly) ──────────────────── -->
+  @if (companionMeta(); as meta) {
+    <section class="momentum-brief">
+      <button class="momentum-brief__toggle" type="button" (click)="showCompanion.set(!showCompanion())">
+        <span class="momentum-hero__eyebrow">{{ meta.cadence === 'weekly' ? 'Weekly rollup' : 'Monthly rollup' }}</span>
+        <span class="momentum-brief__label">{{ showCompanion() ? 'Hide' : 'Read' }} the analyst brief · {{ meta.date_id }}</span>
+        <i class="pi" [class.pi-chevron-down]="!showCompanion()" [class.pi-chevron-up]="showCompanion()"></i>
+      </button>
+      @if (showCompanion()) {
+        <div class="momentum-brief__body">
+          <app-markdown-viewer [source]="companionMarkdown()" />
+        </div>
+      }
+    </section>
+  }
+</section>

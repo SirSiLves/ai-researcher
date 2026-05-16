@@ -34,7 +34,7 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from _lib import upsert_index_marker_line, REPO_ROOT, STATE_DIR, DATA_ROOT, SOURCES_DIR, SWEEPS_DIR, INDEX_MD
+from _lib import upsert_index_marker_line, REPO_ROOT, STATE_DIR, DATA_ROOT, INDEX_MD
 
 ROOT = REPO_ROOT  # back-compat for any `path.relative_to(ROOT)` calls
 # Prefer TODAY from the env (set by `eval "$(scripts/now.sh)"` in the
@@ -54,13 +54,8 @@ DATE_FROM_PATH_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
 
 def iter_github_files(root: Path | None = None):
-    """Yield (path, YYYY-MM-DD) for every dated github/.../*.md file.
-
-    `root` is kept for backwards compatibility but ignored — the github
-    collector dumps live under SOURCES_DIR/github after the publish/research
-    restructure.
-    """
-    base = SOURCES_DIR / "github"
+    """Yield (path, YYYY-MM-DD) for every dated github/.../*.md file under DATA_ROOT/github/."""
+    base = (root or DATA_ROOT) / "github"
     if not base.exists():
         return
     for p in base.rglob("*.md"):
@@ -396,7 +391,7 @@ def main():
                     f.write("\n".join(log_lines) + "\n")
 
     # === Step 9: write change-log markdown ===
-    out_md = SWEEPS_DIR / "github_candidates" / TODAY[:7].replace("-", "/") / f"{TODAY}.md"
+    out_md = DATA_ROOT / "github_candidates" / TODAY[:7].replace("-", "/") / f"{TODAY}.md"
     out_md.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         f"# GitHub sweep — {TODAY}\n",

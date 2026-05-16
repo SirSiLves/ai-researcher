@@ -90,13 +90,13 @@ export class TopicPage {
   readonly breadcrumb = computed<MenuItem[]>(() => {
     const t = this.topic();
     return [
-      { label: 'Radar', routerLink: '/radar' },
+      { label: 'Map', routerLink: '/map' },
       { label: t?.sector ?? '—' },
       { label: 'Topic' }
     ];
   });
 
-  readonly breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/today' };
+  readonly breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/pulse' };
 
   readonly pipelineAgeDays = computed(() => {
     const launch = new Date('2026-05-04');

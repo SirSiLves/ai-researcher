@@ -1,0 +1,206 @@
+<section class="page map">
+
+  <header class="map-hero">
+    <div class="map-hero__head-left">
+      <span class="map-hero__eyebrow">Map · {{ formattedDate() || '—' }}</span>
+      <h1 class="map-hero__title">The whole AI landscape</h1>
+      <p class="map-hero__deck">
+        Sectors on the left, every topic in the middle, the firms behind them on the right.
+        Click a sector to focus, a topic to drill in, a firm to open its profile.
+      </p>
+    </div>
+    <div class="map-hero__head-right">
+      <div class="map-hero__dates">
+        <button pButton type="button" text size="small"
+                (click)="prevDate()" [disabled]="!canPrev()" aria-label="Older snapshot">
+          <i class="pi pi-chevron-left"></i>
+        </button>
+        <button type="button" class="map-hero__date-btn" (click)="goBackToPulse()" title="Open Pulse for this date">
+          <i class="pi pi-wave-pulse" aria-hidden="true"></i>
+          <span class="tabular">{{ selectedDate() || '—' }}</span>
+        </button>
+        <button pButton type="button" text size="small"
+                (click)="nextDate()" [disabled]="!canNext()" aria-label="Newer snapshot">
+          <i class="pi pi-chevron-right"></i>
+        </button>
+      </div>
+      <div class="map-hero__search">
+        <i class="pi pi-search" aria-hidden="true"></i>
+        <input class="map-hero__input"
+               type="search"
+               placeholder="Filter topics…"
+               [value]="search()"
+               (input)="search.set($any($event.target).value)"
+               autocomplete="off" />
+        @if (activeSector() || search() || stageFilter().size) {
+          <button class="map-hero__clear" type="button" (click)="clearAll()">
+            <i class="pi pi-times" aria-hidden="true"></i> Clear
+          </button>
+        }
+      </div>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p-skeleton width="100%" height="32rem" />
+  } @else {
+    <section class="map-grid">
+
+      <!-- ── SECTORS RAIL ─────────────────────────────────────── -->
+      <aside class="map-sectors">
+        <header class="map-sectors__head">
+          <span class="map-section__eyebrow">Sectors</span>
+          <span class="map-sectors__count tabular">{{ sectorRows().length }}</span>
+        </header>
+        <ul class="map-sectors__list">
+          <li>
+            <button type="button"
+                    class="map-sector"
+                    [class.is-active]="activeSector() === null"
+                    (click)="selectSector(null)">
+              <span class="map-sector__name">All sectors</span>
+              <span class="map-sector__count tabular">{{ radarDay()?.topics?.length ?? 0 }}</span>
+            </button>
+          </li>
+          @for (row of sectorRows(); track row.sector.name) {
+            <li>
+              <button type="button"
+                      class="map-sector"
+                      [class.is-active]="activeSector() === row.sector.name"
+                      (click)="selectSector(row.sector.name)">
+                <span class="map-sector__name">{{ row.sector.name }}</span>
+                <div class="map-sector__meta tabular">
+                  @if (row.rising > 0) {
+                    <span class="map-sector__pill is-rising">
+                      <i class="pi pi-arrow-up-right"></i> {{ row.rising }}
+                    </span>
+                  }
+                  @if (row.fading > 0) {
+                    <span class="map-sector__pill is-fading">
+                      <i class="pi pi-arrow-down-right"></i> {{ row.fading }}
+                    </span>
+                  }
+                  <span class="map-sector__count tabular">{{ row.topics.length }}</span>
+                </div>
+              </button>
+            </li>
+          }
+        </ul>
+      </aside>
+
+      <!-- ── TOPICS TABLE ─────────────────────────────────────── -->
+      <article class="map-topics">
+        <header class="map-topics__head">
+          <div>
+            <span class="map-section__eyebrow">Topics</span>
+            <h2 class="map-topics__title">
+              {{ activeSector() || 'All sectors' }} ·
+              <span class="tabular">{{ filteredTopics().length }}</span>
+            </h2>
+          </div>
+          <div class="map-topics__controls">
+            <div class="map-stages">
+              @for (st of allStages; track st) {
+                <button type="button"
+                        class="map-stages__btn"
+                        [class.is-active]="stageFilter().has(st)"
+                        (click)="toggleStage(st)">
+                  {{ st }}
+                </button>
+              }
+            </div>
+            <div class="map-sort">
+              <span class="map-sort__label">Sort</span>
+              <div class="map-stages">
+                <button type="button" class="map-stages__btn"
+                        [class.is-active]="sortKey() === 'score'" (click)="sortKey.set('score')">Score</button>
+                <button type="button" class="map-stages__btn"
+                        [class.is-active]="sortKey() === 'momentum'" (click)="sortKey.set('momentum')">Momentum</button>
+                <button type="button" class="map-stages__btn"
+                        [class.is-active]="sortKey() === 'breadth'" (click)="sortKey.set('breadth')">Breadth</button>
+              </div>
+            </div>
+          </div>
+        </header>
+        @if (filteredTopics().length === 0) {
+          <p class="map-empty muted">No topics match that combination of filters.</p>
+        } @else {
+          <ul class="map-topic-list">
+            @for (t of filteredTopics(); track t.id) {
+              <li class="map-topic" (click)="goToTopic(t)" tabindex="0" (keydown.enter)="goToTopic(t)">
+                <div class="map-topic__main">
+                  <div class="map-topic__label">{{ t.label }}</div>
+                  <div class="map-topic__meta">
+                    <span class="map-topic__stage" [attr.data-stage]="t.stage">{{ t.stage }}</span>
+                    <span class="map-topic__sector">{{ t.sector }}</span>
+                    @if (t.high_breadth) {
+                      <span class="map-topic__breadth"><i class="pi pi-users"></i> breadth {{ t.breadth_7d }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="map-topic__nums">
+                  <div class="map-topic__num">
+                    <span class="map-topic__num-label">Score</span>
+                    <span class="map-topic__num-value tabular">{{ t.score_fast | number:'1.1-1' }}</span>
+                  </div>
+                  <div class="map-topic__num">
+                    <span class="map-topic__num-label">Δ vs slow</span>
+                    @if (t.score_fast !== null && t.score_slow !== null) {
+                      <span class="map-topic__num-value tabular"
+                            [class.is-pos]="t.score_fast - t.score_slow > 0"
+                            [class.is-neg]="t.score_fast - t.score_slow < 0">
+                        {{ t.score_fast - t.score_slow > 0 ? '+' : '' }}{{ (t.score_fast - t.score_slow) | number:'1.1-1' }}
+                      </span>
+                    }
+                  </div>
+                  <div class="map-topic__dir"
+                       [class.is-rising]="t.direction === 'rising' || t.direction === 'surging'"
+                       [class.is-falling]="t.direction === 'fading' || t.direction === 'falling'">
+                    @if (t.direction === 'surging' || t.direction === 'rising') { <i class="pi pi-arrow-up-right"></i> }
+                    @else if (t.direction === 'fading' || t.direction === 'falling') { <i class="pi pi-arrow-down-right"></i> }
+                    @else { <i class="pi pi-minus"></i> }
+                    {{ t.direction }}
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </article>
+
+      <!-- ── FIRMS RAIL ───────────────────────────────────────── -->
+      <aside class="map-firms">
+        <header class="map-sectors__head">
+          <span class="map-section__eyebrow">Firms in view</span>
+          <span class="map-sectors__count tabular">{{ topFirms().length }}</span>
+        </header>
+        @if (topFirms().length === 0) {
+          <p class="map-empty muted">No firm coverage in this slice yet.</p>
+        } @else {
+          <ul class="map-firms__list">
+            @for (f of topFirms(); track f.slug) {
+              <li>
+                <button type="button" class="map-firm" (click)="goToFirm(f.slug)">
+                  <div class="map-firm__left">
+                    <span class="map-firm__name">{{ humanize(f.slug) }}</span>
+                    @if (f.org.tier_hint) {
+                      <span class="map-firm__tier">{{ f.org.tier_hint }}</span>
+                    }
+                  </div>
+                  <div class="map-firm__right">
+                    <span class="map-firm__velocity"
+                          [attr.data-tone]="velocityTone(f.org.velocity_status)">
+                      {{ f.org.velocity_status }}
+                    </span>
+                    <span class="map-firm__count tabular">{{ f.mentions }}</span>
+                  </div>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </aside>
+
+    </section>
+  }
+</section>

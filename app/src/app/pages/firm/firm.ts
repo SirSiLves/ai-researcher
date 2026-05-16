@@ -151,12 +151,12 @@ export class FirmPage {
   readonly breadcrumb = computed<MenuItem[]>(() => {
     const d = this.detail();
     return [
-      { label: 'Firms', routerLink: '/firms' },
+      { label: 'Map', routerLink: '/map' },
       { label: d?.tier_hint ?? '—' },
-      { label: 'Detail' }
+      { label: 'Firm' }
     ];
   });
-  readonly breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/today' };
+  readonly breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/pulse' };
 
   readonly hotEvents = computed(() => {
     const d = this.detail();

@@ -1,12 +1,9 @@
 ---
 name: ai-weekly-digest
-description: Cumulative weekly rollup — runs DAILY, reads MONDAY→TODAY of the current week's dailies, and OVERWRITES publish/weekly/{YYYY}/{YYYY-Www}.md each run. The file grows from 1 day on Monday to 7 days on Sunday and freezes after Sunday's run as the canonical week file. Spawned by the orchestrator every day.
+description: Cumulative weekly rollup — runs DAILY, reads MONDAY→TODAY of the current week's dailies, and OVERWRITES weekly/{YYYY}/{YYYY-Www}.md each run. The file grows from 1 day on Monday to 7 days on Sunday and freezes after Sunday's run as the canonical week file. Spawned by the orchestrator every day.
 ---
 
-> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
->   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
->   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
->   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+> **Path resolution.** CWD when this skill runs is `data/`. Every cadence — `daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`, `reports/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`, `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md` — is a sibling directly under `data/`. Output paths are bare (no `publish/` or `research/` prefix).
 >
 > **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
@@ -27,18 +24,18 @@ The previous week's weekly file is now frozen with its full 7-day content. The `
 
 ## Architectural pyramid
 ```
-collectors → daily orchestrator → publish/daily/{YYYY}/{MM}/{date}.md (one per day)
-publish/daily/{YYYY}/{MM}/{date}.md (×1..7) → ai-weekly-digest (this skill, daily) → publish/weekly/{YYYY}/{WEEK_ID}.md (overwritten each day of the week)
-publish/weekly/{YYYY}/{WEEK_ID}.md (×4-5) → ai-monthly-rollup → publish/monthly/{YYYY}/{YYYY-MM}.md (one per month, first Monday only)
+collectors → daily orchestrator → daily/{YYYY}/{MM}/{date}.md (one per day)
+daily/{YYYY}/{MM}/{date}.md (×1..7) → ai-weekly-digest (this skill, daily) → weekly/{YYYY}/{WEEK_ID}.md (overwritten each day of the week)
+weekly/{YYYY}/{WEEK_ID}.md (×4-5) → ai-monthly-rollup → monthly/{YYYY}/{YYYY-MM}.md (one per month, first Monday only)
 ```
 
 Each layer reads only the layer immediately below. Don't skip layers.
 
 ## 1. Setup
-- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — every cadence is a sibling directly under `data/`.
 - Read `sources.json` `weekly_digest` section.
 - **Timestamps come from the orchestrator's invocation footer.** Look for `PIPELINE TIMESTAMPS` in the footer that follows this skill text — it carries authoritative `TODAY` (YYYY-MM-DD), `WEEK_ID` (YYYY-Www), `MONDAY`, `SUNDAY`, `DOW_ISO` (1=Mon..7=Sun). Use those. If invoked standalone (no footer), fall back to `eval "$(../pipeline/scripts/now.sh)"` from the workspace root. Do NOT compute the date or ISO week locally.
-- **Output filename:** `publish/weekly/{YYYY}/{WEEK_ID}.md` (e.g. `publish/weekly/2026/2026-W20.md`). **OVERWRITE if exists** — this skill is cumulative, not versioned. The previous day's snapshot is intentionally replaced.
+- **Output filename:** `weekly/{YYYY}/{WEEK_ID}.md` (e.g. `weekly/2026/2026-W20.md`). **OVERWRITE if exists** — this skill is cumulative, not versioned. The previous day's snapshot is intentionally replaced.
 
 ## 2. Gather inputs
 
@@ -77,7 +74,7 @@ If no prior week exists, note "first weekly rollup" in the diff section.
 
 Target: ~150-250 lines for the weekly file at week-end. Earlier in the week it'll be shorter — that's fine.
 
-## 4. Write `publish/weekly/{YYYY}/{WEEK_ID}.md` — OVERWRITE
+## 4. Write `weekly/{YYYY}/{WEEK_ID}.md` — OVERWRITE
 
 Use this exact structure (consistency = greppable across weeks).
 
@@ -97,7 +94,7 @@ _Snapshot as of {TODAY} — {N} of 7 daily digests covered._
 ## Top stories
 3–5 thematic clusters. Each:
 **Theme name** — 2–3 sentences synthesizing what happened so far this week. _Why it matters:_ one line.
-Backing: [publish/daily/{date}](../../daily/{YYYY}/{MM}/{date}.md), [research/sources/news/{date}](../../../research/sources/news/{YYYY}/{MM}/{date}.md) …
+Backing: [daily/{date}](../../daily/{YYYY}/{MM}/{date}.md), [news/{date}](../../news/{YYYY}/{MM}/{date}.md) …
 
 ## Top papers
 6–10 papers from this week so far. Each: **Title** — authors, _why notable:_ 1 line. [arxiv link]
@@ -116,7 +113,7 @@ Backing: [publish/daily/{date}](../../daily/{YYYY}/{MM}/{date}.md), [research/so
 
 ## Sources read this run
 - daily/: list of file paths actually read (Mon..Today of this week).
-  Note any gaps within the week (e.g., `publish/daily/2026/05/2026-05-08.md` missing — orchestrator failed that day).
+  Note any gaps within the week (e.g., `daily/2026/05/2026-05-08.md` missing — orchestrator failed that day).
 ```
 
 ## 5. Update `index.md`
@@ -126,13 +123,13 @@ Open `index.md` with Read. Find `<!-- WEEKLY_START -->`. **Replace-don't-append 
 In-place update pattern: find the existing line matching `- [{WEEK_ID}](weekly/...)` and Edit-replace it with the new headline summary. New entry pattern: insert after `<!-- WEEKLY_START -->`.
 
 ```
-- [{WEEK_ID}](publish/weekly/{YYYY}/{WEEK_ID}.md) — Mon {MONDAY} → Sun {SUNDAY}, {N}/7 days, {one-line headline summary, ~80 chars}
+- [{WEEK_ID}](weekly/{YYYY}/{WEEK_ID}.md) — Mon {MONDAY} → Sun {SUNDAY}, {N}/7 days, {one-line headline summary, ~80 chars}
 ```
 
 ## 6. Finish
-- One-line confirmation: `Saved publish/weekly/{YYYY}/{WEEK_ID}.md ({N}/7 days covered, {K} top stories, {P} papers). Index updated.`
+- One-line confirmation: `Saved weekly/{YYYY}/{WEEK_ID}.md ({N}/7 days covered, {K} top stories, {P} papers). Index updated.`
 - Do NOT post the full content to chat.
-- Do NOT touch any `publish/daily/`, `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, or `publish/monthly/` files. Read-only.
+- Do NOT touch any `daily/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, or `monthly/` files. Read-only.
 - Do NOT touch `trends.md` — owned by the ai-trends agent, which fires separately on Mondays.
 
 ## Constraints & quality bar

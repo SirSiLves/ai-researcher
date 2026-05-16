@@ -3,10 +3,7 @@ name: ai-replay
 description: Canonical orchestrator spec for the AI Researcher pipeline. Runs the full daily fan-out on demand. **Today only** — collectors fetch live URLs, all dated outputs use today's date from ../pipeline/scripts/now.sh. Same-day re-runs MERGE into existing files rather than producing -v2 variants. THIS FILE IS ALSO THE SPEC THE NIGHTLY CRON SHOULD FOLLOW — paste the §1–§8 procedure into the Cowork scheduled-task prompt.
 ---
 
-> **Path resolution (post-2026-05-16 publish/research restructure).** CWD when this skill runs is `data/`. Output paths must be prefixed with the right subtree:
->   - **Publish-side** (web app reads these): `publish/daily/`, `publish/weekly/`, `publish/monthly/`, `publish/radar/`, `publish/orgs/`, `publish/reports/`, `publish/index.md`.
->   - **Research sources** (raw collector dumps, never published): `research/sources/news/`, `research/sources/papers/`, `research/sources/blogs/`, `research/sources/jobs/`, `research/sources/linkedin/`, `research/sources/github/`, `research/sources/hackernews/`.
->   - **Research sweeps** (pipeline-internal change logs): `research/sweeps/vendor_candidates/`, `research/sweeps/keyword_candidates/`, `research/sweeps/github_candidates/`.
+> **Path resolution.** CWD when this skill runs is `data/`. Every cadence — `daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`, `reports/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`, `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md` — is a sibling directly under `data/`. Output paths are bare (no `publish/` or `research/` prefix).
 >
 > **State files** (`sources.json`, `discovered_orgs.json`, `discovered_keywords.json`, `github_stars.json`, `vendor_changes.{json,log}`, `keyword_changes.{json,log}`, `github_changes.{json,log}`, `sources.json.{vendor,keyword,github}.bak`) live at `../pipeline/state/<filename>`. Helper scripts at `../pipeline/scripts/<name>.py` invoked as `python3 ../pipeline/scripts/<name>.py`. Other SKILLs at `../pipeline/skills/<name>/SKILL.md`.
 
@@ -21,7 +18,7 @@ You are the **manual replay agent AND the canonical orchestrator spec**. This fi
 
 ## 1. Setup
 
-- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — `publish/...`, `research/sources/...`, `research/sweeps/...`.
+- Workspace folder (CWD when invoked by the orchestrator): `/Users/yruosch/Documents/Claude/Projects/AI Researcher/data/`. All paths in this skill are relative to that — every cadence is a sibling directly under `data/`.
 - Pull canonical timestamps:
   ```bash
   eval "$(../pipeline/scripts/now.sh)"
@@ -29,31 +26,22 @@ You are the **manual replay agent AND the canonical orchestrator spec**. This fi
   This populates `TODAY`, `YYYY`, `MM`, `DD`, `MONTH`, `WEEK_ID`, `MONDAY`, `SUNDAY`, `PREV_WEEK_ID`, `DOW_ISO`, `IS_MONDAY`, `IS_FIRST_MONDAY_OF_MONTH`, `ISO_TS`, `AS_OF`. **All subagents you spawn must trust these values** — pass them in the `PIPELINE TIMESTAMPS` footer.
 - Ensure target folders exist (idempotent):
   ```bash
-  # research-side: raw collector dumps
-  mkdir -p "research/sources/news/$YYYY/$MM" \
-           "research/sources/papers/$YYYY/$MM" \
-           "research/sources/blogs/$YYYY/$MM" \
-           "research/sources/jobs/$YYYY/$MM" \
-           "research/sources/linkedin/$YYYY/$MM" \
-           "research/sources/github/$YYYY/$MM" \
-           "research/sources/hackernews/$YYYY/$MM"
-  # research-side: sweep change logs
-  mkdir -p "research/sweeps/vendor_candidates/$YYYY/$MM" \
-           "research/sweeps/keyword_candidates/$YYYY/$MM" \
-           "research/sweeps/github_candidates/$YYYY/$MM"
-  # publish-side: cadence reports + firm view
-  mkdir -p "publish/daily/$YYYY/$MM" \
-           "publish/radar/$YYYY/$MM" \
-           "publish/weekly/$YYYY" \
-           "publish/monthly/$YYYY" \
-           "publish/orgs" \
-           "publish/reports"
+  # Raw collector dumps
+  mkdir -p "news/$YYYY/$MM" "papers/$YYYY/$MM" "blogs/$YYYY/$MM" \
+           "jobs/$YYYY/$MM" "linkedin/$YYYY/$MM" "github/$YYYY/$MM" \
+           "hackernews/$YYYY/$MM"
+  # Sweep change logs
+  mkdir -p "vendor_candidates/$YYYY/$MM" "keyword_candidates/$YYYY/$MM" \
+           "github_candidates/$YYYY/$MM"
+  # Cadence reports + firm view
+  mkdir -p "daily/$YYYY/$MM" "radar/$YYYY/$MM" \
+           "weekly/$YYYY" "monthly/$YYYY" "orgs" "reports"
   ```
 - Confirm with the user before fanning out:
   ```
   Replay for {TODAY}? This will:
     • Fan out 7 collectors (news, papers, blogs, jobs-ch, linkedin, github, hackernews)
-    • Synthesize publish/daily/{date}.md
+    • Synthesize daily/{date}.md
     • Run radar + vendor sweep
     • {if IS_MONDAY=1} Run weekly rollup
     • {if IS_MONDAY=1} Run ai-trends
@@ -111,13 +99,13 @@ If the user picked "Only collectors, skip synthesis" in §1, stop here. Print:
 
 ## 4. Read all 7 collector outputs
 
-In parallel: Read each of `research/sources/news/{YYYY}/{MM}/{TODAY}.md`, `research/sources/papers/{YYYY}/{MM}/{TODAY}.md`, `research/sources/blogs/{YYYY}/{MM}/{TODAY}.md`, `research/sources/jobs/{YYYY}/{MM}/{TODAY}.md`, `research/sources/linkedin/{YYYY}/{MM}/{TODAY}.md`, `research/sources/github/{YYYY}/{MM}/{TODAY}.md`, `research/sources/hackernews/{YYYY}/{MM}/{TODAY}.md`.
+In parallel: Read each of `news/{YYYY}/{MM}/{TODAY}.md`, `papers/{YYYY}/{MM}/{TODAY}.md`, `blogs/{YYYY}/{MM}/{TODAY}.md`, `jobs/{YYYY}/{MM}/{TODAY}.md`, `linkedin/{YYYY}/{MM}/{TODAY}.md`, `github/{YYYY}/{MM}/{TODAY}.md`, `hackernews/{YYYY}/{MM}/{TODAY}.md`.
 
 Skip files that don't exist (a collector failed) or contain only the stub text (LinkedIn-without-Chrome case).
 
-## 5. Synthesize → publish/daily/{YYYY}/{MM}/{TODAY}.md
+## 5. Synthesize → daily/{YYYY}/{MM}/{TODAY}.md
 
-**Merge-first.** If `publish/daily/{YYYY}/{MM}/{TODAY}.md` already exists, READ it before writing. Same rules as the collector skills:
+**Merge-first.** If `daily/{YYYY}/{MM}/{TODAY}.md` already exists, READ it before writing. Same rules as the collector skills:
 
 1. Parse existing items by their link URLs.
 2. New items the prior synthesis didn't surface: append.
@@ -174,7 +162,7 @@ Five highest-signal items across all slices, ranked. Each: link + 1-line "why yo
 Find `<!-- INDEX_START -->`. **If today's line already exists**, update it in place with the new headline. Otherwise insert directly after the marker.
 
 ```
-- [{TODAY}](publish/daily/{YYYY}/{MM}/{TODAY}.md) — {one-line headline ~120 chars}
+- [{TODAY}](daily/{YYYY}/{MM}/{TODAY}.md) — {one-line headline ~120 chars}
 ```
 
 ## 6.5. Spawn ai-trend-radar
@@ -184,7 +172,7 @@ One Agent call:
 - `description`: `"Trend radar"`
 - `prompt`: contents of `../pipeline/skills/ai-trend-radar/SKILL.md` + footer.
 
-Wait for it. The radar will replace any existing `publish/radar/{YYYY}/{MM}/{TODAY}.{md,json}` in place (its merge rules say "the radar is fully derived; same-day re-run produces an authoritative new snapshot").
+Wait for it. The radar will replace any existing `radar/{YYYY}/{MM}/{TODAY}.{md,json}` in place (its merge rules say "the radar is fully derived; same-day re-run produces an authoritative new snapshot").
 
 ## 6.6. Spawn ai-vendor-sweep
 
@@ -203,7 +191,7 @@ Run the org-view generator directly — no subagent needed, it's a pure Python s
 python3 ../pipeline/scripts/build_org_view.py
 ```
 
-This rebuilds `publish/orgs/index.json` + `publish/orgs/{slug}.json` for every tracked org (discovered orgs + the 6 priority vendors that the sweep skips). The generator scans `discovered_orgs.json`, source files, and radar JSONs — completes in ~8-12 seconds. Idempotent. Drives `orgs.html`.
+This rebuilds `orgs/index.json` + `orgs/{slug}.json` for every tracked org (discovered orgs + the 6 priority vendors that the sweep skips). The generator scans `discovered_orgs.json`, source files, and radar JSONs — completes in ~8-12 seconds. Idempotent. Drives `orgs.html`.
 
 If the script exits non-zero, log the error but don't block — the rest of the pipeline doesn't depend on the firm view.
 
@@ -217,7 +205,7 @@ Two-step process: a deterministic Python script does the mining + classification
 python3 ../pipeline/scripts/run_keyword_sweep.py
 ```
 
-This mines today's source files for 2/3-gram phrases (skipping anything covered by existing keyword lists AND anything the agent has already judged as boilerplate, within a 30-day verdict cache), classifies each phrase (already_applied / promote / watch / dormant), promotes phrases that held `promote` tier for ≥2 consecutive days, auto-applies to the four target lists in sources.json, runs proven-promotion for long-history keywords, writes `research/sweeps/keyword_candidates/{date}.md`, updates `discovered_keywords.json`, and appends to `keyword_changes.log`.
+This mines today's source files for 2/3-gram phrases (skipping anything covered by existing keyword lists AND anything the agent has already judged as boilerplate, within a 30-day verdict cache), classifies each phrase (already_applied / promote / watch / dormant), promotes phrases that held `promote` tier for ≥2 consecutive days, auto-applies to the four target lists in sources.json, runs proven-promotion for long-history keywords, writes `keyword_candidates/{date}.md`, updates `discovered_keywords.json`, and appends to `keyword_changes.log`.
 
 The script writes `keyword_judge_request.md` listing every phrase that lacks a fresh agent verdict.
 
@@ -246,9 +234,9 @@ Pure Python — no subagent needed:
 python3 ../pipeline/scripts/run_github_sweep.py
 ```
 
-Mines `research/sources/github/{YYYY}/{MM}/*.md` (the ai-github collector's daily output) for trending repo appearances over the last 14 days. Repos that trend on ≥3 distinct days AND hold 'promote' tier for ≥2 consecutive sweep runs get auto-added to `news_collector.github_collector.watched_repos`. Repos with a single-day star delta ≥5,000 get a 30-day hot-event TTL. Soft cap at 80 watched repos triggers deep-watch demotion (oldest-silent first; same shape as vendor + keyword sweeps). Manual entries are sacred. Audit trail in `github_changes.log`.
+Mines `github/{YYYY}/{MM}/*.md` (the ai-github collector's daily output) for trending repo appearances over the last 14 days. Repos that trend on ≥3 distinct days AND hold 'promote' tier for ≥2 consecutive sweep runs get auto-added to `news_collector.github_collector.watched_repos`. Repos with a single-day star delta ≥5,000 get a 30-day hot-event TTL. Soft cap at 80 watched repos triggers deep-watch demotion (oldest-silent first; same shape as vendor + keyword sweeps). Manual entries are sacred. Audit trail in `github_changes.log`.
 
-Output: `research/sweeps/github_candidates/{YYYY}/{MM}/{TODAY}.md` (change log, same shape as vendor_candidates and keyword_candidates).
+Output: `github_candidates/{YYYY}/{MM}/{TODAY}.md` (change log, same shape as vendor_candidates and keyword_candidates).
 
 If the script exits non-zero, log the error but don't block — the rest of the pipeline doesn't depend on the github sweep.
 
@@ -275,7 +263,7 @@ One Agent call:
 - `description`: `"Weekly rollup"`
 - `prompt`: contents of `../pipeline/skills/ai-weekly-digest/SKILL.md` + footer.
 
-Wait for it. The skill overwrites `publish/weekly/{YYYY}/{WEEK_ID}.md`.
+Wait for it. The skill overwrites `weekly/{YYYY}/{WEEK_ID}.md`.
 
 ## 7.5. Trends update — Monday only
 
@@ -284,7 +272,7 @@ If `IS_MONDAY=1`, spawn ONE Agent call:
 - `description`: `"Trends update"`
 - `prompt`: contents of `../pipeline/skills/ai-trends/SKILL.md` + footer + this extra line:
   ```
-  SOURCE: publish/weekly/{YYYY}/{PREV_WEEK_ID}.md
+  SOURCE: weekly/{YYYY}/{PREV_WEEK_ID}.md
   ```
   (The trends agent reads the just-completed prior week, not the current week that has only just begun. The skill itself documents this — your job is to pass the source path.)
 
@@ -306,9 +294,9 @@ Spawn ONE Agent call:
   TARGET_MONTH: {PREV_MONTH}
   ```
 
-Wait for it. The monthly rollup writes `publish/monthly/{YYYY}/{PREV_MONTH}.md`, merging if it exists.
+Wait for it. The monthly rollup writes `monthly/{YYYY}/{PREV_MONTH}.md`, merging if it exists.
 
-After monthly completes, if you also want trends to incorporate the new monthly file, spawn `ai-trends` again with `SOURCE: publish/monthly/{YYYY}/{PREV_MONTH}.md`. (Optional — the orchestrator currently does this on monthly runs.)
+After monthly completes, if you also want trends to incorporate the new monthly file, spawn `ai-trends` again with `SOURCE: monthly/{YYYY}/{PREV_MONTH}.md`. (Optional — the orchestrator currently does this on monthly runs.)
 
 ## 8. Finish
 
@@ -331,5 +319,5 @@ Examples:
 - **Sources scanned, theme balance, vendor coverage** — these meta-sections describe the *run*, not the items. They always get regenerated with this run's numbers, not merged.
 - **Failed subagents don't block.** If `ai-blogs` returns an error, note it in the daily's "Sources scanned" and continue with synthesis.
 - **No partial-run rollback.** If the user cancels mid-pipeline (e.g. KeyboardInterrupt), the already-completed steps stay completed. The next replay run will merge with them.
-- **`sources.json.{vendor,keyword,github}.bak`** — per-sweep rollback files, not for the daily files. If a daily merge goes wrong, the user can `git checkout publish/daily/{YYYY}/{MM}/{TODAY}.md` (assuming the workspace is git-tracked).
+- **`sources.json.{vendor,keyword,github}.bak`** — per-sweep rollback files, not for the daily files. If a daily merge goes wrong, the user can `git checkout daily/{YYYY}/{MM}/{TODAY}.md` (assuming the workspace is git-tracked).
 - **Don't post the daily content to chat.** §8's one-line confirmation is the only chat output.

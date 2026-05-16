@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { Skeleton } from 'primeng/skeleton';
-import { Tag } from 'primeng/tag';
+import { MeterGroup } from 'primeng/metergroup';
 
 import {
   DataService,
@@ -17,12 +17,49 @@ interface FirmRow {
   slug: string;
   topicCount: number;
   topics: string[];
+  pct: number;
 }
+
+interface SourceMix {
+  label: string;
+  value: number;
+  color: string;
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+  paper:                       'Papers',
+  long_form_blog:              'Long-form blogs',
+  priority_vendor_blog:        'Vendor blogs',
+  enterprise_vendor_blog:      'Enterprise blogs',
+  tech_news:                   'Tech news',
+  linkedin_network_post:       'LinkedIn',
+  medium_aggregator:           'Medium / aggregators',
+  github_trending_signal:      'GitHub trending',
+  github_watched_star_delta:   'GitHub stars',
+  hn_front_page:               'Hacker News',
+  governance_source:           'Governance / policy',
+  job_posting_skill_mention:   'Job posts'
+};
+
+const SOURCE_COLORS: Record<string, string> = {
+  paper:                       '#0ea5e9',
+  long_form_blog:              '#3b82f6',
+  priority_vendor_blog:        '#2563eb',
+  enterprise_vendor_blog:      '#6366f1',
+  tech_news:                   '#8b5cf6',
+  linkedin_network_post:       '#06b6d4',
+  medium_aggregator:           '#94a3b8',
+  github_trending_signal:      '#a855f7',
+  github_watched_star_delta:   '#7c3aed',
+  hn_front_page:               '#f97316',
+  governance_source:           '#10b981',
+  job_posting_skill_mention:   '#eab308'
+};
 
 @Component({
   selector: 'app-story',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, NgClass, Skeleton, Tag, PageHeader],
+  imports: [RouterLink, DecimalPipe, NgClass, Skeleton, MeterGroup, PageHeader],
   templateUrl: './story.html',
   styleUrl: './story.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -64,13 +101,36 @@ export class StoryPage {
     const map = new Map<string, FirmRow>();
     for (const t of ts) {
       for (const o of t.breadth_orgs_7d ?? []) {
-        const row = map.get(o) ?? { slug: o, topicCount: 0, topics: [] };
+        const row = map.get(o) ?? { slug: o, topicCount: 0, topics: [], pct: 0 };
         row.topicCount += 1;
         if (!row.topics.includes(t.label)) row.topics.push(t.label);
         map.set(o, row);
       }
     }
-    return Array.from(map.values()).sort((a, b) => b.topicCount - a.topicCount);
+    const rows = Array.from(map.values()).sort((a, b) => b.topicCount - a.topicCount);
+    const max = Math.max(1, ...rows.map(r => r.topicCount));
+    return rows.map(r => ({ ...r, pct: (r.topicCount / max) * 100 }));
+  });
+
+  readonly sourceMix = computed<SourceMix[]>(() => {
+    const totals: Record<string, number> = {};
+    for (const t of this.topics()) {
+      const cap = t.source_mentions_capped ?? {};
+      for (const [k, v] of Object.entries(cap)) {
+        if (k === '_note') continue;
+        if (typeof v !== 'number' || !v) continue;
+        totals[k] = (totals[k] ?? 0) + v;
+      }
+    }
+    const sum = Object.values(totals).reduce((a, b) => a + b, 0);
+    if (!sum) return [];
+    return Object.entries(totals)
+      .sort(([, a], [, b]) => b - a)
+      .map(([k, v]) => ({
+        label: SOURCE_LABELS[k] ?? k,
+        value: (v / sum) * 100,
+        color: SOURCE_COLORS[k] ?? '#64748b'
+      }));
   });
 
   readonly delta = computed(() => {
@@ -132,7 +192,7 @@ export class StoryPage {
   readonly breadcrumb = computed<MenuItem[]>(() => {
     const c = this.cluster();
     return [
-      { label: 'Stories', routerLink: '/stories' },
+      { label: 'Map', routerLink: '/map' },
       { label: c?.name ?? 'Story' }
     ];
   });

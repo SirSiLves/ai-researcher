@@ -7,7 +7,7 @@
 
   @if (error(); as e) {
     <p class="firm__error">{{ e }}</p>
-    <p><a routerLink="/firms" class="firm__back">← Back to Firms</a></p>
+    <p><a routerLink="/map" class="firm__back">← Back to Map</a></p>
   }
 
   @if (detail(); as d) {
@@ -99,7 +99,7 @@
         <ul class="firm__stories">
           @for (s of storiesForFirm(); track s.id) {
             <li>
-              <a [routerLink]="['/stories', s.id]" class="firm__story">
+              <a [routerLink]="['/map/story', s.id]" class="firm__story">
                 <i class="pi pi-sitemap"></i>
                 <span class="firm__story-name">{{ s.name }}</span>
                 <span class="firm__story-meta tabular">{{ s.topicCount }} topic{{ s.topicCount === 1 ? '' : 's' }}</span>
@@ -157,7 +157,7 @@
               <ul class="firm__appear-topics">
                 @for (t of a.topics.slice(0, 4); track t.topic_id) {
                   <li>
-                    <a [routerLink]="['/radar/topic', t.topic_id]" class="firm__topic-link">
+                    <a [routerLink]="['/map/topic', t.topic_id]" class="firm__topic-link">
                       {{ t.topic_label }}
                     </a>
                     @if (t.sector) {

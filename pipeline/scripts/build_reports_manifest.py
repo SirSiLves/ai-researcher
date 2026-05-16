@@ -15,18 +15,17 @@ import re
 import sys
 from pathlib import Path
 
-from _lib import PUBLISH_DIR, SWEEPS_DIR, REPORTS_DIR
+from _lib import DATA_ROOT, REPORTS_DIR
 
-# (cadence_dir, label, date_pattern, base_dir)
-# Publish cadences live under data/publish/; sweep cadences live under data/research/sweeps/.
+# (cadence_dir, label, date_pattern) — all cadences are flat siblings under DATA_ROOT.
 CADENCES = [
-    ("daily",              "Daily",         r"(\d{4}-\d{2}-\d{2})",            PUBLISH_DIR),
-    ("weekly",             "Weekly",        r"(\d{4}-W\d{2})",                 PUBLISH_DIR),
-    ("monthly",            "Monthly",       r"(\d{4}-\d{2})",                  PUBLISH_DIR),
-    ("radar",              "Radar",         r"(\d{4}-\d{2}-\d{2}(?:-v\d+)?)",  PUBLISH_DIR),
-    ("vendor_candidates",  "Vendor sweep",  r"(\d{4}-\d{2}-\d{2})",            SWEEPS_DIR),
-    ("keyword_candidates", "Keyword sweep", r"(\d{4}-\d{2}-\d{2})",            SWEEPS_DIR),
-    ("github_candidates",  "GitHub sweep",  r"(\d{4}-\d{2}-\d{2})",            SWEEPS_DIR),
+    ("daily",              "Daily",         r"(\d{4}-\d{2}-\d{2})"),
+    ("weekly",             "Weekly",        r"(\d{4}-W\d{2})"),
+    ("monthly",            "Monthly",       r"(\d{4}-\d{2})"),
+    ("radar",              "Radar",         r"(\d{4}-\d{2}-\d{2}(?:-v\d+)?)"),
+    ("vendor_candidates",  "Vendor sweep",  r"(\d{4}-\d{2}-\d{2})"),
+    ("keyword_candidates", "Keyword sweep", r"(\d{4}-\d{2}-\d{2})"),
+    ("github_candidates",  "GitHub sweep",  r"(\d{4}-\d{2}-\d{2})"),
 ]
 
 
@@ -151,8 +150,8 @@ def sort_key(entry: dict) -> tuple:
 
 def main() -> int:
     entries = []
-    for cadence_dir, cadence_label, date_pat, base_dir in CADENCES:
-        cadence_root = base_dir / cadence_dir
+    for cadence_dir, cadence_label, date_pat in CADENCES:
+        cadence_root = DATA_ROOT / cadence_dir
         if not cadence_root.exists():
             continue
         for path in cadence_root.rglob("*.md"):
@@ -161,7 +160,6 @@ def main() -> int:
             if not match:
                 continue
             date_id = match.group(1)
-            # Sort by the ISO date even for weekly/monthly (best-effort lexicographic).
             if cadence_dir == "weekly":
                 year, week = date_id.split("-W")
                 sort_date = f"{year}-W{int(week):02d}"
@@ -169,10 +167,8 @@ def main() -> int:
                 sort_date = f"{date_id}-99"
             else:
                 sort_date = date_id
-            # Stored path is relative to base_dir (publish vs sweeps). The webapp
-            # picks the right base when it loads (DataService keeps separate
-            # bases for publish vs sweeps).
-            rel_path = path.relative_to(base_dir).as_posix()
+            # Path stored relative to DATA_ROOT — DataService prepends `data/`.
+            rel_path = path.relative_to(DATA_ROOT).as_posix()
             entries.append(
                 {
                     "cadence": cadence_dir,

@@ -198,57 +198,73 @@ export interface OrgDetail {
   [k: string]: any;
 }
 
-// After the 2026-05-16 publish/research restructure, the data tree splits into:
-//   data/publish/  — what humans read (daily, weekly, monthly, radar, orgs, reports)
-//   data/research/sweeps/ — pipeline-internal change logs (vendor/keyword/github candidates)
-//   data/research/sources/ — raw collector dumps (NEVER consumed by the UI)
-//
-// Manifest entries store paths relative to the appropriate base, so the service
-// picks the right base for each request.
-const SWEEP_CADENCE_PREFIXES = ['vendor_candidates/', 'keyword_candidates/', 'github_candidates/'];
+// data/ is flat: every cadence is a sibling folder under data/. The UI
+// consumes daily/, weekly/, monthly/, radar/, orgs/, reports/, plus the three
+// sweep change logs. Raw collector dumps (news/, papers/, blogs/, jobs/,
+// linkedin/, github/, hackernews/) are siblings too but the UI never reads
+// them — they're researcher-internal.
+
+/** Insertion-order LRU: re-getting an entry promotes it to most-recent.
+ *  Drops oldest when size exceeds capacity. Used to bound long-session memory. */
+class LRU<K, V> {
+  private readonly m = new Map<K, V>();
+  constructor(private readonly capacity: number) {}
+  get(key: K): V | undefined {
+    if (!this.m.has(key)) return undefined;
+    const v = this.m.get(key)!;
+    this.m.delete(key);
+    this.m.set(key, v);
+    return v;
+  }
+  set(key: K, value: V): void {
+    if (this.m.has(key)) this.m.delete(key);
+    this.m.set(key, value);
+    while (this.m.size > this.capacity) {
+      const oldest = this.m.keys().next().value;
+      if (oldest === undefined) break;
+      this.m.delete(oldest);
+    }
+  }
+}
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private readonly http = inject(HttpClient);
-  private readonly publishBase = 'data/publish';
-  private readonly sweepsBase  = 'data/research/sweeps';
+  private readonly dataBase = 'data';
 
   readonly reports = signal<ReportsIndex | null>(null);
   readonly radar = signal<RadarIndex | null>(null);
   readonly orgs = signal<OrgsIndex | null>(null);
 
-  private readonly orgDetailCache = new Map<string, Promise<OrgDetail>>();
-  private readonly radarDayCache = new Map<string, Promise<RadarDay>>();
-  private readonly markdownCache = new Map<string, Promise<string>>();
+  // Bounded caches: enough for 90d momentum + a few archive drawer peeks.
+  private readonly orgDetailCache = new LRU<string, Promise<OrgDetail>>(40);
+  private readonly radarDayCache  = new LRU<string, Promise<RadarDay>>(120);
+  private readonly markdownCache  = new LRU<string, Promise<string>>(40);
 
-  /** Resolve a manifest-relative path to a fully-qualified URL.
-   *  Sweep cadences live under data/research/sweeps/; everything else
-   *  publish-side is under data/publish/.
-   */
+  /** Resolve a manifest-relative path to a fully-qualified URL under data/. */
   private resolve(relativePath: string): string {
-    const isSweep = SWEEP_CADENCE_PREFIXES.some(p => relativePath.startsWith(p));
-    return `${isSweep ? this.sweepsBase : this.publishBase}/${relativePath}`;
+    return `${this.dataBase}/${relativePath}`;
   }
 
   loadReportsIndex(): Promise<ReportsIndex> {
-    return firstValueFrom(this.http.get<ReportsIndex>(`${this.publishBase}/reports/index.json`))
+    return firstValueFrom(this.http.get<ReportsIndex>(`${this.dataBase}/reports/index.json`))
       .then(r => { this.reports.set(r); return r; });
   }
 
   loadRadarIndex(): Promise<RadarIndex> {
-    return firstValueFrom(this.http.get<RadarIndex>(`${this.publishBase}/radar/index.json`))
+    return firstValueFrom(this.http.get<RadarIndex>(`${this.dataBase}/radar/index.json`))
       .then(r => { this.radar.set(r); return r; });
   }
 
   loadOrgsIndex(): Promise<OrgsIndex> {
-    return firstValueFrom(this.http.get<OrgsIndex>(`${this.publishBase}/orgs/index.json`))
+    return firstValueFrom(this.http.get<OrgsIndex>(`${this.dataBase}/orgs/index.json`))
       .then(r => { this.orgs.set(r); return r; });
   }
 
   loadOrgDetail(slug: string): Promise<OrgDetail> {
     const cached = this.orgDetailCache.get(slug);
     if (cached) return cached;
-    const p = firstValueFrom(this.http.get<OrgDetail>(`${this.publishBase}/orgs/${slug}.json`));
+    const p = firstValueFrom(this.http.get<OrgDetail>(`${this.dataBase}/orgs/${slug}.json`));
     this.orgDetailCache.set(slug, p);
     return p;
   }

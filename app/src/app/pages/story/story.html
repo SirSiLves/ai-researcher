@@ -6,7 +6,7 @@
 
   @if (error(); as e) {
     <p class="story__error">{{ e }}</p>
-    <p><a routerLink="/stories">← Back to Stories</a></p>
+    <p><a routerLink="/map">← Back to Map</a></p>
   }
 
   @if (cluster(); as c) {
@@ -52,7 +52,7 @@
       <ul class="story__topics">
         @for (t of topics(); track t.id) {
           <li class="story__topic">
-            <a [routerLink]="['/radar/topic', t.id]" class="story__topic-link">
+            <a [routerLink]="['/map/topic', t.id]" class="story__topic-link">
               <span class="dot" [ngClass]="directionDotClass(t.direction)"></span>
               <span class="story__topic-label">{{ t.label }}</span>
               <span class="story__topic-meta">
@@ -66,19 +66,30 @@
       </ul>
     </section>
 
+    @if (sourceMix().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Where the signal comes from</h2>
+          <span class="section__hint">share of mentions across source types</span>
+        </header>
+        <p-metergroup [value]="sourceMix()" labelPosition="end" labelOrientation="horizontal" />
+      </section>
+    }
+
     @if (firms().length) {
       <section class="section">
         <header class="section__head">
           <h2 class="section__title">Firms in this story</h2>
-          <span class="section__hint">orgs talking about ≥1 topic, ranked by overlap</span>
+          <span class="section__hint">orgs talking about ≥1 topic, ranked by overlap · top 16</span>
         </header>
-        <ul class="story__firms">
+        <ul class="story__firms-chart">
           @for (f of firms().slice(0, 16); track f.slug) {
-            <li class="story__firm">
-              <a [routerLink]="['/firms', f.slug]" class="story__firm-link">
-                <span class="story__firm-slug">{{ f.slug }}</span>
-                <span class="story__firm-meta tabular">{{ f.topicCount }} · topic{{ f.topicCount === 1 ? '' : 's' }}</span>
-              </a>
+            <li class="story__firm-row">
+              <a [routerLink]="['/map/firm', f.slug]" class="story__firm-slug">{{ f.slug }}</a>
+              <div class="story__firm-bar" [attr.aria-label]="f.topicCount + ' topics'">
+                <span class="story__firm-bar-fill" [style.width.%]="f.pct"></span>
+              </div>
+              <span class="story__firm-count tabular">{{ f.topicCount }}</span>
             </li>
           }
         </ul>

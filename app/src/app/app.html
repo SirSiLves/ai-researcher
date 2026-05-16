@@ -1,25 +1,51 @@
-<div class="shell">
+<div class="shell" [class.is-collapsed]="sidebarCollapsed()">
   <aside class="sidebar" aria-label="Primary">
-    <a routerLink="/today" class="brand" aria-label="AI Researcher home">
-      <span class="brand__mark" aria-hidden="true">AI</span>
-      <span class="brand__text">Researcher</span>
-    </a>
+    <div class="sidebar__head">
+      <a routerLink="/pulse" class="brand" aria-label="Signal home">
+        <span class="brand__mark" aria-hidden="true">
+          <span class="brand__mark-dot"></span>
+        </span>
+        @if (!sidebarCollapsed()) {
+          <span class="brand__text">
+            <span class="brand__name">Signal</span>
+            <span class="brand__sub">AI intelligence</span>
+          </span>
+        }
+      </a>
+      <button type="button"
+              class="sidebar__toggle"
+              (click)="toggleSidebar()"
+              [pTooltip]="sidebarCollapsed() ? 'Expand' : 'Collapse'"
+              tooltipPosition="right"
+              [attr.aria-label]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+        <i class="pi" [class.pi-angle-double-left]="!sidebarCollapsed()" [class.pi-angle-double-right]="sidebarCollapsed()" aria-hidden="true"></i>
+      </button>
+    </div>
 
     <nav class="sidenav">
-      @for (group of navGroups; track group.label) {
-        <div class="sidenav__group">
-          <div class="sidenav__group-label">{{ group.label }}</div>
-          @for (tab of group.items; track tab.path) {
-            <a [routerLink]="tab.path"
-               routerLinkActive="is-active"
-               class="sidenav__link">
-              <i class="pi" [class]="'pi-' + tab.icon" aria-hidden="true"></i>
-              <span>{{ tab.label }}</span>
-            </a>
+      @for (tab of navTabs; track tab.path) {
+        <a [routerLink]="tab.path"
+           routerLinkActive="is-active"
+           class="sidenav__link"
+           [pTooltip]="sidebarCollapsed() ? tab.label + ' — ' + tab.hint : ''"
+           tooltipPosition="right">
+          <i class="pi" [class]="'pi-' + tab.icon" aria-hidden="true"></i>
+          @if (!sidebarCollapsed()) {
+            <span class="sidenav__link-body">
+              <span class="sidenav__link-label">{{ tab.label }}</span>
+              <span class="sidenav__link-hint">{{ tab.hint }}</span>
+            </span>
           }
-        </div>
+        </a>
       }
     </nav>
+
+    @if (!sidebarCollapsed()) {
+      <div class="sidebar__foot">
+        <div class="sidebar__foot-label">Latest snapshot</div>
+        <div class="sidebar__foot-value tabular">{{ todayLabel }}</div>
+      </div>
+    }
   </aside>
 
   <div class="main">
@@ -43,15 +69,5 @@
     <main class="app-shell">
       <router-outlet />
     </main>
-
-    <footer class="colophon">
-      <span class="colophon__title">AI//Researcher</span>
-      <span class="colophon__sep">·</span>
-      <span class="muted">v{{ volume }}.{{ issue }}</span>
-      <span class="colophon__sep">·</span>
-      <span class="muted">local feed</span>
-      <span class="colophon__sep">·</span>
-      <span class="muted">© {{ year }}</span>
-    </footer>
   </div>
 </div>

@@ -824,6 +824,31 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 1.5rem 0; }
 /* Skeleton */
 .p-skeleton { background: var(--bg-soft-2) !important; border-radius: var(--radius-sm) !important; }
 
+/* MeterGroup — chunkier bar, pill-shaped, slate background */
+.p-metergroup .p-metergroup-meters {
+  height: 14px !important;
+  border-radius: 999px !important;
+  background: var(--bg-soft) !important;
+  overflow: hidden;
+}
+.p-metergroup .p-metergroup-meter {
+  transition: width .35s var(--ease);
+}
+.p-metergroup .p-metergroup-labels {
+  margin-top: 0.85rem !important;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.95rem !important;
+}
+.p-metergroup .p-metergroup-label {
+  font-size: 0.82rem !important;
+  color: var(--fg-3) !important;
+}
+.p-metergroup .p-metergroup-label .p-metergroup-label-marker {
+  width: 0.55rem !important;
+  height: 0.55rem !important;
+  border-radius: 999px !important;
+}
+
 /* Card override */
 .p-card {
   background: var(--panel) !important;
