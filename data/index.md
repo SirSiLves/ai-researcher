@@ -4,6 +4,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Daily reports
 <!-- INDEX_START -->
+- [2026-05-16](daily/2026/05/2026-05-16.md) — HN "AI psychosis" thread takes #1 (Hashimoto, 1,727 pts); SAP × n8n $5.2B + Joule Studio embed; SAP × Anthropic Claude across Business AI Platform; IBM/Red Hat AI Inference GA May 22; Snowflake Cortex AI Guardrails GA; ServiceNow + Microsoft Agent 365 governance; AWS MCP Server GA; Sakana 7B Conductor beats its frontier-model pool; EU Digital Omnibus AI deal (Annex III → Dec 2027); AISI × Microsoft frontier-safety partnership; Mistral Medium 3.5 + Vibe; xAI Grok Build beta; Shadow MCP governance pulse (Manchikanti)
 - [2026-05-15](daily/2026/05/2026-05-15.md) — Cerebras (CBRS) trades — first-day ~$70B market cap; PwC + Anthropic 30,000-staff Claude training; Anthropic + SAP Claude as primary engine on Business AI Platform; Cisco lifts AI-orders forecast to $9B + 4,000 layoffs; xAI Grok Build coding agent + Grok 4.3 default; LangChain Interrupt — Deep Agents Deploy + LangSmith Engine; Snowflake Cobuild + Cortex Guardrails GA; GitHub Skills wave (obra/superpowers, mattpocock/skills); arXiv 1yr-ban on hallucinated citations
 - [2026-05-14](daily/2026/05/2026-05-14.md) — Cerebras IPO at $56B; Cohere → Aleph Alpha ~$20B transatlantic champion; SAP Sapphire Day 3 + Joule Studio 2.0 + Claude on SAP Business AI Platform; AWS MCP Server GA; Anthropic SMB IPO + programmatic-credit split (June 15); Stripe Agentic Commerce
 - [2026-05-13](daily/2026/05/2026-05-13.md) — Google Android Show / Gemini Intelligence + Googlebook; DeepSeek $45B Big Fund round; ServiceNow Otto + Project Arc; Mistral 3 family; OpenAI Voice Intelligence; MCP security thread hardens
@@ -71,7 +72,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Weekly rollups
 <!-- WEEKLY_START -->
-- [2026-W20](weekly/2026/2026-W20.md) — Mon 2026-05-11 → Sun 2026-05-17, 5/7 days, Cerebras priced→traded ~$70B; SAP+PwC pick Claude; ServiceNow Otto; Grok Build + Codex mobile; Cisco $9B/-4k
+- [2026-W20](weekly/2026/2026-W20.md) — Mon 2026-05-11 → Sun 2026-05-17, 6/7 days, Cerebras priced→traded ~$70B; SAP+PwC+Ramp lead pick Claude; HN "AI psychosis" #1; Sakana 7B Conductor
 - [2026-W19](weekly/2026/2026-W19.md) — Mon 2026-05-04 → Sun 2026-05-10, 7/7 days, Anthropic $1.5B JV + Google $40B; frontier pile-up Thu; OpenAI Daybreak; Cloudflare -1,100; EU AI Act deal; Apple iOS 27
 - [2026-W18](weekly/2026/2026-W18.md) — Mon 2026-04-27 → Sun 2026-05-03, 7/7 days, MSFT-OpenAI restructure + Bedrock; Pentagon excludes Anthropic; Agent 365 GA + Headless 360; Mistral 3.5; KAME
 - [2026-W17](weekly/2026/2026-W17.md) — Mon 2026-04-20 → Sun 2026-04-26, 7/7 days, Anthropic $45B+/8.5GW + OpenAI $122B; GPT-5.5; DeepSeek V4; Cohere×Aleph Alpha; Cloud Next 8th-gen TPUs
@@ -93,6 +94,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Trend radar
 <!-- RADAR_START -->
+- [2026-05-16](radar/2026/05/2026-05-16.md) — 38 topics, 2 stage movements, top emerging: Corporate AI-procurement bubble (Hashimoto 'AI psychosis', Amazon token-mandate KPIs)
 - [2026-05-15](radar/2026/05/2026-05-15.md) — 37 topics, 1 stage movement, top emerging: Agent skills wave (Claude Code Skills beta, anthropics/skills, mattpocock/skills, gstack)
 - [2026-05-14](radar/2026/05/2026-05-14.md) — 39 topics, 7 stage movements, top emerging: MCP adoption (servers, registries, vendor uptake)
 - [2026-05-13](radar/2026/05/2026-05-13.md) — 32 topics, 5 stage movements, top emerging: AI engineer hiring (Switzerland + global)
@@ -160,6 +162,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Vendor sweep
 <!-- VENDOR_START -->
+- [2026-05-16](vendor_candidates/2026/05/2026-05-16.md) — applied: 0 promotions, 0 hot, 0 expired; pending: 0; watch: 21; silent: 0
 - [2026-05-15](vendor_candidates/2026/05/2026-05-15.md) — applied: 0 promotions, 0 hot, 0 expired; pending: 0; watch: 26; silent: 0
 - [2026-05-14](vendor_candidates/2026/05/2026-05-14.md) — applied: 0 promotions, 2 hot, 0 expired; pending: 0; watch: 19; silent: 0
 <!-- ai-vendor-sweep auto-prepends new daily entries above this line. -->
@@ -167,6 +170,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Keyword sweep
 <!-- KEYWORD_START -->
+- [2026-05-16](data/keyword_candidates/2026/05/2026-05-16.md) — applied: 0 promotion(s), 15 proven-promotion(s); pending: 1; watch: 116; tally: 726 phrases
 - [2026-05-15](data/keyword_candidates/2026/05/2026-05-15.md) — applied: 131 promotion(s), 0 proven-promotion(s); pending: 0; watch: 101; tally: 572 phrases
 - [2026-05-14](keyword_candidates/2026/05/2026-05-14.md) — applied: 0 promotion(s), 0 proven-promotion(s); pending: 131; watch: 78; tally: 436 phrases
 <!-- ai-keyword-sweep auto-prepends new daily entries above this line. -->
@@ -174,6 +178,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## GitHub sweep
 <!-- GITHUB_START -->
+- [2026-05-16](data/github_candidates/2026/05/2026-05-16.md) — applied: 0 promotion(s), 0 hot, 0 revived; pending: 2; watch: 14; watched_repos: 47 / deep_watch: 0
 - [2026-05-15](data/github_candidates/2026/05/2026-05-15.md) — applied: 0 promotion(s), 0 hot, 0 revived; pending: 0; watch: 10; watched_repos: 47 / deep_watch: 0
 - [2026-05-14](github_candidates/2026/05/2026-05-14.md) — applied: 0 promotion(s), 0 hot, 0 revived; pending: 0; watch: 0; watched_repos: 47 / deep_watch: 0
 <!-- ai-github-sweep auto-prepends new daily entries above this line. -->

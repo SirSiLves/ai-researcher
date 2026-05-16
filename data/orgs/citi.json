@@ -1,46 +1,47 @@
 {
   "slug": "citi",
-  "generated_at": "2026-05-15",
+  "generated_at": "2026-05-16",
   "coverage": "uncovered",
   "tier_hint": null,
   "region": null,
   "blog_url_hint": null,
   "first_seen": "2026-05-14",
-  "last_seen": "2026-05-15",
-  "total_mentions": 7,
-  "distinct_days": 2,
+  "last_seen": "2026-05-16",
+  "total_mentions": 11,
+  "distinct_days": 3,
   "distinct_source_types": [
     "daily_synthesis",
-    "linkedin_network_post"
+    "linkedin_network_post",
+    "tech_news"
   ],
   "mentions_by_source_type": {
     "linkedin_network_post": 3,
-    "daily_synthesis": 4
+    "daily_synthesis": 6,
+    "tech_news": 2
   },
   "mentions_by_date": {
     "2026-05-14": 5,
-    "2026-05-15": 2
+    "2026-05-15": 2,
+    "2026-05-16": 4
   },
   "aliases": [
     "\\bCiti\\b",
-    "Citi"
+    "Citi",
+    "citi"
   ],
   "context_samples": [
     "…l, BNY, Carlyle, Mizuho, Travelers, Hg, Walleye on top of Goldman/JPM/Citi; argues the templates+data+delivery wrapper is the moat, not the mode…  (linkedin/2026/05/2026-05-14.md)",
-    "…opic ships 10 finance-specific Claude agents (JPM, Goldman, Citi, AIG, Visa); IBM Think 2026 wraps core software in \"AI Edit…  (linkedin/2026/05/2026-05-15.md)"
+    "…opic ships 10 finance-specific Claude agents (JPM, Goldman, Citi, AIG, Visa); IBM Think 2026 wraps core software in \"AI Edit…  (linkedin/2026/05/2026-05-15.md)",
+    "… Agent benchmark at 64.4%; production at JPMorgan, Goldman, Citi, AIG, Visa. - **[Microsoft Agent 365 — what's new in May 2026](https://techcommunity.microsoft.…  (news/2026/05/2026-05-16.md)",
+    "…ls Finance Agent at 64.4%; production at JPMorgan, Goldman, Citi, AIG, Visa. - **[Microsoft Agent 365 — May 2026 update](https://techcommunity.microsoft.com/blo…  (daily/2026/05/2026-05-16.md)"
   ],
   "velocity": {
-    "velocity_7d": 7,
-    "velocity_28d_avg": 1.75,
+    "velocity_7d": 11,
+    "velocity_28d_avg": 2.75,
     "velocity_ratio": 4.0,
     "velocity_status": "accelerating"
   },
   "velocity_history": [
-    {
-      "date": "2026-04-15",
-      "velocity_7d": 0,
-      "velocity_ratio": 0.0
-    },
     {
       "date": "2026-04-16",
       "velocity_7d": 0,
@@ -190,12 +191,18 @@
       "date": "2026-05-15",
       "velocity_7d": 7,
       "velocity_ratio": 4.0
+    },
+    {
+      "date": "2026-05-16",
+      "velocity_7d": 11,
+      "velocity_ratio": 4.0
     }
   ],
   "topic_mix": {
-    "swe-bench": 3,
+    "swe-bench": 5,
+    "eu-ai-act": 3,
     "disaggregated-serving": 2,
-    "eu-ai-act": 1,
+    "DeepSeek V4": 1,
     "iso-42001": 1,
     "long-context-vs-rag": 1
   },
@@ -739,9 +746,45 @@
           "stage": "emerging"
         }
       ]
+    },
+    {
+      "date": "2026-05-16",
+      "topics": [
+        {
+          "topic_id": "agentic-retrieval",
+          "topic_label": "Agentic retrieval (grep vs semantic, denoising-first IR, RAG → agent-loop)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "vertical-agents-finance",
+          "topic_label": "Vertical agents — finance (PwC CFO, SAP Joule finance, Anthropic 10 finance agents)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "long-context-vs-rag",
+          "topic_label": "Long-context vs RAG (denoising-first, harness reshapes which retrieval wins)",
+          "sector": "Methods & research",
+          "stage": "emerging"
+        }
+      ]
     }
   ],
-  "hot_events": [],
+  "hot_events": [
+    {
+      "date": "2026-05-16",
+      "keyword": "valuation",
+      "source_file": "news/2026/05/2026-05-16.md",
+      "snippet": "- **[Anthropic finally beat OpenAI in business AI adoption — but 3 big threats could erase its lead](https://venturebeat.com/technology/anthropic-finally-beat-openai-in-business-ai-adoption-but-3-big-threats-could-erase-its-lead)** — VentureBeat / Ramp AI Index May release: Anthropic at 34.4% (+3.8 "
+    },
+    {
+      "date": "2026-05-16",
+      "keyword": "valuation",
+      "source_file": "daily/2026/05/2026-05-16.md",
+      "snippet": "- **[Anthropic now leads OpenAI in business AI adoption (Ramp AI Index, April)](https://venturebeat.com/technology/anthropic-finally-beat-openai-in-business-ai-adoption-but-3-big-threats-could-erase-its-lead)** — Anthropic 34.4% (+3.8 pts) vs OpenAI 32.3% (-2.9 pts). First lead change of the enterpr"
+    }
+  ],
   "classification_history": [
     {
       "date": "2026-05-14",
@@ -750,8 +793,12 @@
     {
       "date": "2026-05-15",
       "tier": "watch"
+    },
+    {
+      "date": "2026-05-16",
+      "tier": "hot_event"
     }
   ],
-  "last_classification": "watch",
+  "last_classification": "hot_event",
   "is_priority": false
 }

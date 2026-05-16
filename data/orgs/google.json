@@ -1,14 +1,14 @@
 {
   "slug": "google",
-  "generated_at": "2026-05-15",
+  "generated_at": "2026-05-16",
   "coverage": "uncovered",
   "tier_hint": null,
   "region": "no",
   "blog_url_hint": null,
   "first_seen": "2026-05-14",
-  "last_seen": "2026-05-15",
-  "total_mentions": 35,
-  "distinct_days": 1,
+  "last_seen": "2026-05-16",
+  "total_mentions": 85,
+  "distinct_days": 2,
   "distinct_source_types": [
     "daily_synthesis",
     "linkedin_network_post",
@@ -17,33 +17,35 @@
     "tech_news"
   ],
   "mentions_by_source_type": {
-    "tech_news": 16,
-    "paper": 1,
-    "long_form_blog": 2,
-    "linkedin_network_post": 3,
-    "daily_synthesis": 13
+    "tech_news": 38,
+    "paper": 3,
+    "long_form_blog": 4,
+    "linkedin_network_post": 9,
+    "daily_synthesis": 31
   },
   "mentions_by_date": {
-    "2026-05-15": 35
+    "2026-05-15": 35,
+    "2026-05-16": 50
   },
   "aliases": [
-    "google"
+    "google",
+    "Google"
   ],
   "context_samples": [
-    "…[https://www.langchain.com/blog/interrupt-2026-overview]  **Google previews \"Gemini Spark\" — always-on AI agent for Gmail, web…  (news/2026/05/2026-05-15.md)"
+    "…[https://www.langchain.com/blog/interrupt-2026-overview]  **Google previews \"Gemini Spark\" — always-on AI agent for Gmail, web…  (news/2026/05/2026-05-15.md)",
+    "…Joule agents, plus deepening alliances with Anthropic, AWS, Google Cloud, Microsoft, NVIDIA, and Palantir. Pro-code support extends to LangChain, Pydantic AI, L…  (news/2026/05/2026-05-16.md)",
+    "…Zhou. _Takeaway:_ Unifies industry agent guides (Anthropic, Google, LangChain — execution topology) with cognitive-science frameworks (cognitive function) into …  (papers/2026/05/2026-05-16.md)",
+    "…s From the Past Week** — MarketingProfs. _Takeaway:_ Tracks Google embedding Gemini deeper into Chrome / Android keyboards, leaks of a \"Gemini Omni\" video-gen s…  (blogs/2026/05/2026-05-16.md)",
+    "…de Managed Agents pricing (~$0.08 per active session-hour), Google A2A crossing 150 orgs, and the 2 Aug 2026 EU AI Act deadline into one thesis: governance move…  (linkedin/2026/05/2026-05-16.md)",
+    "…uilt Joule agents; deepening alliances with Anthropic, AWS, Google Cloud, Microsoft, NVIDIA, and Palantir; pro-code support for LangChain, Pydantic AI, LlamaInd…  (daily/2026/05/2026-05-16.md)"
   ],
   "velocity": {
-    "velocity_7d": 35,
-    "velocity_28d_avg": 8.75,
+    "velocity_7d": 85,
+    "velocity_28d_avg": 21.25,
     "velocity_ratio": 4.0,
     "velocity_status": "accelerating"
   },
   "velocity_history": [
-    {
-      "date": "2026-04-15",
-      "velocity_7d": 0,
-      "velocity_ratio": 0.0
-    },
     {
       "date": "2026-04-16",
       "velocity_7d": 0,
@@ -193,13 +195,19 @@
       "date": "2026-05-15",
       "velocity_7d": 35,
       "velocity_ratio": 4.0
+    },
+    {
+      "date": "2026-05-16",
+      "velocity_7d": 85,
+      "velocity_ratio": 4.0
     }
   ],
   "topic_mix": {
+    "swe-bench": 4,
+    "eu-ai-act": 4,
+    "DeepSeek V4": 3,
     "disaggregated-serving": 2,
-    "DeepSeek V4": 2,
-    "swe-bench": 2,
-    "eu-ai-act": 1
+    "a2a-protocol": 1
   },
   "radar_appearances": [
     {
@@ -1500,6 +1508,71 @@
           "stage": "emerging"
         }
       ]
+    },
+    {
+      "date": "2026-05-16",
+      "topics": [
+        {
+          "topic_id": "mcp-adoption",
+          "topic_label": "MCP adoption (110M monthly SDK downloads, Colab/SAP/AWS/ServiceNow/Atlassian servers)",
+          "sector": "Agents & infrastructure",
+          "stage": "consolidating"
+        },
+        {
+          "topic_id": "multi-agent-coordination",
+          "topic_label": "Multi-agent coordination & orchestration (LATTE, EngiAgent, coordination as layer, orchestration RL)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "agent-sdks",
+          "topic_label": "Agent SDKs / harness layer (MS Agent Framework, Claude Agent SDK, OpenAI Agents, LangGraph, CrewAI)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "tool-use-standards",
+          "topic_label": "Tool-use standards (UCP/ACP/WebMCP, MCP gateways, tool catalog discipline)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "a2a-protocol",
+          "topic_label": "A2A v1.0 stable (Linux Foundation, 150+ orgs in production, MS .NET native)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "agent-platforms-enterprise",
+          "topic_label": "Enterprise agent platforms (Joule, Agentforce, watsonx Orchestrate, Foundry, Bedrock)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "voice-realtime-agents",
+          "topic_label": "Voice & realtime agents (Codex mobile voice, Gemini Spark always-on)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "swe-bench",
+          "topic_label": "SWE-Bench obsolescence (OpenAI stops reporting, harness-level economics is new yardstick)",
+          "sector": "Methods & research",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "edge-inference",
+          "topic_label": "Edge / on-device inference (Perplexity Personal Computer, Googlebook on-device Gemini)",
+          "sector": "Methods & research",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "frontier-models-google",
+          "topic_label": "Google Gemini Spark + Magic Pointer + Googlebook coordinated stack",
+          "sector": "Models & capabilities",
+          "stage": "emerging"
+        }
+      ]
     }
   ],
   "hot_events": [
@@ -1508,6 +1581,36 @@
       "keyword": "IPO",
       "source_file": "news/2026/05/2026-05-15.md",
       "snippet": "026\", \"Google Gemini 3 Spark Magic Pointer announcement May 14 2026\", \"Cerebras IPO trading begins May 2026\", \"Cisco AI infrastructure orders billion May 14 2026\","
+    },
+    {
+      "date": "2026-05-16",
+      "keyword": "valuation",
+      "source_file": "news/2026/05/2026-05-16.md",
+      "snippet": "**Runway pushes past $5.3B valuation with video/world-model bet** — In a TechCrunch profile dated May 15, Runway said it added $40M in ARR in Q2 alone and is staking its next chapter on world models rather than text-first systems. _Why it matters:_ a contrarian wager against the text-LLM playbook fr"
+    },
+    {
+      "date": "2026-05-16",
+      "keyword": "valuation",
+      "source_file": "news/2026/05/2026-05-16.md",
+      "snippet": "- **[Anthropic finally beat OpenAI in business AI adoption — but 3 big threats could erase its lead](https://venturebeat.com/technology/anthropic-finally-beat-openai-in-business-ai-adoption-but-3-big-threats-could-erase-its-lead)** — VentureBeat / Ramp AI Index May release: Anthropic at 34.4% (+3.8 "
+    },
+    {
+      "date": "2026-05-16",
+      "keyword": "funding round",
+      "source_file": "news/2026/05/2026-05-16.md",
+      "snippet": "## Sources scanned\n- https://openai.com/blog, https://openai.com/index, https://openai.com/research (fallback search used; provenance-blocked direct fetch)\n- https://www.anthropic.com/news, https://claude.com/blog, https://www.anthropic.com/research, https://www.anthropic.com/engineering (fallback s"
+    },
+    {
+      "date": "2026-05-16",
+      "keyword": "valuation",
+      "source_file": "daily/2026/05/2026-05-16.md",
+      "snippet": "- **[Anthropic now leads OpenAI in business AI adoption (Ramp AI Index, April)](https://venturebeat.com/technology/anthropic-finally-beat-openai-in-business-ai-adoption-but-3-big-threats-could-erase-its-lead)** — Anthropic 34.4% (+3.8 pts) vs OpenAI 32.3% (-2.9 pts). First lead change of the enterpr"
+    },
+    {
+      "date": "2026-05-16",
+      "keyword": "valuation",
+      "source_file": "daily/2026/05/2026-05-16.md",
+      "snippet": "- **[GraphBit: A Graph-based Agentic Framework for Non-Linear Agent Orchestration](https://arxiv.org/abs/2605.13848)** — Sarker, Ullah, Molla, Joty. Engine-orchestrated DAG-based agentic framework (Rust core) that replaces prompted routing with typed function-style agents — fixes hallucinated routin"
     }
   ],
   "classification_history": [
@@ -1517,6 +1620,10 @@
     },
     {
       "date": "2026-05-15",
+      "tier": "hot_event"
+    },
+    {
+      "date": "2026-05-16",
       "tier": "hot_event"
     }
   ],
