@@ -252,6 +252,18 @@ This rebuilds `vendor_changes.json` + `keyword_changes.json` + `github_changes.j
 
 Runs in ~50ms over a year of log volume. Idempotent. The .log files remain the source of truth; the JSONs are safe to delete and rebuild.
 
+## 6.95. Rebuild reports manifest
+
+```bash
+python3 ../pipeline/scripts/build_reports_manifest.py
+```
+
+Rebuilds `data/reports/index.json` — the flat dated index of every cadence artifact (daily / weekly / monthly / radar / vendor_candidates / keyword_candidates / github_candidates). The Angular SPA reads this manifest to enumerate available reports and pick "today's latest".
+
+**Must run after the daily/radar/sweep files have been written today.** Otherwise the manifest is one day behind: Pulse can't find today's daily MD and silently falls back to yesterday, even though the file is on disk. (Symptom: radar shows today's data — because radar/index.json *is* rebuilt by the radar skill — but the markdown briefing is for yesterday.)
+
+~10ms. Idempotent. The cadence files on disk remain the source of truth; the manifest is safe to delete and rebuild.
+
 If the script exits non-zero, log the error but don't block — the rest of the pipeline doesn't depend on the change-log JSONs.
 
 ## 7. Weekly rollup — every day

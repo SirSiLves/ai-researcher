@@ -304,6 +304,18 @@ Rebuilds `vendor_changes.json` + `keyword_changes.json` + `github_changes.json`
 by replaying the corresponding `.log` files. ~50ms. Idempotent. If non-zero
 exit, log and continue.
 
+## 6.95. Rebuild reports manifest
+
+```bash
+python3 ../pipeline/scripts/build_reports_manifest.py
+```
+
+Rebuilds `data/reports/index.json` — the flat dated index the Angular app
+reads to enumerate daily / weekly / monthly / radar / sweep candidate files.
+Must run after the cadence files have been written today, otherwise the SPA
+will be one day behind (Pulse falls back to yesterday's daily because today
+isn't in the manifest). ~10ms. Idempotent. If non-zero exit, log and continue.
+
 ## 7. Weekly rollup — every day
 
 ai-weekly-digest runs **every day**, not just Mondays — the file is
