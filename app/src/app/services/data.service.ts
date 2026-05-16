@@ -171,6 +171,25 @@ export interface OrgVelocityPoint {
   velocity_ratio: number;
 }
 
+/** Parsed shape of a sweep change-log markdown file (vendor / keyword / github).
+ *  The MD writers all follow the same convention: an H2 "What changed in
+ *  sources.json today" followed by bullets like `- **verb-name** payload`.
+ *  When nothing changed, the section is a single italic line. */
+export interface SweepSummary {
+  kind: 'vendor' | 'keyword' | 'github';
+  date_id: string;
+  /** True when the section contains "No changes" text — drives the empty UI. */
+  no_changes: boolean;
+  /** Counts per verb across the whole MD (e.g. promote-add: 131). */
+  verbs: Record<string, number>;
+  /** Total mutations applied = sum of the additive verbs (promote-add, hot-event-add, proven-promote, deep-watch-promote, revive). */
+  applied: number;
+  /** Total expirations / demotions = sum of removal verbs (expire-remove, deep-watch-demote, auto-demote). */
+  removed: number;
+  /** Raw markdown — useful if a caller wants to render the full body. */
+  markdown: string;
+}
+
 export interface OrgDetail {
   slug: string;
   generated_at: string;
@@ -293,6 +312,21 @@ export class DataService {
     return days.filter((d): d is RadarDay => !!d).reverse();
   }
 
+  /** Load and parse a sweep change-log MD into a SweepSummary.
+   *  Tolerates missing files (returns null) and "no changes" days. */
+  async loadSweep(kind: 'vendor' | 'keyword' | 'github', date_id: string): Promise<SweepSummary | null> {
+    const r = this.reports();
+    if (!r) await this.loadReportsIndex();
+    const reports = this.reports();
+    if (!reports) return null;
+    const cadence = `${kind}_candidates` as const;
+    const entry = reports.entries.find(e => e.cadence === cadence && e.date_id === date_id && !e.is_versioned);
+    if (!entry) return null;
+    const md = await this.loadMarkdown(entry.path).catch(() => '');
+    if (!md) return null;
+    return parseSweep(kind, date_id, md);
+  }
+
   // Convenience: get the most recent daily report
   latestDaily(): ReportEntry | null {
     const r = this.reports();
@@ -305,4 +339,66 @@ export class DataService {
     if (!r) return null;
     return r.entries.find(e => e.cadence === 'daily' && e.date_id === date) ?? null;
   }
+}
+
+// Strict allowlist of verbs the sweep emits at the start of each change-log
+// bullet. Avoids treating bold org/repo/keyword names (also `- **foo**`) as verbs.
+const ADDITIVE_VERBS = new Set(['promote-add', 'hot-event-add', 'proven-promote', 'deep-watch-promote', 'revive', 'hot-add']);
+const REMOVAL_VERBS  = new Set(['expire-remove', 'deep-watch-demote', 'auto-demote']);
+const ALL_VERBS = new Set([...ADDITIVE_VERBS, ...REMOVAL_VERBS]);
+
+function parseSweep(kind: 'vendor' | 'keyword' | 'github', date_id: string, md: string): SweepSummary {
+  // Slice the "What changed in sources.json today" section: from its H2 to the next H2.
+  // Old MD writer used "What changed today"; new one uses "What changed in sources.json today".
+  const lines = md.split('\n');
+  let inSec = false;
+  const sectionLines: string[] = [];
+  for (const line of lines) {
+    const h2 = line.match(/^##\s+(.+)$/);
+    if (h2) {
+      if (inSec) break;
+      if (/^(?:📋\s*)?what\s+changed/i.test(h2[1])) inSec = true;
+      continue;
+    }
+    if (inSec) sectionLines.push(line);
+  }
+  const body = sectionLines.join('\n');
+  // Multiple "no changes" phrasings across the sweep MD writers:
+  //   "No changes to sources.json"
+  //   "_No changes this run_"
+  //   "No promotions applied this run." (keyword sweep)
+  //   "No mutations this run."
+  const noChanges = /no\s+changes\s+to\s+`?sources\.json`?|_?no\s+changes\s+this\s+run_?|no\s+promotions\s+applied\s+this\s+run|no\s+mutations\s+this\s+run/i.test(body);
+
+  // Primary signal: count bullet lines starting with `- **<known-verb>**`.
+  // Vendor MDs use this format consistently for individual changes.
+  const verbs: Record<string, number> = {};
+  for (const m of body.matchAll(/^[-*]\s+\*\*([a-z][a-z-]*[a-z])\*\*/gmi)) {
+    const verb = m[1].toLowerCase();
+    if (ALL_VERBS.has(verb)) verbs[verb] = (verbs[verb] ?? 0) + 1;
+  }
+  let applied = 0, removed = 0;
+  for (const [v, n] of Object.entries(verbs)) {
+    if (ADDITIVE_VERBS.has(v)) applied += n;
+    else if (REMOVAL_VERBS.has(v)) removed += n;
+  }
+
+  // Fallback for the older vendor MD format which uses a natural-language
+  // summary line: "**Auto-applied today (combined sweep totals):** X promotions,
+  // Y hot events, Z expired removals." Surface those counts when no verb bullets
+  // matched.
+  if (applied === 0 && removed === 0 && !noChanges) {
+    const summary = body.match(/auto-applied[^*\n]*?\(combined[^*\n]*?\)[\s\S]*?(\d+)\s*promotion[s]?[\s\S]*?(\d+)\s*hot\s*event[s]?[\s\S]*?(\d+)\s*(?:expired|removal)/i)
+                 ?? body.match(/(\d+)\s*promotion[s]?[\s\S]*?(\d+)\s*hot\s*event[s]?[\s\S]*?(\d+)\s*(?:expired|removal)/i);
+    if (summary) {
+      const promos = parseInt(summary[1], 10) || 0;
+      const hot    = parseInt(summary[2], 10) || 0;
+      const exp    = parseInt(summary[3], 10) || 0;
+      if (promos) { verbs['promote-add']  = promos; applied += promos; }
+      if (hot)    { verbs['hot-event-add'] = hot;    applied += hot; }
+      if (exp)    { verbs['expire-remove'] = exp;    removed += exp; }
+    }
+  }
+
+  return { kind, date_id, no_changes: noChanges, verbs, applied, removed, markdown: md };
 }

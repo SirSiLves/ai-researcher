@@ -1,86 +1,77 @@
 <section class="page pulse">
 
-  <!-- ── HERO BAR ─────────────────────────────────────────────── -->
-  <header class="pulse-hero">
-    <div class="pulse-hero__head">
-      <div class="pulse-hero__head-left">
-        <span class="pulse-hero__eyebrow">Pulse · {{ formattedDate() || '—' }}</span>
-        <h1 class="pulse-hero__title">What's moving in AI right now</h1>
-        <p class="pulse-hero__deck">
-          A single snapshot of the radar — topics, sectors, and stories that shifted since yesterday.
-        </p>
-      </div>
-      <div class="pulse-hero__head-right">
-        <button pButton type="button" text size="small"
-                (click)="prev()" [disabled]="!canPrev()" aria-label="Older snapshot">
-          <i class="pi pi-chevron-left"></i>
-        </button>
-        <p-datepicker [ngModel]="selectedDateValue()"
-                      (ngModelChange)="pickFromCalendar($event)"
-                      [minDate]="minDateValue()!"
-                      [maxDate]="maxDateValue()!"
-                      [dateFormat]="'yy-mm-dd'"
-                      [readonlyInput]="true"
-                      [showIcon]="true"
-                      appendTo="body"
-                      styleClass="pulse-hero__datepicker"
-                      inputId="pulse-date" />
-        <button pButton type="button" text size="small"
-                (click)="next()" [disabled]="!canNext()" aria-label="Newer snapshot">
-          <i class="pi pi-chevron-right"></i>
-        </button>
-        <button pButton type="button" outlined size="small" (click)="jumpToLatest()">
-          <i class="pi pi-arrow-right" aria-hidden="true"></i>
-          <span style="margin-left:0.35rem">Latest</span>
-        </button>
-      </div>
+  <!-- ── DATE BAR ──────────────────────────────────────────────── -->
+  <header class="pulse-bar">
+    <div class="pulse-bar__left">
+      <h1 class="pulse-bar__title">{{ formattedDate() || '—' }}</h1>
     </div>
-
-    <div class="pulse-hero__stats">
-      @for (s of heroStats(); track s.label; let i = $index) {
-        <article class="pulse-hero__stat" [attr.data-tone]="s.tone">
-          <div class="pulse-hero__stat-label">{{ s.label }}</div>
-          <div class="pulse-hero__stat-row">
-            <span class="pulse-hero__stat-value tabular">{{ s.value }}</span>
-            @if (s.delta !== null) {
-              <span class="pulse-hero__stat-delta"
-                    [class.is-pos]="s.delta > 0"
-                    [class.is-neg]="s.delta < 0"
-                    [class.is-zero]="s.delta === 0">
-                @if (s.delta > 0) { <i class="pi pi-arrow-up"></i> }
-                @else if (s.delta < 0) { <i class="pi pi-arrow-down"></i> }
-                @else { <i class="pi pi-minus"></i> }
-                <span class="tabular">{{ s.delta > 0 ? '+' : '' }}{{ s.delta }}</span>
-              </span>
-            }
-          </div>
-          <div class="pulse-hero__stat-hint">{{ s.hint }}</div>
-          @if (radarHistory().length > 1) {
-            <svg viewBox="0 0 120 36" preserveAspectRatio="none" class="pulse-hero__stat-spark" aria-hidden="true">
-              <path [attr.d]="heroSparkPath(i === 0 ? 'topics' : i === 1 ? 'surging' : 'fading')"
-                    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          }
-        </article>
-      }
+    <div class="pulse-bar__right">
+      <button pButton type="button" text size="small" rounded
+              (click)="prev()" [disabled]="!canPrev()" aria-label="Older snapshot">
+        <i class="pi pi-chevron-left"></i>
+      </button>
+      <p-datepicker [ngModel]="selectedDateValue()"
+                    (ngModelChange)="pickFromCalendar($event)"
+                    [minDate]="minDateValue()!"
+                    [maxDate]="maxDateValue()!"
+                    [dateFormat]="'yy-mm-dd'"
+                    [readonlyInput]="true"
+                    [showIcon]="true"
+                    appendTo="body"
+                    styleClass="pulse-bar__datepicker"
+                    inputId="pulse-date" />
+      <button pButton type="button" text size="small" rounded
+              (click)="next()" [disabled]="!canNext()" aria-label="Newer snapshot">
+        <i class="pi pi-chevron-right"></i>
+      </button>
+      <button pButton type="button" outlined size="small" rounded (click)="jumpToLatest()">
+        Latest
+      </button>
     </div>
   </header>
 
-  <!-- ── MAIN GRID: radar (big) + side rail (what changed) ───── -->
-  @if (radarDay(); as d) {
-    <section class="pulse-grid">
+  <!-- ── HERO PRIORITIES ───────────────────────────────────────── -->
+  @if (markdown(); as md) {
+    <app-pulse-hero
+      [source]="md"
+      [vendor]="vendorSweep()"
+      [keyword]="keywordSweep()"
+      [github]="githubSweep()" />
+  } @else {
+    <p-skeleton width="100%" height="22rem" styleClass="pulse-skeleton" />
+  }
 
-      <article class="pulse-radar-card">
-        <header class="pulse-radar-card__head">
-          <div>
-            <span class="pulse-radar-card__eyebrow">Live radar</span>
-            <h2 class="pulse-radar-card__title">{{ d.topics.length }} topics across {{ d.sectors.length }} sectors</h2>
-          </div>
-          <a [routerLink]="selectedDate() ? ['/map/at', selectedDate()] : ['/map']"
-             class="pulse-radar-card__open">
-            Open Map for this date <i class="pi pi-arrow-up-right" aria-hidden="true"></i>
-          </a>
-        </header>
+  <!-- ── WHAT CHANGED ──────────────────────────────────────────── -->
+  @if (diffMarkdown(); as diff) {
+    <app-digest-card
+      title="Since yesterday"
+      subtitle="What moved between yesterday's snapshot and today's — re-rated theses, new distribution moves, theme rotations across GitHub and HN."
+      [source]="diff" />
+  }
+
+  <!-- ── DIGEST GRID ───────────────────────────────────────────── -->
+  @if (digestSlots().length) {
+    <section class="pulse-digest">
+      @for (s of digestSlots(); track s.key) {
+        <app-digest-card [title]="s.title" [subtitle]="s.subtitle" [source]="s.source" />
+      }
+    </section>
+  }
+
+  <!-- ── RADAR — secondary, framed as a card ───────────────────── -->
+  @if (radarDay(); as d) {
+    <p-card styleClass="pulse-radar-section">
+      <header class="pulse-radar-section__head">
+        <div class="pulse-radar-section__heading">
+          <h2 class="pulse-radar-section__title">Topic radar · {{ d.topics.length }} topics · {{ d.sectors.length }} sectors</h2>
+          <p class="pulse-radar-section__subtitle">A two-dimensional landscape: sectors as quadrants, maturity (mainstream → edge) as concentric rings. Each blip is a topic; size = score, color = direction.</p>
+        </div>
+        <a [routerLink]="selectedDate() ? ['/map/at', selectedDate()] : ['/map']"
+           class="pulse-radar-section__cta">
+          Explore the map <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </a>
+      </header>
+      <div class="pulse-radar-section__body">
         <app-pulse-radar
           [topics]="d.topics"
           [sectorOrder]="sectorNames()"
@@ -89,140 +80,32 @@
           [clusters]="d.topic_clusters ?? []"
           [availableDates]="radarDateIds()"
           [selectedDate]="selectedDate()"
+          [window]="radarWindow()"
+          (windowChange)="radarWindow.set($event)"
           (topicSelect)="goToTopic($event)"
           (dateSelect)="selectedDate.set($event)" />
-      </article>
-
-      <aside class="pulse-side">
-        <article class="pulse-side__card">
-          <header class="pulse-side__head">
-            <span class="pulse-side__eyebrow">What changed today</span>
-            <h2 class="pulse-side__title">Movements vs yesterday</h2>
-          </header>
-          @if (dayChanges().length) {
-            <ul class="pulse-side__list">
-              @for (c of dayChanges(); track c.label) {
-                @if (c.topicId) {
-                  <li class="pulse-change" [attr.data-tone]="c.tone">
-                    <a [routerLink]="['/map/topic', c.topicId]" class="pulse-change__row">
-                      <i class="pi" [class]="c.icon" aria-hidden="true"></i>
-                      <div class="pulse-change__body">
-                        <div class="pulse-change__label">{{ c.label }}</div>
-                        <div class="pulse-change__detail">{{ c.detail }}</div>
-                      </div>
-                    </a>
-                  </li>
-                } @else {
-                  <li class="pulse-change" [attr.data-tone]="c.tone">
-                    <div class="pulse-change__row">
-                      <i class="pi" [class]="c.icon" aria-hidden="true"></i>
-                      <div class="pulse-change__body">
-                        <div class="pulse-change__label">{{ c.label }}</div>
-                        <div class="pulse-change__detail">{{ c.detail }}</div>
-                      </div>
-                    </div>
-                  </li>
-                }
-              }
-            </ul>
-          } @else {
-            <p class="pulse-side__empty muted">No stage changes today — the radar is steady.</p>
-          }
-        </article>
-      </aside>
-
-    </section>
-  } @else {
-    <p-skeleton width="100%" height="22rem" />
+      </div>
+    </p-card>
   }
 
-  <!-- ── TOP STORIES (clusters) ────────────────────────────────── -->
-  @if (topStories().length) {
-    <section class="pulse-stories">
-      <header class="pulse-stories__head">
-        <div>
-          <span class="pulse-stories__eyebrow">Top stories</span>
-          <h2 class="pulse-stories__title">Clusters carrying today's narrative</h2>
-        </div>
-        <a [routerLink]="['/momentum']" class="pulse-stories__more">
-          See momentum over time <i class="pi pi-arrow-right" aria-hidden="true"></i>
-        </a>
+  <!-- ── MAJOR NEWS ────────────────────────────────────────────── -->
+  @if (majorNews(); as news) {
+    <section class="pulse-major">
+      <header class="pulse-major__head">
+        <h2 class="pulse-major__title">Major news &amp; releases</h2>
+        <p class="pulse-major__subtitle">Every meaningful AI shipment today — frontier model releases, enterprise deals, agent infrastructure, regulation — grouped by theme.</p>
       </header>
-      <ol class="pulse-stories__list">
-        @for (s of topStories(); track s.cluster.id; let i = $index) {
-          <li class="pulse-story" (click)="goToStory(s.cluster)" tabindex="0"
-              (keydown.enter)="goToStory(s.cluster)">
-            <div class="pulse-story__rank tabular">{{ i + 1 }}</div>
-            <div class="pulse-story__body">
-              <div class="pulse-story__top">
-                <h3 class="pulse-story__title">{{ s.cluster.name }}</h3>
-                <span class="pulse-story__dir"
-                      [class.is-rising]="s.direction === 'rising'"
-                      [class.is-falling]="s.direction === 'falling'">
-                  @if (s.direction === 'rising') { <i class="pi pi-arrow-up-right"></i> rising }
-                  @else if (s.direction === 'falling') { <i class="pi pi-arrow-down-right"></i> cooling }
-                  @else { <i class="pi pi-minus"></i> steady }
-                </span>
-              </div>
-              <div class="pulse-story__topics">
-                @for (t of s.topics; track t.id) {
-                  <a class="pulse-story__topic"
-                     [routerLink]="['/map/topic', t.id]"
-                     (click)="$event.stopPropagation()">{{ t.label }}</a>
-                }
-                @if (s.topicsOverflow > 0) {
-                  <span class="pulse-story__topic is-overflow">+{{ s.topicsOverflow }} more</span>
-                }
-              </div>
-              @if (s.topFirms.length) {
-                <div class="pulse-story__firms">
-                  <span class="muted">Firms:</span>
-                  @for (f of s.topFirms; track f.slug) {
-                    <a class="pulse-story__firm"
-                       [routerLink]="['/map/firm', f.slug]"
-                       (click)="$event.stopPropagation()">{{ f.label }}</a>
-                  }
-                  @if (s.firmsOverflow > 0) {
-                    <span class="pulse-story__firm is-overflow">+{{ s.firmsOverflow }}</span>
-                  }
-                </div>
-              }
-            </div>
-            <div class="pulse-story__meta">
-              @if (s.trend.length > 1) {
-                <svg viewBox="0 0 80 22" preserveAspectRatio="none" class="pulse-story__spark" aria-hidden="true">
-                  <path [attr.d]="storyTrendPath(s.trend)" fill="none"
-                        [attr.stroke]="s.direction === 'rising' ? 'var(--pos)' : s.direction === 'falling' ? 'var(--warn)' : 'var(--fg-4)'"
-                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              }
-              <span class="pulse-story__size tabular">{{ s.cluster.size }} topics · breadth {{ s.cluster.cluster_breadth_7d }}</span>
-            </div>
-          </li>
-        }
-      </ol>
+      <app-digest-card [source]="news" />
     </section>
   }
 
-  <!-- ── PRIORITIES (rendered from markdown but visually structured) ── -->
-  @if (markdown(); as md) {
-    <app-priority-cards [source]="md" />
-  }
-
-  <!-- ── DEEP DIVE — markdown brief, collapsed by default ───── -->
-  @if (markdown(); as md) {
-    <section class="pulse-brief">
-      <button class="pulse-brief__toggle" type="button" (click)="showBrief.set(!showBrief())">
-        <span class="pulse-brief__eyebrow">Daily brief</span>
-        <span class="pulse-brief__label">{{ showBrief() ? 'Hide' : 'Expand' }} the full markdown briefing</span>
-        <i class="pi" [class.pi-chevron-down]="!showBrief()" [class.pi-chevron-up]="showBrief()"></i>
-      </button>
-      @if (showBrief()) {
-        <div class="pulse-brief__body">
-          <app-article-cards [source]="md" />
-        </div>
-      }
-    </section>
+  <!-- ── FOOTER STRIP — pipeline + meta ────────────────────────── -->
+  @if (sweepLine()) {
+    <footer class="pulse-foot">
+      <span class="pulse-foot__label">Pipeline self-maintenance</span>
+      <span class="pulse-foot__line tabular">{{ sweepLine() }}</span>
+      <a routerLink="/archive" class="pulse-foot__link">Archive ↗</a>
+    </footer>
   }
 
   @if (error(); as e) {

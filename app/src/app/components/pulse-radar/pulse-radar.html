@@ -2,26 +2,46 @@
      [class.has-filters]="hasActiveFilters()"
      [class.is-focused]="sectorFilter() !== null">
 
-  <!-- ── Stat strip (top of dashboard) ────────────────────────────── -->
+  <!-- ── Stat strip (top of dashboard) ──────────────────────────────
+       Tiles are clickable filters. Topics-tracked clears all filters;
+       Surging / Rising / Fading toggle the matching direction filter. -->
   @if (stats(); as s) {
     <div class="pulse-radar__stats">
-      <div class="pulse-radar__stat">
+      <button type="button"
+              class="pulse-radar__stat"
+              [disabled]="!hasActiveFilters()"
+              (click)="clearFilters()"
+              [title]="hasActiveFilters() ? 'Click to clear all filters' : 'No filters active'">
         <span class="pulse-radar__stat-value tabular">{{ s.total }}</span>
-        <span class="pulse-radar__stat-label">topics tracked</span>
-      </div>
-      <div class="pulse-radar__stat pulse-radar__stat--surge">
+        <span class="pulse-radar__stat-label">{{ hasActiveFilters() ? 'clear filters' : 'topics tracked' }}</span>
+      </button>
+      <button type="button"
+              class="pulse-radar__stat pulse-radar__stat--surge"
+              [class.is-active]="directionFilter().has('surging')"
+              [disabled]="s.surging === 0"
+              (click)="selectDirectionOnly('surging')"
+              title="Show only surging topics">
         <span class="pulse-radar__stat-value tabular">{{ s.surging }}</span>
         <span class="pulse-radar__stat-label">surging</span>
-      </div>
-      <div class="pulse-radar__stat">
+      </button>
+      <button type="button"
+              class="pulse-radar__stat"
+              [class.is-active]="directionFilter().has('rising') && directionFilter().has('surging') && directionFilter().size === 2"
+              [disabled]="s.rising === 0"
+              (click)="selectDirectionOnly(['rising', 'surging'])"
+              title="Show only rising + surging topics">
         <span class="pulse-radar__stat-value tabular">{{ s.rising }}</span>
         <span class="pulse-radar__stat-label">rising</span>
-      </div>
+      </button>
       @if (s.fading > 0) {
-        <div class="pulse-radar__stat pulse-radar__stat--fade">
+        <button type="button"
+                class="pulse-radar__stat pulse-radar__stat--fade"
+                [class.is-active]="directionFilter().has('fading')"
+                (click)="selectDirectionOnly('fading')"
+                title="Show only fading topics">
           <span class="pulse-radar__stat-value tabular">{{ s.fading }}</span>
           <span class="pulse-radar__stat-label">fading</span>
-        </div>
+        </button>
       }
       @if (biggestMover(); as m) {
         <button type="button" class="pulse-radar__stat pulse-radar__stat--hl"
@@ -41,6 +61,26 @@
       }
     </div>
   }
+
+  <!-- ── Trend window selector ─────────────────────────────────────
+       Changes what the radar means: 7d shows last-week trajectory,
+       90d shows three-month positioning + long trails. -->
+  <div class="pulse-radar__window" role="group" aria-label="Trend window">
+    <span class="pulse-radar__window-label">Trend window</span>
+    <div class="pulse-radar__window-track">
+      @for (w of WINDOWS; track w) {
+        <button type="button"
+                class="pulse-radar__window-btn"
+                [class.is-active]="window() === w"
+                (click)="windowChange.emit(w)">
+          {{ w }}
+        </button>
+      }
+    </div>
+    <span class="pulse-radar__window-hint">
+      Position = trajectory · trails show {{ windowDays() }}-day motion
+    </span>
+  </div>
 
   <!-- ── Filter toolbar ──────────────────────────────────────────── -->
   <div class="pulse-radar__filters" role="toolbar" aria-label="Radar filters">
@@ -198,14 +238,17 @@
           </text>
         }
 
-        <!-- Motion trails: each blip's 7-day-ago position → today -->
+        <!-- Motion trails: each blip's start-of-window position → today.
+             Window comes from the segmented control above the canvas. -->
         @for (t of trails(); track t.topicId) {
           <line class="pulse-radar__trail"
+                [attr.data-direction]="t.direction"
                 [class.is-dimmed]="hasActiveFilters() && !visibleIds().has(t.topicId)"
                 [class.is-active]="hover()?.topic?.id === t.topicId"
                 [attr.x1]="t.x1" [attr.y1]="t.y1"
                 [attr.x2]="t.x2" [attr.y2]="t.y2" />
           <circle class="pulse-radar__trail-tail"
+                  [attr.data-direction]="t.direction"
                   [class.is-dimmed]="hasActiveFilters() && !visibleIds().has(t.topicId)"
                   [attr.cx]="t.x1" [attr.cy]="t.y1" r="1.5" />
         }
@@ -307,10 +350,10 @@
     <aside class="pulse-radar__rail" aria-label="Numbered topic list">
       @if (changedToday().length) {
         <section class="pulse-radar__changed">
-          <header class="pulse-radar__changed-head">
-            <span class="pulse-radar__changed-title">What changed today</span>
+          <p class="pulse-radar__changed-lede">
             <span class="pulse-radar__changed-count tabular">{{ changedToday().length }}</span>
-          </header>
+            change{{ changedToday().length === 1 ? '' : 's' }} on the radar today
+          </p>
           <ul class="pulse-radar__changed-list">
             @for (c of changedToday(); track c.label + c.kind) {
               <li class="pulse-radar__changed-item"
@@ -319,19 +362,12 @@
                   (mouseleave)="onBlipLeave()"
                   (click)="c.topic ? topicSelect.emit(c.topic) : null"
                   [class.is-clickable]="!!c.topic">
-                <span class="pulse-radar__changed-kind">
+                <span class="pulse-radar__changed-text">
+                  <strong>{{ c.label }}</strong>
                   @switch (c.kind) {
-                    @case ('new') { New }
-                    @case ('in')  { Moved in }
-                    @case ('out') { Moved out }
-                  }
-                </span>
-                <span class="pulse-radar__changed-label">{{ c.label }}</span>
-                <span class="pulse-radar__changed-stage">
-                  @if (c.from) {
-                    {{ c.from }} → <strong>{{ c.to }}</strong>
-                  } @else {
-                    <strong>{{ c.to }}</strong>
+                    @case ('new') { is new — entered at {{ c.to }} }
+                    @case ('in')  { moved {{ c.from }} → {{ c.to }} }
+                    @case ('out') { fell back {{ c.from }} → {{ c.to }} }
                   }
                 </span>
               </li>
@@ -339,8 +375,8 @@
           </ul>
         </section>
       }
-      @for (g of legendByRing(); track g.ring) {
-        <section class="pulse-radar__ring-group">
+      @for (g of legendByMomentum(); track g.kind) {
+        <section class="pulse-radar__ring-group" [attr.data-kind]="g.kind">
           <header class="pulse-radar__ring-head">
             <span class="pulse-radar__ring-name">{{ g.label }}</span>
             <span class="pulse-radar__ring-count tabular">{{ g.entries.length }}</span>
@@ -349,6 +385,7 @@
             @for (b of g.entries; track b.topic.id) {
               <li class="pulse-radar__ring-item"
                   [attr.data-topic-id]="b.topic.id"
+                  [attr.data-kind]="g.kind"
                   [class.is-active]="hover()?.topic?.id === b.topic.id"
                   [class.is-dimmed]="hasActiveFilters() && !visibleIds().has(b.topic.id)"
                   [ngClass]="directionDot(b.direction)"
@@ -358,6 +395,13 @@
                   tabindex="0">
                 <span class="pulse-radar__ring-num">{{ b.i }}</span>
                 <span class="pulse-radar__ring-label">{{ b.topic.label }}</span>
+                @if (b.momentum > 0.08 || b.momentum < -0.08) {
+                  <span class="pulse-radar__ring-mom tabular"
+                        [class.is-up]="b.momentum > 0"
+                        [class.is-down]="b.momentum < 0">
+                    {{ b.momentum > 0 ? '+' : '' }}{{ (b.momentum * 100) | number:'1.0-0' }}
+                  </span>
+                }
               </li>
             }
           </ul>

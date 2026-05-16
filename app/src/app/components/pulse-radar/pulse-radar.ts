@@ -9,7 +9,7 @@ import {
   output,
   signal
 } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RadarTopic, RadarDay, StageMovement, TopicCluster } from '../../services/data.service';
 
@@ -69,6 +69,8 @@ interface Blip {
   direction: Direction | string;
   /** 1-based order index — used for staggered entrance animation + label. */
   i: number;
+  /** Window-momentum in [-1, 1] — drives the trajectory bias and the surfacing-list sort. */
+  momentum: number;
 }
 
 interface Quadrant {
@@ -104,7 +106,7 @@ const RING_RADII: Record<Ring, number> = {
 @Component({
   selector: 'app-pulse-radar',
   standalone: true,
-  imports: [NgClass, FormsModule],
+  imports: [NgClass, FormsModule, DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './pulse-radar.html',
   styleUrl: './pulse-radar.scss'
@@ -129,6 +131,22 @@ export class PulseRadar {
   readonly showTopicList = input<boolean>(false);
   readonly topicSelect = output<RadarTopic>();
   readonly dateSelect = output<string>();
+
+  /** Trend window — drives trail length, position trajectory, and the segmented
+   *  control above the canvas. The page is responsible for handing back a
+   *  `history` slice of matching length. */
+  readonly window = input<'7d' | '14d' | '30d' | '90d'>('7d');
+  readonly windowChange = output<'7d' | '14d' | '30d' | '90d'>();
+  readonly WINDOWS = ['7d', '14d', '30d', '90d'] as const;
+  /** Window length in days, derived from the input. */
+  readonly windowDays = computed<number>(() => {
+    switch (this.window()) {
+      case '7d':  return 7;
+      case '14d': return 14;
+      case '30d': return 30;
+      case '90d': return 90;
+    }
+  });
 
   // ── Template constants ──────────────────────────────────────────────
   readonly RING_KEYS = RINGS;
@@ -315,6 +333,31 @@ export class PulseRadar {
       }
     }
 
+    // Look up start-of-window scores so position can be trajectory-biased.
+    // Topics gaining slow-score over the window get pulled inward (toward
+    // mainstream), losing topics drift outward. Returns a value in [-1, 1].
+    // When a topic didn't exist N days ago we walk forward through history
+    // to find its earliest appearance — keeps trails meaningful at 90d.
+    const hist = this.history();
+    const win = this.windowDays();
+    const winStartIdx = Math.max(0, hist.length - win);
+    const findEarliest = (id: string): RadarTopic | null => {
+      for (let i = winStartIdx; i < hist.length; i++) {
+        const t = hist[i].topics.find(x => x.id === id);
+        if (t) return t;
+      }
+      return null;
+    };
+    const momentumOf = (t: RadarTopic): number => {
+      const before = findEarliest(t.id);
+      if (!before) return 0.8; // brand-new on radar this window → strong inward pull
+      const slow = (t.score_slow ?? 0);
+      const slowBefore = (before.score_slow ?? 0);
+      const denom = Math.max(15, Math.max(slow, slowBefore));
+      const m = (slow - slowBefore) / denom;
+      return Math.max(-1, Math.min(1, m));
+    };
+
     // Seed each blip with a deterministic initial position.
     for (const arr of slots.values()) {
       for (const s of arr) {
@@ -324,7 +367,13 @@ export class PulseRadar {
         const startA = quad.startAngle + arcMargin;
         const h = hash32(s.topic.id);
         const aFrac = (h % 1000) / 1000;        // 0..1
-        const rFrac = ((h >>> 10) % 1000) / 1000;
+        const baseRFrac = ((h >>> 10) % 1000) / 1000;
+        // Trajectory bias: rising → small rFrac (inner edge); falling → large.
+        // Mostly trajectory (85%), small hash jitter (15%) so topics don't all
+        // pile onto a single ring radius.
+        const mom = momentumOf(s.topic); // -1..1
+        const trajRFrac = 0.5 - mom * 0.5; // rising=0, steady=0.5, falling=1
+        const rFrac = trajRFrac * 0.85 + baseRFrac * 0.15;
         const angle = startA + span * aFrac;
         // Bias toward the middle of the annulus so blips don't sit on rings.
         const innerPad = s.r + 2;
@@ -416,6 +465,7 @@ export class PulseRadar {
             sector: s.topic.sector,
             direction: s.topic.direction,
             i: n,
+            momentum: momentumOf(s.topic),
           });
         }
       }
@@ -423,36 +473,43 @@ export class PulseRadar {
     return out;
   });
 
-  /** Motion trails — each blip's position 7 days ago (if present and meaningfully different).
+  /** Motion trails — each blip's position at the start of the trend window.
    *  Computed using the same seeded layout against the historical day's data. */
-  readonly trails = computed<Array<{ x1: number; y1: number; x2: number; y2: number; topicId: string }>>(() => {
+  readonly trails = computed<Array<{ x1: number; y1: number; x2: number; y2: number; topicId: string; direction: string }>>(() => {
     const today = this.blips();
     if (!today.length) return [];
     const hist = this.history();
     if (hist.length < 2) return [];
-    // history is oldest → newest. Find a point ~7 days back.
-    const backIdx = Math.max(0, hist.length - 8);
-    const past = hist[backIdx];
-    if (!past) return [];
+    // history is oldest → newest. Walk back by windowDays-1 from the latest day.
+    const win = this.windowDays();
+    const winStartIdx = Math.max(0, hist.length - win);
 
     // Recompute past positions using the same algorithm structure as `blips`
     // — but only for topics that exist today. We reuse quadrant geometry and
     // the seeded hash so the past position is consistent.
+    // For each topic, find its earliest appearance within the window — handles
+    // topics that didn't exist at the very start of a 90d window.
     const quadrants = this.quadrants();
     if (!quadrants.length) return [];
     const sectorIndex = new Map(quadrants.map((q, i) => [q.sector, i]));
-    const sortedScores = past.topics.map(t => t.score_fast).sort((a, b) => a - b);
-    const q1 = quantile(sortedScores, 0.25);
-    const q2 = quantile(sortedScores, 0.5);
-    const q3 = quantile(sortedScores, 0.75);
     const arcMargin = 0.06;
 
-    const out: Array<{ x1: number; y1: number; x2: number; y2: number; topicId: string }> = [];
+    const out: Array<{ x1: number; y1: number; x2: number; y2: number; topicId: string; direction: string }> = [];
     for (const b of today) {
-      const pastT = past.topics.find(p => p.id === b.topic.id);
-      if (!pastT) continue;
+      // Find the earliest day within the window where this topic existed.
+      let past: RadarDay | null = null;
+      let pastT: RadarTopic | null = null;
+      for (let i = winStartIdx; i < hist.length - 1; i++) {
+        const t = hist[i].topics.find(p => p.id === b.topic.id);
+        if (t) { past = hist[i]; pastT = t; break; }
+      }
+      if (!past || !pastT) continue;
       const qi = sectorIndex.get(pastT.sector);
       if (qi === undefined) continue;
+      const sortedScores = past.topics.map(t => t.score_fast).sort((a, b) => a - b);
+      const q1 = quantile(sortedScores, 0.25);
+      const q2 = quantile(sortedScores, 0.5);
+      const q3 = quantile(sortedScores, 0.75);
       const ring = chooseRing(pastT, q1, q2, q3);
       const outer = RING_RADII[ring];
       const inner = innerRing(ring) ? RING_RADII[innerRing(ring) as Ring] : 0;
@@ -466,11 +523,11 @@ export class PulseRadar {
       const angle = startA + span * aFrac;
       const x1 = CENTER + Math.cos(angle) * radial;
       const y1 = CENTER + Math.sin(angle) * radial;
-      // Skip tiny moves (< 10px) to avoid trail noise on stationary blips.
+      // Skip tiny moves (< 5px) to avoid trail noise on stationary blips.
       const dx = b.cx - x1;
       const dy = b.cy - y1;
-      if (dx * dx + dy * dy < 100) continue;
-      out.push({ x1, y1, x2: b.cx, y2: b.cy, topicId: b.topic.id });
+      if (dx * dx + dy * dy < 25) continue;
+      out.push({ x1, y1, x2: b.cx, y2: b.cy, topicId: b.topic.id, direction: b.direction });
     }
     return out;
   });
@@ -517,6 +574,22 @@ export class PulseRadar {
         .sort((a, b) => a.i - b.i);
       if (entries.length) out.push({ ring, label: RING_LABELS[ring], entries });
     }
+    return out;
+  });
+
+  /** Window-aware ordering — surfacing list groups by movement.
+   *  Rising (gaining momentum) at top, steady in the middle, falling at the bottom.
+   *  The grouping changes whenever the trend window changes. */
+  readonly legendByMomentum = computed(() => {
+    const blips = this.blips();
+    const rising = blips.filter(b => b.momentum > 0.08).sort((a, b) => b.momentum - a.momentum);
+    const falling = blips.filter(b => b.momentum < -0.08).sort((a, b) => a.momentum - b.momentum);
+    const steady = blips.filter(b => b.momentum >= -0.08 && b.momentum <= 0.08)
+                        .sort((a, b) => (b.topic.score_fast ?? 0) - (a.topic.score_fast ?? 0));
+    const out: { kind: 'rising' | 'steady' | 'falling'; label: string; entries: Blip[] }[] = [];
+    if (rising.length)  out.push({ kind: 'rising',  label: `Rising over ${this.windowDays()}d`, entries: rising });
+    if (steady.length)  out.push({ kind: 'steady',  label: 'Steady',                              entries: steady });
+    if (falling.length) out.push({ kind: 'falling', label: `Falling over ${this.windowDays()}d`,  entries: falling });
     return out;
   });
 
@@ -683,6 +756,16 @@ export class PulseRadar {
       next.has(d) ? next.delete(d) : next.add(d);
       return next;
     });
+  }
+  /** Exclusive direction select — used by the top-of-radar stat tiles.
+   *  Toolbar chips still use `toggleDirection` for additive multi-select.
+   *  Accepts a single direction or a list (e.g. "rising" tile maps to
+   *  rising+surging to match the displayed count). */
+  selectDirectionOnly(dirs: string | string[]) {
+    const list = Array.isArray(dirs) ? dirs : [dirs];
+    const cur = this.directionFilter();
+    const sameSet = cur.size === list.length && list.every(d => cur.has(d));
+    this.directionFilter.set(sameSet ? new Set() : new Set(list));
   }
   toggleStage(r: Ring) {
     this.stageFilter.update(set => {

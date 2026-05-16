@@ -4,38 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { Skeleton } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
+import { Card } from 'primeng/card';
 
-import { DataService, ReportEntry, RadarDay, RadarTopic, TopicCluster } from '../../services/data.service';
-import { humanizeSlug } from '../../services/humanize';
+import { DataService, ReportEntry, RadarDay, RadarTopic, SweepSummary } from '../../services/data.service';
+import { findSection } from '../../services/markdown-sections';
 import { PulseRadar } from '../../components/pulse-radar/pulse-radar';
-import { ArticleCards } from '../../components/article-cards/article-cards';
-import { PriorityCards } from '../../components/priority-cards/priority-cards';
+import { PulseHero } from '../../components/pulse-hero/pulse-hero';
+import { DigestCard } from '../../components/digest-card/digest-card';
 
-interface HeroStat {
-  label: string;
-  value: number;
-  delta: number | null;
-  tone: 'accent' | 'success' | 'warn' | 'neutral';
-  hint: string;
-}
-
-interface StoryCard {
-  cluster: TopicCluster;
-  topics: RadarTopic[];
-  topicsOverflow: number;
-  topFirms: { slug: string; label: string }[];
-  firmsOverflow: number;
-  direction: string;
-  trend: number[];
-}
-
-interface DayChange {
-  kind: 'promoted' | 'demoted' | 'new-sector' | 'first-seen';
-  label: string;
-  detail: string;
-  topicId?: string;
-  tone: 'success' | 'warn' | 'accent' | 'neutral';
-  icon: string;
+interface DigestSlot {
+  key: string;
+  title: string;
+  subtitle: string;
+  source: string;
 }
 
 @Component({
@@ -43,8 +24,8 @@ interface DayChange {
   standalone: true,
   imports: [
     RouterLink, FormsModule,
-    Skeleton, ButtonModule, DatePicker,
-    PulseRadar, ArticleCards, PriorityCards
+    Skeleton, ButtonModule, DatePicker, Card,
+    PulseRadar, PulseHero, DigestCard
   ],
   templateUrl: './today.html',
   styleUrl: './today.scss',
@@ -60,178 +41,108 @@ export class TodayPage {
   readonly markdown = signal<string>('');
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
-  readonly showBrief = signal<boolean>(false);
 
   readonly radarDay = signal<RadarDay | null>(null);
   readonly radarHistory = signal<RadarDay[]>([]);
+  readonly radarWindow = signal<'7d' | '14d' | '30d' | '90d'>('7d');
   private readonly radarEntries = signal<{ date_id: string; json_path: string; is_versioned: boolean }[]>([]);
+
+  readonly vendorSweep  = signal<SweepSummary | null>(null);
+  readonly keywordSweep = signal<SweepSummary | null>(null);
+  readonly githubSweep  = signal<SweepSummary | null>(null);
 
   readonly sectorNames = computed<string[]>(() => (this.radarDay()?.sectors ?? []).map(s => s.name));
   readonly radarDateIds = computed<string[]>(() => this.radarEntries().map(e => e.date_id));
 
-  // ── HERO STATS — three numbers, each with yesterday's delta ──────────
-  readonly heroStats = computed<HeroStat[]>(() => {
-    const today = this.radarDay();
-    const hist = this.radarHistory();
-    if (!today) return [];
-    // history is oldest → newest. Yesterday = second-to-last (last is today).
-    const yesterday = hist.length >= 2 ? hist[hist.length - 2] : null;
+  /** "What changed vs. yesterday" — strip the H2 we matched on. */
+  readonly diffMarkdown = computed<string>(() => {
+    const md = this.markdown();
+    if (!md) return '';
+    const s = findSection(md, /what\s+changed/i);
+    return s?.body ?? '';
+  });
 
-    const surgingT = today.topics.filter(t => t.direction === 'surging').length;
-    const risingT  = today.topics.filter(t => t.direction === 'rising' || t.direction === 'surging').length;
-    const fadingT  = today.topics.filter(t => t.direction === 'fading').length;
-    const surgingY = yesterday?.topics.filter(t => t.direction === 'surging').length ?? surgingT;
-    const risingY  = yesterday?.topics.filter(t => t.direction === 'rising' || t.direction === 'surging').length ?? risingT;
-    const fadingY  = yesterday?.topics.filter(t => t.direction === 'fading').length ?? fadingT;
-
-    return [
+  /** Digest cards: GitHub, HN, blogs, jobs, research. */
+  readonly digestSlots = computed<DigestSlot[]>(() => {
+    const md = this.markdown();
+    if (!md) return [];
+    const map: { key: string; title: string; subtitle: string; match: RegExp }[] = [
       {
-        label: 'Topics on radar',
-        value: today.topics.length,
-        delta: yesterday ? today.topics.length - yesterday.topics.length : null,
-        tone: 'accent',
-        hint: `${today.sectors.length} sectors covered`
+        key: 'github',
+        title: 'GitHub momentum',
+        subtitle: 'Trending AI repos today + star-count deltas on the watched-repo list — the earliest signal before mainstream coverage.',
+        match: /github\s*momentum/i
       },
       {
-        label: 'Surging now',
-        value: surgingT,
-        delta: yesterday ? surgingT - surgingY : null,
-        tone: 'success',
-        hint: `${risingT} rising in total`
+        key: 'hn',
+        title: 'Hacker News pulse',
+        subtitle: 'Front-page items filtered for AI relevance, with the sentiment-shift signal the threads collectively send.',
+        match: /hacker\s*news/i
       },
       {
-        label: 'Cooling',
-        value: fadingT,
-        delta: yesterday ? fadingT - fadingY : null,
-        tone: 'warn',
-        hint: yesterday ? `was ${fadingY} yesterday` : 'no prior reference'
+        key: 'blogs',
+        title: 'Best blog reads',
+        subtitle: 'Long-form analysis from independent practitioners (Willison, SemiAnalysis, Stratechery, Latent Space, Every).',
+        match: /(best\s*blog|^blog\s*reads|long.?form)/i
+      },
+      {
+        key: 'research',
+        title: 'Research highlights',
+        subtitle: 'ArXiv + Hugging Face papers filtered to LLM, agent, retrieval, and evaluation work that actually moves the field.',
+        match: /research|papers/i
+      },
+      {
+        key: 'jobs',
+        title: 'Swiss job market',
+        subtitle: 'AI / LLM / GenAI openings in Switzerland with the pattern read on what titles and skills are consolidating.',
+        match: /swiss|jobs/i
+      },
+      {
+        key: 'linkedin',
+        title: 'LinkedIn pulse',
+        subtitle: 'Practitioner posts and Pulse articles surfacing reference architectures, scorecards, and field reports.',
+        match: /linkedin/i
       }
     ];
-  });
-
-  // ── WHAT CHANGED TODAY ────────────────────────────────────────────────
-  readonly dayChanges = computed<DayChange[]>(() => {
-    const d = this.radarDay();
-    if (!d) return [];
-    const out: DayChange[] = [];
-    const topicById = new Map(d.topics.map(t => [t.id, t]));
-    const topicByLabel = new Map(d.topics.map(t => [t.label, t]));
-    const STAGE_ORDER = ['fading', 'emerging', 'consolidating', 'mainstream'];
-
-    for (const sm of d.stage_movements ?? []) {
-      const t = topicById.get(sm.topic) ?? topicByLabel.get(sm.topic);
-      const fromIdx = sm.from ? STAGE_ORDER.indexOf(sm.from) : -1;
-      const toIdx = STAGE_ORDER.indexOf(sm.to);
-      if (!sm.from || fromIdx < 0) {
-        out.push({
-          kind: 'first-seen',
-          label: t?.label ?? sm.topic,
-          detail: `New on radar · ${sm.to}`,
-          topicId: t?.id,
-          tone: 'accent',
-          icon: 'pi-plus-circle'
-        });
-      } else if (toIdx > fromIdx) {
-        out.push({
-          kind: 'promoted',
-          label: t?.label ?? sm.topic,
-          detail: `${sm.from} → ${sm.to}`,
-          topicId: t?.id,
-          tone: 'success',
-          icon: 'pi-arrow-up-right'
-        });
-      } else if (toIdx < fromIdx) {
-        out.push({
-          kind: 'demoted',
-          label: t?.label ?? sm.topic,
-          detail: `${sm.from} → ${sm.to}`,
-          topicId: t?.id,
-          tone: 'warn',
-          icon: 'pi-arrow-down-right'
-        });
+    const out: DigestSlot[] = [];
+    for (const m of map) {
+      const sec = findSection(md, m.match);
+      if (sec && sec.body.trim()) {
+        out.push({ key: m.key, title: m.title, subtitle: m.subtitle, source: sec.body });
       }
     }
-
-    for (const name of d.sectors_spawned_today ?? []) {
-      out.push({
-        kind: 'new-sector',
-        label: name,
-        detail: 'New sector emerged',
-        tone: 'accent',
-        icon: 'pi-th-large'
-      });
-    }
-    return out.slice(0, 8);
+    return out;
   });
 
-  /** Pre-index history clusters: Map<clusterId, score[]> aligned to history order. */
-  private readonly clusterHistory = computed<Map<string, number[]>>(() => {
-    const hist = this.radarHistory();
-    const byId = new Map<string, number[]>();
-    const W = hist.length;
-    for (let i = 0; i < W; i++) {
-      for (const c of (hist[i].topic_clusters ?? [])) {
-        let arr = byId.get(c.id);
-        if (!arr) { arr = new Array(W).fill(0); byId.set(c.id, arr); }
-        arr[i] = c.cluster_score_fast ?? 0;
-      }
-    }
-    return byId;
+  /** Major news as a wide "what shipped today" block. */
+  readonly majorNews = computed<string>(() => {
+    const md = this.markdown();
+    if (!md) return '';
+    const s = findSection(md, /major\s*news|news\s*&\s*releases/i);
+    return s?.body ?? '';
   });
 
-  // ── TOP STORIES (clusters, ranked by fast momentum) ──────────────────
-  readonly topStories = computed<StoryCard[]>(() => {
-    const d = this.radarDay();
-    if (!d || !d.topic_clusters?.length) return [];
-    const byId = new Map(d.topics.map(t => [t.id, t]));
-    const ranked = [...d.topic_clusters]
-      .filter(c => c.size >= 2)
-      .sort((a, b) => b.cluster_score_fast - a.cluster_score_fast)
-      .slice(0, 5);
-
-    const TOPIC_CAP = 4;
-    const FIRM_CAP = 4;
-    const histIdx = this.clusterHistory();
-    return ranked.map(c => {
-      const allTopics = c.topic_ids
-        .map(id => byId.get(id))
-        .filter((t): t is RadarTopic => !!t)
-        .sort((a, b) => b.score_fast - a.score_fast);
-
-      // Aggregate firm mentions across the cluster's topics; pick most prominent.
-      const firmCounts = new Map<string, number>();
-      for (const t of allTopics) {
-        for (const o of t.breadth_orgs_7d ?? []) {
-          firmCounts.set(o, (firmCounts.get(o) ?? 0) + 1);
-        }
+  /** One-line summary like "vendor: no changes · keyword: +131 · github: no changes". */
+  readonly sweepLine = computed<string>(() => {
+    const parts: string[] = [];
+    const fmt = (label: string, s: SweepSummary | null) => {
+      if (!s) return null;
+      if (s.no_changes) return `${label} —`;
+      if (s.applied || s.removed) {
+        const a = s.applied ? `+${s.applied}` : '';
+        const r = s.removed ? `−${s.removed}` : '';
+        return `${label} ${[a, r].filter(Boolean).join(' ')}`;
       }
-      const rankedFirms = Array.from(firmCounts.entries())
-        .sort((a, b) => b[1] - a[1])
-        .map(([slug]) => ({ slug, label: humanizeSlug(slug) }));
-
-      const trend = histIdx.get(c.id) ?? [];
-      return {
-        cluster: c,
-        topics: allTopics.slice(0, TOPIC_CAP),
-        topicsOverflow: Math.max(0, allTopics.length - TOPIC_CAP),
-        topFirms: rankedFirms.slice(0, FIRM_CAP),
-        firmsOverflow: Math.max(0, rankedFirms.length - FIRM_CAP),
-        direction: c.cluster_direction,
-        trend
-      };
-    });
+      return `${label} —`;
+    };
+    const v = fmt('vendor',  this.vendorSweep());  if (v) parts.push(v);
+    const k = fmt('keyword', this.keywordSweep()); if (k) parts.push(k);
+    const g = fmt('github',  this.githubSweep());  if (g) parts.push(g);
+    return parts.join('  ·  ');
   });
 
   goToTopic(t: RadarTopic) {
     this.router.navigate(['/map/topic', t.id]);
-  }
-
-  goToStory(c: TopicCluster) {
-    this.router.navigate(['/map/story', c.id]);
-  }
-
-  goToFirm(slug: string) {
-    this.router.navigate(['/map/firm', slug]);
   }
 
   // ── Navigation by date ───────────────────────────────────────────────
@@ -270,65 +181,43 @@ export class TodayPage {
     if (this.availableDateSet().has(iso)) this.selectedDate.set(iso);
   }
 
-  // Sparkline → path for hero stats (each stat shows its own 14d series).
-  heroSparkPath(key: 'topics' | 'surging' | 'fading'): string {
-    const hist = this.radarHistory();
-    if (hist.length < 2) return '';
-    const vals = hist.map(d => {
-      if (key === 'topics') return d.topics.length;
-      if (key === 'surging') return d.topics.filter(t => t.direction === 'surging').length;
-      return d.topics.filter(t => t.direction === 'fading').length;
-    });
-    const w = 120, h = 36, pad = 2;
-    const min = Math.min(...vals);
-    const max = Math.max(...vals);
-    const range = Math.max(1, max - min);
-    const step = w / (vals.length - 1);
-    const usable = h - pad * 2;
-    return vals.map((v, i) => {
-      const x = (i * step).toFixed(1);
-      const y = (pad + (1 - (v - min) / range) * usable).toFixed(1);
-      return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-    }).join(' ');
-  }
-
-  storyTrendPath(values: number[], w = 80, h = 22): string {
-    if (values.length < 2) return '';
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const range = Math.max(0.01, max - min);
-    const step = w / (values.length - 1);
-    return values.map((v, i) => {
-      const x = (i * step).toFixed(1);
-      const y = (h - ((v - min) / range) * (h - 4) - 2).toFixed(1);
-      return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-    }).join(' ');
-  }
-
   constructor() {
     this.data.loadRadarIndex().then(idx => {
       this.radarEntries.set(idx.entries.filter(e => !e.is_versioned));
-    }).catch(() => { /* radar block is optional */ });
+    }).catch(() => { /* optional */ });
 
     effect(() => {
       const date = this.selectedDate();
       const entries = this.radarEntries();
+      const win = this.radarWindow();
       if (!date || !entries.length) return;
       let idx = entries.findIndex(e => e.date_id === date);
       if (idx < 0) idx = entries.findIndex(e => e.date_id <= date);
       if (idx < 0) idx = 0;
       const entry = entries[idx];
-      const windowPaths = entries.slice(idx, idx + 14).map(e => e.json_path);
+      const days = win === '90d' ? 90 : win === '30d' ? 30 : win === '14d' ? 14 : 7;
+      const windowPaths = entries.slice(idx, idx + days).map(e => e.json_path);
       this.radarDay.set(null);
       this.radarHistory.set([]);
       Promise.all([
         this.data.loadRadarDay(entry.json_path),
-        this.data.loadRadarHistory(windowPaths, 14)
+        this.data.loadRadarHistory(windowPaths, days)
       ]).then(([d, hist]) => {
         if (this.selectedDate() !== date) return;
         this.radarDay.set(d);
         this.radarHistory.set(hist);
-      }).catch(() => { /* radar block is optional */ });
+      }).catch(() => { /* optional */ });
+    });
+
+    effect(() => {
+      const date = this.selectedDate();
+      if (!date) return;
+      this.vendorSweep.set(null);
+      this.keywordSweep.set(null);
+      this.githubSweep.set(null);
+      this.data.loadSweep('vendor',  date).then(s => { if (this.selectedDate() === date) this.vendorSweep.set(s); }).catch(() => {});
+      this.data.loadSweep('keyword', date).then(s => { if (this.selectedDate() === date) this.keywordSweep.set(s); }).catch(() => {});
+      this.data.loadSweep('github',  date).then(s => { if (this.selectedDate() === date) this.githubSweep.set(s); }).catch(() => {});
     });
 
     this.data.loadReportsIndex().then(idx => {

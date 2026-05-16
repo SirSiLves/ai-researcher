@@ -24,6 +24,7 @@
   grid-template-columns: 1fr;
   grid-template-areas:
     "stats"
+    "window"
     "filters"
     "main"
     "scrubber"
@@ -52,12 +53,34 @@
   border-radius: var(--radius);
   text-align: left;
   cursor: default;
-  transition: background .15s var(--ease), border-color .15s var(--ease);
+  font: inherit;
+  color: inherit;
+  transition: background .15s var(--ease), border-color .15s var(--ease), box-shadow .15s var(--ease);
 }
 button.pulse-radar__stat { cursor: pointer; }
-button.pulse-radar__stat:hover {
+button.pulse-radar__stat:hover:not(:disabled) {
   background: var(--bg-soft);
   border-color: var(--hairline-2);
+}
+button.pulse-radar__stat:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+button.pulse-radar__stat:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+button.pulse-radar__stat.is-active {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--hairline));
+}
+button.pulse-radar__stat--surge.is-active {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent-strong) 50%, var(--hairline));
+}
+button.pulse-radar__stat--fade.is-active {
+  background: var(--warn-soft, color-mix(in srgb, var(--warn) 12%, transparent));
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--hairline));
 }
 .pulse-radar__stat-value {
   font-family: var(--sans);
@@ -454,12 +477,24 @@ button.pulse-radar__stat:hover {
   .pulse-radar__blip { animation: none; }
 }
 
-/* Dim non-matching blips when filters active */
+/* Dim non-matching blips when filters active.
+   Push contrast hard so the radar visibly narrows on filter. */
 .pulse-radar__blip.is-dimmed {
-  opacity: 0.1;
+  opacity: 0.05;
   pointer-events: none;
+  filter: saturate(0) blur(0.5px);
+  transform-origin: center;
+  transform: scale(0.7);
+  transition: opacity .25s var(--ease), transform .25s var(--ease), filter .25s var(--ease);
 }
 .pulse-radar__blip.is-dimmed .pulse-radar__echo { display: none; }
+.pulse-radar__blip:not(.is-dimmed) {
+  transition: opacity .25s var(--ease), transform .25s var(--ease), filter .25s var(--ease);
+}
+/* When a filter is active, give the visible blips a focused glow */
+.pulse-radar.has-filters .pulse-radar__blip:not(.is-dimmed) .pulse-radar__dot {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 65%, transparent));
+}
 
 /* When any blip is hovered, dim the others slightly to direct focus */
 .pulse-radar__canvas:has(.pulse-radar__blip:hover) .pulse-radar__blip:not(:hover):not(.is-active) {
@@ -540,16 +575,23 @@ button.pulse-radar__stat:hover {
 }
 
 /* ============================================================
-   Motion trails — each blip's 7-day-ago position to today
+   Motion trails — each blip's start-of-window position → today
+   Color encodes direction so trails read as "where it's headed".
    ============================================================ */
 .pulse-radar__trail {
-  stroke: color-mix(in srgb, var(--accent) 30%, transparent);
+  stroke: color-mix(in srgb, var(--fg-4) 35%, transparent);
   stroke-width: 1.2;
   stroke-linecap: round;
   fill: none;
   pointer-events: none;
   transition: stroke .15s var(--ease), stroke-width .15s var(--ease), opacity .2s var(--ease);
 }
+.pulse-radar__trail[data-direction="surging"] { stroke: color-mix(in srgb, var(--accent-strong) 55%, transparent); stroke-width: 1.6; }
+.pulse-radar__trail[data-direction="rising"]  { stroke: color-mix(in srgb, var(--accent) 45%, transparent); }
+.pulse-radar__trail[data-direction="fading"]  { stroke: color-mix(in srgb, var(--warn) 45%, transparent); }
+.pulse-radar__trail-tail[data-direction="surging"] { fill: var(--accent-strong); opacity: 0.6; }
+.pulse-radar__trail-tail[data-direction="rising"]  { fill: var(--accent); opacity: 0.5; }
+.pulse-radar__trail-tail[data-direction="fading"]  { fill: var(--warn); opacity: 0.5; }
 .pulse-radar__trail.is-active {
   stroke: var(--accent-strong);
   stroke-width: 1.8;
@@ -590,33 +632,30 @@ button.pulse-radar__stat:hover {
 /* ============================================================
    "What changed today" panel (sidebar)
    ============================================================ */
+/* Editorial sentence-style list — no panel, no chips, no kind colors.
+   Just one short readable line per change, leading with the topic. */
 .pulse-radar__changed {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  padding: 0.65rem 0.85rem 0.75rem;
-  background: var(--panel);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius-sm);
+  padding: 0 0 0.7rem;
+  margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--hairline);
 }
-.pulse-radar__changed-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-.pulse-radar__changed-title {
-  font-family: var(--sans);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent-strong);
+.pulse-radar__changed-lede {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--fg-4);
+  font-style: italic;
+  letter-spacing: -0.005em;
 }
 .pulse-radar__changed-count {
   font-family: var(--mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--fg-3);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-style: normal;
+  color: var(--fg);
+  margin-right: 0.2rem;
 }
 .pulse-radar__changed-list {
   list-style: none;
@@ -624,60 +663,35 @@ button.pulse-radar__stat:hover {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
 }
 .pulse-radar__changed-item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  column-gap: 0.45rem;
-  row-gap: 0.05rem;
-  padding: 0.3rem 0.4rem;
-  border-radius: var(--radius-sm);
+  position: relative;
+  padding: 0.35rem 0 0.35rem 0.95rem;
   font-size: 0.8rem;
-  color: var(--fg-2);
-  border-left: 2px solid var(--hairline);
-  transition: background .12s var(--ease);
+  color: var(--fg-3);
+  line-height: 1.45;
+  letter-spacing: -0.003em;
+  transition: color .12s var(--ease);
 }
-.pulse-radar__changed-item.is-clickable {
-  cursor: pointer;
-}
-.pulse-radar__changed-item.is-clickable:hover { background: var(--bg-soft); }
-.pulse-radar__changed-item[data-kind="new"]  { border-left-color: var(--accent-strong); }
-.pulse-radar__changed-item[data-kind="in"]   { border-left-color: var(--accent); }
-.pulse-radar__changed-item[data-kind="out"]  { border-left-color: var(--warn); }
-.pulse-radar__changed-kind {
-  grid-column: 1;
-  grid-row: 1;
-  font-family: var(--sans);
-  font-size: 0.65rem;
+.pulse-radar__changed-item::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  top: 0.32rem;
+  color: var(--fg-5);
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding-right: 0.35rem;
+  font-size: 1rem;
+  line-height: 1;
 }
-.pulse-radar__changed-item[data-kind="new"] .pulse-radar__changed-kind  { color: var(--accent-strong); }
-.pulse-radar__changed-item[data-kind="in"]  .pulse-radar__changed-kind  { color: var(--accent); }
-.pulse-radar__changed-item[data-kind="out"] .pulse-radar__changed-kind  { color: var(--warn-text); }
-.pulse-radar__changed-label {
-  grid-column: 2;
-  grid-row: 1;
-  font-weight: 500;
-  color: var(--fg);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  letter-spacing: -0.005em;
+.pulse-radar__changed-item.is-clickable { cursor: pointer; }
+.pulse-radar__changed-item.is-clickable:hover { color: var(--fg); }
+.pulse-radar__changed-item.is-clickable:hover::before { color: var(--accent); }
+.pulse-radar__changed-text { display: inline; }
+.pulse-radar__changed-text strong {
+  font-weight: 600;
+  color: var(--fg-2);
 }
-.pulse-radar__changed-stage {
-  grid-column: 2;
-  grid-row: 2;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--fg-4);
-  text-transform: capitalize;
-}
-.pulse-radar__changed-stage strong { color: var(--fg-2); font-weight: 600; }
+.pulse-radar__changed-item.is-clickable:hover .pulse-radar__changed-text strong { color: var(--fg); }
 
 /* ============================================================
    Side rail — numbered topic list grouped by ring
@@ -716,6 +730,24 @@ button.pulse-radar__stat:hover {
   font-weight: 600;
   color: var(--fg-3);
 }
+/* Group head accent — surfacing list groups by momentum direction */
+.pulse-radar__ring-group[data-kind="rising"]  .pulse-radar__ring-name { color: var(--accent-strong); }
+.pulse-radar__ring-group[data-kind="falling"] .pulse-radar__ring-name { color: var(--warn-text); }
+
+/* Per-row momentum chip (window-aware delta in percent) */
+.pulse-radar__ring-mom {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  color: var(--fg-4);
+  background: var(--bg-soft);
+  font-variant-numeric: tabular-nums;
+}
+.pulse-radar__ring-mom.is-up   { color: var(--accent-strong); background: var(--accent-soft); }
+.pulse-radar__ring-mom.is-down { color: var(--warn-text);     background: var(--warn-soft, color-mix(in srgb, var(--warn) 12%, transparent)); }
 .pulse-radar__ring-list {
   list-style: none;
   padding: 0;
@@ -1051,3 +1083,60 @@ button.pulse-radar__stat:hover {
 .pulse-radar__scale-item.pulse--steady .pulse-radar__scale-dot  { background: var(--pulse-steady); }
 .pulse-radar__scale-item.pulse--fading .pulse-radar__scale-dot  { background: var(--pulse-fade); }
 .pulse-radar__scale-sep { color: var(--fg-5); }
+
+/* ============================================================
+   Trend window selector — segmented 7d / 14d / 30d / 90d
+   ============================================================ */
+.pulse-radar__window {
+  grid-area: window;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0.1rem 0.2rem;
+  flex-wrap: wrap;
+}
+.pulse-radar__window-label {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+}
+.pulse-radar__window-track {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--bg-soft);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+}
+.pulse-radar__window-btn {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fg-3);
+  background: transparent;
+  border: 0;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .12s var(--ease), color .12s var(--ease);
+  font-variant-numeric: tabular-nums;
+}
+.pulse-radar__window-btn:hover:not(.is-active) { color: var(--fg); }
+.pulse-radar__window-btn.is-active {
+  background: var(--panel);
+  color: var(--accent-strong);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+.pulse-radar__window-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-ring);
+}
+.pulse-radar__window-hint {
+  font-size: 0.74rem;
+  color: var(--fg-4);
+  font-style: italic;
+}
