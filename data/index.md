@@ -71,7 +71,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Weekly rollups
 <!-- WEEKLY_START -->
-- [2026-W20](weekly/2026/2026-W20.md) — Mon 2026-05-11 → Sun 2026-05-17, 4/7 days, Cerebras IPO $56B; SAP picks Claude; ServiceNow Otto; OpenAI Deployment Co; DeepSeek $45B Big Fund; Stripe ACP
+- [2026-W20](weekly/2026/2026-W20.md) — Mon 2026-05-11 → Sun 2026-05-17, 5/7 days, Cerebras priced→traded ~$70B; SAP+PwC pick Claude; ServiceNow Otto; Grok Build + Codex mobile; Cisco $9B/-4k
 - [2026-W19](weekly/2026/2026-W19.md) — Mon 2026-05-04 → Sun 2026-05-10, 7/7 days, Anthropic $1.5B JV + Google $40B; frontier pile-up Thu; OpenAI Daybreak; Cloudflare -1,100; EU AI Act deal; Apple iOS 27
 - [2026-W18](weekly/2026/2026-W18.md) — Mon 2026-04-27 → Sun 2026-05-03, 7/7 days, MSFT-OpenAI restructure + Bedrock; Pentagon excludes Anthropic; Agent 365 GA + Headless 360; Mistral 3.5; KAME
 - [2026-W17](weekly/2026/2026-W17.md) — Mon 2026-04-20 → Sun 2026-04-26, 7/7 days, Anthropic $45B+/8.5GW + OpenAI $122B; GPT-5.5; DeepSeek V4; Cohere×Aleph Alpha; Cloud Next 8th-gen TPUs
