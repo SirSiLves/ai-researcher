@@ -1,30 +1,33 @@
 {
   "slug": "cognition",
-  "generated_at": "2026-05-16",
-  "coverage": "informal_url_list",
+  "generated_at": "2026-05-17",
+  "coverage": "enterprise",
   "tier_hint": "vertical-agent",
   "region": "us",
   "blog_url_hint": "https://cognition.ai/blog",
   "first_seen": "2026-03-19",
-  "last_seen": "2026-05-16",
-  "total_mentions": 10,
-  "distinct_days": 5,
+  "last_seen": "2026-05-17",
+  "total_mentions": 17,
+  "distinct_days": 6,
   "distinct_source_types": [
     "github_trending",
     "long_form_blog",
-    "paper"
+    "paper",
+    "daily_synthesis"
   ],
   "mentions_by_source_type": {
     "paper": 1,
-    "long_form_blog": 8,
-    "github_trending": 1
+    "long_form_blog": 13,
+    "github_trending": 1,
+    "daily_synthesis": 2
   },
   "mentions_by_date": {
     "2026-04-04": 1,
     "2026-03-19": 6,
     "2026-05-14": 1,
     "2026-05-15": 1,
-    "2026-05-16": 3
+    "2026-05-16": 3,
+    "2026-05-17": 7
   },
   "aliases": [
     "Devin",
@@ -33,25 +36,20 @@
     "Cognition"
   ],
   "context_samples": [
-    "…open-source PRs across Codex, Claude Code, Copilot, Jules, Devin: agent participation is rising, but agent-written code shows higher churn than human-writ…  (papers/2026/04/2026-04-04.md)",
     "…astral.sh/blog/openai) - **Devin Can Now Manage Devins** — Cognition AI. _Takeaway:_ Devin gains a meta-orchestrator layer: large tasks get decomposed and delega…  (blogs/2026/03/2026-03-19.md)",
     "…/astral.sh/blog/openai](https://astral.sh/blog/openai) - **Devin Can Now Manage Devins** — Cognition AI. _Takeaway:_ Devin gains a meta-orchestrator layer…  (blogs/2026/03/2026-03-19.md)",
     "…last commit 2026-05-01   _Context:_ Open-source coding agent (ex-OpenDevin). - **[hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factor…  (github/2026/05/2026-05-14.md)",
     "…- https://cognition.ai/blog (no new May 14–15 post — May 13 Devin 2.0/Terminal already captured) - https://news.smol.ai (no n…  (blogs/2026/05/2026-05-15.md)",
-    "…test is March 26 \"Revenge of the Data Scientist\") - https://cognition.ai/blog (no new May 14–16 post — May 13 Devin 2.0 already captured) - https://news.smol.ai…  (blogs/2026/05/2026-05-16.md)"
+    "…test is March 26 \"Revenge of the Data Scientist\") - https://cognition.ai/blog (no new May 14–16 post — May 13 Devin 2.0 already captured) - https://news.smol.ai…  (blogs/2026/05/2026-05-16.md)",
+    "…ex.ai/blog/long-horizon-document-agents)  - **Devin 2.0** — Cognition (released May 13, still the freshest substantive p… (blogs/2026/05/2026-05-17.md)"
   ],
   "velocity": {
-    "velocity_7d": 5,
-    "velocity_28d_avg": 1.25,
+    "velocity_7d": 12,
+    "velocity_28d_avg": 3.0,
     "velocity_ratio": 4.0,
     "velocity_status": "accelerating"
   },
   "velocity_history": [
-    {
-      "date": "2026-04-16",
-      "velocity_7d": 0,
-      "velocity_ratio": 0.0
-    },
     {
       "date": "2026-04-17",
       "velocity_7d": 0,
@@ -201,12 +199,18 @@
       "date": "2026-05-16",
       "velocity_7d": 5,
       "velocity_ratio": 4.0
+    },
+    {
+      "date": "2026-05-17",
+      "velocity_7d": 12,
+      "velocity_ratio": 4.0
     }
   ],
   "topic_mix": {
+    "DeepSeek V4": 3,
     "swe-bench": 3,
-    "DeepSeek V4": 2,
-    "a2a-protocol": 1,
+    "a2a-protocol": 2,
+    "eu-ai-act": 1,
     "long-context-vs-rag": 1,
     "disaggregated-serving": 1
   },
@@ -742,9 +746,39 @@
           "stage": "emerging"
         }
       ]
+    },
+    {
+      "date": "2026-05-17",
+      "topics": [
+        {
+          "topic_id": "agent-sdks",
+          "topic_label": "Agent SDKs & frameworks (Claude Agent SDK, AgentCore SDK, LangChain v1, Mastra, CrewAI)",
+          "sector": "Agents & infrastructure",
+          "stage": "consolidating"
+        },
+        {
+          "topic_id": "ai-coding-agents",
+          "topic_label": "AI coding agents (Devin 2.0, Grok Build, Claude Code, Codex, Cursor, Zerostack)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "swe-bench",
+          "topic_label": "SWE-bench / agent coding evals (Mistral 77.6%, Grok Build, Devin scoring)",
+          "sector": "Methods & research",
+          "stage": "emerging"
+        }
+      ]
     }
   ],
-  "hot_events": [],
+  "hot_events": [
+    {
+      "date": "2026-05-17",
+      "keyword": "valuation",
+      "source_file": "daily/2026/05/2026-05-17.md",
+      "snippet": "one month — but Lambert pairs the release map with CAISI's evaluation concluding the gap between open models and the Ame"
+    }
+  ],
   "classification_history": [
     {
       "date": "2026-05-14",
@@ -757,8 +791,12 @@
     {
       "date": "2026-05-16",
       "tier": "informal_covered"
+    },
+    {
+      "date": "2026-05-17",
+      "tier": "hot_event"
     }
   ],
-  "last_classification": "informal_covered",
+  "last_classification": "hot_event",
   "is_priority": false
 }
