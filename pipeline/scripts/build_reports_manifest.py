@@ -79,13 +79,17 @@ def first_headline(path: Path) -> str:
     """Pull a useful one-line summary from a markdown report.
 
     Strategy:
-      1. Skip H1, italic meta blocks, and any H2 like "## TL;DR" / "## Summary".
-      2. Prefer the first non-boilerplate bullet. Inside bullets:
+      1. Skip the ai-briefing lead block entirely (between BRIEFING_START
+         and BRIEFING_END markers) — it's a human-only newspaper lead and
+         its prose would otherwise dominate the archive list.
+      2. Skip H1, italic meta blocks, HTML comments, and any H2 like
+         "## TL;DR" / "## Summary".
+      3. Prefer the first non-boilerplate bullet. Inside bullets:
          - if it leads with [text](url) or **[text](url)**, use that link text
          - else strip the leading **bold** span and use the bold text
          - else use the bullet body
-      3. Skip radar/sweep boilerplate bullets entirely.
-      4. Fall back to the first non-empty prose line.
+      4. Skip radar/sweep boilerplate bullets entirely.
+      5. Fall back to the first non-empty prose line.
     """
     try:
         with open(path, encoding="utf-8") as handle:
@@ -93,9 +97,21 @@ def first_headline(path: Path) -> str:
     except OSError:
         return ""
 
-    for line in lines[1:200]:
+    in_briefing = False
+    for line in lines[1:400]:
         stripped = line.strip()
         if not stripped:
+            continue
+        # ai-briefing lead: skip everything between the markers.
+        if "<!-- BRIEFING_START -->" in stripped:
+            in_briefing = True
+            continue
+        if in_briefing:
+            if "<!-- BRIEFING_END -->" in stripped:
+                in_briefing = False
+            continue
+        # Any other HTML comment line — skip.
+        if stripped.startswith("<!--") and stripped.endswith("-->"):
             continue
         # italic meta block "_..._"
         if stripped.startswith("_") and stripped.endswith("_"):

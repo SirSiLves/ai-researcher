@@ -10,6 +10,7 @@ import { DataService, ReportEntry, RadarDay, RadarTopic, SweepSummary } from '..
 import { findSection } from '../../services/markdown-sections';
 import { PulseRadar } from '../../components/pulse-radar/pulse-radar';
 import { PulseHero } from '../../components/pulse-hero/pulse-hero';
+import { PulseBriefing } from '../../components/pulse-briefing/pulse-briefing';
 import { DigestCard } from '../../components/digest-card/digest-card';
 
 interface DigestSlot {
@@ -25,7 +26,7 @@ interface DigestSlot {
   imports: [
     RouterLink, FormsModule,
     Skeleton, ButtonModule, DatePicker, Card,
-    PulseRadar, PulseHero, DigestCard
+    PulseRadar, PulseHero, PulseBriefing, DigestCard
   ],
   templateUrl: './today.html',
   styleUrl: './today.scss',

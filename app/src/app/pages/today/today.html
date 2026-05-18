@@ -30,6 +30,11 @@
     </div>
   </header>
 
+  <!-- ── BRIEFING LEAD (newspaper-style "in 90 seconds") ──────── -->
+  @if (markdown(); as md) {
+    <app-pulse-briefing [source]="md" />
+  }
+
   <!-- ── HERO PRIORITIES ───────────────────────────────────────── -->
   @if (markdown(); as md) {
     <app-pulse-hero
