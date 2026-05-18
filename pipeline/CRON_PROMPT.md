@@ -208,6 +208,28 @@ Five highest-signal items across all slices, ranked. Each: link + 1-line "why yo
 - hackernews/: {N items}
 ```
 
+## 5.5. Spawn ai-briefing — daily newspaper-style lead
+
+Immediately after the daily synthesis lands, prepend a 600-800-word
+human-friendly newspaper lead to the same file. Single-file approach:
+the lead goes between the H1 and the existing `## 🎯 Top-5 reading priorities`,
+demarcated by `<!-- BRIEFING_START -->` / `<!-- BRIEFING_END -->` markers.
+Downstream agents (radar, sweeps, weekly digest) anchor on section headers
+below the lead and don't see it.
+
+One Agent call:
+- `subagent_type`: `"general-purpose"`
+- `description`: `"Daily briefing lead"`
+- `prompt`: contents of `pipeline/skills/ai-briefing/SKILL.md` + footer + these extra lines:
+  ```
+  CADENCE: daily
+  TARGET_FILE: daily/{YYYY}/{MM}/{TODAY}.md
+  ```
+
+Wait for it. Idempotent — same-day re-runs replace any prior lead between
+the markers rather than stacking. If it fails, log and continue (the file
+is still valid without the lead; downstream pipeline doesn't depend on it).
+
 ## 6. Update index.md
 
 Find `<!-- INDEX_START -->`. **If today's line already exists**, update it
@@ -328,6 +350,24 @@ One Agent call:
 
 Wait for it. The skill overwrites `weekly/{YYYY}/{WEEK_ID}.md`.
 
+## 7.1. Spawn ai-briefing — weekly newspaper-style lead
+
+Same skill as §5.5, different cadence. Prepends a 600-800-word "The week in
+90 seconds" lead to the weekly file. Idempotent — runs every day (since
+weekly rolls cumulatively Mon→Sun), each run re-writes the lead between
+the markers.
+
+One Agent call:
+- `subagent_type`: `"general-purpose"`
+- `description`: `"Weekly briefing lead"`
+- `prompt`: contents of `pipeline/skills/ai-briefing/SKILL.md` + footer + these extra lines:
+  ```
+  CADENCE: weekly
+  TARGET_FILE: weekly/{YYYY}/{WEEK_ID}.md
+  ```
+
+If it fails, log and continue.
+
 ## 7.5. Trends update — Monday only
 
 If `IS_MONDAY=1`, spawn ONE Agent call:
@@ -358,6 +398,24 @@ Spawn ONE Agent call:
   ```
 
 The monthly rollup writes `monthly/{YYYY}/{PREV_MONTH}.md`, merging if it exists.
+
+## 7.65. Spawn ai-briefing — monthly newspaper-style lead
+
+If §7.6 ran (`IS_FIRST_MONDAY_OF_MONTH=1`), prepend a 600-800-word "The
+month in 90 seconds" lead to the just-written monthly file. Monthly
+framing is reflective — what changed in the field over the month, not
+what happened today.
+
+One Agent call:
+- `subagent_type`: `"general-purpose"`
+- `description`: `"Monthly briefing lead"`
+- `prompt`: contents of `pipeline/skills/ai-briefing/SKILL.md` + footer + these extra lines:
+  ```
+  CADENCE: monthly
+  TARGET_FILE: monthly/{YYYY}/{PREV_MONTH}.md
+  ```
+
+If it fails, log and continue.
 
 ## 8. Finish
 
