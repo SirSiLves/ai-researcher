@@ -4,6 +4,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Daily reports
 <!-- INDEX_START -->
+- [2026-05-18](daily/2026/05/2026-05-18.md) — Microsoft open-sources Agent Framework + Agent Governance Toolkit at OSS Summit NA (Linux Foundation play); Anthropic Agent SDK billing split effective 15 Jun (Pro/Max $20/$100/$200 caps; OpenClaw reinstated); Google I/O 2026 opens tomorrow (Gemini Omni / 4.0 expected); Anthropic $30B / $900B+ round closing; Sierra $950M Series E at $15.8B; Snowflake Cortex Code GA as "agentic enterprise control plane"; Stratechery on datacenter NIMBY; White House blocks Mythos expansion to ~70 firms; Stanford HAI Index — 47 countries with AI law, only 12 with enforcement, 8× compliance variance
 - [2026-05-17](daily/2026/05/2026-05-17.md) — Hashimoto "AI psychosis" thread doubles in weight (2,061 pts / 1,210 comments); Show HN Needle 26M tool-caller with no MLPs (763 pts); Sapphire week consolidates (SAP × n8n + Anthropic + IBM Think watsonx Orchestrate + ServiceNow Action Fabric); Snowflake Cortex AI Guardrails reach Cortex Agents; xAI Grok Build CLI + Wall Street pitch; OpenAI ChatGPT Personal Finance via Plaid; EU AI Act Omnibus political deal; FutureSim agent benchmark; AI Index 2026 (Stanford HAI — $581.7B '25 corp investment, FMTI 58 → 40); CAISI: open vs frontier gap widening
 - [2026-05-16](daily/2026/05/2026-05-16.md) — HN "AI psychosis" thread takes #1 (Hashimoto, 1,727 pts); SAP × n8n $5.2B + Joule Studio embed; SAP × Anthropic Claude across Business AI Platform; IBM/Red Hat AI Inference GA May 22; Snowflake Cortex AI Guardrails GA; ServiceNow + Microsoft Agent 365 governance; AWS MCP Server GA; Sakana 7B Conductor beats its frontier-model pool; EU Digital Omnibus AI deal (Annex III → Dec 2027); AISI × Microsoft frontier-safety partnership; Mistral Medium 3.5 + Vibe; xAI Grok Build beta; Shadow MCP governance pulse (Manchikanti)
 - [2026-05-15](daily/2026/05/2026-05-15.md) — Cerebras (CBRS) trades — first-day ~$70B market cap; PwC + Anthropic 30,000-staff Claude training; Anthropic + SAP Claude as primary engine on Business AI Platform; Cisco lifts AI-orders forecast to $9B + 4,000 layoffs; xAI Grok Build coding agent + Grok 4.3 default; LangChain Interrupt — Deep Agents Deploy + LangSmith Engine; Snowflake Cobuild + Cortex Guardrails GA; GitHub Skills wave (obra/superpowers, mattpocock/skills); arXiv 1yr-ban on hallucinated citations
@@ -73,6 +74,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Weekly rollups
 <!-- WEEKLY_START -->
+- [2026-W21](weekly/2026/2026-W21.md) — Mon 2026-05-18 → Sun 2026-05-24, 1/7 days, MSFT Agent Framework + AAIF at OSS Summit NA; Anthropic Agent SDK billing split (Jun 15); Google I/O eve; Mythos export-control template
 - [2026-W20](weekly/2026/2026-W20.md) — Mon 2026-05-11 → Sun 2026-05-17, 7/7 days, enterprise consolidation peak (SAP+PwC+Ramp pick Claude; Anthropic $30B run-rate); Cerebras priced→traded ~$70B; AWS AgentCore Payments; HN "AI psychosis" #1 two days
 - [2026-W19](weekly/2026/2026-W19.md) — Mon 2026-05-04 → Sun 2026-05-10, 7/7 days, Anthropic $1.5B JV + Google $40B; frontier pile-up Thu; OpenAI Daybreak; Cloudflare -1,100; EU AI Act deal; Apple iOS 27
 - [2026-W18](weekly/2026/2026-W18.md) — Mon 2026-04-27 → Sun 2026-05-03, 7/7 days, MSFT-OpenAI restructure + Bedrock; Pentagon excludes Anthropic; Agent 365 GA + Headless 360; Mistral 3.5; KAME
@@ -95,6 +97,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Trend radar
 <!-- RADAR_START -->
+- [2026-05-18](radar/2026/05/2026-05-18.md) — 39 topics, 0 stage movements, top surging cluster: Agent protocol stack (MCP + A2A + Microsoft AAIF + agent-SDK billing split)
 - [2026-05-17](radar/2026/05/2026-05-17.md) — 39 topics, 2 stage movements, top emerging: AI coding agents (Devin 2.0, Grok Build, Claude Code, Codex, Cursor, Zerostack)
 - [2026-05-16](radar/2026/05/2026-05-16.md) — 38 topics, 2 stage movements, top emerging: Corporate AI-procurement bubble (Hashimoto 'AI psychosis', Amazon token-mandate KPIs)
 - [2026-05-15](radar/2026/05/2026-05-15.md) — 37 topics, 1 stage movement, top emerging: Agent skills wave (Claude Code Skills beta, anthropics/skills, mattpocock/skills, gstack)
@@ -164,6 +167,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Vendor sweep
 <!-- VENDOR_START -->
+- [2026-05-18](vendor_candidates/2026/05/2026-05-18.md) — applied: 0 promotions, 3 hot, 0 expired; pending: 0; watch: 20; silent: 0
 - [2026-05-17](vendor_candidates/2026/05/2026-05-17.md) — applied: 0 promotions, 5 hot, 0 expired; pending: 1; watch: 22; silent: 0
 - [2026-05-16](vendor_candidates/2026/05/2026-05-16.md) — applied: 0 promotions, 0 hot, 0 expired; pending: 0; watch: 21; silent: 0
 - [2026-05-15](vendor_candidates/2026/05/2026-05-15.md) — applied: 0 promotions, 0 hot, 0 expired; pending: 0; watch: 26; silent: 0
@@ -173,6 +177,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Keyword sweep
 <!-- KEYWORD_START -->
+- [2026-05-18](data/keyword_candidates/2026/05/2026-05-18.md) — applied: 1 promotion(s), 2 proven-promotion(s); pending: 2; watch: 161; tally: 1044 phrases
 - [2026-05-17](data/keyword_candidates/2026/05/2026-05-17.md) — applied: 1 promotion(s), 1 proven-promotion(s); pending: 1; watch: 137; tally: 882 phrases
 - [2026-05-16](data/keyword_candidates/2026/05/2026-05-16.md) — applied: 0 promotion(s), 15 proven-promotion(s); pending: 1; watch: 116; tally: 726 phrases
 - [2026-05-15](data/keyword_candidates/2026/05/2026-05-15.md) — applied: 131 promotion(s), 0 proven-promotion(s); pending: 0; watch: 101; tally: 572 phrases
@@ -182,6 +187,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## GitHub sweep
 <!-- GITHUB_START -->
+- [2026-05-18](data/github_candidates/2026/05/2026-05-18.md) — applied: 6 promotion(s), 0 hot, 0 revived; pending: 11; watch: 10; watched_repos: 55 / deep_watch: 0
 - [2026-05-17](data/github_candidates/2026/05/2026-05-17.md) — applied: 2 promotion(s), 0 hot, 0 revived; pending: 6; watch: 19; watched_repos: 49 / deep_watch: 0
 - [2026-05-16](data/github_candidates/2026/05/2026-05-16.md) — applied: 0 promotion(s), 0 hot, 0 revived; pending: 2; watch: 14; watched_repos: 47 / deep_watch: 0
 - [2026-05-15](data/github_candidates/2026/05/2026-05-15.md) — applied: 0 promotion(s), 0 hot, 0 revived; pending: 0; watch: 10; watched_repos: 47 / deep_watch: 0
