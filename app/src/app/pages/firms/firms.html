@@ -174,7 +174,7 @@
             <div><dt>Distinct days</dt><dd class="tabular">{{ d.distinct_days }}</dd></div>
             <div><dt>First seen</dt><dd class="tabular">{{ d.first_seen }}</dd></div>
             <div><dt>Last seen</dt><dd class="tabular">{{ d.last_seen }}</dd></div>
-            <div><dt>Source types</dt><dd>{{ d.distinct_source_types?.join(' · ') || '—' }}</dd></div>
+            <div><dt>Source types</dt><dd>{{ d.distinct_source_types.join(' · ') || '—' }}</dd></div>
           </dl>
 
           @if (sourceMeter().length) {
