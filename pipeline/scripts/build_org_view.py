@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 """
 build_org_view.py — consolidates discovered_orgs.json + all radar JSONs +
-source files into a per-org dataset that drives orgs.html.
+source files into a per-org dataset that drives the firm view.
 
 Outputs:
-  orgs/index.json        — sorted org list with summary metrics
-  orgs/{slug}.json       — full per-org timeline + topic mix + classification history
+  orgs/index.json        — sorted org list + velocity_history per entry. One
+                           file powers the entire /firms list view, including
+                           the row sparkline. App fetches this once instead of
+                           one HTTP request per firm.
+  orgs/{slug}.json       — detail-only fields (mentions_by_date, radar_appearances,
+                           hot_events, classification_history, context_samples,
+                           topic_mix, aliases, source-type breakdown). Loaded
+                           lazily when a firm's drawer or detail page opens.
+                           Does NOT carry velocity_history (lives in index.json).
 
 What it adds beyond discovered_orgs.json:
   1. Priority vendors (OpenAI, Anthropic, Google DeepMind, Meta, Mistral, DeepSeek)
@@ -20,7 +27,10 @@ What it adds beyond discovered_orgs.json:
      axis of the firm view. Will be replaced by radar's `breadth_orgs_7d` once
      the radar starts populating that field on real runs.
 
-Idempotent — re-running rebuilds the orgs/ tree from scratch.
+Idempotent — re-running rebuilds the orgs/ tree from scratch, but per-firm
+files are only re-written when their content actually changed. A second
+same-day run touches zero per-firm files. Daily run touches only the orgs
+whose mention/topic/radar state moved.
 
 Hooked into ai-replay's §6.7 step (added in this commit), so it runs daily
 alongside the radar and vendor sweep.
@@ -333,6 +343,8 @@ def main():
     orgs_dir.mkdir(parents=True, exist_ok=True)
 
     index_entries = []
+    org_files_written = 0
+    org_files_skipped = 0
     for slug, entry in all_orgs.items():
         mentions_by_date = entry.get("mentions_by_date", {})
         velocity = compute_velocity(mentions_by_date, TODAY)
@@ -342,7 +354,6 @@ def main():
 
         per_org = {
             "slug": slug,
-            "generated_at": TODAY,
             "coverage": entry.get("coverage", "uncovered"),
             "tier_hint": entry.get("tier_hint"),
             "region": entry.get("region"),
@@ -356,8 +367,6 @@ def main():
             "mentions_by_date": mentions_by_date,
             "aliases": list(entry.get("alias_hits", {}).keys()) or entry.get("aliases", []),
             "context_samples": entry.get("context_samples", [])[:6],
-            "velocity": velocity,
-            "velocity_history": velocity_history,
             "topic_mix": topic_mix,
             "radar_appearances": radar_appearances,
             "hot_events": entry.get("hot_events", []),
@@ -365,8 +374,17 @@ def main():
             "last_classification": entry.get("last_classification"),
             "is_priority": slug in PRIORITY_VENDORS,
         }
-        # Write per-org file
-        (orgs_dir / f"{slug}.json").write_text(json.dumps(per_org, indent=2, ensure_ascii=False))
+        # Write per-org file only when content actually changed. Without this
+        # gate, the daily run touches every firm even when nothing happened to
+        # it — the file's mtime moves and git sees a diff. velocity +
+        # velocity_history live in orgs/index.json, not here.
+        new_text = json.dumps(per_org, indent=2, ensure_ascii=False)
+        org_file = orgs_dir / f"{slug}.json"
+        if not org_file.exists() or org_file.read_text() != new_text:
+            org_file.write_text(new_text)
+            org_files_written += 1
+        else:
+            org_files_skipped += 1
 
         index_entries.append({
             "slug": slug,
@@ -381,6 +399,8 @@ def main():
             "velocity_7d": velocity["velocity_7d"],
             "velocity_ratio": velocity["velocity_ratio"],
             "velocity_status": velocity["velocity_status"],
+            "velocity_28d_avg": velocity["velocity_28d_avg"],
+            "velocity_history": velocity_history,
             "topic_count": len(topic_mix),
             "top_topics": list(topic_mix.keys())[:3],
         })
@@ -399,12 +419,17 @@ def main():
         "total_orgs": len(index_entries),
         "priority_count": sum(1 for e in index_entries if e["is_priority"]),
         "entries": index_entries,
-        "_note": "Rebuilt every run by scripts/build_org_view.py. Consumed by orgs.html.",
+        "_note": (
+            "Rebuilt every run by scripts/build_org_view.py. Carries velocity_history "
+            "per entry so the firm list + row sparklines render from one HTTP request. "
+            "Per-firm orgs/{slug}.json is loaded lazily for the drawer/detail page."
+        ),
     }
     (orgs_dir / "index.json").write_text(json.dumps(index_payload, indent=2, ensure_ascii=False))
 
     print(
-        f"[build_org_view] wrote orgs/index.json + {len(index_entries)} per-org files. "
+        f"[build_org_view] wrote orgs/index.json + {org_files_written} per-org files "
+        f"({org_files_skipped} unchanged, skipped). "
         f"Priority orgs with data: {sum(1 for e in index_entries if e['is_priority'])}/{len(PRIORITY_VENDORS)}.",
         file=sys.stderr,
     )

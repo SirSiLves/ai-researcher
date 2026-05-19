@@ -144,11 +144,21 @@ recent_distinct_days = { d in mentions_by_date if d >= window_start }
 
 7. **`dormant`** — everything else. Tracked but uninteresting today.
 
-Set `last_classification: "{tier}"` and `last_classified_at: "{TODAY}"` on each org. Also append to `classification_history` (cap at last 14 entries):
+Set `last_classification: "{tier}"` and `last_classified_at: "{TODAY}"` on each org (always — these are scalars).
+
+For `classification_history`, **only append when the row carries new information**, to keep per-firm files stable on quiet days. Append a new entry today if **any** of the following hold:
+
+- The tier today differs from the most recent entry's tier (a real transition — must be recorded).
+- The tier today is `promote` or `hot_event` (these feed the sustained-day gate in §6; the gate needs consecutive rows to count).
+- `classification_history` is empty (first-ever classification).
+
+Otherwise, **do not append** — re-stating yesterday's `dormant`/`covered_healthy`/`informal_covered` verdict adds no signal and forces the org file to rewrite every day. Existing rows are sacred; this rule only governs whether a *new* row gets added.
+
+Format and cap unchanged (cap at last 14 entries):
 ```json
 {"date": "{TODAY}", "tier": "{tier}"}
 ```
-`classification_history` is what powers the sustained-signal gate in §6 (auto-apply): a `promote` tier must hold for ≥ `auto_apply.auto_promote.min_consecutive_days_at_promote` consecutive days before the skill mutates `sources.json`.
+`classification_history` powers the sustained-signal gate in §6 (auto-apply): a `promote` tier must hold for ≥ `auto_apply.auto_promote.min_consecutive_days_at_promote` consecutive days before the skill mutates `sources.json`. Because `promote`/`hot_event` rows are always appended (per the rule above), the gate still works.
 
 ## 5.5. Auto-apply: mutate sources.json
 

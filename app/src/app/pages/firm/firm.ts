@@ -8,7 +8,7 @@ import { Tag } from 'primeng/tag';
 import { MenuItem } from 'primeng/api';
 import { PageHeader } from '../../components/page-header/page-header';
 
-import { DataService, OrgDetail, RadarDay } from '../../services/data.service';
+import { DataService, OrgDetail, OrgIndexEntry, RadarDay } from '../../services/data.service';
 
 interface VelocityPoint {
   date: string;
@@ -32,6 +32,9 @@ export class FirmPage {
 
   readonly slug = signal<string>('');
   readonly detail = signal<OrgDetail | null>(null);
+  /** Index entry for this firm. Carries velocity + velocity_history (which
+   *  used to live on OrgDetail). Loaded in parallel with the detail file. */
+  readonly indexEntry = signal<OrgIndexEntry | null>(null);
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
 
@@ -54,13 +57,26 @@ export class FirmPage {
   });
 
   readonly velocitySeries = computed<VelocityPoint[]>(() => {
-    const d = this.detail();
-    if (!d?.velocity_history?.length) return [];
-    return d.velocity_history.map(p => ({
+    const e = this.indexEntry();
+    if (!e?.velocity_history?.length) return [];
+    return e.velocity_history.map(p => ({
       date: p.date,
       v7: p.velocity_7d,
       ratio: p.velocity_ratio
     }));
+  });
+
+  /** Velocity snapshot — read from the index entry, since per-firm files no
+   *  longer carry it. */
+  readonly velocity = computed(() => {
+    const e = this.indexEntry();
+    if (!e) return null;
+    return {
+      velocity_7d: e.velocity_7d,
+      velocity_28d_avg: e.velocity_28d_avg,
+      velocity_ratio: e.velocity_ratio,
+      velocity_status: e.velocity_status
+    };
   });
 
   /** Full mentions_by_date — chronological. */
@@ -176,10 +192,17 @@ export class FirmPage {
   private async loadFirm(slug: string) {
     this.loading.set(true);
     this.detail.set(null);
+    this.indexEntry.set(null);
     this.error.set(null);
     try {
-      const d = await this.data.loadOrgDetail(slug);
+      // Detail + index entry in parallel. The detail has the heavy fields;
+      // the index entry has velocity + velocity_history.
+      const [d, entry] = await Promise.all([
+        this.data.loadOrgDetail(slug),
+        this.data.orgIndexEntry(slug)
+      ]);
       this.detail.set(d);
+      this.indexEntry.set(entry);
       this.loading.set(false);
     } catch (err: any) {
       this.error.set(`Couldn't load firm "${slug}": ${err?.message ?? err}`);

@@ -46,9 +46,6 @@ export class FirmsPage {
   readonly detail = signal<OrgDetail | null>(null);
   readonly detailLoading = signal<boolean>(false);
 
-  private readonly historyCache = new Map<string, number[]>();
-  readonly historyVersion = signal<number>(0);
-
   readonly velocityOptions = [
     { label: 'All',          value: null },
     { label: 'Surging',      value: 'surging' },
@@ -56,6 +53,14 @@ export class FirmsPage {
     { label: 'Steady',       value: 'steady' },
     { label: 'Cooling',      value: 'cooling' }
   ];
+
+  /** Slug → index entry. Built once when the index loads; powers row sparklines
+   *  and drawer-side velocity without the per-firm fetch waterfall. */
+  private readonly bySlug = computed<Map<string, OrgIndexEntry>>(() => {
+    const m = new Map<string, OrgIndexEntry>();
+    for (const o of this.orgs()) m.set(o.slug, o);
+    return m;
+  });
 
   readonly filtered = computed(() => {
     const q = this.query().toLowerCase().trim();
@@ -80,10 +85,16 @@ export class FirmsPage {
     };
   });
 
+  /** Selected firm's index entry — drives drawer-side velocity stats + sparkline.
+   *  Resolved from the in-memory index map; no extra HTTP request. */
+  readonly selectedEntry = computed<OrgIndexEntry | null>(() => {
+    const slug = this.selectedSlug();
+    return slug ? (this.bySlug().get(slug) ?? null) : null;
+  });
+
   readonly detailSpark = computed<number[]>(() => {
-    const d = this.detail();
-    if (!d?.velocity_history?.length) return [];
-    return d.velocity_history.map(p => p.velocity_7d);
+    const e = this.selectedEntry();
+    return e?.velocity_history?.map(p => p.velocity_7d) ?? [];
   });
 
   readonly topicMixSorted = computed(() => {
@@ -109,7 +120,18 @@ export class FirmsPage {
       }));
   });
 
-  readonly detailVelocity = computed(() => this.detail()?.velocity ?? null);
+  /** Derived from the selected index entry (not the per-firm detail file),
+   *  since velocity_history + velocity stats live on the index now. */
+  readonly detailVelocity = computed(() => {
+    const e = this.selectedEntry();
+    if (!e) return null;
+    return {
+      velocity_7d: e.velocity_7d,
+      velocity_28d_avg: e.velocity_28d_avg,
+      velocity_ratio: e.velocity_ratio,
+      velocity_status: e.velocity_status
+    };
+  });
 
   constructor() {
     this.data.loadOrgsIndex()
@@ -118,7 +140,6 @@ export class FirmsPage {
         this.loading.set(false);
         const slug = this.route.snapshot.paramMap.get('slug');
         if (slug) this.selectedSlug.set(slug);
-        this.warmupSparklines(idx.entries);
       })
       .catch(err => {
         this.error.set(`Couldn't load orgs index: ${err.message ?? err}`);
@@ -130,7 +151,7 @@ export class FirmsPage {
       if (!slug) { this.detail.set(null); return; }
       this.detailLoading.set(true);
       this.data.loadOrgDetail(slug)
-        .then(d => { this.detail.set(d); this.detailLoading.set(false); this.cacheHistory(slug, d); })
+        .then(d => { this.detail.set(d); this.detailLoading.set(false); })
         .catch(err => {
           this.error.set(`Couldn't load orgs/${slug}.json: ${err.message ?? err}`);
           this.detailLoading.set(false);
@@ -138,29 +159,11 @@ export class FirmsPage {
     });
   }
 
-  private cacheHistory(slug: string, d: OrgDetail) {
-    if (d.velocity_history?.length) {
-      this.historyCache.set(slug, d.velocity_history.map(p => p.velocity_7d));
-      this.historyVersion.update(v => v + 1);
-    }
-  }
-
-  private async warmupSparklines(orgs: OrgIndexEntry[]) {
-    const BATCH = 8;
-    for (let i = 0; i < orgs.length; i += BATCH) {
-      const slice = orgs.slice(i, i + BATCH);
-      await Promise.all(slice.map(o =>
-        this.data.loadOrgDetail(o.slug)
-          .then(d => this.cacheHistory(o.slug, d))
-          .catch(() => { /* swallow */ })
-      ));
-    }
-  }
-
   rowSpark(slug: string): string {
-    this.historyVersion();
-    const arr = this.historyCache.get(slug);
-    return arr ? this.sparkFromArr(arr.slice(-14)) : '';
+    const e = this.bySlug().get(slug);
+    if (!e?.velocity_history?.length) return '';
+    const arr = e.velocity_history.slice(-14).map(p => p.velocity_7d);
+    return this.sparkFromArr(arr);
   }
 
   private sparkFromArr(arr: number[]): string {

@@ -146,6 +146,11 @@ export interface OrgIndexEntry {
   velocity_7d: number;
   velocity_ratio: number;
   velocity_status: 'surging' | 'accelerating' | 'steady' | 'cooling' | string;
+  velocity_28d_avg: number;
+  /** 31-day rolling window. Drives the row sparkline on /firms and the
+   *  velocity line chart on /firms/:slug. Lives on the index entry so the
+   *  list view renders from a single HTTP request. */
+  velocity_history: OrgVelocityPoint[];
   topic_count: number;
   top_topics: string[];
 }
@@ -190,9 +195,12 @@ export interface SweepSummary {
   markdown: string;
 }
 
+/** Per-firm detail file (orgs/{slug}.json). Contains the heavy fields the
+ *  drawer + /firms/:slug page need but the list view doesn't. Velocity and
+ *  velocity_history live on OrgIndexEntry (orgs/index.json) — single source
+ *  of truth for the row sparkline + detail-page line chart. */
 export interface OrgDetail {
   slug: string;
-  generated_at: string;
   coverage: string;
   tier_hint: string | null;
   region: string | null;
@@ -207,8 +215,6 @@ export interface OrgDetail {
   mentions_by_date?: Record<string, number>;
   aliases?: string[];
   context_samples?: string[];
-  velocity?: OrgVelocity;
-  velocity_history?: OrgVelocityPoint[];
   topic_mix?: Record<string, number>;
   radar_appearances?: any[];
   hot_events?: any[];
@@ -278,6 +284,14 @@ export class DataService {
   loadOrgsIndex(): Promise<OrgsIndex> {
     return firstValueFrom(this.http.get<OrgsIndex>(`${this.dataBase}/orgs/index.json`))
       .then(r => { this.orgs.set(r); return r; });
+  }
+
+  /** Look up an OrgIndexEntry by slug, loading the index lazily if needed.
+   *  Used by the firm detail page (deep-linked /firms/:slug) to read the
+   *  velocity series without re-fetching. */
+  async orgIndexEntry(slug: string): Promise<OrgIndexEntry | null> {
+    const idx = this.orgs() ?? await this.loadOrgsIndex();
+    return idx.entries.find(e => e.slug === slug) ?? null;
   }
 
   loadOrgDetail(slug: string): Promise<OrgDetail> {
