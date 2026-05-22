@@ -29,3 +29,8 @@ app/docs/screenshots/
 pipeline/state/keyword_judge_request.md
 pipeline/state/keyword_judge_verdicts.json
 pipeline/state/keyword_judge_verdicts.*.applied.json
+
+# Pipeline scratch — collectors and sweep agents drop temporary workspaces and
+# one-off scripts under data/.tmp_*. Regenerated every run, never read by the
+# app or any cadence consumer.
+data/.tmp_*
