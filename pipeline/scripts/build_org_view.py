@@ -234,27 +234,51 @@ def compute_velocity_history(mentions_by_date, today_iso, window_days=30):
     return history
 
 
-def build_topic_mix(org_entry, taxonomy, file_index):
-    """For one org, find which topic-taxonomy strings appear alongside its mentions.
+def precompute_topic_mix(all_orgs, taxonomy, file_index):
+    """One-pass topic-mix builder.
 
-    For every source file the org was mentioned in, scan the file for every
-    topic alias and count co-occurrences. Returns {topic: count} sorted.
+    The old per-org `build_topic_mix` re-read every source file from disk
+    once per org × per topic, costing ~60ms × 1104 orgs ≈ 65s on cron. That
+    timed out on the Cowork bash sandbox (~30s limit), leaving orgs/index.json
+    stale until the next manual rebuild.
+
+    This version inverts the loop:
+      1. Compile every org-alias pattern and every taxonomy-topic pattern once.
+      2. Walk source files once. For each file:
+           - find which orgs are mentioned (by alias)
+           - find which topics appear (by taxonomy string), with their counts
+           - cross-product: for each mentioned org, add the topic counts
+      3. Returns {slug: {topic: count}} for every org with any topic hits.
+
+    Cost is dominated by len(files) × (len(org_patterns) + len(topic_patterns))
+    rather than len(orgs) × len(files). For 333 files / 1104 orgs / ~50 topics
+    that drops 65s → roughly 5-8s, well inside the sandbox window.
     """
-    mentioned_in = set()
-    # Build set of file paths where this org was mentioned. We use first_seen_in_file
-    # as a proxy + mentions_by_date keys to crosswalk file_index.
-    org_dates = set(org_entry.get("mentions_by_date", {}).keys())
-    if not org_dates:
-        return {}
+    # Build per-org list of (alias, slug) — lowercased for substring matching
+    # via cheap `in` rather than regex per org per file.
+    alias_to_slugs = defaultdict(list)
+    for slug, entry in all_orgs.items():
+        aliases = list(entry.get("alias_hits", {}).keys())
+        if not aliases:
+            aliases = entry.get("aliases", [])
+        for a in aliases:
+            # Skip too-short aliases that would over-match.
+            if len(a) < 2:
+                continue
+            alias_to_slugs[a.lower()].append(slug)
 
-    aliases = list(org_entry.get("alias_hits", {}).keys())
-    if not aliases:
-        aliases = org_entry.get("aliases", [])  # priority vendors carry aliases
-    if not aliases:
+    # Compile a single combined regex that matches ANY org alias. Word-boundary
+    # at start/end. Captures the alias so we can map back to slug. Aliases are
+    # sorted longest-first so e.g. "anthropic-policy" wins over "anthropic".
+    sorted_aliases = sorted(alias_to_slugs.keys(), key=lambda x: -len(x))
+    if not sorted_aliases:
         return {}
-    org_patterns = [whole_word_pattern(a) for a in aliases]
+    org_combined_re = re.compile(
+        r"(?<![A-Za-z0-9])(" + "|".join(re.escape(a) for a in sorted_aliases) + r")(?![A-Za-z0-9])",
+        re.IGNORECASE,
+    )
 
-    # Topic patterns (flat: topic_string → pattern)
+    # Compile every taxonomy topic-string pattern once.
     topic_patterns = {}
     for group, topics in taxonomy.items():
         if group.startswith("_") or not isinstance(topics, list):
@@ -262,18 +286,76 @@ def build_topic_mix(org_entry, taxonomy, file_index):
         for t in topics:
             topic_patterns[t] = whole_word_pattern(t)
 
-    topic_counts = defaultdict(int)
+    # Walk files once. For each file:
+    #   1. Find every (alias, position) hit via the combined org regex.
+    #   2. If at least one org appeared, find topic hits and tally.
+    topic_mix_per_org = defaultdict(lambda: defaultdict(int))
+    for path, _src_type, _file_date in file_index:
+        try:
+            text = path.read_text(errors="ignore")
+        except OSError:
+            continue
+        # Which orgs are mentioned? Single regex scan.
+        slugs_in_file = set()
+        for m in org_combined_re.finditer(text):
+            alias = m.group(1).lower()
+            for slug in alias_to_slugs.get(alias, []):
+                slugs_in_file.add(slug)
+        if not slugs_in_file:
+            continue
+        # Topic counts for this file
+        topic_counts_in_file = {}
+        for topic_name, rx in topic_patterns.items():
+            n = len(rx.findall(text))
+            if n:
+                topic_counts_in_file[topic_name] = n
+        if not topic_counts_in_file:
+            continue
+        # Cross-product: each mentioned org gets the topic counts.
+        for slug in slugs_in_file:
+            for topic_name, count in topic_counts_in_file.items():
+                topic_mix_per_org[slug][topic_name] += count
 
-    # Limit to files within org_dates — much cheaper than scanning everything.
-    candidate_files = [
-        (p, st, fd) for p, st, fd in file_index if fd in org_dates
-    ]
+    # Sort each org's mix by count desc.
+    return {
+        slug: dict(sorted(counts.items(), key=lambda kv: -kv[1]))
+        for slug, counts in topic_mix_per_org.items()
+    }
+
+
+def build_topic_mix(org_entry, taxonomy, file_index, precomputed=None, slug=None):
+    """Topic-mix accessor.
+
+    If `precomputed` (the dict returned by `precompute_topic_mix`) is supplied,
+    just look up the slug. Otherwise fall back to the slow per-org scan so
+    standalone callers (one-off scripts, tests) still work.
+    """
+    if precomputed is not None and slug is not None:
+        return precomputed.get(slug, {})
+
+    # Fallback: original per-org scan (kept for backward compatibility).
+    org_dates = set(org_entry.get("mentions_by_date", {}).keys())
+    if not org_dates:
+        return {}
+    aliases = list(org_entry.get("alias_hits", {}).keys())
+    if not aliases:
+        aliases = org_entry.get("aliases", [])
+    if not aliases:
+        return {}
+    org_patterns = [whole_word_pattern(a) for a in aliases]
+    topic_patterns = {}
+    for group, topics in taxonomy.items():
+        if group.startswith("_") or not isinstance(topics, list):
+            continue
+        for t in topics:
+            topic_patterns[t] = whole_word_pattern(t)
+    topic_counts = defaultdict(int)
+    candidate_files = [(p, st, fd) for p, st, fd in file_index if fd in org_dates]
     for path, _, _ in candidate_files:
         try:
             text = path.read_text(errors="ignore")
         except Exception:
             continue
-        # Must contain at least one org alias to count
         if not any(rx.search(text) for rx in org_patterns):
             continue
         for topic_name, rx in topic_patterns.items():
@@ -336,6 +418,14 @@ def main():
             except Exception:
                 pass
 
+    # Precompute topic-mix for every org in one source-file pass.
+    # Was the bottleneck at ~60ms × 1104 orgs ≈ 65s before; now ~5-8s by
+    # inverting the loop (files outer, orgs inner). Lets the script finish
+    # inside Cowork's bash sandbox timeout.
+    print(f"[build_org_view] precomputing topic-mix for {len(all_orgs)} orgs…", file=sys.stderr)
+    topic_mix_index = precompute_topic_mix(all_orgs, taxonomy, file_index)
+    print(f"[build_org_view] topic-mix indexed for {len(topic_mix_index)} orgs", file=sys.stderr)
+
     print(f"[build_org_view] building per-org files for {len(all_orgs)} orgs…", file=sys.stderr)
 
     # Ensure orgs/ exists
@@ -349,7 +439,8 @@ def main():
         mentions_by_date = entry.get("mentions_by_date", {})
         velocity = compute_velocity(mentions_by_date, TODAY)
         velocity_history = compute_velocity_history(mentions_by_date, TODAY, window_days=30)
-        topic_mix = build_topic_mix(entry, taxonomy, file_index)
+        topic_mix = build_topic_mix(entry, taxonomy, file_index,
+                                    precomputed=topic_mix_index, slug=slug)
         radar_appearances = attach_radar_org_appearances(slug, radar_jsons)
 
         per_org = {

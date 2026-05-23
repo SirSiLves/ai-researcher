@@ -55,7 +55,18 @@ For each of today's source files:
 - Identify which source type it represents from its top directory (`news/` → `tech_news`, `papers/` → `paper`, `blogs/` → `long_form_blog`, `jobs/` → `job_posting_skill_mention`, `linkedin/` → `linkedin_network_post`, `daily/` → `daily_synthesis`).
 - Read content. Extract org mentions. Two paths:
   - **Known orgs (already in `discovered_orgs.json.orgs`):** detect via case-insensitive substring of any known alias from the seed (and any aliases the skill has added historically). Increment counters.
-  - **New orgs (not in tally):** LLM-extract by reading the file. A "new org" is any company / lab / research institution / public sector body name that appears at least 2 times in the file and that's NOT already in the tally. Add it with `coverage: "uncovered"`, `tier_hint: null` (you'll classify in step 4), `aliases: [the canonical name]`, `discovered_on: {TODAY}`.
+  - **New orgs (not in tally):** LLM-extract by reading the file. A "new org" is any **named legal entity** — a company, lab, university, research institute, regulatory body, government agency, NGO, or trade body — that appears at least 2 times in the file and that's NOT already in the tally. Add it with `coverage: "uncovered"`, `tier_hint: null` (you'll classify in step 4), `aliases: [the canonical name]`, `discovered_on: {TODAY}`.
+
+    **WHAT TO INSERT:** "Anthropic", "Stanford HAI", "EU AI Office", "Bank of England", "Cloudflare", "Mistral", "Apollo Research", "Mercury" (the bank), "QPQ IaaS AG". These are entities people can sue, hire from, or invest in.
+
+    **DO NOT INSERT THESE AS ORGS** — they're concepts, protocols, products, papers, or generic phrases that prior LLM runs repeatedly mistook for companies (157 leaks cleaned 2026-05-23):
+    - **Topic / concept names**: "agent memory", "agent SDK", "agent runtime", "agent gateway", "agent governance toolkit", "context engineering", "MCP adoption", "tool-use standards"
+    - **Protocols and frameworks**: "A2A protocol", "MCP", "AP2", "Agent Framework 1.0" (these are interop specs / SDKs, not corporate entities — track the *vendor shipping them* instead)
+    - **Paper titles or any slug ending in `-paper`**: "agent-as-adversary-paper", "ai-scientists-paper", "mcp-pitfall-lab-paper"
+    - **Document/article references**: "Annex I", "Annex III" (EU AI Act sections), "Annex VI", "Article 43"
+    - **Product features**: "Agent 365", "Agent Inbox", "Model Garden", "AI Pulse"
+
+    Test before inserting: ask *"could a journalist write 'X said today...'* with X = this slug?" If no, it's not an org and stays out of the tally.
 - For each mention, append/update:
   ```json
   {

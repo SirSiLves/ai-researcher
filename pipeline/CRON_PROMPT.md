@@ -338,6 +338,20 @@ Must run after the cadence files have been written today, otherwise the SPA
 will be one day behind (Pulse falls back to yesterday's daily because today
 isn't in the manifest). ~10ms. Idempotent. If non-zero exit, log and continue.
 
+## 6.96. Emit daily health beacon
+
+```bash
+python3 ../pipeline/scripts/build_health_beacon.py --as-of {TODAY}
+```
+
+Writes `data/daily/{YYYY}/{MM}/{TODAY}-health.json` — per-collector item
+counts, presence flags, file sizes, manifest staleness, and an aggregated
+`overall_status` of green / yellow / red. Single-file morning-after check
+that catches silent failures the cron leaves behind (collector stub, stale
+manifest, radar empty, etc.). Pure Python, ~50ms. Read-only — never blocks
+the pipeline. Always run as the last step before weekly/trends so it sees
+the full pipeline output. If non-zero exit, log and continue.
+
 ## 7. Weekly rollup — every day
 
 ai-weekly-digest runs **every day**, not just Mondays — the file is

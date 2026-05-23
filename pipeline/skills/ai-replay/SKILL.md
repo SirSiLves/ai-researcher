@@ -281,6 +281,16 @@ Rebuilds `data/reports/index.json` — the flat dated index of every cadence art
 
 If the script exits non-zero, log the error but don't block — the rest of the pipeline doesn't depend on the change-log JSONs.
 
+## 6.96. Emit daily health beacon
+
+```bash
+python3 ../pipeline/scripts/build_health_beacon.py --as-of {TODAY}
+```
+
+Writes `data/daily/{YYYY}/{MM}/{TODAY}-health.json` — per-collector item counts, presence flags, file sizes, manifest staleness checks, and an aggregated `overall_status` of green / yellow / red. The next morning's reader can open this single file to see whether anything failed silently overnight (a collector returning a stub, a manifest going stale, the radar emitting zero topics, etc.).
+
+Pure Python, ~50ms. Read-only — never blocks the pipeline. Always run as the **last** step before the weekly/trends spawns so it sees the full pipeline output. If the script exits non-zero, log and continue — the beacon is observability, not gating.
+
 ## 7. Weekly rollup — every day
 
 ai-weekly-digest runs **every day**, not just Mondays — the file is cumulatively rewritten Mon→today.
