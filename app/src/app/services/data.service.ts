@@ -61,6 +61,12 @@ export interface RadarTopic {
   breadth_30d: number;
   high_breadth: boolean;
   source_type_count: number;
+  /** importance = days_in_sources × source_types × ln(breadth_30d + 2). Primary ranking field — measures structural relevance across the 30d window from raw source-file presence, independent of when the radar agent created a topic. */
+  importance?: number;
+  /** Distinct dates in last 30 days where any of this topic's keywords matched a source file. Populated by compute_topic_importance.py. */
+  days_in_sources_30d?: number;
+  /** Distinct source types (of 8: daily / news / papers / blogs / linkedin / github / hackernews / jobs) with at least one keyword match in the 30d window. */
+  source_types_in_sources_30d?: number;
   sector: string;
   first_seen: string;
   breadth_orgs_7d: string[];

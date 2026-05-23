@@ -71,12 +71,18 @@ export const routes: Routes = [
     data: { label: 'Archive' }
   },
 
+  // ── 5. TRENDS — long-arc ledger (data/trends.md) ───────────
+  {
+    path: 'trends',
+    loadComponent: () => import('./pages/trends/trends').then(m => m.TrendsPage),
+    data: { label: 'Trends' }
+  },
+
   // ── Legacy redirects ────────────────────────────────────────
   { path: 'today',          redirectTo: 'pulse' },
   { path: 'today/:date',    redirectTo: 'pulse/:date' },
   { path: 'priorities',     redirectTo: 'pulse' },
   { path: 'priorities/:date', redirectTo: 'pulse/:date' },
-  { path: 'trends',         redirectTo: 'map' },
   { path: 'radar',          redirectTo: 'map' },
   { path: 'radar/:date',    redirectTo: 'map' },
   { path: 'radar/topic/:id', redirectTo: 'map/topic/:id' },

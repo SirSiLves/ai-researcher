@@ -113,6 +113,9 @@
               <span class="map-sort__label">Sort</span>
               <div class="map-stages">
                 <button type="button" class="map-stages__btn"
+                        [class.is-active]="sortKey() === 'importance'" (click)="sortKey.set('importance')"
+                        title="Structural relevance — days mentioned in source files × source types × log(breadth_30d)">Importance</button>
+                <button type="button" class="map-stages__btn"
                         [class.is-active]="sortKey() === 'score'" (click)="sortKey.set('score')">Score</button>
                 <button type="button" class="map-stages__btn"
                         [class.is-active]="sortKey() === 'momentum'" (click)="sortKey.set('momentum')">Momentum</button>
@@ -120,8 +123,150 @@
                         [class.is-active]="sortKey() === 'breadth'" (click)="sortKey.set('breadth')">Breadth</button>
               </div>
             </div>
+            <div class="map-sort">
+              <span class="map-sort__label">Compare to</span>
+              <div class="map-stages">
+                <button type="button" class="map-stages__btn"
+                        [class.is-active]="compareDate() === null"
+                        (click)="setCompareWindow(null)"
+                        title="No comparison — today only">Off</button>
+                <button type="button" class="map-stages__btn"
+                        [class.is-active]="compareDate() !== null && getCompareWindow() === 7"
+                        (click)="setCompareWindow(7)"
+                        title="Diff against radar from 7 days ago">7d ago</button>
+                <button type="button" class="map-stages__btn"
+                        [class.is-active]="compareDate() !== null && getCompareWindow() === 30"
+                        (click)="setCompareWindow(30)"
+                        title="Diff against radar from 30 days ago">30d ago</button>
+                <button type="button" class="map-stages__btn"
+                        [class.is-active]="compareDate() !== null && getCompareWindow() === 60"
+                        (click)="setCompareWindow(60)"
+                        title="Diff against radar from 60 days ago">60d ago</button>
+              </div>
+            </div>
           </div>
         </header>
+
+        @if (topicDiff(); as diff) {
+          <section class="map-diff" aria-label="Comparison vs earlier radar">
+            <header class="map-diff__head">
+              <h3 class="map-diff__title">vs {{ compareDate() }}</h3>
+              <span class="map-diff__hint muted">
+                Δ importance (or score_slow on older radars).
+                <strong>{{ diff.rose.length }}</strong> rose ·
+                <strong>{{ diff.fell.length }}</strong> fell ·
+                <strong>{{ diff.appeared.length }}</strong> new ·
+                <strong>{{ diff.vanished.length }}</strong> gone
+              </span>
+              @if (compareDate() && compareDate()! < '2026-05-05') {
+                <span class="map-diff__hint map-diff__hint--warn"
+                      title="The radar schema was rewritten on 2026-05-05. Many topic IDs changed, so cross-rewrite diffs are dominated by ID rotation, not real movement. Real signal returns once today's date is >30 days past 2026-05-05 (i.e. after 2026-06-04).">
+                  ⚠ spans the 2026-05-05 schema rewrite — IDs rotated, diffs noisy
+                </span>
+              }
+            </header>
+            <div class="map-diff__cols">
+              <div class="map-diff__col">
+                <div class="map-diff__col-head map-diff__col-head--rose">
+                  <i class="pi pi-arrow-up"></i> Rose
+                </div>
+                @if (diff.rose.length === 0) {
+                  <p class="map-diff__empty muted">No topic gained ≥10% importance.</p>
+                } @else {
+                  <ol class="map-diff__list">
+                    @for (r of diff.rose.slice(0, 8); track r.topic.id) {
+                      <li class="map-diff__item" (click)="goToTopic(r.topic)" tabindex="0" (keydown.enter)="goToTopic(r.topic)">
+                        <span class="map-diff__label">{{ r.topic.label }}</span>
+                        <span class="map-diff__delta map-diff__delta--rose tabular"
+                              [title]="'Was: ' + (r.before | number:'1.0-0') + ', now: ' + (r.after | number:'1.0-0')">
+                          {{ r.delta >= 9.99 ? '+999%+' : '+' + ((r.delta * 100) | number:'1.0-0') + '%' }}
+                        </span>
+                      </li>
+                    }
+                  </ol>
+                }
+              </div>
+              <div class="map-diff__col">
+                <div class="map-diff__col-head map-diff__col-head--fell">
+                  <i class="pi pi-arrow-down"></i> Fell
+                </div>
+                @if (diff.fell.length === 0) {
+                  <p class="map-diff__empty muted">No topic lost ≥10% importance.</p>
+                } @else {
+                  <ol class="map-diff__list">
+                    @for (r of diff.fell.slice(0, 8); track r.topic.id) {
+                      <li class="map-diff__item" (click)="goToTopic(r.topic)" tabindex="0" (keydown.enter)="goToTopic(r.topic)">
+                        <span class="map-diff__label">{{ r.topic.label }}</span>
+                        <span class="map-diff__delta map-diff__delta--fell tabular"
+                              [title]="'Was: ' + (r.before | number:'1.0-0') + ', now: ' + (r.after | number:'1.0-0')">
+                          {{ (r.delta * 100) | number:'1.0-0' }}%
+                        </span>
+                      </li>
+                    }
+                  </ol>
+                }
+              </div>
+              <div class="map-diff__col">
+                <div class="map-diff__col-head map-diff__col-head--new">
+                  <i class="pi pi-plus"></i> Appeared
+                </div>
+                @if (diff.appeared.length === 0) {
+                  <p class="map-diff__empty muted">No new topics since then.</p>
+                } @else {
+                  <ol class="map-diff__list">
+                    @for (t of diff.appeared.slice(0, 8); track t.id) {
+                      <li class="map-diff__item" (click)="goToTopic(t)" tabindex="0" (keydown.enter)="goToTopic(t)">
+                        <span class="map-diff__label">{{ t.label }}</span>
+                        <span class="map-diff__delta map-diff__delta--new tabular">new</span>
+                      </li>
+                    }
+                  </ol>
+                }
+              </div>
+              <div class="map-diff__col">
+                <div class="map-diff__col-head map-diff__col-head--gone">
+                  <i class="pi pi-minus"></i> Gone
+                </div>
+                @if (diff.vanished.length === 0) {
+                  <p class="map-diff__empty muted">No topics dropped from the radar.</p>
+                } @else {
+                  <ol class="map-diff__list">
+                    @for (t of diff.vanished.slice(0, 8); track t.id) {
+                      <li class="map-diff__item map-diff__item--inert">
+                        <span class="map-diff__label">{{ t.label }}</span>
+                        <span class="map-diff__delta map-diff__delta--gone tabular">gone</span>
+                      </li>
+                    }
+                  </ol>
+                }
+              </div>
+            </div>
+          </section>
+        }
+
+        @if (mostImportant().length) {
+          <section class="map-importance">
+            <header class="map-importance__head">
+              <h3 class="map-importance__title">What structurally matters</h3>
+              <span class="map-importance__hint muted">days mentioned × source types × ln(breadth_30d). Sustained × broad × multi-source presence — independent of weekly loudness.</span>
+            </header>
+            <ol class="map-importance__list">
+              @for (t of mostImportant(); track t.id; let i = $index) {
+                <li class="map-importance__item" (click)="goToTopic(t)" tabindex="0" (keydown.enter)="goToTopic(t)">
+                  <span class="map-importance__rank tabular">{{ i + 1 }}</span>
+                  <div class="map-importance__body">
+                    <div class="map-importance__label">{{ t.label }}</div>
+                    <div class="map-importance__meta muted">
+                      {{ t.days_in_sources_30d }}d in sources · {{ t.source_types_in_sources_30d }} source types · {{ t.breadth_30d }} orgs (30d) · {{ t.stage }}
+                    </div>
+                  </div>
+                  <span class="map-importance__score tabular">{{ t.importance | number:'1.0-0' }}</span>
+                </li>
+              }
+            </ol>
+          </section>
+        }
+
         @if (filteredTopics().length === 0) {
           <p class="map-empty muted">No topics match that combination of filters.</p>
         } @else {
@@ -134,25 +279,40 @@
                     <span class="map-topic__stage" [attr.data-stage]="t.stage">{{ t.stage }}</span>
                     <span class="map-topic__sector">{{ t.sector }}</span>
                     @if (t.high_breadth) {
-                      <span class="map-topic__breadth"><i class="pi pi-users"></i> breadth {{ t.breadth_7d }}</span>
+                      <span class="map-topic__breadth"
+                            [class.is-very-high]="t.breadth_7d >= 20"
+                            [title]="t.breadth_7d >= 20 ? 'Very high breadth (≥20 orgs)' : 'High breadth (≥15 orgs)'">
+                        <i class="pi pi-users"></i> breadth {{ t.breadth_7d }}
+                      </span>
                     }
                   </div>
                 </div>
                 <div class="map-topic__nums">
-                  <div class="map-topic__num">
-                    <span class="map-topic__num-label">Score</span>
-                    <span class="map-topic__num-value tabular">{{ t.score_fast | number:'1.1-1' }}</span>
-                  </div>
-                  <div class="map-topic__num">
-                    <span class="map-topic__num-label">Δ vs slow</span>
-                    @if (t.score_fast !== null && t.score_slow !== null) {
-                      <span class="map-topic__num-value tabular"
-                            [class.is-pos]="t.score_fast - t.score_slow > 0"
-                            [class.is-neg]="t.score_fast - t.score_slow < 0">
-                        {{ t.score_fast - t.score_slow > 0 ? '+' : '' }}{{ (t.score_fast - t.score_slow) | number:'1.1-1' }}
-                      </span>
-                    }
-                  </div>
+                  @if (sortKey() === 'importance' && t.importance) {
+                    <div class="map-topic__num">
+                      <span class="map-topic__num-label">Imp</span>
+                      <span class="map-topic__num-value tabular">{{ t.importance | number:'1.0-0' }}</span>
+                    </div>
+                    <div class="map-topic__num">
+                      <span class="map-topic__num-label">Presence</span>
+                      <span class="map-topic__num-value tabular">{{ t.days_in_sources_30d ?? 0 }}d / {{ t.source_types_in_sources_30d ?? 0 }}s</span>
+                    </div>
+                  } @else {
+                    <div class="map-topic__num">
+                      <span class="map-topic__num-label">Score</span>
+                      <span class="map-topic__num-value tabular">{{ t.score_fast | number:'1.1-1' }}</span>
+                    </div>
+                    <div class="map-topic__num">
+                      <span class="map-topic__num-label">Δ vs slow</span>
+                      @if (t.score_fast !== null && t.score_slow !== null) {
+                        <span class="map-topic__num-value tabular"
+                              [class.is-pos]="t.score_fast - t.score_slow > 0"
+                              [class.is-neg]="t.score_fast - t.score_slow < 0">
+                          {{ t.score_fast - t.score_slow > 0 ? '+' : '' }}{{ (t.score_fast - t.score_slow) | number:'1.1-1' }}
+                        </span>
+                      }
+                    </div>
+                  }
                   <div class="map-topic__dir"
                        [class.is-rising]="t.direction === 'rising' || t.direction === 'surging'"
                        [class.is-falling]="t.direction === 'fading' || t.direction === 'falling'">

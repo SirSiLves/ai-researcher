@@ -66,10 +66,10 @@
           "reason": "first appearance — Agent Toolkit launch with 17 anchor partners"
         }
       ],
-      "stage": "consolidating",
-      "score": 27.7,
-      "score_fast": 30.0,
-      "score_slow": 27.7,
+      "stage": "emerging",
+      "score": 27.38,
+      "score_fast": 29.25,
+      "score_slow": 27.38,
       "raw_score_today": 34.5,
       "score_fast_yesterday": 27.0,
       "score_slow_yesterday": 27.0,
@@ -162,9 +162,9 @@
         }
       ],
       "stage": "emerging",
-      "score": 18.5,
-      "score_fast": 25.0,
-      "score_slow": 18.5,
+      "score": 16.42,
+      "score_fast": 22.71,
+      "score_slow": 16.42,
       "raw_score_today": 33.0,
       "score_fast_yesterday": 21.6,
       "score_slow_yesterday": 17.7,
@@ -247,10 +247,10 @@
           "reason": "first appearance (cold-start seed)"
         }
       ],
-      "stage": "consolidating",
-      "score": 14.9,
-      "score_fast": 25.4,
-      "score_slow": 14.9,
+      "stage": "emerging",
+      "score": 12.63,
+      "score_fast": 20.36,
+      "score_slow": 12.63,
       "raw_score_today": 38.0,
       "score_fast_yesterday": 14.6,
       "score_slow_yesterday": 11.7,
@@ -332,9 +332,9 @@
         }
       ],
       "stage": "emerging",
-      "score": 17.8,
-      "score_fast": 23.6,
-      "score_slow": 17.8,
+      "score": 14.79,
+      "score_fast": 22.12,
+      "score_slow": 14.79,
       "raw_score_today": 28.0,
       "score_fast_yesterday": 22.3,
       "score_slow_yesterday": 16.0,
@@ -484,9 +484,9 @@
         }
       ],
       "stage": "emerging",
-      "score": 12.6,
-      "score_fast": 13.5,
-      "score_slow": 12.6,
+      "score": 12.15,
+      "score_fast": 12.9,
+      "score_slow": 12.15,
       "raw_score_today": 15.0,
       "score_fast_yesterday": 12.0,
       "score_slow_yesterday": 12.0,
@@ -556,9 +556,9 @@
         }
       ],
       "stage": "emerging",
-      "score": 10.6,
-      "score_fast": 11.7,
-      "score_slow": 10.6,
+      "score": 10.18,
+      "score_fast": 11.05,
+      "score_slow": 10.18,
       "raw_score_today": 13.5,
       "score_fast_yesterday": 10.0,
       "score_slow_yesterday": 10.0,
@@ -716,28 +716,69 @@
       "hn_comment_thread": 1,
       "job_posting_skill_mention": 0.5
     },
-    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "convergence_multiplier": {
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
     "max_mentions_per_source_type": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5,
-      "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5,
-      "governance_source": 5, "github_trending_signal": 5, "github_watched_star_delta": 5,
-      "hn_front_page": 5, "hn_comment_thread": 3, "medium_aggregator": 3,
-      "linkedin_hashtag_post": 3, "job_posting_skill_mention": 5
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "github_trending_signal": 5,
+      "github_watched_star_delta": 5,
+      "hn_front_page": 5,
+      "hn_comment_thread": 3,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
     },
     "stages": {
-      "emerging": {"score_range": [10, 30], "max_age_days": 21, "min_source_types": 2},
-      "consolidating": {"score_range": [30, 70], "min_sustained_days": 7, "min_source_types": 3},
-      "mainstream": {"score_range": [70, 999], "min_sustained_days": 30},
-      "fading": {"_trigger": "score declined >25% over rolling window AND was previously >=50"}
+      "emerging": {
+        "score_range": [
+          10,
+          30
+        ],
+        "max_age_days": 21,
+        "min_source_types": 2
+      },
+      "consolidating": {
+        "score_range": [
+          30,
+          70
+        ],
+        "min_sustained_days": 7,
+        "min_source_types": 3
+      },
+      "mainstream": {
+        "score_range": [
+          70,
+          999
+        ],
+        "min_sustained_days": 30
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50"
+      }
     },
     "sector_config": {
-      "min_sectors": 3, "max_sectors": 6, "min_topics_per_sector": 2,
-      "min_topics_for_new_sector": 3, "sector_dissolve_after_days_below_min": 5
+      "min_sectors": 3,
+      "max_sectors": 6,
+      "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3,
+      "sector_dissolve_after_days_below_min": 5
     },
     "breadth_config": {
-      "window_short_days": 7, "window_long_days": 30,
+      "window_short_days": 7,
+      "window_long_days": 30,
       "max_mentions_per_org_per_day": 2,
-      "thresholds": {"high_breadth_7d": 5, "very_high_breadth_7d": 8}
+      "thresholds": {
+        "high_breadth_7d": 5,
+        "very_high_breadth_7d": 8
+      }
     },
     "ema_alpha_fast": 0.3,
     "ema_alpha_slow": 0.05

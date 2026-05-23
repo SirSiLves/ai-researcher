@@ -73,7 +73,10 @@
     {
       "id": "agent-protocol-stack",
       "name": "Agent protocol stack",
-      "topic_ids": ["mcp-adoption", "agent-platforms-enterprise"],
+      "topic_ids": [
+        "mcp-adoption",
+        "agent-platforms-enterprise"
+      ],
       "size": 2,
       "first_seen": "2026-03-18",
       "cluster_score_slow": 27.3,
@@ -86,7 +89,10 @@
     {
       "id": "open-coding-stack",
       "name": "Open coding stack",
-      "topic_ids": ["ai-coding-agents", "open-vs-closed"],
+      "topic_ids": [
+        "ai-coding-agents",
+        "open-vs-closed"
+      ],
       "size": 2,
       "first_seen": "2026-03-20",
       "cluster_score_slow": 25.0,
@@ -99,7 +105,10 @@
     {
       "id": "agent-safety-cluster",
       "name": "Agent safety stack",
-      "topic_ids": ["agent-security", "agent-evaluation-observability"],
+      "topic_ids": [
+        "agent-security",
+        "agent-evaluation-observability"
+      ],
       "size": 2,
       "first_seen": "2026-03-21",
       "cluster_score_slow": 36.1,
@@ -112,7 +121,10 @@
     {
       "id": "harness-engineering",
       "name": "Harness engineering",
-      "topic_ids": ["ai-coding-agents", "agent-platforms-enterprise"],
+      "topic_ids": [
+        "ai-coding-agents",
+        "agent-platforms-enterprise"
+      ],
       "size": 2,
       "first_seen": "2026-03-23",
       "cluster_score_slow": 33.8,
@@ -129,12 +141,17 @@
       "label": "Agent security (LiteLLM .pth supply-chain attack — install-time exec; Anthropic Auto mode classifier-based tool-call gating; NemoCLAW kernel-level sandbox + privacy router; Friday-cohort papers carry)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
-      "stage": "consolidating",
-      "score": 32.5,
-      "score_fast": 51.6,
-      "score_slow": 32.5,
+      "stage": "emerging",
+      "score": 18.83,
+      "score_fast": 32.52,
+      "score_slow": 18.83,
       "raw_score_today": 60.0,
       "score_fast_yesterday": 28.9,
       "score_slow_yesterday": 31.6,
@@ -209,7 +226,12 @@
       ],
       "cluster_id": "agent-safety-cluster",
       "cluster_history": [
-        {"date": "2026-03-21", "from": null, "to": "Agent safety stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-21",
+          "from": null,
+          "to": "Agent safety stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "STAGE PROMOTION: emerging → consolidating. score_slow=32.5 in band [30,70], sustained_days=7 meets gate, min_source_types=4 satisfies. Tuesday's threat surface widens dramatically: Willison reports MALICIOUS LiteLLM 1.82.7+1.82.8 with base64 credential stealer in .pth file (runs on install, no import needed) — exfiltrates ~/.ssh/, ~/.aws/, crypto wallets, shell history. Likely chained off recent Trivy CI compromise. Anthropic ships Auto mode for Claude Code — Sonnet 4.6 classifier gates each tool call against allow/soft-deny ruleset; Willison's caveat: AI-based prompt-injection defenses are non-deterministic, and a `pip install -r` allow rule wouldn't have stopped today's LiteLLM attack. NemoCLAW deep coverage: kernel-level sandbox + 'privacy router' monitoring all outgoing agent comms — sets new compliance baseline (Microsoft Defender for AI, Palo Alto Prisma AIRS, CrowdStrike will all be benchmarked against it). Andrew Nesbitt 'Package Managers Need to Cool Down' — six-month industry shift toward delaying releases (pnpm, Yarn, Bun, Deno, uv, pip, npm). Friday cohort papers (AC4A, SSGM, MAS-security, Attack/Defense Landscape) still in window. score_fast surges 28.9 → 51.6 (1.59× slow → surging).",
       "_breadth_method": "orgs added today: anthropic (Auto mode), litellm/berriai (compromise), simonwillison (analysis), nesbitt (cooldown piece), trivy (chain origin). Previously: 11."
@@ -219,12 +241,17 @@
       "label": "Agent evaluation & observability (REVERE reflective research engineer, RLVR direction decomposition, PivotRL low-cost agentic post-training, OpenResearcher trajectory synthesis, Omni-WorldBench, ProactiveBench carry, Hyperagents, Subgoal-driven, CUBE)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
-      "stage": "consolidating",
-      "score": 30.4,
-      "score_fast": 32.2,
-      "score_slow": 30.4,
+      "stage": "emerging",
+      "score": 21.05,
+      "score_fast": 29.89,
+      "score_slow": 21.05,
       "raw_score_today": 36.0,
       "score_fast_yesterday": 32.0,
       "score_slow_yesterday": 30.0,
@@ -300,7 +327,12 @@
       ],
       "cluster_id": "agent-safety-cluster",
       "cluster_history": [
-        {"date": "2026-03-21", "from": null, "to": "Agent safety stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-21",
+          "from": null,
+          "to": "Agent safety stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "STAGE PROMOTION: emerging → consolidating. score_slow=30.4 in band, sustained_days=7 meets gate, min_source_types=3 satisfies. Tuesday adds: REVERE (Gangireddi et al — research-engineer agent that reflects and evolves its own workflow over scientific tasks), RLVR Direction (Huang et al — decomposes RLVR gradient updates into useful and harmful directions; concrete diagnostic for why some RLVR runs collapse the base policy), PivotRL (Yi et al — compute-efficient agentic post-training, claims accuracy preservation under aggressive cost cuts), OpenResearcher (Li, Jiang, Ma, Zhang — open pipeline for long-horizon deep-research trajectory synthesis; concrete answer to data bottleneck), Omni-WorldBench (Wu et al — interaction-centric world-model benchmark, fills gap between rollout-FID and what agents need from a simulator). Carries: Hyperagents, Subgoal-driven, ProactiveBench, CUBE, Memento-Skills, AndroTMem, VTC-Bench, ProRL Agent. Paper count climbs to 16 uncapped (capped at 5).",
       "_breadth_method": "orgs added today: revere-paper, rlvr-direction-paper, pivotrl-paper, openresearcher-paper, omni-worldbench-paper. Previously: 13."
@@ -310,12 +342,17 @@
       "label": "Enterprise agent platforms (NemoCLAW kernel-sandbox + privacy router; Oracle OCI Enterprise AI upcoming GA; Anthropic Auto mode; harness-engineering carries; ServiceNow×Accenture FDE)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
-      "stage": "consolidating",
-      "score": 33.5,
-      "score_fast": 35.7,
-      "score_slow": 33.5,
+      "stage": "emerging",
+      "score": 27.5,
+      "score_fast": 30.52,
+      "score_slow": 27.5,
       "raw_score_today": 30.0,
       "score_fast_yesterday": 47.7,
       "score_slow_yesterday": 32.0,
@@ -424,8 +461,18 @@
       ],
       "cluster_id": "harness-engineering",
       "cluster_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first cluster formation"},
-        {"date": "2026-03-23", "from": "Agent protocol stack", "to": "Harness engineering", "reason": "Anthropic harness post + practitioner uptake forms a tighter sister cluster around harness vocabulary"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first cluster formation"
+        },
+        {
+          "date": "2026-03-23",
+          "from": "Agent protocol stack",
+          "to": "Harness engineering",
+          "reason": "Anthropic harness post + practitioner uptake forms a tighter sister cluster around harness vocabulary"
+        }
       ],
       "_evidence_summary": "Tuesday: Oracle announces upcoming GA of OCI Enterprise AI — end-to-end build/manage/deploy for production AI workloads (Oracle joining Snowflake/ServiceNow/Cisco/NVIDIA in the wave of enterprise control planes). NVIDIA NemoCLAW deep coverage: kernel-level sandbox + privacy router for outgoing agent comms — new compliance baseline (Defender for AI, Prisma AIRS, CrowdStrike will benchmark against). Anthropic Auto mode = harness primitive (Sonnet 4.6 classifier gates tool calls against allow/soft-deny). Carries: Anthropic harness post + community uptake, ServiceNow×Accenture FDE, Writer Skills, SnowWork, Wukong, Manus, Agent Toolkit. Stage stays consolidating. score_fast cools from 47.7 → 35.7 (1.07× slow → rising); score_slow climbs to 33.5.",
       "_breadth_method": "orgs added today: oracle (OCI Enterprise AI GA), microsoft (Defender for AI competitive ref), devflokers (NemoCLAW deep coverage). Previously: 38."
@@ -435,12 +482,17 @@
       "label": "AI coding agents / agentic engineering (Anthropic Auto mode + LiteLLM security wake-up; Streaming Experts Kimi K2.5 1T on M2 Max; Context Engineering Medium; harness uptake carries)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Agents & infrastructure", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
-      "stage": "consolidating",
-      "score": 33.7,
-      "score_fast": 49.9,
-      "score_slow": 33.7,
+      "stage": "emerging",
+      "score": 25.69,
+      "score_fast": 51.3,
+      "score_slow": 25.69,
       "raw_score_today": 64.0,
       "score_fast_yesterday": 51.1,
       "score_slow_yesterday": 33.0,
@@ -538,8 +590,18 @@
       ],
       "cluster_id": "open-coding-stack",
       "cluster_history": [
-        {"date": "2026-03-20", "from": null, "to": "Open coding stack", "reason": "first cluster formation"},
-        {"date": "2026-03-23", "from": "Open coding stack", "to": "Harness engineering", "reason": "Anthropic harness post anchors a new vocabulary that supersedes the open-coding angle"}
+        {
+          "date": "2026-03-20",
+          "from": null,
+          "to": "Open coding stack",
+          "reason": "first cluster formation"
+        },
+        {
+          "date": "2026-03-23",
+          "from": "Open coding stack",
+          "to": "Harness engineering",
+          "reason": "Anthropic harness post anchors a new vocabulary that supersedes the open-coding angle"
+        }
       ],
       "_evidence_summary": "Tuesday: Anthropic Auto mode for Claude Code (Sonnet 4.6 classifier gates tool calls — non-deterministic, complementary to deterministic sandboxes). Willison Streaming Experts: in 5 days, Dan Woods went from 397B-MoE-in-48GB to @seikixtc running 1T-parameter Kimi K2.5 in 96GB on M2 Max + iOS port at 0.6 tok/s. ALFAZA Context Engineering Medium piece (the new frontier of production AI in 2026). Anmol Gupta MCP Deep Dive Medium (connects MCP-as-tool-bus to LiteLLM/Auto-mode security debate). Carries: Anthropic harness post + practitioner uptake (Hightower, AddyOsmani, Anup, ZenML), David Abram, Slop definition, Jack Clark Import AI 450, Willison Starlette skill, Mark It AI Cohere Command-A. Stage stays consolidating. Direction = surging (fast 49.9, slow 33.7, ratio 1.48×).",
       "_breadth_method": "orgs added today: alfaza (Context Engineering), anmol-gupta (MCP deep dive), seikixtc (Kimi K2.5 1T on M2 Max), bruce-li (Groq deep dive — also under compute-economics), litellm/berriai (security crossover). Previously: 33."
@@ -549,12 +611,17 @@
       "label": "Frontier model release cadence (OpenAI Sora discontinuation — first explicit consumer-AI retirement on cost grounds; Grok 4.20 follow-up; four-frontier-tier choices)",
       "sector": "Models & capabilities",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Models & capabilities", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
       "stage": "emerging",
-      "score": 17.6,
-      "score_fast": 24.5,
-      "score_slow": 17.6,
+      "score": 15.28,
+      "score_fast": 24.03,
+      "score_slow": 15.28,
       "raw_score_today": 30.0,
       "score_fast_yesterday": 22.7,
       "score_slow_yesterday": 17.0,
@@ -654,12 +721,17 @@
       "label": "Compute economics / inference physics (Groq deterministic LPU 3.5-5.8× latency advantage; Sora retirement on inference economics; $1T order book carry)",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Methods & research", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
       "stage": "emerging",
-      "score": 16.3,
-      "score_fast": 11.0,
-      "score_slow": 16.3,
+      "score": 13.82,
+      "score_fast": 11.74,
+      "score_slow": 13.82,
       "raw_score_today": 17.0,
       "score_fast_yesterday": 9.2,
       "score_slow_yesterday": 16.6,
@@ -738,12 +810,17 @@
       "label": "Open-vs-closed model tiering (Streaming Experts Kimi K2.5 1T on M2 Max in 96GB; Cohere Command-A; Lambert 8 plots carry; Voxtral pre-announce as adjacent open-weights)",
       "sector": "Models & capabilities",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Models & capabilities", "reason": "first appearance"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 15.1,
-      "score_fast": 17.4,
-      "score_slow": 15.1,
+      "score": 13.15,
+      "score_fast": 17.1,
+      "score_slow": 13.15,
       "raw_score_today": 18.0,
       "score_fast_yesterday": 16.5,
       "score_slow_yesterday": 14.6,
@@ -818,7 +895,12 @@
       ],
       "cluster_id": "open-coding-stack",
       "cluster_history": [
-        {"date": "2026-03-20", "from": null, "to": "Open coding stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-20",
+          "from": null,
+          "to": "Open coding stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Tuesday adds Streaming Experts (Willison) — five days after the 397B-MoE-in-48GB demo, @seikixtc running 1T-parameter Kimi K2.5 in 96GB on M2 Max + iOS port at 0.6 tok/s. Autoresearch loops still finding optimizations. Carries: Lambert 8-plots, Cohere Command-A coverage (Mark It AI + Raman Srivastava), Cursor on Kimi K2.5, Tony Thomas Qwen 3 Coder review.",
       "_breadth_method": "orgs added today: seikixtc (Kimi K2.5 1T on M2 Max). Previously: 19."
@@ -828,12 +910,17 @@
       "label": "MCP adoption (Anmol Gupta MCP deep dive in security-debate context, CUBE substrate, Yusuf Baykaloglu A2A, Srinivasan production patterns, ServiceNow AI Gateway, 97M downloads — anchor 03-25)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 17.0,
-      "score_fast": 21.7,
-      "score_slow": 17.0,
+      "score": 14.57,
+      "score_fast": 19.03,
+      "score_slow": 14.57,
       "raw_score_today": 19.5,
       "score_fast_yesterday": 22.4,
       "score_slow_yesterday": 16.4,
@@ -904,7 +991,12 @@
       ],
       "cluster_id": "agent-protocol-stack",
       "cluster_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Tuesday adds Anmol Gupta 'Deep Dive into Model Context Protocol (MCP): Agentic AI' (Medium — connects MCP-as-tool-bus to LiteLLM/Auto-mode security debate). Carries: CUBE, Yusuf Baykaloglu A2A, Srinivasan, ServiceNow Gateway, 97M downloads (anchor lands officially Wednesday). Direction = rising.",
       "_breadth_method": "orgs added today: anmol-gupta. Previously: 13."
@@ -914,12 +1006,17 @@
       "label": "Post-training recipes (RLVR direction decomposition, mSFT heterogeneous mixture, PivotRL low-cost, LongCat-Flash-Prover tool-integrated formal RL; Markov-states, LoopRPT, Nemotron-Cascade 2 carry)",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-17", "from": null, "to": "Methods & research", "reason": "first appearance"}
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 15.3,
-      "score_fast": 19.7,
-      "score_slow": 15.3,
+      "score": 13.97,
+      "score_fast": 19.84,
+      "score_slow": 13.97,
       "raw_score_today": 25.0,
       "score_fast_yesterday": 17.6,
       "score_slow_yesterday": 14.4,
@@ -992,12 +1089,17 @@
       "label": "Agentic retrieval (BubbleRAG black-box knowledge graphs, BEAVER prompt compression, Vinod Rane LangGraph, F2LLM-v2, AdaMem, Cortex Search)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-17", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 16.8,
-      "score_fast": 13.6,
-      "score_slow": 16.8,
+      "score": 15.6,
+      "score_fast": 14.86,
+      "score_slow": 15.6,
       "raw_score_today": 12.0,
       "score_fast_yesterday": 14.7,
       "score_slow_yesterday": 16.4,
@@ -1078,12 +1180,17 @@
       "label": "Voice / TTS open-weights (Mistral Voxtral pre-announce continues circulating ahead of formal release later this week)",
       "sector": "Models & capabilities",
       "sector_history": [
-        {"date": "2026-03-23", "from": null, "to": "Models & capabilities", "reason": "first appearance"}
+        {
+          "date": "2026-03-23",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 11.6,
-      "score_fast": 10.4,
-      "score_slow": 11.6,
+      "score": 11.8,
+      "score_fast": 10.8,
+      "score_slow": 11.8,
       "raw_score_today": 8.0,
       "score_fast_yesterday": 12.0,
       "score_slow_yesterday": 12.0,
@@ -1134,12 +1241,17 @@
       "label": "Long-context rot (Y-Combinator-for-LLMs / λ-calculus, BEAVER, Reasoning-as-Compression budget-forcing IB, Materials Science Latent Space podcast, Jack Clark 'traumatized LLMs')",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-23", "from": null, "to": "Methods & research", "reason": "first appearance"}
+        {
+          "date": "2026-03-23",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 13.6,
-      "score_fast": 12.8,
-      "score_slow": 13.6,
+      "score": 13.85,
+      "score_fast": 13.1,
+      "score_slow": 13.85,
       "raw_score_today": 11.0,
       "score_fast_yesterday": 14.0,
       "score_slow_yesterday": 14.0,
@@ -1197,12 +1309,17 @@
       "label": "AI governance (carry only — no fresh policy moves Tue; Atlassian framing as adjacent workforce-AI signal; Manish Atri carry)",
       "sector": "Governance & market",
       "sector_history": [
-        {"date": "2026-03-19", "from": null, "to": "Governance & market", "reason": "first appearance"}
+        {
+          "date": "2026-03-19",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 17.4,
-      "score_fast": 13.2,
-      "score_slow": 17.4,
+      "score": 12.55,
+      "score_fast": 10.11,
+      "score_slow": 12.55,
       "raw_score_today": 4.0,
       "score_fast_yesterday": 17.4,
       "score_slow_yesterday": 17.7,
@@ -1273,12 +1390,17 @@
       "label": "Lab × consultancy GTM (ServiceNow + Accenture FDE program carryforward; Anthropic-Blackstone-Goldman antecedent — Cyber.AI launch queued for 03-25)",
       "sector": "Governance & market",
       "sector_history": [
-        {"date": "2026-03-23", "from": null, "to": "Governance & market", "reason": "first appearance"}
+        {
+          "date": "2026-03-23",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 11.6,
-      "score_fast": 10.4,
-      "score_slow": 11.6,
+      "score": 11.8,
+      "score_fast": 10.8,
+      "score_slow": 11.8,
       "raw_score_today": 8.0,
       "score_fast_yesterday": 12.0,
       "score_slow_yesterday": 12.0,
@@ -1333,7 +1455,12 @@
       "label": "Workforce / capital reallocation (Atlassian 1,600 layoffs / 10% framed as AI shift — first major enterprise-SaaS layoff with explicit 'staff out, AI in' framing; Sora retirement as portfolio reallocation in consumer direction)",
       "sector": "Governance & market",
       "sector_history": [
-        {"date": "2026-03-24", "from": null, "to": "Governance & market", "reason": "first appearance — Atlassian framing template precedes Cloudflare 8 May by six weeks"}
+        {
+          "date": "2026-03-24",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance — Atlassian framing template precedes Cloudflare 8 May by six weeks"
+        }
       ],
       "stage": "emerging",
       "score": 12.0,
@@ -1410,38 +1537,89 @@
   "config_snapshot": {
     "_purpose": "exact tuning constants in effect this run, for reproducibility",
     "source_weights": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 4, "paper": 3,
-      "long_form_blog": 3, "linkedin_network_post": 3, "github_trending_signal": 3,
-      "tech_news": 2, "governance_source": 2, "hn_front_page": 2,
-      "github_watched_star_delta": 2, "medium_aggregator": 1,
-      "linkedin_hashtag_post": 1, "hn_comment_thread": 1,
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "github_trending_signal": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "hn_front_page": 2,
+      "github_watched_star_delta": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
+      "hn_comment_thread": 1,
       "job_posting_skill_mention": 0.5
     },
-    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "convergence_multiplier": {
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
     "max_mentions_per_source_type": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5,
-      "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5,
-      "governance_source": 5, "github_trending_signal": 5, "github_watched_star_delta": 5,
-      "hn_front_page": 5, "hn_comment_thread": 3, "medium_aggregator": 3,
-      "linkedin_hashtag_post": 3, "job_posting_skill_mention": 5
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "github_trending_signal": 5,
+      "github_watched_star_delta": 5,
+      "hn_front_page": 5,
+      "hn_comment_thread": 3,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
     },
     "stages": {
-      "emerging": {"score_range": [10, 30], "max_age_days": 21, "min_source_types": 2},
-      "consolidating": {"score_range": [30, 70], "min_sustained_days": 7, "min_source_types": 3},
-      "mainstream": {"score_range": [70, 999], "min_sustained_days": 30},
-      "fading": {"_trigger": "score declined >25% over rolling window AND was previously >=50"}
+      "emerging": {
+        "score_range": [
+          10,
+          30
+        ],
+        "max_age_days": 21,
+        "min_source_types": 2
+      },
+      "consolidating": {
+        "score_range": [
+          30,
+          70
+        ],
+        "min_sustained_days": 7,
+        "min_source_types": 3
+      },
+      "mainstream": {
+        "score_range": [
+          70,
+          999
+        ],
+        "min_sustained_days": 30
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50"
+      }
     },
     "sector_config": {
-      "min_sectors": 3, "max_sectors": 6, "min_topics_per_sector": 2,
-      "min_topics_for_new_sector": 3, "sector_dissolve_after_days_below_min": 5
+      "min_sectors": 3,
+      "max_sectors": 6,
+      "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3,
+      "sector_dissolve_after_days_below_min": 5
     },
     "breadth_config": {
-      "window_short_days": 7, "window_long_days": 30,
+      "window_short_days": 7,
+      "window_long_days": 30,
       "max_mentions_per_org_per_day": 2,
-      "thresholds": {"high_breadth_7d": 5, "very_high_breadth_7d": 8}
+      "thresholds": {
+        "high_breadth_7d": 5,
+        "very_high_breadth_7d": 8
+      }
     },
     "clustering_config": {
-      "co_mention_window_days": 7, "min_co_mentions": 3, "min_cluster_size": 2,
+      "co_mention_window_days": 7,
+      "min_co_mentions": 3,
+      "min_cluster_size": 2,
       "max_clusters": 8
     },
     "ema_alpha_fast": 0.3,

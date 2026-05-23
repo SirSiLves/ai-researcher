@@ -34,3 +34,12 @@ pipeline/state/keyword_judge_verdicts.*.applied.json
 # one-off scripts under data/.tmp_*. Regenerated every run, never read by the
 # app or any cadence consumer.
 data/.tmp_*
+
+# Local-only caches and screenshots. The importance cache is regenerated every
+# radar run; the screenshot cache holds preview captures from chrome-devtools.
+.cache/
+data/.cache/
+
+# Local one-off scratch scripts that the vendor-sweep agent writes when
+# debugging — short-lived and not source-of-truth.
+pipeline/scripts/_vendor_sweep_run.py

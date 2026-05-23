@@ -69,6 +69,32 @@ For each topic, collect every mention in the rolling window with:
 - which source type the file represents (priority_vendor_blog / enterprise_vendor_blog / paper / long_form_blog / tech_news / governance_source / linkedin_network_post / linkedin_hashtag_post / job_posting_skill_mention / medium_aggregator)
 - the date of the file (used for momentum and age)
 
+### 3.5. Maintain `topic_keywords.json`
+
+`../pipeline/state/topic_keywords.json` is the per-topic keyword registry that feeds `compute_topic_importance.py` (run in §4.8). It is the **source of truth for what counts as a mention** of each topic in raw source files — distinct from the radar's day-by-day topic creation decisions. The score-driven `score_slow` measures recent loudness; the keyword-driven `importance` measures structural persistence across all source types over the 30-day window.
+
+**Schema:**
+```json
+{
+  "topics": {
+    "agent-memory": {
+      "keywords": ["agent memory", "long-term memory", "letta", "mem0", "longmemeval", "atomic facts", ...],
+      "label": "Agent memory (Datasette Agent layered memory, context-rot, Code with Claude memory track)",
+      "_seeded_on": "2026-05-22",
+      "_llm_enriched": true,
+      "_last_updated": "2026-05-22"
+    }
+  }
+}
+```
+
+**When to update:**
+- **New topic created today**: append an entry with `keywords` covering the topic name, the parenthetical examples in the label, and 3-7 synonyms / product names / vendor names that would plausibly appear in source files about this topic. Examples of good keyword choices: specific product names (`claude code`, `cursor`, `letta`), vendor names (`langchain`, `pinecone`), abbreviations and version strings (`mcp`, `gemini 3.5 flash`, `kimi k2.5`). Avoid bare generic words (`agent`, `model`, `platform`) — they match everything.
+- **Existing topic's label rotates today**: update its `keywords` to include any new examples, and bump `_last_updated`. Do not remove existing keywords (they preserve historical match continuity).
+- **Topic stops appearing**: leave the entry alone. It stays available for future revival.
+
+Use Edit with `replace_all: false`. Read the file, find the topics object, insert / update the relevant entry. Do not rewrite the whole file from scratch.
+
 ## 4. Score each topic
 
 For each topic, compute:
@@ -230,6 +256,42 @@ g) On each topic, set `cluster_id` and `cluster_history` (append-only):
 
 Emit `topic_clusters` as a top-level array in the radar JSON output (see §6 schema).
 
+## 4.8. Compute importance from raw source-file presence
+
+After §3.5 keyword maintenance is done, run the Python script that scans all source files in the 30-day window and counts presence per topic. Importance is the user-facing measure of *structural relevance* — independent of the radar's per-day topic-creation decisions and independent of EMA score volatility.
+
+**Why this step exists:** the radar agent sometimes takes 10-14 days to recognize a topic that's been mentioned in source files all along (e.g., `agent-memory` had 22 days of source presence before the radar carved it out as a topic on May 14). Without this step, the radar's own ranking penalizes topics it was slow to notice. With this step, a sustained topic is visibly important from day 1 regardless of when the radar gave it an ID.
+
+```bash
+python3 ../pipeline/scripts/compute_topic_importance.py --as-of {TODAY} --quiet
+```
+
+The script reads `../pipeline/state/topic_keywords.json` + all `data/<source_type>/YYYY/MM/*.md` in the 30-day window, then writes `data/.cache/importance/{TODAY}.json` with structure:
+
+```json
+{
+  "_computed_at": "2026-05-22",
+  "_window_days": 30,
+  "_files_scanned": 240,
+  "_topic_count": 41,
+  "topics": {
+    "agent-memory": {
+      "days_in_sources": 22,
+      "source_types_in_sources": 5,
+      "window_days": 30,
+      "computed_at": "2026-05-22"
+    }
+  }
+}
+```
+
+**Read the cache after the script runs.** For each topic, add three fields to the JSON output (§6 schema):
+- `days_in_sources_30d` (int) — distinct dates within last 30 days where any of the topic's keywords matched any source file.
+- `source_types_in_sources_30d` (int) — distinct source types (daily / news / papers / blogs / linkedin / github / hackernews / jobs) where matches occurred.
+- `importance` (float, 2 decimals) — computed as `days_in_sources_30d × source_types_in_sources_30d × ln(breadth_30d + 2)`. This is the primary ranking key in the markdown output (§7).
+
+**If `compute_topic_importance.py` fails** (script error, missing keywords file, etc.): log the failure, set all three fields to `null` on every topic, and rank §7 by `score_slow` as a fallback. Do not fail the radar run.
+
 ## 5. Assign stages — based on SLOW score (structural)
 
 Stages are about structural state, not yesterday's news. Use `score_slow` for all stage threshold comparisons. The fast EMA is for direction-of-change only.
@@ -327,6 +389,9 @@ Write to `radar/{YYYY}/{MM}/{YYYY-MM-DD}.json` (NOT to `radar/{YYYY-MM-DD}.json`
       "breadth_30d": 12,
       "breadth_orgs_7d": ["anthropic", "openai", "llamaindex", "langchain", "pinecone", "snowflake", "databricks"],
       "high_breadth": true,
+      "days_in_sources_30d": 23,
+      "source_types_in_sources_30d": 7,
+      "importance": 414.16,
       "source_mentions": {
         "_note": "Uncapped raw counts — for transparency. The capped values used in scoring are derived by min(count, radar_config.max_mentions_per_source_type[type]).",
         "priority_vendor_blog": 1,
@@ -377,12 +442,16 @@ Keep the JSON deterministic — sort sectors alphabetically by name, sort topics
 
 ## 7. Write the markdown output
 
-Write to `radar/{YYYY}/{MM}/{YYYY-MM-DD}.md`. The user reads this in Apple Notes. Group by **sector first**, then within each sector by stage. This is the structure that mirrors the polar-radar view: each `##` heading is a sector (quadrant), and within it the topics are listed in stage-order (Mainstream → Consolidating → Emerging → Fading at the bottom).
+Write to `radar/{YYYY}/{MM}/{YYYY-MM-DD}.md`. The user reads this in Apple Notes.
+
+**Primary ranking is `importance`, not `score`.** Importance answers "what's structurally relevant" (sustained × broad × multi-source); score answers "what's loud this week." Score is still shown alongside, but it does not drive the ordering.
+
+The layout has three tiers so that "what matters most" gets the most visual weight and "also tracked" stays available but compact:
 
 ```markdown
 # AI Trend Radar — {YYYY-MM-DD}
 
-_Rolling 30-day window. Two-dimensional view: **persistence** (slow EMA) drives stage, **breadth** (distinct orgs talking this week) is shown alongside. Sectors are recomputed each run with hysteresis — watch the **Sector movements** section when the field reshapes._
+_Rolling 30-day window. Topics are ranked by **importance** = `days_in_sources × source_types × ln(breadth_30d + 2)` — how often the topic actually appears in raw source files (daily/news/papers/blogs/linkedin/github/HN/jobs) over 30 days, independent of when the radar agent decided to create a topic for it. Score is loudness this week; importance is structural weight._
 
 ## What moved today
 **Sector movements:** list every `sector_movements` entry as "**{topic_label}** — {from_sector} → {to_sector}. {reason}". (If no sector movements: "_No sector reassignments today._")
@@ -391,7 +460,28 @@ _Rolling 30-day window. Two-dimensional view: **persistence** (slow EMA) drives 
 
 **Stage movements:** list every `stage_movements` entry as "**{topic_label}** — {from_stage} → {to_stage}". (If no stage movements: "_No stage transitions today — signals are steady._")
 
-**Highest breadth this week:** top 5 topics by `breadth_7d`, each "**{topic_label}** — {breadth_7d} orgs ({first 4 orgs joined by `, `}…)".
+## Top 5 by importance — what actually matters this month
+
+_These topics show up in source files most consistently, across the most source types, and engage the most distinct orgs. Persistent broad attention is the strongest signal of structural relevance._
+
+For each of the top 5 topics by `importance`:
+
+### {N}. {topic.label}
+`{topic.stage}` · importance **{importance:.0f}** (presence {days_in_sources_30d}d / {source_types_in_sources_30d} sources, breadth_30d {breadth_30d} orgs) · score {score_slow:.0f} ({direction arrow ⇈/↑/→/↓} {momentum_7d_pct:+.0f}% 7d)
+
+_Source mix:_ {top 3 source types by count}
+_Orgs talking this week:_ {breadth_orgs_7d joined by `, `, truncated to 10}
+_Sector:_ {sector} · _Cluster:_ {cluster_id}
+_Why it matters:_ {one line — be specific, not generic}
+_Backing:_ {first 3 paths from supporting_files}
+
+## Also persistent — ranks 6–15
+
+For ranks 6 through 15 by importance, render as a compact markdown table with columns: # | Topic | Imp | Pres (e.g. "23d/7s") | Br30 | Stage | Sector. No "why it matters" prose at this tier.
+
+## Also tracked — ranks 16+
+
+Wrap in a `<details>` / `<summary>` block so it's collapsed by default. Same table shape as ranks 6-15, minus the Sector column to keep it compact.
 
 ## Sectors — alphabetical, one H2 per sector
 
@@ -400,13 +490,9 @@ For each sector in `sectors`:
 ### {sector.name} — {topic_count} topics, {active_orgs} orgs active this week
 _{sector.description}_
 
-For each topic in this sector, in stage order (Mainstream → Consolidating → Emerging → Fading) then score-desc within stage:
+For each topic in this sector, ordered by `importance` descending (NOT stage order — importance is the new primary key):
 
-**{topic.label}** — `{topic.stage}` · score {score_slow:.1f} ({direction arrow ↑/↓/→} {momentum_7d_pct:+.0f}% 7d) · breadth {breadth_7d} orgs{` 🔥 high breadth` if high_breadth}
-_Source mix:_ {top 3 source types by count, e.g. "tech_news(6), linkedin(5), paper(3)"}
-_Orgs talking this week:_ {breadth_orgs_7d joined by `, `, truncated to 10}
-_Why it matters:_ {one line — be specific, not generic}
-Backing: {first 3 paths from supporting_files joined by `, `}
+- **{topic.label}** — importance {importance:.0f} · {days_in_sources_30d}d presence · breadth {breadth_30d} · {stage} · score {score_slow:.0f}
 
 ## Signal sources scanned
 - daily/: N files in rolling window
@@ -415,10 +501,13 @@ Backing: {first 3 paths from supporting_files joined by `, `}
 - blogs/: N files
 - jobs/: N files
 - linkedin/: N files
+- github/: N files
+- hackernews/: N files
 - Prior radar: radar/{YYYY}/{MM}/{yesterday}.json {present | absent — first run}
+- Importance source: pipeline/state/topic_keywords.json + data/.cache/importance/{TODAY}.json
 ```
 
-Keep the markdown under ~500 lines. Be ruthless about "background" topics — they belong in the JSON but not the markdown view. The "highest breadth this week" callout is the new headline section the user explicitly asked for — make it scannable.
+Keep the markdown under ~300 lines. The three-tier structure makes "everything is important" impossible: only 5 topics get the full paragraph treatment, ranks 6-15 are one-line, ranks 16+ collapse behind a disclosure. The user opens the file and immediately sees what's structurally important — not a flat list where every topic carries the same visual weight.
 
 ## 8. Update index.md
 

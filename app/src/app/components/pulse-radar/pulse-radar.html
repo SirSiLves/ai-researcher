@@ -314,10 +314,20 @@
             <span>{{ h.direction }}</span>
           </div>
           <div class="pulse-radar__tip-stats">
+            @if (h.topic.importance) {
+              <span title="Importance — days_in_sources × source_types × ln(breadth_30d+2). Drives blip size.">
+                <strong>{{ h.topic.importance | number:'1.0-0' }}</strong> imp
+              </span>
+            }
             <span><strong>{{ h.topic.score_fast.toFixed(1) }}</strong> loud</span>
             <span><strong>{{ h.topic.breadth_7d }}</strong> orgs</span>
             <span><strong>{{ h.topic.sustained_days }}</strong>d</span>
           </div>
+          @if (h.topic.importance && h.topic.days_in_sources_30d !== undefined) {
+            <div class="pulse-radar__tip-presence">
+              {{ h.topic.days_in_sources_30d }}d in sources · {{ h.topic.source_types_in_sources_30d }} src types · {{ h.topic.breadth_30d }} orgs (30d)
+            </div>
+          }
           @if (sparkOf(h.topic.id).length > 1) {
             <svg class="pulse-radar__tip-spark" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
               <path [attr.d]="sparkPath(sparkOf(h.topic.id), 120, 28)"

@@ -496,6 +496,61 @@
         "_added_on": "2026-05-21",
         "_added_reason": "hot-event: keyword='funding round', velocity_status=accelerating",
         "_expires_on": "2026-06-20"
+      },
+      "epfl": {
+        "blog_urls": [
+          "https://actu.epfl.ch"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:actu.epfl.ch 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-22",
+        "_added_reason": "hot-event: keyword='valuation', velocity_status=steady",
+        "_expires_on": "2026-06-21"
+      },
+      "ethz": {
+        "blog_urls": [
+          "https://ethz.ch/en/news-and-events"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:ethz.ch 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-22",
+        "_added_reason": "hot-event: keyword='valuation', velocity_status=steady",
+        "_expires_on": "2026-06-21"
+      },
+      "figure": {
+        "blog_urls": [
+          "https://www.figure.ai/news"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:figure.ai 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-22",
+        "_added_reason": "hot-event: keyword='billion', velocity_status=accelerating",
+        "_expires_on": "2026-06-21"
+      },
+      "swiss-ai-initiative": {
+        "blog_urls": [
+          "https://www.swiss-ai.org"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:swiss-ai.org 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-22",
+        "_added_reason": "hot-event: keyword='valuation', velocity_status=steady",
+        "_expires_on": "2026-06-21"
+      },
+      "zhipu": {
+        "blog_urls": [
+          "https://zhipuai.cn"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:zhipuai.cn 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-22",
+        "_added_reason": "hot-event: keyword='billion', velocity_status=steady",
+        "_expires_on": "2026-06-21"
       }
     },
     "_deep_watch_vendors_comment": "Auto-demoted enterprise vendors — formerly active, now silent past the silence threshold AND enterprise_vendors had hit its soft cap. The news collector does NOT fetch these daily (no blog URL pulls, no fallback search). They remain tracked in discovered_orgs.json for radar mention-counting and topic-attribution; if mentions resurface via tech_news / blogs / papers, the sweep can re-promote them back to enterprise_vendors. Manual entries are never demoted here — only _auto_added entries with a _demoted_on stamp. Maintained by ai-vendor-sweep auto-apply. Empty by default; populates only when the soft cap is exceeded.",
@@ -902,7 +957,9 @@
       "rasbt/LLMs-from-scratch",
       "browser-use/browser-use",
       "punkpeye/awesome-mcp-servers",
-      "infiniflow/ragflow"
+      "infiniflow/ragflow",
+      "multica-ai/andrej-karpathy-skills",
+      "msitarzewski/agency-agents"
     ],
     "_watched_comment": "These are repos we track star-count delta on every day. Big delta jumps (≥ +500 stars/day) are leading indicators. Manual entries are sacred (no _auto_added flag). The github sweep auto-extends this list per github_sweep_config below.",
     "_deep_watch_comment": "Auto-demoted repos — formerly active in trending, now silent past silence threshold AND watched_repos hit its soft cap. github_stars.json stops tracking these (no daily fetch); they remain in deep_watch_repos for re-promotion if they trend again. Maintained by scripts/run_github_sweep.py. Empty by default.",
@@ -1111,7 +1168,8 @@
       "agent harness",
       "autonomous enterprise",
       "claude code codex",
-      "code codex"
+      "code codex",
+      "gemini omni"
     ],
     "min_points_for_inclusion": 30,
     "_min_points_comment": "Anything ≥ 30 points + matches a filter keyword is included. Ask HN/Show HN with ≥ 10 points + keyword match also included (lower bar for new launches).",
@@ -1706,6 +1764,11 @@
         "_auto_added": true,
         "_added_on": "2026-05-21",
         "_added_reason": "promote: 21 mentions, 6 src types, 5 days"
+      },
+      "gemini omni": {
+        "_auto_added": true,
+        "_added_on": "2026-05-22",
+        "_added_reason": "promote: 13 mentions, 4 src types, 4 days"
       }
     },
     "_deep_watch_meta": {}
@@ -2615,7 +2678,8 @@
         "research engineer",
         "autonomous enterprise",
         "claude code codex",
-        "code codex"
+        "code codex",
+        "gemini omni"
       ],
       "_auto_added_meta": {
         "a2a protocol": {
@@ -3312,6 +3376,11 @@
           "_auto_added": true,
           "_added_on": "2026-05-21",
           "_added_reason": "promote: 21 mentions, 6 src types, 5 days"
+        },
+        "gemini omni": {
+          "_auto_added": true,
+          "_added_on": "2026-05-22",
+          "_added_reason": "promote: 13 mentions, 4 src types, 4 days"
         }
       },
       "_deep_watch_meta": {}
@@ -3435,9 +3504,9 @@
       "max_mentions_per_org_per_day": 2,
       "_org_definition": "An 'org' is the primary publisher or subject of the mention — Anthropic, OpenAI, ServiceNow, Heise, Handelsblatt, an individual author of a long-form blog post. The radar skill extracts orgs from each mention's context. For backfill where org data isn't separately stored, breadth is approximated by distinct (source_type, file_date) pairs in the window.",
       "thresholds": {
-        "_comment": "How the viewer interprets breadth into visual cues.",
-        "high_breadth_7d": 5,
-        "very_high_breadth_7d": 8
+        "_comment": "How the viewer interprets breadth into visual cues. Raised 2026-05-23: original 5/8 floor was below the natural median (14 today) so the high_breadth flag fired on every topic. New floor 15/20 ~= top-third / top-quartile of today's distribution. Re-tune if topic count grows past ~60 or the rolling median shifts.",
+        "high_breadth_7d": 15,
+        "very_high_breadth_7d": 20
       }
     },
     "output_format": {

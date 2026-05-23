@@ -14,13 +14,26 @@
     <app-page-header
         [title]="t.label"
         [model]="breadcrumb()">
+      @if (t.importance) {
+        <span class="muted"
+              title="Importance = days_in_sources × source_types × ln(breadth_30d+2). Structural relevance over the 30d window — independent of EMA loudness.">
+          <strong class="tabular">{{ t.importance | number:'1.0-0' }}</strong> importance
+        </span>
+      }
       <span class="muted">first seen <strong class="tabular">{{ t.first_seen }}</strong></span>
-      <span class="muted"><strong>{{ t.sustained_days }}d</strong> sustained</span>
+      <span class="muted"><strong>{{ t.sustained_days }}d</strong> sustained on radar</span>
       <span class="muted"><strong>{{ t.breadth_7d }}</strong> orgs · 7d</span>
     </app-page-header>
+    @if (t.days_in_sources_30d !== undefined && t.days_in_sources_30d !== null) {
+      <p class="topic__presence muted">
+        Source-file presence (30d): <strong>{{ t.days_in_sources_30d }}</strong> distinct days ·
+        <strong>{{ t.source_types_in_sources_30d }}</strong> of 8 source types ·
+        <strong>{{ t.breadth_30d }}</strong> orgs (30d window).
+      </p>
+    }
     <p class="topic__deck">
       <span class="dot" [ngClass]="directionDot(t.direction)"></span>
-      {{ t.direction }} · stage {{ t.stage }} · loudness <strong>{{ t.score_fast | number:'1.0-1' }}</strong>
+      {{ t.direction }} · stage {{ t.stage }} · loudness this week <strong>{{ t.score_fast | number:'1.0-1' }}</strong>
     </p>
 
     @if (t.cluster_id) {

@@ -24,10 +24,11 @@ const STORAGE_KEY_SIDEBAR = 'air.sidebar.collapsed';
 })
 export class App implements OnInit {
   readonly navTabs: NavTab[] = [
-    { path: '/pulse',    label: 'Pulse',    icon: 'wave-pulse', hint: 'Today' },
-    { path: '/momentum', label: 'Momentum', icon: 'chart-line', hint: '7d · 30d · 90d' },
-    { path: '/map',      label: 'Map',      icon: 'compass',    hint: 'Sectors · Topics · Firms' },
-    { path: '/archive',  label: 'Archive',  icon: 'inbox',      hint: 'Everything published' }
+    { path: '/pulse',    label: 'Pulse',    icon: 'wave-pulse',  hint: 'Today' },
+    { path: '/momentum', label: 'Momentum', icon: 'chart-line',  hint: '7d · 30d · 90d' },
+    { path: '/map',      label: 'Map',      icon: 'compass',     hint: 'Sectors · Topics · Firms' },
+    { path: '/trends',   label: 'Trends',   icon: 'sitemap',     hint: 'Long-arc ledger' },
+    { path: '/archive',  label: 'Archive',  icon: 'inbox',       hint: 'Everything published' }
   ];
 
   readonly theme = signal<Theme>('light');

@@ -70,7 +70,10 @@
     {
       "id": "agent-protocol-stack",
       "name": "Agent protocol stack",
-      "topic_ids": ["mcp-adoption", "agent-platforms-enterprise"],
+      "topic_ids": [
+        "mcp-adoption",
+        "agent-platforms-enterprise"
+      ],
       "size": 2,
       "first_seen": "2026-03-18",
       "cluster_score_slow": 23.2,
@@ -83,7 +86,10 @@
     {
       "id": "open-coding-stack",
       "name": "Open coding stack",
-      "topic_ids": ["ai-coding-agents", "open-vs-closed"],
+      "topic_ids": [
+        "ai-coding-agents",
+        "open-vs-closed"
+      ],
       "size": 2,
       "first_seen": "2026-03-20",
       "cluster_score_slow": 18.4,
@@ -96,7 +102,10 @@
     {
       "id": "agent-safety-cluster",
       "name": "Agent safety stack",
-      "topic_ids": ["agent-security", "agent-evaluation-observability"],
+      "topic_ids": [
+        "agent-security",
+        "agent-evaluation-observability"
+      ],
       "size": 2,
       "first_seen": "2026-03-21",
       "cluster_score_slow": 19.0,
@@ -113,12 +122,17 @@
       "label": "Agent security (AC4A access control, SSGM memory governance, MAS security survey, Attack/Defense landscape, NVIDIA OpenShell privacy router)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 30.7,
-      "score_fast": 47.4,
-      "score_slow": 30.7,
+      "score": 16.7,
+      "score_fast": 26.55,
+      "score_slow": 16.7,
       "raw_score_today": 60.0,
       "score_fast_yesterday": 13.5,
       "score_slow_yesterday": 14.4,
@@ -181,7 +195,12 @@
       ],
       "cluster_id": "agent-safety-cluster",
       "cluster_history": [
-        {"date": "2026-03-21", "from": null, "to": "Agent safety stack", "reason": "first cluster formation — six Friday-cohort security papers land in one Sat backfill, co-mention with agent-evaluation-observability cross threshold today"}
+        {
+          "date": "2026-03-21",
+          "from": null,
+          "to": "Agent safety stack",
+          "reason": "first cluster formation — six Friday-cohort security papers land in one Sat backfill, co-mention with agent-evaluation-observability cross threshold today"
+        }
       ],
       "_evidence_summary": "Saturday papers backfill (HF Papers redirect 03-21→03-20 Friday cohort) lands SIX agent-security papers in one drop: AC4A (Sharma & Grossman, granular permission framework — most concrete agent-governance primitive), SSGM (Lam & Li, governing evolving memory in long-running LLM agents), MAS Security (Nguyen & Ndebugre, multi-agent failure modes — non-determinism + inter-agent leakage), Attack/Defense Landscape Survey (Kim & Liu, structured threat-model reference), Chaturvedi-Bergerson scientific-LLM safety, and Wu Sell-Me-This-Stock unsafe rec drift carryforward. Carry: NVIDIA OpenShell privacy router (the operational answer in product form) + PromptArmor Cortex sandbox-escape. raw_today=60 (5 capped papers × 3 weight × 1.5 convergence = 22.5, + 2 tech_news × 2 = 4, + 1 long_form_blog × 3 = 3, ×1.5 conv = 44.25, expanded by capping logic to ~60 with full multiplier on capped sum). score_fast jumps to 47.4 (3.51× slow EMA → surging); score_slow steps over the 30 threshold → STAGE PROMOTION emerging → consolidating, satisfies sustained_days=4 ≥ 7? No, 4 < 7 — but the consolidating gate is min_sustained_days=7. Stage stays emerging UNTIL sustained_days≥7. Adjusting: stage = emerging (sustained_days=4 < 7 holds the gate). NOTE: score_slow=30.7 is in consolidating band [30,70] but min_sustained_days fail, so stage = emerging.",
       "_breadth_method": "orgs added today: ac4a-paper, ssgm-paper, mas-security-paper, attack-defense-paper, chaturvedi-paper. Previously: 6.",
@@ -192,12 +211,17 @@
       "label": "Enterprise agent platforms (NVIDIA Agent Toolkit + OpenShell + Snowflake SnowWork + ServiceNow AI Gateway + Alibaba Wukong + Manus desktop)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Agents & infrastructure", "reason": "first appearance — Agent Toolkit launch with 17 anchor partners"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Agent Toolkit launch with 17 anchor partners"
+        }
       ],
       "stage": "emerging",
-      "score": 30.6,
-      "score_fast": 22.5,
-      "score_slow": 30.6,
+      "score": 26.52,
+      "score_fast": 21.22,
+      "score_slow": 26.52,
       "raw_score_today": 5.0,
       "score_fast_yesterday": 27.7,
       "score_slow_yesterday": 31.4,
@@ -290,7 +314,12 @@
       ],
       "cluster_id": "agent-protocol-stack",
       "cluster_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Saturday weekend pickup: Constellation Research + SDG Group analyst notes on SnowWork carry forward as 'control plane for the agentic enterprise' framing. No fresh platform launches today. raw_today=5 (light Sat carry). Fast EMA pulls below slow → direction = fading short-term as the news mix shifts to security/papers. score_slow stays in consolidating band; sustained_days=6 < 7 still — but the topic was previously consolidating-eligible at 31.4 → now 30.6 (still ≥ 30). Stage stays emerging until sustained_days≥7 (which lands tomorrow 03-22).",
       "_breadth_method": "orgs added today: constellation-research, sdg-group (already in prior list — confirmed). Previously: 33."
@@ -300,12 +329,17 @@
       "label": "AI coding agents / agentic engineering (Willison Git+coding-agents chapter, Dave Patten state-of-coding-agents 2026, Kuntal Gemini ecosystem, Cursor on Kimi K2.5 carryforward)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Agents & infrastructure", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
       "stage": "emerging",
-      "score": 23.6,
-      "score_fast": 27.5,
-      "score_slow": 23.6,
+      "score": 20.35,
+      "score_fast": 34.45,
+      "score_slow": 20.35,
       "raw_score_today": 39.0,
       "score_fast_yesterday": 27.6,
       "score_slow_yesterday": 22.7,
@@ -395,7 +429,12 @@
       ],
       "cluster_id": "open-coding-stack",
       "cluster_history": [
-        {"date": "2026-03-20", "from": null, "to": "Open coding stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-20",
+          "from": null,
+          "to": "Open coding stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Saturday additions: Willison's Git-with-coding-agents Agentic Engineering Patterns chapter (long_form_blog) — argues coding agents fluent in Git let humans lean on rebase/bisect/worktree without memorizing commands; Dave Patten's State of AI Coding Agents 2026 Medium piece (architectural shift from pair programming → managing AI engineer teams); Kuntal's Gemini ecosystem production guide; Dewasheesh agentic design patterns survey. score_fast at 27.5 carries from yesterday's 27.6 with the new mentions; score_slow steps to 23.6 (still emerging band).",
       "_breadth_method": "orgs added today: dave-patten, kuntal-c, dewasheesh-rana, umesh-kushwaha. Previously: 21."
@@ -405,12 +444,17 @@
       "label": "Open-vs-closed model tiering (Lambert 8 plots open models, Cohere Command-A enterprise-OSS, Cursor on Kimi K2.5 carryforward, Wukong-Qwen bundle)",
       "sector": "Models & capabilities",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Models & capabilities", "reason": "first appearance"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 14.0,
-      "score_fast": 21.5,
-      "score_slow": 14.0,
+      "score": 13.1,
+      "score_fast": 22.65,
+      "score_slow": 13.1,
       "raw_score_today": 28.0,
       "score_fast_yesterday": 19.9,
       "score_slow_yesterday": 13.3,
@@ -491,7 +535,12 @@
       ],
       "cluster_id": "open-coding-stack",
       "cluster_history": [
-        {"date": "2026-03-20", "from": null, "to": "Open coding stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-20",
+          "from": null,
+          "to": "Open coding stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Lambert's '8 plots that explain the state of open models' (Interconnects) is the day's anchor — Qwen still dominates Western adoption metrics for new entrants (Z.ai, MiniMax, Kimi, Ant Ling); DeepSeek V3/R1 outperform every Qwen large MoE/dense on download share. From the ATOM Project's expanded ecosystem measurement. Raman Srivastava 'Inside Cohere Command-A' Medium adds a Western-OSS counterpart (tool-use, 23-language coverage, two-A100s deployment). Carryforward: Cursor on Kimi K2.5, Tony Thomas Qwen 3 Coder vs Kimi K2, HF State of OSS. score_fast at 21.5 = 1.54× slow EMA → direction = surging.",
       "_breadth_method": "orgs added today: minimax (Lambert mention), raman-srivastava (Cohere Command-A author). Previously: 17."
@@ -501,12 +550,17 @@
       "label": "AI governance (White House National Policy Framework metabolisation, GUARDRAILS Act, ICC bi-weekly EU AI Act + U.S. Framework reactions)",
       "sector": "Governance & market",
       "sector_history": [
-        {"date": "2026-03-19", "from": null, "to": "Governance & market", "reason": "first appearance"}
+        {
+          "date": "2026-03-19",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 18.6,
-      "score_fast": 30.4,
-      "score_slow": 18.6,
+      "score": 13.8,
+      "score_fast": 19.98,
+      "score_slow": 13.8,
       "raw_score_today": 12.0,
       "score_fast_yesterday": 38.4,
       "score_slow_yesterday": 17.0,
@@ -577,12 +631,17 @@
       "label": "Compute economics / GTC 2026 / $1T order book (weekend reflection — CNBC, TechRadar, Tom's Hardware)",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Methods & research", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
       "stage": "emerging",
-      "score": 17.9,
-      "score_fast": 13.5,
-      "score_slow": 17.9,
+      "score": 14.59,
+      "score_fast": 14.34,
+      "score_slow": 14.59,
       "raw_score_today": 8.0,
       "score_fast_yesterday": 16.3,
       "score_slow_yesterday": 18.5,
@@ -663,12 +722,17 @@
       "label": "Post-training recipes (Nemotron-Cascade 2 carryforward, ProRL Agent, Online RLHF, Expert Threshold Routing)",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-17", "from": null, "to": "Methods & research", "reason": "first appearance"}
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 13.5,
-      "score_fast": 12.8,
-      "score_slow": 13.5,
+      "score": 12.56,
+      "score_fast": 13.57,
+      "score_slow": 12.56,
       "raw_score_today": 9.0,
       "score_fast_yesterday": 16.0,
       "score_slow_yesterday": 14.0,
@@ -731,12 +795,17 @@
       "label": "Agentic retrieval (BubbleRAG, Modern RAG 2026, Top 10 Vector DBs, Cortex Search multi-index, Oracle cuVS, F2LLM-v2)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-17", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 16.4,
-      "score_fast": 14.3,
-      "score_slow": 16.4,
+      "score": 15.77,
+      "score_fast": 16.54,
+      "score_slow": 15.77,
       "raw_score_today": 9.0,
       "score_fast_yesterday": 17.4,
       "score_slow_yesterday": 16.5,
@@ -815,12 +884,17 @@
       "label": "MCP adoption (Srinivasan production patterns paper, ServiceNow AI Gateway, 97M downloads, OpenShell)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 15.0,
-      "score_fast": 16.0,
-      "score_slow": 15.0,
+      "score": 13.74,
+      "score_fast": 17.59,
+      "score_slow": 13.74,
       "raw_score_today": 13.5,
       "score_fast_yesterday": 18.4,
       "score_slow_yesterday": 15.3,
@@ -891,7 +965,12 @@
       ],
       "cluster_id": "agent-protocol-stack",
       "cluster_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Saturday papers backfill adds Srinivasan 'Bridging Protocol and Production: Design Patterns for Deploying AI Agents with MCP' (arXiv:2603.13417) — concrete production gaps (identity, tool budgeting, error handling) for any team building MCP-grade agent platforms. Carries: ServiceNow AI Gateway features + 97M monthly downloads + 2026 MCP Roadmap. Fast EMA ticks slightly down (18.4 → 16.0) but stays above slow → direction = rising.",
       "_breadth_method": "no new orgs today (srinivasan-paper already listed)."
@@ -901,12 +980,17 @@
       "label": "Frontier model release cadence (Grok 4.20 due 22 Mar; Mean.ceo March releases; GPT-5.4 mini/nano + Mistral Small 4 + Qwen 3 Coder + Kimi K2.5 carryforward)",
       "sector": "Models & capabilities",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Models & capabilities", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
       "stage": "emerging",
-      "score": 15.4,
-      "score_fast": 13.8,
-      "score_slow": 15.4,
+      "score": 12.76,
+      "score_fast": 14.3,
+      "score_slow": 12.76,
       "raw_score_today": 11.0,
       "score_fast_yesterday": 14.9,
       "score_slow_yesterday": 15.4,
@@ -992,12 +1076,17 @@
       "label": "Agent evaluation & observability (AgentProcessBench, One-Eval, MEMO, SWE-Skills-Bench, CCTU, ProRL-Agent)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 17.5,
-      "score_fast": 11.7,
-      "score_slow": 17.5,
+      "score": 17.61,
+      "score_fast": 10.47,
+      "score_slow": 17.61,
       "raw_score_today": 4.0,
       "score_fast_yesterday": 13.9,
       "score_slow_yesterday": 18.4,
@@ -1049,7 +1138,12 @@
       ],
       "cluster_id": "agent-safety-cluster",
       "cluster_history": [
-        {"date": "2026-03-21", "from": null, "to": "Agent safety stack", "reason": "first cluster formation with agent-security — Friday-cohort security papers + carryforward eval papers co-mention via daily synthesis"}
+        {
+          "date": "2026-03-21",
+          "from": null,
+          "to": "Agent safety stack",
+          "reason": "first cluster formation with agent-security — Friday-cohort security papers + carryforward eval papers co-mention via daily synthesis"
+        }
       ],
       "_evidence_summary": "Saturday: no fresh eval papers (Friday cohort skewed to security/governance, attributed to agent-security topic). Carry: AgentProcessBench, One-Eval, MEMO, SWE-Skills-Bench, CCTU, ProRL Agent. Fast EMA continues to fade (13.9 → 11.7). Now clustered with agent-security as the agent-safety stack — these two topics begin moving in concert as the safety+evals papers thread consolidates.",
       "_breadth_method": "no orgs added today; carries from 03-20."
@@ -1059,12 +1153,17 @@
       "label": "Multimodal eval skepticism (Tinted Frames, Cognitive Mismatch, LVOmniBench, VTC-Bench, ESPIRE — carryforward)",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-20", "from": null, "to": "Methods & research", "reason": "first appearance — four MLLM/VLM critique papers cross the gate together"}
+        {
+          "date": "2026-03-20",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance — four MLLM/VLM critique papers cross the gate together"
+        }
       ],
       "stage": "emerging",
-      "score": 14.2,
-      "score_fast": 12.0,
-      "score_slow": 14.2,
+      "score": 14.45,
+      "score_fast": 11.7,
+      "score_slow": 14.45,
       "raw_score_today": 4.0,
       "score_fast_yesterday": 15.0,
       "score_slow_yesterday": 15.0,
@@ -1121,38 +1220,89 @@
   "config_snapshot": {
     "_purpose": "exact tuning constants in effect this run, for reproducibility",
     "source_weights": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 4, "paper": 3,
-      "long_form_blog": 3, "linkedin_network_post": 3, "github_trending_signal": 3,
-      "tech_news": 2, "governance_source": 2, "hn_front_page": 2,
-      "github_watched_star_delta": 2, "medium_aggregator": 1,
-      "linkedin_hashtag_post": 1, "hn_comment_thread": 1,
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "github_trending_signal": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "hn_front_page": 2,
+      "github_watched_star_delta": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
+      "hn_comment_thread": 1,
       "job_posting_skill_mention": 0.5
     },
-    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "convergence_multiplier": {
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
     "max_mentions_per_source_type": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5,
-      "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5,
-      "governance_source": 5, "github_trending_signal": 5, "github_watched_star_delta": 5,
-      "hn_front_page": 5, "hn_comment_thread": 3, "medium_aggregator": 3,
-      "linkedin_hashtag_post": 3, "job_posting_skill_mention": 5
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "github_trending_signal": 5,
+      "github_watched_star_delta": 5,
+      "hn_front_page": 5,
+      "hn_comment_thread": 3,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
     },
     "stages": {
-      "emerging": {"score_range": [10, 30], "max_age_days": 21, "min_source_types": 2},
-      "consolidating": {"score_range": [30, 70], "min_sustained_days": 7, "min_source_types": 3},
-      "mainstream": {"score_range": [70, 999], "min_sustained_days": 30},
-      "fading": {"_trigger": "score declined >25% over rolling window AND was previously >=50"}
+      "emerging": {
+        "score_range": [
+          10,
+          30
+        ],
+        "max_age_days": 21,
+        "min_source_types": 2
+      },
+      "consolidating": {
+        "score_range": [
+          30,
+          70
+        ],
+        "min_sustained_days": 7,
+        "min_source_types": 3
+      },
+      "mainstream": {
+        "score_range": [
+          70,
+          999
+        ],
+        "min_sustained_days": 30
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50"
+      }
     },
     "sector_config": {
-      "min_sectors": 3, "max_sectors": 6, "min_topics_per_sector": 2,
-      "min_topics_for_new_sector": 3, "sector_dissolve_after_days_below_min": 5
+      "min_sectors": 3,
+      "max_sectors": 6,
+      "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3,
+      "sector_dissolve_after_days_below_min": 5
     },
     "breadth_config": {
-      "window_short_days": 7, "window_long_days": 30,
+      "window_short_days": 7,
+      "window_long_days": 30,
       "max_mentions_per_org_per_day": 2,
-      "thresholds": {"high_breadth_7d": 5, "very_high_breadth_7d": 8}
+      "thresholds": {
+        "high_breadth_7d": 5,
+        "very_high_breadth_7d": 8
+      }
     },
     "clustering_config": {
-      "co_mention_window_days": 7, "min_co_mentions": 3, "min_cluster_size": 2,
+      "co_mention_window_days": 7,
+      "min_co_mentions": 3,
+      "min_cluster_size": 2,
       "max_clusters": 8
     },
     "ema_alpha_fast": 0.3,

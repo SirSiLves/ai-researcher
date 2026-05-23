@@ -70,7 +70,10 @@
     {
       "id": "agent-protocol-stack",
       "name": "Agent protocol stack",
-      "topic_ids": ["mcp-adoption", "agent-platforms-enterprise"],
+      "topic_ids": [
+        "mcp-adoption",
+        "agent-platforms-enterprise"
+      ],
       "size": 2,
       "first_seen": "2026-03-18",
       "cluster_score_slow": 22.8,
@@ -83,7 +86,10 @@
     {
       "id": "open-coding-stack",
       "name": "Open coding stack",
-      "topic_ids": ["ai-coding-agents", "open-vs-closed"],
+      "topic_ids": [
+        "ai-coding-agents",
+        "open-vs-closed"
+      ],
       "size": 2,
       "first_seen": "2026-03-20",
       "cluster_score_slow": 19.6,
@@ -96,7 +102,10 @@
     {
       "id": "agent-safety-cluster",
       "name": "Agent safety stack",
-      "topic_ids": ["agent-security", "agent-evaluation-observability"],
+      "topic_ids": [
+        "agent-security",
+        "agent-evaluation-observability"
+      ],
       "size": 2,
       "first_seen": "2026-03-21",
       "cluster_score_slow": 27.2,
@@ -113,12 +122,17 @@
       "label": "Frontier model release cadence (Grok 4.20 SHIPS — capstone of the 23-day compressed launch window; factual-recency claim; GPT-5.4 family + Gemini 3.1 + Mistral Small 4 + Kimi K2.5 carryforward)",
       "sector": "Models & capabilities",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Models & capabilities", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
       "stage": "emerging",
-      "score": 16.4,
-      "score_fast": 25.7,
-      "score_slow": 16.4,
+      "score": 14.42,
+      "score_fast": 23.81,
+      "score_slow": 14.42,
       "raw_score_today": 46.0,
       "score_fast_yesterday": 13.8,
       "score_slow_yesterday": 15.4,
@@ -208,12 +222,17 @@
       "label": "Agent security (AC4A, SSGM, MAS-security survey, Attack/Defense landscape, NVIDIA OpenShell privacy router — Friday cohort carries forward)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
-      "stage": "consolidating",
-      "score": 31.7,
-      "score_fast": 37.0,
-      "score_slow": 31.7,
+      "stage": "emerging",
+      "score": 17.07,
+      "score_fast": 25.78,
+      "score_slow": 17.07,
       "raw_score_today": 24.0,
       "score_fast_yesterday": 47.4,
       "score_slow_yesterday": 30.7,
@@ -275,7 +294,12 @@
       ],
       "cluster_id": "agent-safety-cluster",
       "cluster_history": [
-        {"date": "2026-03-21", "from": null, "to": "Agent safety stack", "reason": "first cluster formation — six Friday-cohort security papers + co-mention with agent-evaluation-observability"}
+        {
+          "date": "2026-03-21",
+          "from": null,
+          "to": "Agent safety stack",
+          "reason": "first cluster formation — six Friday-cohort security papers + co-mention with agent-evaluation-observability"
+        }
       ],
       "_evidence_summary": "Sunday: no fresh agent-security papers today (Sunday's papers-cohort backfill skewed to MCP/agent-protocol/evals — see CUBE paper attributed to mcp-adoption + agent-evaluation-observability). Carry: AC4A, SSGM, MAS-Security, Attack/Defense Landscape, Chaturvedi science-LLM safety, Wu unsafe rec drift, NVIDIA OpenShell privacy router, PromptArmor Cortex sandbox-escape. Fast EMA cools from yesterday's 47.4 peak to 37.0 (still 1.17× slow → rising). score_slow now at 31.7 — STAGE PROMOTION: emerging → consolidating, sustained_days=5 still < min_sustained_days=7 BUT slow has held above 30 across two consecutive days. Reading the spec strictly: min_sustained_days for consolidating = 7. sustained_days=5 — promotion BLOCKED. Stage stays emerging. (Promotion expected 2026-03-24 if score_slow continues to hold ≥30.) NOTE: I had to walk back the consolidating promotion — sustained_days gate is firm.",
       "_breadth_method": "no orgs added today; carries from 03-21.",
@@ -286,12 +310,17 @@
       "label": "AI coding agents / agentic engineering (Willison Starlette+Claude skills, Bram Cohen manyana CRDT-Git successor, Perplexity Computer, Vinod Rane Agentic RAG with LangGraph)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Agents & infrastructure", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
       "stage": "emerging",
-      "score": 24.5,
-      "score_fast": 30.5,
-      "score_slow": 24.5,
+      "score": 21.24,
+      "score_fast": 35.52,
+      "score_slow": 21.24,
       "raw_score_today": 38.0,
       "score_fast_yesterday": 27.5,
       "score_slow_yesterday": 23.6,
@@ -388,7 +417,12 @@
       ],
       "cluster_id": "open-coding-stack",
       "cluster_history": [
-        {"date": "2026-03-20", "from": null, "to": "Open coding stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-20",
+          "from": null,
+          "to": "Open coding stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Sunday additions: Willison's Starlette 1.0 + Claude skills demo — practical instantiation of skills-as-context for libraries that broke compatibility after the model's cutoff (sets up Anthropic's harness formalization Monday). Bram Cohen's 'manyana' — CRDT-based Git successor with 470-line Python reference impl + Willison fed it to Claude to build interactive merge-state visualizer. Stuart Breckenridge web-bloat post-mortem + Willison Rodney/Claude-Code-for-web audit. Vinod Rane Next-Generation Agentic RAG with LangGraph (planner/retriever/judge/refiner + state checkpoints). Perplexity Computer teardowns (Fahey + Yang Fan/sailcpu) frame 'browser-as-OS' for 19-model + 400-connector agent. Adham Khaled 'Prompt Engineering vs Context Engineering' framing — the month's loudest meme. Direction = rising (fast 30.5 over slow 24.5, 1.24×).",
       "_breadth_method": "orgs added today: bram-cohen, stuart-breckenridge, sailcpu, adham-khaled, perplexity (carried from prior runs). Previously: 25."
@@ -398,12 +432,17 @@
       "label": "Enterprise agent platforms (NVIDIA Agent Toolkit + OpenShell + Snowflake SnowWork + ServiceNow AI Gateway + Alibaba Wukong + Manus desktop — Sunday quiet ahead of Anthropic harness Monday)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Agents & infrastructure", "reason": "first appearance — Agent Toolkit launch with 17 anchor partners"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — Agent Toolkit launch with 17 anchor partners"
+        }
       ],
-      "stage": "consolidating",
-      "score": 30.1,
-      "score_fast": 17.6,
-      "score_slow": 30.1,
+      "stage": "emerging",
+      "score": 25.39,
+      "score_fast": 16.05,
+      "score_slow": 25.39,
       "raw_score_today": 4.0,
       "score_fast_yesterday": 22.5,
       "score_slow_yesterday": 30.6,
@@ -492,7 +531,12 @@
       ],
       "cluster_id": "agent-protocol-stack",
       "cluster_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Sunday is quiet on enterprise platforms — zero net-new launches. Carry: SnowWork analyst pickup, Wukong, Manus desktop, NVIDIA Agent Toolkit + OpenShell + AI-Q, ServiceNow AI Gateway, Palantir AIPCON 9 field notes. score_fast pulled down to 17.6 (0.58× slow → fading). HOWEVER: score_slow=30.1 sits in consolidating band [30,70], sustained_days=7 now meets min_sustained_days=7, min_source_types=4 satisfied → STAGE PROMOTION: emerging → consolidating today. This is the first non-warming-up stage transition in the radar.",
       "_breadth_method": "no orgs added today.",
@@ -503,12 +547,17 @@
       "label": "Open-vs-closed model tiering (Lambert 8 plots, Cohere Command-A, Mistral Voxtral pre-announce circulating, Cursor on Kimi K2.5 carryforward)",
       "sector": "Models & capabilities",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Models & capabilities", "reason": "first appearance"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 14.5,
-      "score_fast": 18.2,
-      "score_slow": 14.5,
+      "score": 12.99,
+      "score_fast": 19.15,
+      "score_slow": 12.99,
       "raw_score_today": 11.0,
       "score_fast_yesterday": 21.5,
       "score_slow_yesterday": 14.0,
@@ -588,7 +637,12 @@
       ],
       "cluster_id": "open-coding-stack",
       "cluster_history": [
-        {"date": "2026-03-20", "from": null, "to": "Open coding stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-20",
+          "from": null,
+          "to": "Open coding stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Sunday quieter on open-vs-closed: no fresh long-form posts today. Carry: Lambert 8-plots, Cohere Command-A coverage, Cursor-on-Kimi-K2.5, Tony Thomas Qwen 3 Coder review. Background: Mistral Voxtral TTS open-weights pre-announce starts circulating ahead of formal release later in the week (will boost this topic on 03-23+). Fast EMA cools from 21.5 → 18.2 (1.26× slow → rising still).",
       "_breadth_method": "no orgs added today; carries from 03-21."
@@ -598,12 +652,17 @@
       "label": "MCP adoption (CUBE paper proposes MCP tools/call API as benchmark substrate, Srinivasan production patterns, ServiceNow AI Gateway, 97M downloads)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-16", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-16",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 15.5,
-      "score_fast": 16.0,
-      "score_slow": 15.5,
+      "score": 13.88,
+      "score_fast": 17.26,
+      "score_slow": 13.88,
       "raw_score_today": 16.5,
       "score_fast_yesterday": 16.0,
       "score_slow_yesterday": 15.0,
@@ -677,7 +736,12 @@
       ],
       "cluster_id": "agent-protocol-stack",
       "cluster_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agent protocol stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Sunday papers backfill (HF Papers redirect 03-22→03-20 Friday cohort) adds CUBE (Lacoste & Gontier, arXiv:2603.15798) — proposes a universal protocol so any compliant agent benchmark plugs into any compliant runtime, built on MCP's non-blocking tools/call API. If adopted, removes the per-benchmark integration tax. Week-over-week MCP has gone from production-protocol research → enterprise-governance object → academic-benchmark substrate. Carries: Srinivasan production-patterns, ServiceNow Gateway, 97M downloads, 2026 MCP Roadmap. Direction = rising (fast 16.0, slow 15.5, ratio 1.03).",
       "_breadth_method": "orgs added today: cube-paper (Lacoste & Gontier). Previously: 11."
@@ -687,12 +751,17 @@
       "label": "Agent evaluation & observability (CUBE benchmark unification, VTC-Bench, AgentProcessBench, One-Eval, MEMO, SWE-Skills-Bench, CCTU, ProRL-Agent, Memento-Skills, AndroTMem)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-18", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-18",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 22.6,
-      "score_fast": 45.6,
-      "score_slow": 22.6,
+      "score": 19.43,
+      "score_fast": 23.53,
+      "score_slow": 19.43,
       "raw_score_today": 54.0,
       "score_fast_yesterday": 11.7,
       "score_slow_yesterday": 17.5,
@@ -754,7 +823,12 @@
       ],
       "cluster_id": "agent-safety-cluster",
       "cluster_history": [
-        {"date": "2026-03-21", "from": null, "to": "Agent safety stack", "reason": "first cluster formation"}
+        {
+          "date": "2026-03-21",
+          "from": null,
+          "to": "Agent safety stack",
+          "reason": "first cluster formation"
+        }
       ],
       "_evidence_summary": "Sunday papers backfill (HF Papers redirect 03-22→03-20) lands FIVE evals/agent-infra papers in one drop: CUBE (Lacoste & Gontier — MCP-based universal benchmark protocol), Memento-Skills (Zhou & Guo — agents design agents, meta-agent skill library), AndroTMem (Shi & Li — anchored state memory from long Android-GUI trajectories, 5-30% gains on long-horizon tasks), VTC-Bench (Zhu & Dong — compositional visual tool chaining, 32 OpenCV tools + 680 problems revealing multimodal-agent compositional failures), ProRL Agent (Zhang & Liu — rollout-as-a-service infra for multi-turn agent RL). Carries: AgentProcessBench, One-Eval, MEMO, SWE-Skills-Bench, CCTU. score_fast surges from 11.7 → 45.6 (2.02× slow → surging — the day's strongest topic-level signal); score_slow steps up modestly to 22.6 (still emerging). Topic clustered with agent-security as the agent-safety stack.",
       "_breadth_method": "orgs added today: cube-paper, memento-skills-paper, androtmem-paper, vtc-bench-paper. Previously: 6 + 1 (added zhang-foerster-hyperagents as bridge-author, but Hyperagents lands Monday)."
@@ -764,12 +838,17 @@
       "label": "Post-training recipes (Nemotron-Cascade 2, ProRL Agent rollout-as-a-service, Reasoning over mathematical objects on-policy reward modeling, Online RLHF, Expert Threshold Routing)",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-17", "from": null, "to": "Methods & research", "reason": "first appearance"}
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 13.7,
-      "score_fast": 14.6,
-      "score_slow": 13.7,
+      "score": 12.83,
+      "score_fast": 14.9,
+      "score_slow": 12.83,
       "raw_score_today": 18.0,
       "score_fast_yesterday": 12.8,
       "score_slow_yesterday": 13.5,
@@ -836,12 +915,17 @@
       "label": "Multimodal eval skepticism (VTC-Bench compositional tool chaining, Tinted Frames, LVOmniBench, Cognitive Mismatch, ESPIRE — Sunday backfill re-attribution)",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-20", "from": null, "to": "Methods & research", "reason": "first appearance — four MLLM/VLM critique papers cross the gate together"}
+        {
+          "date": "2026-03-20",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance — four MLLM/VLM critique papers cross the gate together"
+        }
       ],
       "stage": "emerging",
-      "score": 15.0,
-      "score_fast": 16.0,
-      "score_slow": 15.0,
+      "score": 14.63,
+      "score_fast": 13.59,
+      "score_slow": 14.63,
       "raw_score_today": 18.0,
       "score_fast_yesterday": 12.0,
       "score_slow_yesterday": 14.2,
@@ -898,12 +982,17 @@
       "label": "Agentic retrieval (Vinod Rane Next-Gen Agentic RAG with LangGraph, Umesh Kushwaha 'when static retrieval is no longer enough', AdaMem, BenchPreS, F2LLM-v2, Cortex Search)",
       "sector": "Agents & infrastructure",
       "sector_history": [
-        {"date": "2026-03-17", "from": null, "to": "Agents & infrastructure", "reason": "first appearance"}
+        {
+          "date": "2026-03-17",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 16.4,
-      "score_fast": 15.0,
-      "score_slow": 16.4,
+      "score": 15.88,
+      "score_fast": 16.98,
+      "score_slow": 15.88,
       "raw_score_today": 18.0,
       "score_fast_yesterday": 14.3,
       "score_slow_yesterday": 16.4,
@@ -987,12 +1076,17 @@
       "label": "AI governance (White House National Policy Framework metabolisation, GUARDRAILS Act, EU AI Act trilogue — Sunday carry only)",
       "sector": "Governance & market",
       "sector_history": [
-        {"date": "2026-03-19", "from": null, "to": "Governance & market", "reason": "first appearance"}
+        {
+          "date": "2026-03-19",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance"
+        }
       ],
       "stage": "emerging",
-      "score": 18.0,
-      "score_fast": 21.3,
-      "score_slow": 18.0,
+      "score": 13.31,
+      "score_fast": 15.19,
+      "score_slow": 13.31,
       "raw_score_today": 4.0,
       "score_fast_yesterday": 30.4,
       "score_slow_yesterday": 18.6,
@@ -1061,12 +1155,17 @@
       "label": "Compute economics / GTC 2026 / $1T order book (Sunday quiet; Build Fast / Digital Applied trackers continue)",
       "sector": "Methods & research",
       "sector_history": [
-        {"date": "2026-03-15", "from": null, "to": "Methods & research", "reason": "first appearance (cold-start seed)"}
+        {
+          "date": "2026-03-15",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance (cold-start seed)"
+        }
       ],
       "stage": "emerging",
-      "score": 17.3,
-      "score_fast": 11.7,
-      "score_slow": 17.3,
+      "score": 14.16,
+      "score_fast": 11.84,
+      "score_slow": 14.16,
       "raw_score_today": 6.0,
       "score_fast_yesterday": 13.5,
       "score_slow_yesterday": 17.9,
@@ -1155,38 +1254,89 @@
   "config_snapshot": {
     "_purpose": "exact tuning constants in effect this run, for reproducibility",
     "source_weights": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 4, "paper": 3,
-      "long_form_blog": 3, "linkedin_network_post": 3, "github_trending_signal": 3,
-      "tech_news": 2, "governance_source": 2, "hn_front_page": 2,
-      "github_watched_star_delta": 2, "medium_aggregator": 1,
-      "linkedin_hashtag_post": 1, "hn_comment_thread": 1,
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "github_trending_signal": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "hn_front_page": 2,
+      "github_watched_star_delta": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
+      "hn_comment_thread": 1,
       "job_posting_skill_mention": 0.5
     },
-    "convergence_multiplier": {"min_source_types": 3, "multiplier": 1.5},
+    "convergence_multiplier": {
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
     "max_mentions_per_source_type": {
-      "priority_vendor_blog": 5, "enterprise_vendor_blog": 5, "paper": 5,
-      "long_form_blog": 5, "linkedin_network_post": 5, "tech_news": 5,
-      "governance_source": 5, "github_trending_signal": 5, "github_watched_star_delta": 5,
-      "hn_front_page": 5, "hn_comment_thread": 3, "medium_aggregator": 3,
-      "linkedin_hashtag_post": 3, "job_posting_skill_mention": 5
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "github_trending_signal": 5,
+      "github_watched_star_delta": 5,
+      "hn_front_page": 5,
+      "hn_comment_thread": 3,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
     },
     "stages": {
-      "emerging": {"score_range": [10, 30], "max_age_days": 21, "min_source_types": 2},
-      "consolidating": {"score_range": [30, 70], "min_sustained_days": 7, "min_source_types": 3},
-      "mainstream": {"score_range": [70, 999], "min_sustained_days": 30},
-      "fading": {"_trigger": "score declined >25% over rolling window AND was previously >=50"}
+      "emerging": {
+        "score_range": [
+          10,
+          30
+        ],
+        "max_age_days": 21,
+        "min_source_types": 2
+      },
+      "consolidating": {
+        "score_range": [
+          30,
+          70
+        ],
+        "min_sustained_days": 7,
+        "min_source_types": 3
+      },
+      "mainstream": {
+        "score_range": [
+          70,
+          999
+        ],
+        "min_sustained_days": 30
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50"
+      }
     },
     "sector_config": {
-      "min_sectors": 3, "max_sectors": 6, "min_topics_per_sector": 2,
-      "min_topics_for_new_sector": 3, "sector_dissolve_after_days_below_min": 5
+      "min_sectors": 3,
+      "max_sectors": 6,
+      "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3,
+      "sector_dissolve_after_days_below_min": 5
     },
     "breadth_config": {
-      "window_short_days": 7, "window_long_days": 30,
+      "window_short_days": 7,
+      "window_long_days": 30,
       "max_mentions_per_org_per_day": 2,
-      "thresholds": {"high_breadth_7d": 5, "very_high_breadth_7d": 8}
+      "thresholds": {
+        "high_breadth_7d": 5,
+        "very_high_breadth_7d": 8
+      }
     },
     "clustering_config": {
-      "co_mention_window_days": 7, "min_co_mentions": 3, "min_cluster_size": 2,
+      "co_mention_window_days": 7,
+      "min_co_mentions": 3,
+      "min_cluster_size": 2,
       "max_clusters": 8
     },
     "ema_alpha_fast": 0.3,

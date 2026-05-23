@@ -41,10 +41,16 @@ export class MapPage {
   readonly availableDates = signal<string[]>([]);
   readonly selectedDate = signal<string | null>(null);
 
+  // Compare-to-past mode: which earlier radar to diff against.
+  // null = no comparison; otherwise a date_id from availableDates().
+  readonly compareDate = signal<string | null>(null);
+  readonly compareRadar = signal<RadarDay | null>(null);
+  readonly compareLoading = signal<boolean>(false);
+
   // Selection state
   readonly activeSector = signal<string | null>(null);
   readonly search = signal<string>('');
-  readonly sortKey = signal<'score' | 'momentum' | 'breadth' | 'stage'>('score');
+  readonly sortKey = signal<'importance' | 'score' | 'momentum' | 'breadth' | 'stage'>('importance');
   readonly stageFilter = signal<Set<string>>(new Set());
 
   // Lookup: lowercase label/slug → canonical org slug from orgs index.
@@ -97,6 +103,13 @@ export class MapPage {
     if (stages.size) out = out.filter(t => stages.has(t.stage));
 
     out.sort((a, b) => {
+      if (key === 'importance') {
+        // Importance = structural relevance (days_in_sources × source_types × ln(breadth_30d+2)).
+        // Fall back to score_fast when importance isn't populated.
+        const ai = (a.importance && a.importance > 0) ? a.importance : (a.score_fast ?? 0);
+        const bi = (b.importance && b.importance > 0) ? b.importance : (b.score_fast ?? 0);
+        return bi - ai;
+      }
       if (key === 'score')    return (b.score_fast ?? 0) - (a.score_fast ?? 0);
       if (key === 'momentum') {
         const ma = (a.score_fast ?? 0) - (a.score_slow ?? 0);
@@ -144,6 +157,144 @@ export class MapPage {
       })
       .slice(0, 12);
   });
+
+  /**
+   * Top 10 topics ranked by `importance` = days_in_sources × source_types ×
+   * ln(breadth_30d + 2). Reflects structural relevance over the 30d window,
+   * independent of when the radar agent first carved out a topic for it —
+   * so topics like Hermes (mentioned 22+ days before getting their own ID)
+   * still surface. Returns [] when no topic on this day has importance
+   * populated (older radar JSONs before §4.8 of ai-trend-radar/SKILL.md).
+   */
+  readonly mostImportant = computed<RadarTopic[]>(() => {
+    const d = this.radarDay();
+    if (!d) return [];
+    return [...d.topics]
+      .filter(t => typeof t.importance === 'number' && t.importance > 0)
+      .sort((a, b) => (b.importance ?? 0) - (a.importance ?? 0))
+      .slice(0, 10);
+  });
+
+  /**
+   * Compare today's radar against an earlier radar (default: 30 days ago).
+   * Returns a four-bucket diff:
+   *   - rose:     topic exists in both, importance grew ≥10%
+   *   - fell:     topic exists in both, importance dropped ≥10%
+   *   - appeared: topic in today's radar but not in the compare radar
+   *   - vanished: topic in compare radar but not today's
+   *
+   * Empty when no compare radar is loaded. Uses `importance` as the diff
+   * metric because that's the structural-relevance signal; falls back to
+   * `score_slow` for older radars where importance wasn't populated.
+   */
+  readonly topicDiff = computed<{
+    rose: { topic: RadarTopic; before: number; after: number; delta: number }[];
+    fell: { topic: RadarTopic; before: number; after: number; delta: number }[];
+    appeared: RadarTopic[];
+    vanished: { id: string; label: string; before: number }[];
+  } | null>(() => {
+    const now = this.radarDay();
+    const past = this.compareRadar();
+    if (!now || !past) return null;
+
+    const metric = (t: RadarTopic): number => {
+      if (typeof t.importance === 'number' && t.importance > 0) return t.importance;
+      return t.score_slow ?? 0;
+    };
+
+    const pastById = new Map(past.topics.map(t => [t.id, t]));
+    const nowById = new Map(now.topics.map(t => [t.id, t]));
+
+    const rose: { topic: RadarTopic; before: number; after: number; delta: number }[] = [];
+    const fell: { topic: RadarTopic; before: number; after: number; delta: number }[] = [];
+    const appeared: RadarTopic[] = [];
+
+    for (const t of now.topics) {
+      const prior = pastById.get(t.id);
+      if (!prior) {
+        appeared.push(t);
+        continue;
+      }
+      const before = metric(prior);
+      const after = metric(t);
+      if (before <= 0) {
+        appeared.push(t);
+        continue;
+      }
+      const delta = (after - before) / before;
+      if (delta >= 0.10) rose.push({ topic: t, before, after, delta });
+      else if (delta <= -0.10) fell.push({ topic: t, before, after, delta });
+    }
+
+    const vanished: { id: string; label: string; before: number }[] = [];
+    for (const t of past.topics) {
+      if (!nowById.has(t.id)) {
+        vanished.push({ id: t.id, label: t.label, before: metric(t) });
+      }
+    }
+
+    rose.sort((a, b) => b.delta - a.delta);
+    fell.sort((a, b) => a.delta - b.delta);
+    appeared.sort((a, b) => metric(b) - metric(a));
+    vanished.sort((a, b) => b.before - a.before);
+
+    return { rose, fell, appeared, vanished };
+  });
+
+  /**
+   * Pick the radar entry that's closest to (today - N days). Returns the
+   * date_id, or null if no entry is far enough back.
+   */
+  private findCompareTarget(daysAgo: number): string | null {
+    const today = this.selectedDate();
+    const dates = this.availableDates();
+    if (!today || dates.length === 0) return null;
+    const target = new Date(today + 'T00:00:00');
+    target.setDate(target.getDate() - daysAgo);
+    const targetIso = target.toISOString().slice(0, 10);
+    // dates is sorted newest-first (radar/index.json). Find the first that's
+    // <= targetIso (the closest non-future radar).
+    for (const d of dates) {
+      if (d <= targetIso) return d;
+    }
+    return dates[dates.length - 1] ?? null;
+  }
+
+  setCompareWindow(days: number | null): void {
+    if (days === null) {
+      this.compareDate.set(null);
+      this.compareRadar.set(null);
+      return;
+    }
+    const target = this.findCompareTarget(days);
+    if (!target) return;
+    this.compareDate.set(target);
+  }
+
+  /**
+   * Inverse of setCompareWindow — returns the integer day window currently
+   * active (so the toggle can show which button is selected). Returns the
+   * closest preset (7/30/60) to the actual day-delta, or null if no compare
+   * is active.
+   */
+  getCompareWindow(): number | null {
+    const today = this.selectedDate();
+    const cmp = this.compareDate();
+    if (!today || !cmp) return null;
+    const a = new Date(today + 'T00:00:00').getTime();
+    const b = new Date(cmp + 'T00:00:00').getTime();
+    const days = Math.round((a - b) / 86_400_000);
+    // Snap to closest preset
+    const presets = [7, 30, 60];
+    let best = presets[0];
+    let bestDist = Math.abs(days - best);
+    for (const p of presets) {
+      const dist = Math.abs(days - p);
+      if (dist < bestDist) { best = p; bestDist = dist; }
+    }
+    return best;
+  }
+
 
   readonly allStages = ['mainstream', 'consolidating', 'emerging', 'fading'];
 
@@ -260,6 +411,32 @@ export class MapPage {
           this.loading.set(false);
         });
       }).catch(() => this.loading.set(false));
+    });
+
+    // Load the compare radar whenever compareDate changes.
+    effect(() => {
+      const d = this.compareDate();
+      if (!d) {
+        this.compareRadar.set(null);
+        return;
+      }
+      this.compareLoading.set(true);
+      this.data.loadRadarIndex().then(idx => {
+        const entry = idx.entries.find(e => e.date_id === d);
+        if (!entry) {
+          this.compareRadar.set(null);
+          this.compareLoading.set(false);
+          return;
+        }
+        return this.data.loadRadarDay(entry.json_path).then(day => {
+          if (this.compareDate() !== d) return;
+          this.compareRadar.set(day);
+          this.compareLoading.set(false);
+        });
+      }).catch(() => {
+        this.compareRadar.set(null);
+        this.compareLoading.set(false);
+      });
     });
   }
 }

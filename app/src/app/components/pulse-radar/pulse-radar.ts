@@ -273,12 +273,13 @@ export class PulseRadar {
     const topics = this.topics();
     if (!topics.length) return [];
 
-    // Score thresholds (quartiles) — used when topic.stage is degenerate.
-    const sortedScores = topics.map(t => t.score_fast).sort((a, b) => a - b);
+    // Loudness thresholds (quartiles) — used when topic.stage is degenerate.
+    // Loudness = importance (preferred) or score_fast (fallback). See topicLoudness().
+    const sortedScores = topics.map(t => topicLoudness(t)).sort((a, b) => a - b);
     const q1 = quantile(sortedScores, 0.25);
     const q2 = quantile(sortedScores, 0.5);
     const q3 = quantile(sortedScores, 0.75);
-    const maxScore = Math.max(1, ...topics.map(t => t.score_fast));
+    const maxScore = Math.max(1, ...topics.map(t => topicLoudness(t)));
 
     interface Slot {
       topic: RadarTopic;
@@ -295,7 +296,7 @@ export class PulseRadar {
       const ring = chooseRing(t, q1, q2, q3);
       const key = `${qi}:${ring}`;
       const arr = slots.get(key) ?? [];
-      arr.push({ topic: t, qi, ring, r: blipRadius(t.score_fast, maxScore), x: 0, y: 0 });
+      arr.push({ topic: t, qi, ring, r: blipRadius(topicLoudness(t), maxScore), x: 0, y: 0 });
       slots.set(key, arr);
     }
 
@@ -323,7 +324,7 @@ export class PulseRadar {
         const cap = cellCapacity(qi, here);
         if (arr.length > cap) {
           // Keep biggest in place, bump smallest out.
-          arr.sort((a, b) => b.topic.score_fast - a.topic.score_fast);
+          arr.sort((a, b) => topicLoudness(b.topic) - topicLoudness(a.topic));
           const keep = arr.slice(0, cap);
           const overflow = arr.slice(cap).map(s => ({ ...s, ring: next }));
           slots.set(`${qi}:${here}`, keep);
@@ -453,7 +454,7 @@ export class PulseRadar {
     for (let qi = 0; qi < quadrants.length; qi++) {
       for (const ring of ringOrder) {
         const arr = (slots.get(`${qi}:${ring}`) ?? []).slice()
-          .sort((a, b) => b.topic.score_fast - a.topic.score_fast);
+          .sort((a, b) => topicLoudness(b.topic) - topicLoudness(a.topic));
         for (const s of arr) {
           n += 1;
           out.push({
@@ -506,7 +507,7 @@ export class PulseRadar {
       if (!past || !pastT) continue;
       const qi = sectorIndex.get(pastT.sector);
       if (qi === undefined) continue;
-      const sortedScores = past.topics.map(t => t.score_fast).sort((a, b) => a - b);
+      const sortedScores = past.topics.map(t => topicLoudness(t)).sort((a, b) => a - b);
       const q1 = quantile(sortedScores, 0.25);
       const q2 = quantile(sortedScores, 0.5);
       const q3 = quantile(sortedScores, 0.75);
@@ -585,7 +586,7 @@ export class PulseRadar {
     const rising = blips.filter(b => b.momentum > 0.08).sort((a, b) => b.momentum - a.momentum);
     const falling = blips.filter(b => b.momentum < -0.08).sort((a, b) => a.momentum - b.momentum);
     const steady = blips.filter(b => b.momentum >= -0.08 && b.momentum <= 0.08)
-                        .sort((a, b) => (b.topic.score_fast ?? 0) - (a.topic.score_fast ?? 0));
+                        .sort((a, b) => topicLoudness(b.topic) - topicLoudness(a.topic));
     const out: { kind: 'rising' | 'steady' | 'falling'; label: string; entries: Blip[] }[] = [];
     if (rising.length)  out.push({ kind: 'rising',  label: `Rising over ${this.windowDays()}d`, entries: rising });
     if (steady.length)  out.push({ kind: 'steady',  label: 'Steady',                              entries: steady });
@@ -604,7 +605,7 @@ export class PulseRadar {
     }
     return this.quadrants().map(q => ({
       sector: q.sector,
-      entries: (bySector.get(q.sector) ?? []).sort((a, b) => b.topic.score_fast - a.topic.score_fast)
+      entries: (bySector.get(q.sector) ?? []).sort((a, b) => topicLoudness(b.topic) - topicLoudness(a.topic))
     }));
   });
 
@@ -653,7 +654,7 @@ export class PulseRadar {
       const rising = ts.filter(t => t.direction === 'rising' || t.direction === 'surging').length;
       const fading = ts.filter(t => t.direction === 'fading').length;
       const top = [...ts]
-        .sort((a, b) => (b.score_fast ?? 0) - (a.score_fast ?? 0))
+        .sort((a, b) => topicLoudness(b) - topicLoudness(a))
         .slice(0, 2);
       return { sector: q.sector, idx, total: ts.length, rising, fading, top };
     });
@@ -854,12 +855,30 @@ export class PulseRadar {
 
 // ─────────── Helpers ───────────
 
+/**
+ * Loudness signal used for blip *size and ranking* in the radar.
+ *
+ * Prefers `importance` (= days_in_sources × source_types × ln(breadth_30d + 2)) —
+ * structural relevance over the 30d window from raw source-file presence.
+ * Falls back to `score_fast` when importance isn't populated (older radar JSONs
+ * or topics added before §4.8 of ai-trend-radar/SKILL.md kicked in).
+ *
+ * Direction, animation, and pulsing are still driven by `direction` /
+ * `score_fast` — that's "loud this week," separate from importance.
+ */
+export function topicLoudness(t: RadarTopic): number {
+  if (typeof t.importance === 'number' && Number.isFinite(t.importance) && t.importance > 0) {
+    return t.importance;
+  }
+  return t.score_fast ?? 0;
+}
+
 function chooseRing(t: RadarTopic, q1: number, q2: number, q3: number): Ring {
   if (t.stage && STAGE_TO_RING[t.stage]) {
     // We can't tell here whether stage is degenerate, so we always honour it.
     return STAGE_TO_RING[t.stage];
   }
-  const s = t.score_fast;
+  const s = topicLoudness(t);
   if (s >= q3) return 'inner';
   if (s >= q2) return 'core';
   if (s >= q1) return 'mid';
