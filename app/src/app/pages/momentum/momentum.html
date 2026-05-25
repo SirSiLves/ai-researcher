@@ -99,9 +99,13 @@
                 </span>
               </td>
               <td class="movers-table__num">
-                <span [class.muted-2]="Math.abs(m.pctDelta) < 5">
-                  {{ m.pctDelta > 0 ? '+' : '' }}{{ m.pctDelta | number:'1.0-0' }}%
-                </span>
+                @if (m.isNew) {
+                  <span class="chip chip--accent" title="Topic did not exist at the start of this window">new</span>
+                } @else {
+                  <span [class.muted-2]="Math.abs(m.pctDelta) < 5">
+                    {{ m.pctDelta > 0 ? '+' : '' }}{{ m.pctDelta | number:'1.0-0' }}%
+                  </span>
+                }
               </td>
               <td class="movers-table__trend">
                 <svg viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">

@@ -16,6 +16,10 @@ interface Mover {
   scoreThen: number;
   delta: number;
   pctDelta: number;
+  /** True when the topic didn't exist (or had score 0) at the window start.
+   *  pctDelta is meaningless in that case (division by zero); the template
+   *  shows "new" instead of "+100%". */
+  isNew: boolean;
   trend: number[];
   sector: string;
 }
@@ -82,7 +86,11 @@ export class MomentumPage {
       const scoreNow = t.score_fast ?? 0;
       const scoreThen = past?.score_fast ?? 0;
       const delta = scoreNow - scoreThen;
-      const pctDelta = scoreThen > 0 ? (delta / scoreThen) * 100 : (scoreNow > 0 ? 100 : 0);
+      // Topics that didn't exist (or had score 0) at the window start can't
+      // be assigned a % change — flag and render "new" in the template
+      // instead of a misleading "+100%".
+      const isNew = scoreThen <= 0 && scoreNow > 0;
+      const pctDelta = scoreThen > 0 ? (delta / scoreThen) * 100 : 0;
       const trend = byId.get(t.id) ?? [];
       out.push({
         topic: t,
@@ -90,6 +98,7 @@ export class MomentumPage {
         scoreThen,
         delta,
         pctDelta,
+        isNew,
         trend,
         sector: t.sector
       });
