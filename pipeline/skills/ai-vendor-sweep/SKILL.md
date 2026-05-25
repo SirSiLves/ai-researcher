@@ -59,14 +59,29 @@ For each of today's source files:
 
     **WHAT TO INSERT:** "Anthropic", "Stanford HAI", "EU AI Office", "Bank of England", "Cloudflare", "Mistral", "Apollo Research", "Mercury" (the bank), "QPQ IaaS AG". These are entities people can sue, hire from, or invest in.
 
-    **DO NOT INSERT THESE AS ORGS** — they're concepts, protocols, products, papers, or generic phrases that prior LLM runs repeatedly mistook for companies (157 leaks cleaned 2026-05-23):
+    **DO NOT INSERT THESE AS ORGS** — they're concepts, protocols, products, papers, or generic phrases that prior LLM runs repeatedly mistook for companies (157 leaks cleaned 2026-05-23 + 140 more 2026-05-25):
+
     - **Topic / concept names**: "agent memory", "agent SDK", "agent runtime", "agent gateway", "agent governance toolkit", "context engineering", "MCP adoption", "tool-use standards"
     - **Protocols and frameworks**: "A2A protocol", "MCP", "AP2", "Agent Framework 1.0" (these are interop specs / SDKs, not corporate entities — track the *vendor shipping them* instead)
     - **Paper titles or any slug ending in `-paper`**: "agent-as-adversary-paper", "ai-scientists-paper", "mcp-pitfall-lab-paper"
     - **Document/article references**: "Annex I", "Annex III" (EU AI Act sections), "Annex VI", "Article 43"
     - **Product features**: "Agent 365", "Agent Inbox", "Model Garden", "AI Pulse"
+    - **Legislation / regulatory bodies' sub-units written as slugs**: "aieuact", "artificialintelligenceact", "europarl", "commission", "consilium", "epsr" (the EU AI Act and the bodies that voted it; track "European Commission" as one org, not "commission" + "consilium" + "europarl" as three).
+    - **Generic benchmarks / eval names**: "mt-bench", "swe-bench", "clawbench" (these are *benchmarks the radar measures topics against*, not vendors).
+    - **Brand / product names that already belong to a parent firm.** The build-side `BRAND_TO_PARENT` in `pipeline/scripts/build_org_view.py` will absorb any of these into their parent on the next firm-view rebuild, but it's cleaner to never insert them at all:
+        - `claude`, `claude-code`, `mythos`, `stainless` → Anthropic
+        - `gpt-5`, `codex`, `sora` → OpenAI
+        - `gemini`, `deepmind`, `alphafold`, `alphaevolve` → Google DeepMind
+        - `llama` → Meta
+        - `qwen`, `tongyi` → Alibaba
+        - `kimi` → Moonshot
+        - `azure`, `github-copilot` → Microsoft
+        - `bedrock`, `amazon-aws` → AWS
+        - `agentforce` → Salesforce
+        - `watsonx` → IBM
+        - `cortex` → Snowflake
 
-    Test before inserting: ask *"could a journalist write 'X said today...'* with X = this slug?" If no, it's not an org and stays out of the tally.
+    Test before inserting: ask *"could a journalist write 'X said today...'* with X = this slug?" If no, it's not an org and stays out of the tally. The journalist test rejects all of: products ("Claude said today..."), protocols ("MCP said today..."), benchmarks ("SWE-bench said today..."), legislation ("Annex III said today..."), papers, and concept names.
 - For each mention, append/update:
   ```json
   {
@@ -88,6 +103,15 @@ For each of today's source files:
   Append-only. Cap at 10 hot events per org (drop oldest).
 
 **Also pull breadth-derived orgs from radar JSONs.** For each radar JSON in the last 30 days, take every `topic.breadth_orgs_7d` entry — if a slug there isn't yet in `discovered_orgs.json.orgs`, add it with `tier_hint: null, coverage: "uncovered"`, `discovered_from: "radar/{date}.json"`. This is how the radar's first-class org extraction feeds back into vendor coverage.
+
+**Filter every breadth-derived candidate through the same "what's an org" rules above** before adding. The radar agent occasionally drops topic IDs, paper slugs, and concept names into `breadth_orgs_7d`; passing those straight into `discovered_orgs.json` was the root cause of multiple cleanup waves. Concretely, **reject** any candidate that:
+
+- ends in `-paper`, `-bench`, `-act`, `-toolkit`, `-spec`, `-protocol`, `-paper-v2` etc.
+- matches a known brand→parent entry (see the list above) — and add the *parent* if not present.
+- is a single common word with no proper-noun signal (`commission`, `consilium`, `europarl`, `eu`, `iso`, `mind`, `every`, `infosec`).
+- is shorter than 3 chars (over-matches).
+
+When in doubt, **skip** rather than insert. The next radar run will re-surface the org if it's real; a false insertion only gets cleaned up by hand.
 
 ## 3.5. Compute velocity per org
 
