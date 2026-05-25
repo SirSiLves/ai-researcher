@@ -333,10 +333,26 @@ python3 ../pipeline/scripts/build_reports_manifest.py
 ```
 
 Rebuilds `data/reports/index.json` — the flat dated index the Angular app
-reads to enumerate daily / weekly / monthly / radar / sweep candidate files.
+reads to enumerate daily / weekly / monthly / radar / sweep candidate files
+**plus** the raw collector dumps (news / papers / blogs / hackernews / github /
+linkedin / jobs) — the latter are surfaced under the "Raw sources" tab of
+/archive and as the per-day footer chip strip on /pulse.
 Must run after the cadence files have been written today, otherwise the SPA
 will be one day behind (Pulse falls back to yesterday's daily because today
 isn't in the manifest). ~10ms. Idempotent. If non-zero exit, log and continue.
+
+## 6.955. Rebuild gap-keywords ranking
+
+```bash
+python3 ../pipeline/scripts/build_gap_keywords.py
+```
+
+Rebuilds `data/radar/gap_keywords.json` — the "what's the pipeline seeing that
+the radar agent hasn't promoted to a topic yet?" backlog. Reads
+`pipeline/state/discovered_keywords.json` + `pipeline/state/topic_keywords.json`,
+filters out boilerplate and topic-covered terms, and ranks the rest by
+`source_types × days_active × ln(total_mentions+2)`. Consumed by the "Gap
+signals" panel on /map. ~50ms. Idempotent. If non-zero exit, log and continue.
 
 ## 6.96. Emit daily health beacon
 
@@ -345,12 +361,15 @@ python3 ../pipeline/scripts/build_health_beacon.py --as-of {TODAY}
 ```
 
 Writes `data/daily/{YYYY}/{MM}/{TODAY}-health.json` — per-collector item
-counts, presence flags, file sizes, manifest staleness, and an aggregated
-`overall_status` of green / yellow / red. Single-file morning-after check
-that catches silent failures the cron leaves behind (collector stub, stale
-manifest, radar empty, etc.). Pure Python, ~50ms. Read-only — never blocks
-the pipeline. Always run as the last step before weekly/trends so it sees
-the full pipeline output. If non-zero exit, log and continue.
+counts, presence flags, file sizes, manifest staleness, an aggregated
+`overall_status` of green / yellow / red, **plus a `timing` block** that
+reconstructs per-stage durations from filesystem mtimes (total wall-clock,
+chronological stage list, top-3 slowest stages, and a flag for any stage
+the orchestrator skipped). Single-file morning-after check that catches
+silent failures and answers "why did it take that long last night?".
+Pure Python, ~50ms. Read-only — never blocks the pipeline. Always run as
+the last step before weekly/trends so it sees the full pipeline output.
+If non-zero exit, log and continue.
 
 ## 7. Weekly rollup — every day
 

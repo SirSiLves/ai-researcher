@@ -287,7 +287,7 @@ If the script exits non-zero, log the error but don't block — the rest of the 
 python3 ../pipeline/scripts/build_health_beacon.py --as-of {TODAY}
 ```
 
-Writes `data/daily/{YYYY}/{MM}/{TODAY}-health.json` — per-collector item counts, presence flags, file sizes, manifest staleness checks, and an aggregated `overall_status` of green / yellow / red. The next morning's reader can open this single file to see whether anything failed silently overnight (a collector returning a stub, a manifest going stale, the radar emitting zero topics, etc.).
+Writes `data/daily/{YYYY}/{MM}/{TODAY}-health.json` — per-collector item counts, presence flags, file sizes, manifest staleness checks, an aggregated `overall_status` of green / yellow / red, **plus a `timing` block** that reconstructs per-stage durations from filesystem mtimes (total wall-clock, chronological stage list, top-3 slowest, and a flag for any stage the orchestrator skipped). The next morning's reader can open this single file to see whether anything failed silently overnight (a collector returning a stub, a manifest going stale, the radar emitting zero topics, etc.) **and** answer "why did it take that long last night?".
 
 Pure Python, ~50ms. Read-only — never blocks the pipeline. Always run as the **last** step before the weekly/trends spawns so it sees the full pipeline output. If the script exits non-zero, log and continue — the beacon is observability, not gating.
 
