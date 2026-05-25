@@ -97,6 +97,138 @@ PRIORITY_VENDORS = {
     },
 }
 
+# Brand / product slugs that the vendor sweep agent has registered as their own
+# "orgs" but actually belong to a priority vendor. Their mentions are *already*
+# counted under the parent via PRIORITY_VENDORS' alias scan, so leaving them as
+# separate orgs double-counts on the leaderboard ("claude" showed up 4th with
+# velocity_7d=378 — same physical mentions Anthropic was already crediting via
+# its "Claude" alias).
+#
+# Also covers a pair of true duplicates: amazon-aws → aws (the sweep agent
+# created both for the same firm).
+#
+# Maintenance: when adding a new priority vendor to PRIORITY_VENDORS above,
+# add any of its brand slugs here too so the next build folds them in.
+BRAND_TO_PARENT = {
+    # Anthropic family
+    "claude":          "anthropic",
+    "claude-code":     "anthropic",
+    "mythos":          "anthropic",  # Anthropic's leaked-then-acknowledged model
+    "stainless":       "anthropic",  # acquired May 2026, hosted product wound down
+    # OpenAI family
+    "gpt-5":           "openai",
+    "codex":           "openai",
+    # Google-DeepMind family
+    "gemini":          "google-deepmind",
+    "deepmind":        "google-deepmind",
+    # Meta family
+    "llama":           "meta",
+    # Alibaba family — note seed_orgs.json has slug "alibaba-qwen"; not currently
+    # in PRIORITY_VENDORS but discovered_orgs has both "alibaba" and "qwen", so
+    # fold qwen into alibaba (the firm) here. If the sweep ever promotes the
+    # alibaba-qwen seed slug it'll need adjustment.
+    "qwen":            "alibaba",
+    "tongyi":          "alibaba",
+    # Moonshot
+    "kimi":            "moonshot",
+    # Microsoft family — Bedrock is AWS, Azure is Microsoft, github-copilot is
+    # Microsoft (via GitHub). Be careful: "azure" alone can name many things,
+    # but in this corpus it's overwhelmingly Azure OpenAI/AI services.
+    "azure":           "microsoft",
+    "github-copilot":  "microsoft",
+    # AWS family
+    "amazon-aws":      "aws",
+    "bedrock":         "aws",
+    # Salesforce family
+    "agentforce":      "salesforce",
+    # IBM family
+    "watsonx":         "ibm",
+    # Snowflake family
+    "cortex":          "snowflake",
+    # Protocol slug — not a firm at all. Drop entirely (parent=None means
+    # delete without merging into anyone).
+    "mcp":             None,
+}
+
+
+def fold_brand_slugs(orgs: dict) -> tuple[dict, list[str]]:
+    """Absorb known brand/product slugs into their canonical parent.
+
+    For each (brand, parent) in BRAND_TO_PARENT:
+      - parent is None → drop the brand slug entirely (e.g. `mcp` is a protocol).
+      - parent in orgs → merge brand's mentions_by_date, mentions_by_source_type,
+        alias_hits, radar_appearances, context_samples, hot_events into parent;
+        recompute first_seen/last_seen/total_mentions/distinct_days/
+        distinct_source_types; drop the brand from `orgs`.
+      - parent not in orgs → leave brand alone (the parent isn't tracked, so
+        folding would lose data). Logged to stderr.
+
+    Returns (filtered_orgs, dropped_files) — `dropped_files` is the list of
+    `data/orgs/<slug>.json` paths to delete from disk after the rebuild.
+    """
+    dropped_files = []
+    for brand, parent in BRAND_TO_PARENT.items():
+        if brand not in orgs:
+            continue
+        brand_entry = orgs[brand]
+        if parent is None:
+            # Pure drop — not a firm at all.
+            del orgs[brand]
+            dropped_files.append(brand)
+            continue
+        if parent not in orgs:
+            print(f"[build_org_view] brand {brand!r} → parent {parent!r} not tracked yet, leaving brand alone",
+                  file=sys.stderr)
+            continue
+        # Merge into parent. The parent is the priority entry (which has the
+        # higher-quality scan), so we ADD brand counts on top.
+        parent_entry = orgs[parent]
+        # mentions_by_date — sum per date
+        pmbd = parent_entry.setdefault("mentions_by_date", {})
+        for d, n in (brand_entry.get("mentions_by_date") or {}).items():
+            pmbd[d] = pmbd.get(d, 0) + n
+        # mentions_by_source_type — sum per type
+        pmbst = parent_entry.setdefault("mentions_by_source_type", {})
+        for t, n in (brand_entry.get("mentions_by_source_type") or {}).items():
+            pmbst[t] = pmbst.get(t, 0) + n
+        # alias_hits — sum
+        pah = parent_entry.setdefault("alias_hits", {})
+        for a, n in (brand_entry.get("alias_hits") or {}).items():
+            pah[a] = pah.get(a, 0) + n
+        # radar_appearances — concatenate, dedupe by (date, topic_id)
+        pra = parent_entry.setdefault("radar_appearances", [])
+        seen = {(r.get("date"), tuple(t.get("topic_id") for t in r.get("topics", [])))
+                for r in pra}
+        for r in (brand_entry.get("radar_appearances") or []):
+            key = (r.get("date"), tuple(t.get("topic_id") for t in r.get("topics", [])))
+            if key not in seen:
+                pra.append(r)
+                seen.add(key)
+        # hot_events — concatenate
+        parent_entry.setdefault("hot_events", []).extend(brand_entry.get("hot_events") or [])
+        # context_samples — keep parent's, top up from brand if room
+        ctx = parent_entry.setdefault("context_samples", [])
+        for s in (brand_entry.get("context_samples") or []):
+            if len(ctx) >= 12:
+                break
+            if s not in ctx:
+                ctx.append(s)
+        # Recompute summaries
+        parent_entry["total_mentions"] = sum(pmbd.values())
+        parent_entry["distinct_days"] = len(pmbd)
+        parent_entry["distinct_source_types"] = sorted(pmbst.keys())
+        # first_seen / last_seen — span of either entry
+        for k in ("first_seen", "last_seen"):
+            pv = parent_entry.get(k)
+            bv = brand_entry.get(k)
+            if bv and (not pv or (k == "first_seen" and bv < pv) or (k == "last_seen" and bv > pv)):
+                parent_entry[k] = bv
+        # Done — drop the brand from the map and queue its file for deletion.
+        del orgs[brand]
+        dropped_files.append(brand)
+    return orgs, dropped_files
+
+
 def load_sources_json():
     with open(STATE_DIR / "sources.json") as f:
         return json.load(f)
@@ -433,6 +565,15 @@ def main():
     # but just in case).
     all_orgs = {**discovered_orgs, **priority_tally}
 
+    # Fold brand/product slugs into their canonical parent. Without this, the
+    # vendor sweep agent's discovery of "claude" / "gemini" / etc. creates
+    # standalone slugs that double-count the mentions PRIORITY_VENDORS already
+    # credited to Anthropic/Google-DeepMind/etc. See BRAND_TO_PARENT comment.
+    all_orgs, dropped_brand_slugs = fold_brand_slugs(all_orgs)
+    if dropped_brand_slugs:
+        print(f"[build_org_view] folded {len(dropped_brand_slugs)} brand slugs into parents: "
+              f"{sorted(dropped_brand_slugs)}", file=sys.stderr)
+
     # Load radar JSONs once
     radar_jsons = []
     radar_dir = RADAR_DIR
@@ -544,6 +685,24 @@ def main():
         ),
     }
     (orgs_dir / "index.json").write_text(json.dumps(index_payload, indent=2, ensure_ascii=False))
+
+    # Clean up brand-slug files on disk. Two sources:
+    #   1. Slugs the fold step just absorbed (dropped_brand_slugs).
+    #   2. Slugs that were absorbed by an EARLIER run and stripped from
+    #      discovered_orgs.json — their per-slug files would otherwise survive
+    #      indefinitely on disk because the loop above never touched them.
+    # In both cases, the index no longer references them; without this cleanup,
+    # Angular's lazy fetch on /map/firm/claude would still resolve to stale
+    # JSON. Belt-and-braces: remove every BRAND_TO_PARENT slug file that exists.
+    brand_files_removed = 0
+    for slug in BRAND_TO_PARENT:
+        f = orgs_dir / f"{slug}.json"
+        if f.exists():
+            f.unlink()
+            brand_files_removed += 1
+    if brand_files_removed:
+        print(f"[build_org_view] removed {brand_files_removed} stale brand-slug files",
+              file=sys.stderr)
 
     print(
         f"[build_org_view] wrote orgs/index.json + {org_files_written} per-org files "

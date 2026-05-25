@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { Skeleton } from 'primeng/skeleton';
 import { MeterGroup } from 'primeng/metergroup';
@@ -18,6 +18,34 @@ interface VelocityPoint {
 
 const SPARK_BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
 
+/** Brand / product slugs that used to be standalone firms but now fold into a
+ *  canonical parent (matches BRAND_TO_PARENT in build_org_view.py). A user
+ *  navigating to /map/firm/claude — via bookmark, an external link, or a stale
+ *  page reference — gets transparently redirected to the parent firm rather
+ *  than a 404. Keep in sync with the Python map; the duplication is small
+ *  enough that two declarations is cleaner than fetching a server-side map. */
+const BRAND_TO_PARENT: Record<string, string> = {
+  claude:           'anthropic',
+  'claude-code':    'anthropic',
+  mythos:           'anthropic',
+  stainless:        'anthropic',
+  'gpt-5':          'openai',
+  codex:            'openai',
+  gemini:           'google-deepmind',
+  deepmind:         'google-deepmind',
+  llama:            'meta',
+  qwen:             'alibaba',
+  tongyi:           'alibaba',
+  kimi:             'moonshot',
+  azure:            'microsoft',
+  'github-copilot': 'microsoft',
+  'amazon-aws':     'aws',
+  bedrock:          'aws',
+  agentforce:       'salesforce',
+  watsonx:          'ibm',
+  cortex:           'snowflake',
+};
+
 @Component({
   selector: 'app-firm',
   standalone: true,
@@ -29,6 +57,7 @@ const SPARK_BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
 export class FirmPage {
   private readonly data = inject(DataService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly slug = signal<string>('');
   readonly detail = signal<OrgDetail | null>(null);
@@ -182,7 +211,17 @@ export class FirmPage {
   constructor() {
     this.route.paramMap.subscribe(params => {
       const slug = params.get('slug');
-      if (slug && slug !== this.slug()) {
+      if (!slug) return;
+      // Redirect brand/product slugs to their canonical parent. replaceUrl=true
+      // so the bookmark/back-button history doesn't get the brand URL stuck in
+      // it. Skip the load — the redirect will fire paramMap again with the
+      // parent slug.
+      const parent = BRAND_TO_PARENT[slug];
+      if (parent) {
+        this.router.navigate(['/map/firm', parent], { replaceUrl: true });
+        return;
+      }
+      if (slug !== this.slug()) {
         this.slug.set(slug);
         this.loadFirm(slug);
       }
