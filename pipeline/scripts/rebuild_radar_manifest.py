@@ -10,9 +10,19 @@ Paths stored in the manifest are RELATIVE TO DATA_ROOT (e.g. `radar/2026/05/
 """
 
 import json
+import re
 import sys
 
 from _lib import DATA_ROOT, RADAR_DIR
+
+# A radar snapshot stem looks like `2026-05-24` or `2026-05-24-v2`. Anything
+# else under `radar/` (gap_keywords.json, index.json, future siblings like
+# stage_movement_log.json) is not a snapshot and must NOT be indexed as one.
+# Previously, gap_keywords.json was being picked up and — sorting later than
+# any real snapshot under `("gap_keywords", False)` — would land as the
+# "newest" entry, breaking the Map page header ("INVALID DATE", date button
+# labelled "gap_keywords") and the health beacon's manifest generated_at field.
+SNAPSHOT_STEM = re.compile(r"^\d{4}-\d{2}-\d{2}(-v\d+)?$")
 
 
 def main() -> int:
@@ -22,6 +32,8 @@ def main() -> int:
         if path.name == "index.json":
             continue
         date_id = path.stem
+        if not SNAPSHOT_STEM.match(date_id):
+            continue
         try:
             with open(path) as handle:
                 data = json.load(handle)

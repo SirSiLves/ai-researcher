@@ -37,6 +37,33 @@ interface MonthGroup {
 /** How many rows to show per month before user clicks "show more". */
 const PAGE_SIZE = 50;
 
+/** Bucket an entry into its calendar month, even when the date_id is an ISO
+ *  week (`2026-W21`). A naive `slice(0, 7)` truncates the W## suffix and
+ *  collapses every weekly into "2026-W2" / "2026-W1" buckets. Here we resolve
+ *  weekly IDs to their Monday's YYYY-MM so weekly rollups sit next to that
+ *  week's daily entries in the archive. */
+function monthKeyOf(entry: ReportEntry): string {
+  const raw = entry.sort_date || entry.date_id;
+  // YYYY-Www → Monday-of-week's YYYY-MM
+  const weekMatch = /^(\d{4})-W(\d{2})$/.exec(raw);
+  if (weekMatch) {
+    const year = Number(weekMatch[1]);
+    const week = Number(weekMatch[2]);
+    // ISO-week Monday: take Jan 4 of the year (always week 1 per ISO 8601),
+    // subtract its day-of-week-from-Monday, then add (week-1)*7.
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const jan4DowMon = (jan4.getUTCDay() + 6) % 7; // Mon=0 ... Sun=6
+    const week1Monday = new Date(jan4);
+    week1Monday.setUTCDate(jan4.getUTCDate() - jan4DowMon);
+    const monday = new Date(week1Monday);
+    monday.setUTCDate(week1Monday.getUTCDate() + (week - 1) * 7);
+    const mm = String(monday.getUTCMonth() + 1).padStart(2, '0');
+    return `${monday.getUTCFullYear()}-${mm}`;
+  }
+  // YYYY-MM (monthly entries) or YYYY-MM-DD (everything else)
+  return raw.slice(0, 7);
+}
+
 @Component({
   selector: 'app-archive',
   standalone: true,
@@ -123,7 +150,7 @@ export class ArchivePage {
     const expanded = this.expanded();
     const byMonth = new Map<string, ReportEntry[]>();
     for (const entry of list) {
-      const key = (entry.sort_date || entry.date_id).slice(0, 7);
+      const key = monthKeyOf(entry);
       if (!byMonth.has(key)) byMonth.set(key, []);
       byMonth.get(key)!.push(entry);
     }
@@ -136,8 +163,6 @@ export class ArchivePage {
         if (/^\d{4}-\d{2}$/.test(key)) {
           const parsed = new Date(key + '-01T00:00:00');
           label = parsed.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        } else if (/^\d{4}-W\d{2}/.test(key)) {
-          label = key;
         }
         const total = entries.length;
         const visible = expanded.has(key) ? entries : entries.slice(0, PAGE_SIZE);
