@@ -4,6 +4,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Daily reports
 <!-- INDEX_START -->
+- [2026-05-24](daily/2026/05/2026-05-24.md) — Anthropic $30B+ round at $900B+ valuation (Sequoia/Dragoneer/Altimeter/Greenoaks lead, $50B run-rate by June) set to overtake OpenAI; OpenAI confidentially files S-1 at $852B–$1T (Goldman/MS); Karpathy joins Anthropic pre-training; Stainless acquired ($300M, hosted product wound down); Claude Security GA + Cyber Verification Program; Cohere Command A+ first Apache 2.0 frontier-class model (218B MoE, 2× H100s, native citations); OpenAI Dell on-prem Codex + autonomous Erdős unit-distance disproof; Mistral acquires Vienna's Emmi AI (industrial AI); Red Hat AI Inference on IBM Cloud GA; Microsoft Edge Business agentic Copilot preview; AISI first Frontier AI Trends Report; EU AI Act draft Article 6 guidelines (consultation through June 23); CHUV starts Meditron clinical pilot in Lausanne ER; GitHub: multica-ai/andrej-karpathy-skills +2,555; HN: Glasswing 90.6% TPR but Stenberg disagrees + Microsoft cancels Claude Code licenses + DeepSeek V4 Pro 75% discount permanent; Lakera Zurich opens five AI-security roles
 - [2026-05-23](daily/2026/05/2026-05-23.md) — Anthropic ships self-hosted sandboxes + MCP tunnels (regulated buyers unblocked); MCP 2026-07-28 release candidate (stateless core, Tasks, MCP Apps, hardened auth); SAP Sapphire Joule Studio + Claude + n8n $5.2B; OpenAI Deployment Company launches ($4B+, Tomoro acquisition, 150 forward-deployed engineers); Sierra $950M at ~$15B; Isomorphic Labs $2.1B Series B (Thrive lead); EU AI Act Omnibus political agreement + Commission high-risk classification consultation through June 23; Pinecone Nexus + KnowQL; AWS Bedrock AgentCore Payments + MCP Server GA; IBM Think 2026; HN front page: OpenAI model disproves Erdős unit-distance conjecture (1,402 pts) + Antigravity bait-and-switch (Google AI strategy postmortem in comments); GitHub: NousResearch/hermes-agent +1,334, multica-ai/andrej-karpathy-skills +3,372; LinkedIn: 53% of production MCP servers still use long-lived static secrets
 - [2026-05-22](daily/2026/05/2026-05-22.md) — OpenAI files confidential S-1 with Goldman + Morgan Stanley (September listing target above $1T); SpaceX prospectus exposes Anthropic compute economics ($1.25B/month, $45B-through-2029 Colossus deal, Colossus 2 GB200 ramps in June); WSJ confirms Anthropic Q2 first-ever profitable quarter ($10.9B rev / $559M op-profit, 71¢ → 56¢ compute ratio, $1M+ customers 500 → 1,000+); CNBC: Chinese models 60% of OpenRouter, 9× cost gap threatens IPO valuations; OpenAI reasoning model disproves Erdős unit-distance conjecture (Alon/Wood/Bloom verified); Mistral 3 ships (Large 3 sparse-MoE 41B/675B + Ministral 3, all Apache 2.0); Gemini Spark + Google Pics → trusted testers today; ChatGPT Enterprise/EDU Goal mode + browser annotations; Salesforce Agentforce Life Sciences lands Pierre Fabre (first major EU pharma); Snowflake Cortex AI Guardrails GA for Intelligence + Cortex Agents; Hark $700M Series A at $6B (Adcock — NVIDIA/AMD/Intel/Qualcomm/Salesforce all in); EU AI Act Omnibus confirmed (Annex III → Dec 2027 / Annex I → Aug 2028 / watermark grace to Dec 2026); White House EO postponed again; HN sentiment turns sharply anti-AI (Wozniak / slop-grenade / Antigravity bait-and-switch); NousResearch/hermes-agent viral on GitHub (+1,761 today)
 - [2026-05-21](daily/2026/05/2026-05-21.md) — Trump pulls AI cybersecurity EO on signing day; OpenAI confidential IPO filing as soon as Friday (Sept listing target, $1T valuation); Anthropic projects first-ever profitable quarter ($10.9B Q2 rev / $559M op-profit); Pinecone Nexus + KnowQL ship ("the RAG era is ending"); Gemini 3.5 Flash + Omni Flash GA to AI Plus/Pro/Ultra; Universal Cart launches with Nike/Sephora/Target/Walmart + AP2 at 60+ partners; Blackstone $5B TPU JV with Google (500MW by 2027); SAP × Mistral S/4HANA migration partnership + SBB live with 30k-employee RAG chatbot; Code with Claude London Extended Day 2; Figma native AI Design Agent + figma-use-figjam MCP skill; DeepSeek forms Beijing "Harness" team for DeepSeek Code; Mythos cascade reaches Switzerland (FINMA systemic-risk + Schwyz-based QPQ IaaS countermeasure); Germany Hightech-Agenda (Bär — 4,000 AI startups + sovereign chips + fusion baseline)
@@ -79,7 +80,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Weekly rollups
 <!-- WEEKLY_START -->
-- [2026-W21](weekly/2026/2026-W21.md) — Mon 2026-05-18 → Sun 2026-05-24, 6/7 days, OpenAI files $1T S-1 + Anthropic first profit ($10.9B Q2/$559M op); SpaceX exposes $45B Colossus; Karpathy→Anthropic; Stainless EOL + MS open-sources Agent Framework; MCP 2026-07-28 RC; Trump EO collapses, FINMA tops Mythos; OpenAI Deployment Co $4B+; Erdős disproof
+- [2026-W21](weekly/2026/2026-W21.md) — Mon 2026-05-18 → Sun 2026-05-24, 7/7 days, capital flip: OpenAI files $1T S-1 + Anthropic $30B/$900B queued + first profit ($10.9B Q2/$559M op); SpaceX exposes $45B Colossus; Stainless EOL vs MS Agent Framework open-sourced + MCP 2026-07-28 RC; Google I/O Gemini 3.5+AP2+$5B Blackstone TPU JV; Trump EO collapses, FINMA tops Mythos; OpenAI Deployment Co $4B+; Cohere Apache-2.0 Command A+; Erdős disproof
 - [2026-W20](weekly/2026/2026-W20.md) — Mon 2026-05-11 → Sun 2026-05-17, 7/7 days, enterprise consolidation peak (SAP+PwC+Ramp pick Claude; Anthropic $30B run-rate); Cerebras priced→traded ~$70B; AWS AgentCore Payments; HN "AI psychosis" #1 two days
 - [2026-W19](weekly/2026/2026-W19.md) — Mon 2026-05-04 → Sun 2026-05-10, 7/7 days, Anthropic $1.5B JV + Google $40B; frontier pile-up Thu; OpenAI Daybreak; Cloudflare -1,100; EU AI Act deal; Apple iOS 27
 - [2026-W18](weekly/2026/2026-W18.md) — Mon 2026-04-27 → Sun 2026-05-03, 7/7 days, MSFT-OpenAI restructure + Bedrock; Pentagon excludes Anthropic; Agent 365 GA + Headless 360; Mistral 3.5; KAME
@@ -102,6 +103,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Trend radar
 <!-- RADAR_START -->
+- [2026-05-24](radar/2026/05/2026-05-24.md) — 41 topics, 0 stage movements, top by importance: Frontier models — Anthropic ($30B+/$900B+ round + Karpathy + Stainless + Claude Security GA) & Frontier models — OpenAI (confidential S-1 + GPT-5.5/Codex + Dell on-prem + Erdős disproof) — capital-axis pivot at the frontier
 - [2026-05-23](radar/2026/05/2026-05-23.md) — 41 topics, 2 stage movements, top promotions to consolidating: Vendor governance as business line (Snowflake Cortex Guardrails GA + ServiceNow Control Tower + IBM watsonx Orchestrate), Frontier models — OpenAI (Deployment Company $4B+ + Tomoro acquisition + Erdős disproof model)
 - [2026-05-22](radar/2026/05/2026-05-22.md) — 41 topics, 3 stage movements, top promotions to consolidating: AI corporate token-mandate & bubble (OpenAI S-1 + Anthropic Q2 + 60% OpenRouter China), EU AI Act (Omnibus Annex III → Dec 2027 / Annex I → Aug 2028), AI vendor trust & friction (Trump EO postponed + Antigravity HN backlash + anti-AI sentiment wave)
 - [2026-05-21](radar/2026/05/2026-05-21.md) — 41 topics, 3 stage movements, top promotions to consolidating: AI coding agents (DeepSeek 'Harness' team + DeepSeek Code), Agent skills wave (Claude Skills, obra/superpowers, FigJam generate-project-plan), Implementation revenue (SAP×Mistral SBB live, Hightech-Agenda 4000 startups, OpenAI IPO disclosure)
@@ -177,6 +179,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Vendor sweep
 <!-- VENDOR_START -->
+- [2026-05-24](vendor_candidates/2026/05/2026-05-24.md) — applied: 0 promotions, 1 hot, 0 expired; pending: 0; watch: 20; silent: 0
 - [2026-05-23](vendor_candidates/2026/05/2026-05-23.md) — applied: 0 promotions, 0 hot, 0 expired; pending: 0; watch: 20; silent: 0
 - [2026-05-22](vendor_candidates/2026/05/2026-05-22.md) — applied: 0 promotions, 5 hot, 0 expired; pending: 0; watch: 20; silent: 0
 - [2026-05-21](vendor_candidates/2026/05/2026-05-21.md) — applied: 1 promotions, 2 hot, 0 expired; pending: 0; watch: 20; silent: 0
@@ -192,6 +195,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## Keyword sweep
 <!-- KEYWORD_START -->
+- [2026-05-24](data/keyword_candidates/2026/05/2026-05-24.md) — applied: 4 promotion(s), 0 proven-promotion(s); pending: 5; watch: 339; tally: 2132 phrases
 - [2026-05-23](data/keyword_candidates/2026/05/2026-05-23.md) — applied: 3 promotion(s), 1 proven-promotion(s); pending: 4; watch: 318; tally: 1985 phrases
 - [2026-05-22](data/keyword_candidates/2026/05/2026-05-22.md) — applied: 1 promotion(s), 0 proven-promotion(s); pending: 3; watch: 292; tally: 1821 phrases
 - [2026-05-21](data/keyword_candidates/2026/05/2026-05-21.md) — applied: 3 promotion(s), 1 proven-promotion(s); pending: 1; watch: 275; tally: 1656 phrases
@@ -207,6 +211,7 @@ Newest first in each section. The pipeline writes to one folder per cadence — 
 
 ## GitHub sweep
 <!-- GITHUB_START -->
+- [2026-05-24](data/github_candidates/2026/05/2026-05-24.md) — applied: 2 promotion(s), 0 hot, 0 revived; pending: 2; watch: 26; watched_repos: 76 / deep_watch: 0
 - [2026-05-23](data/github_candidates/2026/05/2026-05-23.md) — applied: 5 promotion(s), 0 hot, 0 revived; pending: 2; watch: 20; watched_repos: 74 / deep_watch: 0
 - [2026-05-22](data/github_candidates/2026/05/2026-05-22.md) — applied: 2 promotion(s), 0 hot, 0 revived; pending: 5; watch: 18; watched_repos: 69 / deep_watch: 0
 - [2026-05-21](data/github_candidates/2026/05/2026-05-21.md) — applied: 8 promotion(s), 0 hot, 0 revived; pending: 2; watch: 21; watched_repos: 67 / deep_watch: 0
