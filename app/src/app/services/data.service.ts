@@ -144,6 +144,11 @@ export interface RadarDay {
 
 export interface OrgIndexEntry {
   slug: string;
+  /** Human-readable name (e.g. "Anthropic" not "anthropic"). Populated by
+   *  build_org_view.derive_display_name. Always present in newly-built
+   *  manifests; older builds may omit it, so consumers should fall back to
+   *  slug for safety. */
+  display_name?: string;
   is_priority: boolean;
   coverage: string;
   tier_hint: string | null;
@@ -229,6 +234,8 @@ export interface SweepSummary {
  *  of truth for the row sparkline + detail-page line chart. */
 export interface OrgDetail {
   slug: string;
+  /** Human-readable name. See OrgIndexEntry.display_name for derivation. */
+  display_name?: string;
   coverage: string;
   tier_hint: string | null;
   region: string | null;

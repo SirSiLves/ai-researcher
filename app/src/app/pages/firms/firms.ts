@@ -14,6 +14,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ButtonModule } from 'primeng/button';
 
 import { DataService, OrgIndexEntry, OrgDetail } from '../../services/data.service';
+import { humanizeSlug } from '../../services/humanize';
 
 const SPARK_BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
 
@@ -45,6 +46,13 @@ export class FirmsPage {
   readonly selectedSlug = signal<string | null>(null);
   readonly detail = signal<OrgDetail | null>(null);
   readonly detailLoading = signal<boolean>(false);
+
+  /** Display label for a firm row: prefer the build-side display_name, then
+   *  humanizeSlug() so brand names like "OpenAI" / "Hugging Face" render
+   *  correctly even before display_name lands in older index files. */
+  firmDisplay(o: OrgIndexEntry): string {
+    return o.display_name || humanizeSlug(o.slug);
+  }
 
   readonly velocityOptions = [
     { label: 'All',          value: null },

@@ -11,6 +11,7 @@ import {
   RadarTopic
 } from '../../services/data.service';
 import { PageHeader } from '../../components/page-header/page-header';
+import { humanizeSlug } from '../../services/humanize';
 import { MenuItem } from 'primeng/api';
 
 interface FirmRow {
@@ -74,6 +75,13 @@ export class StoryPage {
 
   readonly day = signal<RadarDay | null>(null);
   readonly history = signal<RadarDay[]>([]);
+  /** slug → display_name from orgs/index.json. firmDisplay() falls back to
+   *  the slug while this is empty. */
+  readonly firmNames = signal<Record<string, string>>({});
+
+  firmDisplay(slug: string): string {
+    return this.firmNames()[slug] ?? humanizeSlug(slug);
+  }
 
   readonly cluster = computed<TopicCluster | null>(() => {
     const d = this.day();
@@ -205,6 +213,14 @@ export class StoryPage {
         this.load();
       }
     });
+    // Eagerly populate firmNames for the "Firms in this story" chips.
+    this.data.loadOrgsIndex().then(idx => {
+      const m: Record<string, string> = {};
+      for (const e of idx.entries) {
+        if (e.display_name) m[e.slug] = e.display_name;
+      }
+      this.firmNames.set(m);
+    }).catch(() => { /* keep slug fallback */ });
   }
 
   private async load() {

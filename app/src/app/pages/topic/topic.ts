@@ -12,6 +12,7 @@ import {
   SectorHistoryEntry,
   ClusterHistoryEntry
 } from '../../services/data.service';
+import { humanizeSlug } from '../../services/humanize';
 
 interface SeriesPoint {
   date: string;
@@ -39,6 +40,19 @@ export class TopicPage {
   readonly latestDate = signal<string | null>(null);
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
+  /** slug → display_name map, populated once the orgs index loads. Empty
+   *  until then; firmDisplay() returns the slug as fallback. */
+  readonly firmNames = signal<Record<string, string>>({});
+
+  /** Resolve a firm slug to its display name. Order:
+   *    1. display_name from orgs/index.json (best — derived from real aliases)
+   *    2. humanizeSlug() fallback (covers brand-cased orgs not yet indexed,
+   *       and acronym title-casing)
+   *  Result: chip labels read "Anthropic" / "OpenAI" / "Hugging Face", not
+   *  "anthropic" / "openai" / "huggingface". */
+  firmDisplay(slug: string): string {
+    return this.firmNames()[slug] ?? humanizeSlug(slug);
+  }
   /** "_Why it matters:_ ..." sentence parsed out of the latest radar.md.
    *  Present for top-5 by importance; empty for ranks 6+. */
   readonly whyItMatters = signal<string>('');
@@ -163,6 +177,15 @@ export class TopicPage {
         this.loadTopic(id);
       }
     });
+    // Eagerly load the orgs index for the "Firms talking" chip list. Falls
+    // back gracefully (firmDisplay returns slug) if the index 404s.
+    this.data.loadOrgsIndex().then(idx => {
+      const m: Record<string, string> = {};
+      for (const e of idx.entries) {
+        if (e.display_name) m[e.slug] = e.display_name;
+      }
+      this.firmNames.set(m);
+    }).catch(() => { /* keep slugs as fallback */ });
   }
 
   private async loadTopic(id: string) {

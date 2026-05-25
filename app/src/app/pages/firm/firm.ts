@@ -9,6 +9,7 @@ import { MenuItem } from 'primeng/api';
 import { PageHeader } from '../../components/page-header/page-header';
 
 import { DataService, OrgDetail, OrgIndexEntry, RadarDay } from '../../services/data.service';
+import { humanizeSlug } from '../../services/humanize';
 
 interface VelocityPoint {
   date: string;
@@ -301,6 +302,14 @@ export class FirmPage {
     if (d.coverage) parts.push(`coverage ${d.coverage}`);
     parts.push(`${d.total_mentions} mentions over ${d.distinct_days} days`);
     return parts.join(' · ');
+  }
+
+  /** Title for the firm page header. Prefer the build-side display_name
+   *  (derived from real aliases / PRIORITY_VENDORS hardcode), then
+   *  humanizeSlug() for orgs not yet enriched. Slug is the last-ditch
+   *  fallback. */
+  displayName(d: OrgDetail): string {
+    return d.display_name || humanizeSlug(d.slug) || d.slug;
   }
 
   statusSeverity(status: string | undefined): 'success' | 'info' | 'warn' | 'secondary' | 'danger' {

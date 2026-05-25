@@ -175,7 +175,7 @@
         <ul class="topic__orgs">
           @for (org of t.breadth_orgs_7d; track org) {
             <li>
-              <a [routerLink]="['/map/firm', org]" class="topic__org-chip">{{ org }}</a>
+              <a [routerLink]="['/map/firm', org]" class="topic__org-chip">{{ firmDisplay(org) }}</a>
             </li>
           }
         </ul>

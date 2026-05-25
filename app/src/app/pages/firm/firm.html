@@ -12,7 +12,7 @@
 
   @if (detail(); as d) {
     <app-page-header
-        [title]="d.slug"
+        [title]="displayName(d)"
         [subtitle]="firmSubtitle(d)"
         [model]="breadcrumb()">
       @if (velocity(); as v) {

@@ -54,6 +54,7 @@ TODAY = os.environ.get("TODAY") or date.today().isoformat()
 # Aliases match case-insensitive whole-word substring (same logic as the sweep).
 PRIORITY_VENDORS = {
     "openai": {
+        "display_name": "OpenAI",
         "aliases": ["OpenAI", "GPT-4", "GPT-5", "ChatGPT", "Sora", "DALL-E"],
         "tier_hint": "frontier-lab",
         "region": "us",
@@ -61,6 +62,7 @@ PRIORITY_VENDORS = {
         "coverage": "priority",
     },
     "anthropic": {
+        "display_name": "Anthropic",
         "aliases": ["Anthropic", "Claude", "Claude Opus", "Claude Sonnet", "Claude Haiku"],
         "tier_hint": "frontier-lab",
         "region": "us",
@@ -68,6 +70,7 @@ PRIORITY_VENDORS = {
         "coverage": "priority",
     },
     "google-deepmind": {
+        "display_name": "Google DeepMind",
         "aliases": ["Google DeepMind", "DeepMind", "Gemini", "AlphaFold", "AlphaEvolve", "AlphaProof"],
         "tier_hint": "frontier-lab",
         "region": "us",
@@ -75,6 +78,7 @@ PRIORITY_VENDORS = {
         "coverage": "priority",
     },
     "meta": {
+        "display_name": "Meta",
         "aliases": ["Meta AI", "Llama", "LLaMA", "FAIR Labs", "Meta FAIR"],
         "tier_hint": "frontier-lab",
         "region": "us",
@@ -82,6 +86,7 @@ PRIORITY_VENDORS = {
         "coverage": "priority",
     },
     "mistral": {
+        "display_name": "Mistral",
         "aliases": ["Mistral", "Mistral AI", "Mixtral", "Codestral"],
         "tier_hint": "frontier-lab",
         "region": "fr",
@@ -89,6 +94,7 @@ PRIORITY_VENDORS = {
         "coverage": "priority",
     },
     "deepseek": {
+        "display_name": "DeepSeek",
         "aliases": ["DeepSeek", "DeepSeek-V", "DeepSeek-R"],
         "tier_hint": "frontier-lab",
         "region": "cn",
@@ -96,6 +102,38 @@ PRIORITY_VENDORS = {
         "coverage": "priority",
     },
 }
+
+
+def derive_display_name(slug: str, entry: dict) -> str:
+    """Pick a human-readable name for a firm.
+
+    Priority order:
+      1. entry["display_name"] if set (priority vendors hardcode this).
+      2. Most-hit alias that has at least one uppercase letter — typically the
+         best brand form (e.g. "Anthropic" over "anthropic", "Hugging Face"
+         over "hugging face"). Ties broken by the alias seen most often.
+      3. The longest alias as a fallback.
+      4. Title-cased slug for orgs we know nothing about beyond their key.
+
+    Avoids returning an all-lowercase form when a mixed-case alias is available,
+    which is what made firm headers read "anthropic" instead of "Anthropic"
+    before this fix.
+    """
+    name = entry.get("display_name")
+    if name:
+        return name
+    alias_hits = entry.get("alias_hits") or {}
+    aliases = list(alias_hits.keys()) or entry.get("aliases") or []
+    if not aliases:
+        # Fallback: title-case the slug, replacing hyphens with spaces.
+        return slug.replace("-", " ").title()
+    mixed_case = [a for a in aliases if any(c.isupper() for c in a)]
+    if mixed_case:
+        # Among mixed-case aliases, prefer the one with the most hits.
+        mixed_case.sort(key=lambda a: (-alias_hits.get(a, 0), -len(a)))
+        return mixed_case[0]
+    # No mixed-case alias — fall back to the longest one.
+    return max(aliases, key=len)
 
 # Brand / product slugs that the vendor sweep agent has registered as their own
 # "orgs" but actually belong to a priority vendor. Their mentions are *already*
@@ -657,8 +695,10 @@ def main():
                                     precomputed=topic_mix_index, slug=slug)
         radar_appearances = attach_radar_org_appearances(slug, radar_jsons)
 
+        display_name = derive_display_name(slug, entry)
         per_org = {
             "slug": slug,
+            "display_name": display_name,
             "coverage": entry.get("coverage", "uncovered"),
             "tier_hint": entry.get("tier_hint"),
             "region": entry.get("region"),
@@ -693,6 +733,7 @@ def main():
 
         index_entries.append({
             "slug": slug,
+            "display_name": display_name,
             "is_priority": slug in PRIORITY_VENDORS,
             "coverage": per_org["coverage"],
             "tier_hint": per_org["tier_hint"],

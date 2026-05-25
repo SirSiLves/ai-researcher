@@ -85,7 +85,7 @@
         <ul class="story__firms-chart">
           @for (f of firms().slice(0, 16); track f.slug) {
             <li class="story__firm-row">
-              <a [routerLink]="['/map/firm', f.slug]" class="story__firm-slug">{{ f.slug }}</a>
+              <a [routerLink]="['/map/firm', f.slug]" class="story__firm-slug">{{ firmDisplay(f.slug) }}</a>
               <div class="story__firm-bar" [attr.aria-label]="f.topicCount + ' topics'">
                 <span class="story__firm-bar-fill" [style.width.%]="f.pct"></span>
               </div>
