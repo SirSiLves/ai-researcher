@@ -393,8 +393,18 @@ def compute_velocity_history(mentions_by_date, today_iso, window_days=30):
     return history
 
 
-def precompute_topic_mix(all_orgs, taxonomy, file_index):
-    """One-pass topic-mix builder.
+def precompute_topic_mix(all_orgs, topic_keywords, file_index):
+    """One-pass topic-mix builder, keyed on TODAY's radar topic IDs.
+
+    `topic_keywords` is `pipeline/state/topic_keywords.json` — the radar
+    pipeline's canonical per-topic keyword set, kept current as topics are
+    born/retired. Previously we keyed topic_mix on the static
+    `sources.json.radar_config.topic_taxonomy_seed` strings; that worked at
+    first but the seed list rotted (30 of 51 entries no longer match any
+    current topic), so firm pages showed stale labels like "DeepSeek V4" and
+    "pentagon-anthropic" as a firm's top topics. Using topic_keywords keeps
+    topic_mix slug-stable and label-fresh — radar churn is the source of
+    truth.
 
     The old per-org `build_topic_mix` re-read every source file from disk
     once per org × per topic, costing ~60ms × 1104 orgs ≈ 65s on cron. That
@@ -402,15 +412,16 @@ def precompute_topic_mix(all_orgs, taxonomy, file_index):
     stale until the next manual rebuild.
 
     This version inverts the loop:
-      1. Compile every org-alias pattern and every taxonomy-topic pattern once.
+      1. Compile every org-alias pattern; compile one regex per topic that
+         alternates over its keyword set.
       2. Walk source files once. For each file:
            - find which orgs are mentioned (by alias)
-           - find which topics appear (by taxonomy string), with their counts
+           - find which topics appear (any keyword hits), with their counts
            - cross-product: for each mentioned org, add the topic counts
-      3. Returns {slug: {topic: count}} for every org with any topic hits.
+      3. Returns {slug: {topic_id: count}} for every org with any topic hits.
 
     Cost is dominated by len(files) × (len(org_patterns) + len(topic_patterns))
-    rather than len(orgs) × len(files). For 333 files / 1104 orgs / ~50 topics
+    rather than len(orgs) × len(files). For 333 files / 1104 orgs / ~41 topics
     that drops 65s → roughly 5-8s, well inside the sandbox window.
     """
     # Build per-org list of (alias, slug) — lowercased for substring matching
@@ -437,13 +448,27 @@ def precompute_topic_mix(all_orgs, taxonomy, file_index):
         re.IGNORECASE,
     )
 
-    # Compile every taxonomy topic-string pattern once.
+    # Compile one regex per topic id over its current keyword set. Keywords come
+    # from topic_keywords.json (the radar's source of truth). Each topic's regex
+    # alternates over its keywords; whole-word boundaries to avoid e.g.
+    # "anthropic" matching inside "misanthropic". Skip keywords shorter than 3
+    # chars to avoid over-matching common short tokens.
     topic_patterns = {}
-    for group, topics in taxonomy.items():
-        if group.startswith("_") or not isinstance(topics, list):
+    topics_dict = topic_keywords.get("topics", {}) if isinstance(topic_keywords, dict) else {}
+    for topic_id, entry in topics_dict.items():
+        if topic_id.startswith("_") or not isinstance(entry, dict):
             continue
-        for t in topics:
-            topic_patterns[t] = whole_word_pattern(t)
+        kws = [k for k in (entry.get("keywords") or []) if isinstance(k, str) and len(k) >= 3]
+        if not kws:
+            continue
+        # Longest first so e.g. "claude opus 4.7" wins over "claude".
+        kws_sorted = sorted(kws, key=lambda x: -len(x))
+        pattern = (
+            r"(?<![A-Za-z0-9])(?:"
+            + "|".join(re.escape(k) for k in kws_sorted)
+            + r")(?![A-Za-z0-9])"
+        )
+        topic_patterns[topic_id] = re.compile(pattern, re.IGNORECASE)
 
     # Walk files once. For each file:
     #   1. Find every (alias, position) hit via the combined org regex.
@@ -462,18 +487,18 @@ def precompute_topic_mix(all_orgs, taxonomy, file_index):
                 slugs_in_file.add(slug)
         if not slugs_in_file:
             continue
-        # Topic counts for this file
+        # Topic counts for this file — keyed on topic_id (e.g. "agent-sdks").
         topic_counts_in_file = {}
-        for topic_name, rx in topic_patterns.items():
+        for topic_id, rx in topic_patterns.items():
             n = len(rx.findall(text))
             if n:
-                topic_counts_in_file[topic_name] = n
+                topic_counts_in_file[topic_id] = n
         if not topic_counts_in_file:
             continue
         # Cross-product: each mentioned org gets the topic counts.
         for slug in slugs_in_file:
-            for topic_name, count in topic_counts_in_file.items():
-                topic_mix_per_org[slug][topic_name] += count
+            for topic_id, count in topic_counts_in_file.items():
+                topic_mix_per_org[slug][topic_id] += count
 
     # Sort each org's mix by count desc.
     return {
@@ -482,12 +507,13 @@ def precompute_topic_mix(all_orgs, taxonomy, file_index):
     }
 
 
-def build_topic_mix(org_entry, taxonomy, file_index, precomputed=None, slug=None):
-    """Topic-mix accessor.
+def build_topic_mix(org_entry, topic_keywords, file_index, precomputed=None, slug=None):
+    """Topic-mix accessor, keyed on TODAY's radar topic IDs.
 
     If `precomputed` (the dict returned by `precompute_topic_mix`) is supplied,
     just look up the slug. Otherwise fall back to the slow per-org scan so
-    standalone callers (one-off scripts, tests) still work.
+    standalone callers (one-off scripts, tests) still work. `topic_keywords`
+    has the same shape as topic_keywords.json — `{"topics": {id: {keywords: [...]}}}`.
     """
     if precomputed is not None and slug is not None:
         return precomputed.get(slug, {})
@@ -503,11 +529,19 @@ def build_topic_mix(org_entry, taxonomy, file_index, precomputed=None, slug=None
         return {}
     org_patterns = [whole_word_pattern(a) for a in aliases]
     topic_patterns = {}
-    for group, topics in taxonomy.items():
-        if group.startswith("_") or not isinstance(topics, list):
+    for topic_id, entry in (topic_keywords.get("topics", {}) if isinstance(topic_keywords, dict) else {}).items():
+        if topic_id.startswith("_") or not isinstance(entry, dict):
             continue
-        for t in topics:
-            topic_patterns[t] = whole_word_pattern(t)
+        kws = [k for k in (entry.get("keywords") or []) if isinstance(k, str) and len(k) >= 3]
+        if not kws:
+            continue
+        kws_sorted = sorted(kws, key=lambda x: -len(x))
+        pattern = (
+            r"(?<![A-Za-z0-9])(?:"
+            + "|".join(re.escape(k) for k in kws_sorted)
+            + r")(?![A-Za-z0-9])"
+        )
+        topic_patterns[topic_id] = re.compile(pattern, re.IGNORECASE)
     topic_counts = defaultdict(int)
     candidate_files = [(p, st, fd) for p, st, fd in file_index if fd in org_dates]
     for path, _, _ in candidate_files:
@@ -517,10 +551,10 @@ def build_topic_mix(org_entry, taxonomy, file_index, precomputed=None, slug=None
             continue
         if not any(rx.search(text) for rx in org_patterns):
             continue
-        for topic_name, rx in topic_patterns.items():
+        for topic_id, rx in topic_patterns.items():
             n = len(rx.findall(text))
             if n:
-                topic_counts[topic_name] += n
+                topic_counts[topic_id] += n
     return dict(sorted(topic_counts.items(), key=lambda kv: -kv[1]))
 
 
@@ -546,12 +580,22 @@ def attach_radar_org_appearances(slug, radar_jsons):
     return rows
 
 
-def main():
-    sources_json = load_sources_json()
-    taxonomy = sources_json.get("radar_config", {}).get("topic_taxonomy_seed", {})
+def load_topic_keywords():
+    """Load pipeline/state/topic_keywords.json. Source of truth for which topics
+    exist today and what keywords surface them in raw source text. Maintained
+    by the radar pipeline (ai-trend-radar appends/retires entries here)."""
+    p = STATE_DIR / "topic_keywords.json"
+    if not p.exists():
+        return {"topics": {}}
+    with open(p) as f:
+        return json.load(f)
 
+
+def main():
     discovered = load_discovered()
     discovered_orgs = discovered.get("orgs", {})
+
+    topic_keywords = load_topic_keywords()
 
     print(f"[build_org_view] indexing source files…", file=sys.stderr)
     file_index = list(iter_source_files(DATA_ROOT))
@@ -590,8 +634,10 @@ def main():
     # Was the bottleneck at ~60ms × 1104 orgs ≈ 65s before; now ~5-8s by
     # inverting the loop (files outer, orgs inner). Lets the script finish
     # inside Cowork's bash sandbox timeout.
-    print(f"[build_org_view] precomputing topic-mix for {len(all_orgs)} orgs…", file=sys.stderr)
-    topic_mix_index = precompute_topic_mix(all_orgs, taxonomy, file_index)
+    n_topics = len((topic_keywords.get("topics") or {}))
+    print(f"[build_org_view] precomputing topic-mix for {len(all_orgs)} orgs against "
+          f"{n_topics} current topics…", file=sys.stderr)
+    topic_mix_index = precompute_topic_mix(all_orgs, topic_keywords, file_index)
     print(f"[build_org_view] topic-mix indexed for {len(topic_mix_index)} orgs", file=sys.stderr)
 
     print(f"[build_org_view] building per-org files for {len(all_orgs)} orgs…", file=sys.stderr)
@@ -607,7 +653,7 @@ def main():
         mentions_by_date = entry.get("mentions_by_date", {})
         velocity = compute_velocity(mentions_by_date, TODAY)
         velocity_history = compute_velocity_history(mentions_by_date, TODAY, window_days=30)
-        topic_mix = build_topic_mix(entry, taxonomy, file_index,
+        topic_mix = build_topic_mix(entry, topic_keywords, file_index,
                                     precomputed=topic_mix_index, slug=slug)
         radar_appearances = attach_radar_org_appearances(slug, radar_jsons)
 
