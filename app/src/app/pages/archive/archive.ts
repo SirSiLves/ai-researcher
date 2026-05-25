@@ -8,7 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { DataService, ReportEntry } from '../../services/data.service';
 import { MarkdownViewer } from '../../components/markdown-viewer/markdown-viewer';
 
-type Cadence = 'all' | 'daily' | 'weekly' | 'monthly' | 'radar' | 'sweeps';
+type Cadence = 'all' | 'daily' | 'weekly' | 'monthly' | 'radar' | 'sweeps' | 'sources';
 
 const CADENCE_LABEL: Record<Cadence, string> = {
   all:     'All',
@@ -16,10 +16,15 @@ const CADENCE_LABEL: Record<Cadence, string> = {
   weekly:  'Weekly',
   monthly: 'Monthly',
   radar:   'Radar',
-  sweeps:  'Sweeps'
+  sweeps:  'Sweeps',
+  sources: 'Raw sources'
 };
 
 const SWEEP_CADENCES = new Set(['vendor_candidates', 'keyword_candidates', 'github_candidates']);
+/** Raw-collector dumps — exposed under the "Raw sources" cadence so a
+ *  researcher can browse the long tail (papers/blogs/HN/etc.) directly
+ *  instead of only via the synthesized daily briefing. */
+const SOURCE_CADENCES = new Set(['news', 'papers', 'blogs', 'hackernews', 'github', 'linkedin', 'jobs']);
 
 interface MonthGroup {
   key: string;
@@ -49,7 +54,7 @@ export class ArchivePage {
   readonly query = signal<string>('');
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
-  readonly cadences: Cadence[] = ['all', 'daily', 'weekly', 'monthly', 'radar', 'sweeps'];
+  readonly cadences: Cadence[] = ['all', 'daily', 'weekly', 'monthly', 'radar', 'sweeps', 'sources'];
   /** Per-month "expanded" flag for showing all rows beyond PAGE_SIZE. */
   readonly expanded = signal<Set<string>>(new Set());
 
@@ -64,13 +69,16 @@ export class ArchivePage {
   private cadenceMatches(entry: ReportEntry, cadence: Cadence): boolean {
     if (cadence === 'all') return true;
     if (cadence === 'sweeps') return SWEEP_CADENCES.has(entry.cadence);
+    if (cadence === 'sources') return SOURCE_CADENCES.has(entry.cadence);
     return entry.cadence === cadence;
   }
 
   /** Pre-index by cadence to avoid O(N) walks on every cadence-tab render.
    *  Runs once per index load. */
   private readonly byCadence = computed<Record<Cadence, ReportEntry[]>>(() => {
-    const out: Record<Cadence, ReportEntry[]> = { all: [], daily: [], weekly: [], monthly: [], radar: [], sweeps: [] };
+    const out: Record<Cadence, ReportEntry[]> = {
+      all: [], daily: [], weekly: [], monthly: [], radar: [], sweeps: [], sources: []
+    };
     for (const e of this.all()) {
       if (e.is_versioned) continue;
       out.all.push(e);
@@ -78,7 +86,8 @@ export class ArchivePage {
       if (e.cadence === 'weekly')  out.weekly.push(e);
       if (e.cadence === 'monthly') out.monthly.push(e);
       if (e.cadence === 'radar')   out.radar.push(e);
-      if (SWEEP_CADENCES.has(e.cadence)) out.sweeps.push(e);
+      if (SWEEP_CADENCES.has(e.cadence))  out.sweeps.push(e);
+      if (SOURCE_CADENCES.has(e.cadence)) out.sources.push(e);
     }
     return out;
   });
@@ -91,7 +100,8 @@ export class ArchivePage {
       weekly: idx.weekly.length,
       monthly: idx.monthly.length,
       radar: idx.radar.length,
-      sweeps: idx.sweeps.length
+      sweeps: idx.sweeps.length,
+      sources: idx.sources.length
     };
   });
 
@@ -190,6 +200,7 @@ export class ArchivePage {
     if (entry.cadence === 'monthly') return 'info';
     if (entry.cadence === 'radar')   return 'warn';
     if (SWEEP_CADENCES.has(entry.cadence)) return 'neutral';
+    if (SOURCE_CADENCES.has(entry.cadence)) return 'subtle';
     return 'neutral';
   }
 

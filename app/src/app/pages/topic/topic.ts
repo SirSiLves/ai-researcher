@@ -39,6 +39,47 @@ export class TopicPage {
   readonly latestDate = signal<string | null>(null);
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
+  /** "_Why it matters:_ ..." sentence parsed out of the latest radar.md.
+   *  Present for top-5 by importance; empty for ranks 6+. */
+  readonly whyItMatters = signal<string>('');
+
+  /** Source-mix breakdown from source_mentions_capped, sorted by count desc.
+   *  Drives the "where this topic is loudest" bar list. */
+  readonly sourceMix = computed<Array<{ source: string; count: number; pct: number }>>(() => {
+    const t = this.topic();
+    const m = t?.source_mentions_capped ?? t?.source_mentions ?? {};
+    const entries = Object.entries(m)
+      .map(([source, raw]) => ({ source, count: typeof raw === 'number' ? raw : Number(raw) || 0 }))
+      .filter(e => e.count > 0)
+      .sort((a, b) => b.count - a.count);
+    const total = entries.reduce((acc, e) => acc + e.count, 0) || 1;
+    return entries.map(e => ({ ...e, pct: (e.count / total) * 100 }));
+  });
+
+  /** supporting_files grouped by source type for a tidy "evidence" panel. */
+  readonly evidenceFiles = computed<Array<{ source: string; files: string[] }>>(() => {
+    const t = this.topic();
+    const files = t?.supporting_files ?? [];
+    const groups = new Map<string, string[]>();
+    for (const f of files) {
+      const seg = f.split('/')[0] ?? 'other';
+      if (!groups.has(seg)) groups.set(seg, []);
+      groups.get(seg)!.push(f);
+    }
+    return Array.from(groups.entries())
+      .map(([source, files]) => ({ source, files: files.sort().reverse() }))
+      .sort((a, b) => b.files.length - a.files.length);
+  });
+
+  /** Pretty label for source-type keys ("long_form_blog" → "Long-form blog"). */
+  sourceLabel(s: string): string {
+    return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  /** "data" prefix for the raw evidence links so they work from the app shell. */
+  evidenceHref(path: string): string {
+    return `data/${path}`;
+  }
 
   // Cohort of timeline events combining sector + cluster history
   readonly lifeline = computed(() => {
@@ -129,6 +170,7 @@ export class TopicPage {
     this.topic.set(null);
     this.history.set([]);
     this.error.set(null);
+    this.whyItMatters.set('');
 
     try {
       const idx = await this.data.loadRadarIndex();
@@ -142,9 +184,10 @@ export class TopicPage {
 
       // Find topic on the latest day; fall back to walking backward if it's missing
       let found: RadarTopic | null = null;
+      let foundOnDate: string | null = null;
       for (let i = hist.length - 1; i >= 0; i--) {
         const t = hist[i].topics.find(x => x.id === id);
-        if (t) { found = t; break; }
+        if (t) { found = t; foundOnDate = hist[i].date; break; }
       }
       if (!found) {
         this.error.set(`Topic "${id}" not found in the last ${hist.length} radar snapshots.`);
@@ -153,6 +196,19 @@ export class TopicPage {
       }
       this.topic.set(found);
       this.loading.set(false);
+
+      // Best-effort: pull the "_Why it matters:_ ..." line for this topic out
+      // of the radar markdown on the day we found it. Only top-5 topics get
+      // this section, so silent failure is fine.
+      if (foundOnDate) {
+        const radarEntry = entries.find(e => e.date_id === foundOnDate);
+        if (radarEntry?.md_path) {
+          this.data.loadMarkdown(radarEntry.md_path).then(md => {
+            const sentence = extractWhy(md, found!.label);
+            if (sentence) this.whyItMatters.set(sentence);
+          }).catch(() => { /* optional */ });
+        }
+      }
     } catch (err: any) {
       this.error.set(`Couldn't load topic data: ${err?.message ?? err}`);
       this.loading.set(false);
@@ -184,4 +240,30 @@ export class TopicPage {
   windowChip(status: string): string {
     return status === 'warm' ? 'chip--accent' : 'chip--outline';
   }
+}
+
+/** Pull the "_Why it matters:_ …" sentence for a topic out of the daily radar
+ *  markdown. The MD format puts that line a few rows below an "### N. label"
+ *  heading; we scan a small window after each H3 looking for our label.
+ *  Returns the sentence without the leading underscore tag, or '' if not found. */
+function extractWhy(md: string, label: string): string {
+  if (!md || !label) return '';
+  const lines = md.split('\n');
+  // First word(s) of the label are usually enough to find the right heading,
+  // since labels contain parentheticals the H3 doesn't always carry verbatim.
+  const labelHead = label.split('(')[0].trim().toLowerCase();
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^###\s+\d+\.\s+(.+)$/);
+    if (!m) continue;
+    const heading = m[1].trim().toLowerCase();
+    // Match if the H3 starts with our label-head OR our label-head starts with the H3.
+    if (!heading.startsWith(labelHead) && !labelHead.startsWith(heading.split('(')[0].trim())) continue;
+    // Scan up to ~12 lines forward for the "_Why it matters:_" line.
+    for (let j = i + 1; j < Math.min(i + 14, lines.length); j++) {
+      const why = lines[j].match(/^_Why it matters:_\s*(.+)$/);
+      if (why) return why[1].trim();
+      if (/^###\s+\d+\./.test(lines[j])) break;
+    }
+  }
+  return '';
 }

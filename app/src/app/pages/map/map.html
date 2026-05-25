@@ -267,6 +267,29 @@
           </section>
         }
 
+        @if (gapKeywords().length) {
+          <section class="map-importance map-gap">
+            <header class="map-importance__head">
+              <h3 class="map-importance__title">Gap signals — keywords without a radar topic</h3>
+              <span class="map-importance__hint muted">Discovered phrases with broad cross-source presence that haven't been carved out as their own topic yet. The radar's "what should we be tracking?" backlog.</span>
+            </header>
+            <ol class="map-importance__list">
+              @for (g of gapKeywords().slice(0, 10); track g.keyword; let i = $index) {
+                <li class="map-importance__item map-gap__item" tabindex="0">
+                  <span class="map-importance__rank tabular">{{ i + 1 }}</span>
+                  <div class="map-importance__body">
+                    <div class="map-importance__label">{{ g.keyword }}</div>
+                    <div class="map-importance__meta muted">
+                      {{ g.days_active }}d active · {{ g.source_types }} source types · {{ g.total_mentions }} mentions · seen {{ g.first_seen }} → {{ g.last_seen }}
+                    </div>
+                  </div>
+                  <span class="map-importance__score tabular">{{ g.gap_score | number:'1.0-0' }}</span>
+                </li>
+              }
+            </ol>
+          </section>
+        }
+
         @if (filteredTopics().length === 0) {
           <p class="map-empty muted">No topics match that combination of filters.</p>
         } @else {

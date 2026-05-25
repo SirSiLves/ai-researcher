@@ -180,6 +180,40 @@ def scan_priority_vendors(file_index):
     return out
 
 
+def _status_from(last_7: int, ratio: float) -> str:
+    """Classify velocity_status from absolute 7d count + ratio-vs-baseline.
+
+    Ratio alone is misleading because the baseline floor (= 1.0) lets any org
+    with low 28d activity hit ratio == 4.0 from a single new mention. So we
+    require **both** a meaningful absolute spike and a high rate-of-change.
+
+    - surging:      ratio >= 3.5 AND velocity_7d >= 50   (real, large spike)
+    - accelerating: ratio >= 2.0 AND velocity_7d >= 10   (real growth above noise floor)
+    - cooling:      ratio <= 0.4 AND velocity_7d <= 5    (was active, has cooled)
+    - steady:       everything else
+
+    Calibrated against the observed distribution (May 2026): historically
+    surging==0 under the old 5.0 / accelerating==3.0 rules because the ratio
+    was capped at 4.0 by the floor. New thresholds give ~10-20 surging and a
+    real accelerating tier of ~50-150 firms instead of all 271.
+
+    NOTE: `_vendor_sweep_run.py` still uses the old 5.0 / 3.0 thresholds for
+    sweep-side hot-event detection (line 421+ there). That is intentional —
+    those thresholds gate side-effects on `sources.json` (promotions, hot
+    events, demotions) and changing them would cascade unpredictable state
+    mutations. The app's velocity_status is for *display ranking*; the sweep's
+    is for *operational gating*. Keep them separate until we deliberately
+    unify the two with sweep-side regression tests in place.
+    """
+    if ratio >= 3.5 and last_7 >= 50:
+        return "surging"
+    if ratio >= 2.0 and last_7 >= 10:
+        return "accelerating"
+    if ratio <= 0.4 and last_7 <= 5:
+        return "cooling"
+    return "steady"
+
+
 def compute_velocity(mentions_by_date, today_iso):
     """7-day vs 28-day baseline velocity (matches vendor-sweep math)."""
     today = date.fromisoformat(today_iso)
@@ -193,14 +227,7 @@ def compute_velocity(mentions_by_date, today_iso):
     )
     avg_weekly_baseline = last_28 / 4.0
     ratio = last_7 / max(avg_weekly_baseline, 1.0)
-    if ratio >= 5.0:
-        status = "surging"
-    elif ratio >= 3.0:
-        status = "accelerating"
-    elif ratio <= 0.33:
-        status = "cooling"
-    else:
-        status = "steady"
+    status = _status_from(last_7, ratio)
     return {
         "velocity_7d": last_7,
         "velocity_28d_avg": round(avg_weekly_baseline, 2),

@@ -32,31 +32,37 @@
 
   <!-- ── BRIEFING LEAD (newspaper-style "in 90 seconds") ──────── -->
   @if (markdown(); as md) {
-    <app-pulse-briefing [source]="md" />
+    <div [appLinkTopics]="topicsForLinks()">
+      <app-pulse-briefing [source]="md" />
+    </div>
   }
 
   <!-- ── HERO PRIORITIES ───────────────────────────────────────── -->
   @if (markdown(); as md) {
-    <app-pulse-hero
-      [source]="md"
-      [vendor]="vendorSweep()"
-      [keyword]="keywordSweep()"
-      [github]="githubSweep()" />
+    <div [appLinkTopics]="topicsForLinks()">
+      <app-pulse-hero
+        [source]="md"
+        [vendor]="vendorSweep()"
+        [keyword]="keywordSweep()"
+        [github]="githubSweep()" />
+    </div>
   } @else {
     <p-skeleton width="100%" height="22rem" styleClass="pulse-skeleton" />
   }
 
   <!-- ── WHAT CHANGED ──────────────────────────────────────────── -->
   @if (diffMarkdown(); as diff) {
-    <app-digest-card
-      title="Since yesterday"
-      subtitle="What moved between yesterday's snapshot and today's — re-rated theses, new distribution moves, theme rotations across GitHub and HN."
-      [source]="diff" />
+    <div [appLinkTopics]="topicsForLinks()">
+      <app-digest-card
+        title="Since yesterday"
+        subtitle="What moved between yesterday's snapshot and today's — re-rated theses, new distribution moves, theme rotations across GitHub and HN."
+        [source]="diff" />
+    </div>
   }
 
   <!-- ── DIGEST GRID ───────────────────────────────────────────── -->
   @if (digestSlots().length) {
-    <section class="pulse-digest">
+    <section class="pulse-digest" [appLinkTopics]="topicsForLinks()">
       @for (s of digestSlots(); track s.key) {
         <app-digest-card [title]="s.title" [subtitle]="s.subtitle" [source]="s.source" />
       }
@@ -95,13 +101,28 @@
 
   <!-- ── MAJOR NEWS ────────────────────────────────────────────── -->
   @if (majorNews(); as news) {
-    <section class="pulse-major">
+    <section class="pulse-major" [appLinkTopics]="topicsForLinks()">
       <header class="pulse-major__head">
         <h2 class="pulse-major__title">Major news &amp; releases</h2>
         <p class="pulse-major__subtitle">Every meaningful AI shipment today — frontier model releases, enterprise deals, agent infrastructure, regulation — grouped by theme.</p>
       </header>
       <app-digest-card [source]="news" />
     </section>
+  }
+
+  <!-- ── RAW SOURCES STRIP — quick-link to today's collector dumps ── -->
+  @if (rawSourcesForDate().length) {
+    <footer class="pulse-foot pulse-foot--sources">
+      <span class="pulse-foot__label">Raw sources for {{ selectedDate() }}</span>
+      <span class="pulse-foot__sources">
+        @for (s of rawSourcesForDate(); track s.path) {
+          <a [href]="s.path" target="_blank" rel="noopener noreferrer" class="pulse-foot__source-chip">
+            {{ s.label }}
+          </a>
+        }
+      </span>
+      <a routerLink="/archive" class="pulse-foot__link">Archive ↗</a>
+    </footer>
   }
 
   <!-- ── FOOTER STRIP — pipeline + meta ────────────────────────── -->

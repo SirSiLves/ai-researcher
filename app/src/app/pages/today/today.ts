@@ -8,6 +8,7 @@ import { Card } from 'primeng/card';
 
 import { DataService, ReportEntry, RadarDay, RadarTopic, SweepSummary } from '../../services/data.service';
 import { findSection } from '../../services/markdown-sections';
+import { LinkTopicsDirective } from '../../services/link-topics.directive';
 import { PulseRadar } from '../../components/pulse-radar/pulse-radar';
 import { PulseHero } from '../../components/pulse-hero/pulse-hero';
 import { PulseBriefing } from '../../components/pulse-briefing/pulse-briefing';
@@ -26,7 +27,8 @@ interface DigestSlot {
   imports: [
     RouterLink, FormsModule,
     Skeleton, ButtonModule, DatePicker, Card,
-    PulseRadar, PulseHero, PulseBriefing, DigestCard
+    PulseRadar, PulseHero, PulseBriefing, DigestCard,
+    LinkTopicsDirective
   ],
   templateUrl: './today.html',
   styleUrl: './today.scss',
@@ -52,8 +54,30 @@ export class TodayPage {
   readonly keywordSweep = signal<SweepSummary | null>(null);
   readonly githubSweep  = signal<SweepSummary | null>(null);
 
+  /** All raw collector report entries — populated from reports/index.json
+   *  (the build_reports_manifest.py output now includes news/papers/blogs/etc.).
+   *  Filtered to the current selectedDate() in `rawSourcesForDate`. */
+  readonly rawSourceEntries = signal<ReportEntry[]>([]);
+
   readonly sectorNames = computed<string[]>(() => (this.radarDay()?.sectors ?? []).map(s => s.name));
   readonly radarDateIds = computed<string[]>(() => this.radarEntries().map(e => e.date_id));
+  /** Topics on the current day — fed to the LinkTopicsDirective so digest /
+   *  briefing / news prose can auto-link to /map/topic/:id. Empty until
+   *  the radar JSON loads. */
+  readonly topicsForLinks = computed<readonly RadarTopic[]>(() => this.radarDay()?.topics ?? []);
+
+  /** Raw collector files (news/papers/blogs/etc.) that exist for the current
+   *  date — surfaced as a small footer strip so the researcher can pop the
+   *  long tail rather than only seeing the synthesized briefing. */
+  readonly rawSourcesForDate = computed<Array<{ label: string; cadence: string; path: string }>>(() => {
+    const date = this.selectedDate();
+    if (!date) return [];
+    const SOURCE_CADENCES = new Set(['news', 'papers', 'blogs', 'hackernews', 'github', 'linkedin', 'jobs']);
+    return this.rawSourceEntries()
+      .filter(e => SOURCE_CADENCES.has(e.cadence) && e.date_id === date && !e.is_versioned)
+      .sort((a, b) => a.cadence.localeCompare(b.cadence))
+      .map(e => ({ label: e.cadence_label, cadence: e.cadence, path: `data/${e.path}` }));
+  });
 
   /** "What changed vs. yesterday" — strip the H2 we matched on. */
   readonly diffMarkdown = computed<string>(() => {
@@ -224,6 +248,7 @@ export class TodayPage {
     this.data.loadReportsIndex().then(idx => {
       const dailies = idx.entries.filter(e => e.cadence === 'daily' && !e.is_versioned);
       this.dailies.set(dailies);
+      this.rawSourceEntries.set(idx.entries);
       const routeParam = this.route.snapshot.paramMap.get('date');
       this.selectedDate.set(routeParam ?? dailies[0]?.date_id ?? null);
     }).catch(err => {

@@ -915,3 +915,19 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 1.5rem 0; }
   html, body { font-size: 14.5px; }
   .page-head__title { font-size: clamp(1.7rem, 7vw, 2.25rem); }
 }
+
+/* Topic auto-links injected by `appLinkTopics` directive — subtle accent
+   underline so prose stays readable but the click target is discoverable. */
+a.topic-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted color-mix(in srgb, var(--accent) 55%, transparent);
+  transition: color .12s ease-in-out, border-color .12s ease-in-out, background .12s ease-in-out;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+a.topic-link:hover {
+  color: var(--accent-strong, var(--accent));
+  border-bottom-color: var(--accent-strong, var(--accent));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}

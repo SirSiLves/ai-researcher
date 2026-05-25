@@ -697,3 +697,11 @@
   font-size: 0.7rem;
   cursor: help;
 }
+
+/* Gap-signals panel — same skeleton as map-importance but a tinted left rail
+   so it visually reads as "the watchlist" rather than the top ranking. */
+.map-gap .map-importance__item {
+  cursor: default;
+  border-left: 3px solid color-mix(in srgb, var(--warn, #f59e0b) 50%, transparent);
+}
+.map-gap__item:hover { background: transparent; }

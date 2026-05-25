@@ -45,6 +45,34 @@
       </a>
     }
 
+    @if (whyItMatters(); as why) {
+      <aside class="topic__why">
+        <span class="topic__why-label">Why it matters</span>
+        <p class="topic__why-body">{{ why }}</p>
+      </aside>
+    }
+
+    @if (sourceMix().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Source mix</h2>
+          <span class="section__hint">where this topic is loudest this cycle · {{ sourceMix().length }} types</span>
+        </header>
+        <ul class="topic__source-mix">
+          @for (row of sourceMix(); track row.source) {
+            <li class="topic__source-row">
+              <span class="topic__source-name">{{ sourceLabel(row.source) }}</span>
+              <span class="topic__source-bar"
+                    role="presentation"
+                    [style.width.%]="row.pct">
+              </span>
+              <span class="topic__source-count tabular">{{ row.count }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
     <!-- Time lens: dual-axis chart over loaded history -->
     <section class="section">
       <header class="section__head">
@@ -154,10 +182,34 @@
       </section>
     }
 
+    @if (evidenceFiles().length) {
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">Backing files</h2>
+          <span class="section__hint">collector dumps that mention this topic</span>
+        </header>
+        <ul class="topic__evidence">
+          @for (group of evidenceFiles(); track group.source) {
+            <li class="topic__evidence-group">
+              <span class="topic__evidence-kind">{{ sourceLabel(group.source) }}</span>
+              <ul class="topic__evidence-files">
+                @for (f of group.files.slice(0, 6); track f) {
+                  <li><a [href]="evidenceHref(f)" target="_blank" rel="noopener noreferrer">{{ f }}</a></li>
+                }
+                @if (group.files.length > 6) {
+                  <li class="muted">+{{ group.files.length - 6 }} more</li>
+                }
+              </ul>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
     @if (t.supporting_links.length) {
       <section class="section">
         <header class="section__head">
-          <h2 class="section__title">Evidence</h2>
+          <h2 class="section__title">Evidence links</h2>
           <span class="section__hint">{{ t.supporting_links.length }} links</span>
         </header>
         <ul class="topic__links">

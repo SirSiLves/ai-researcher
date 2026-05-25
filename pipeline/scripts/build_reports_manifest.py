@@ -18,6 +18,10 @@ from pathlib import Path
 from _lib import DATA_ROOT, REPORTS_DIR
 
 # (cadence_dir, label, date_pattern) — all cadences are flat siblings under DATA_ROOT.
+# Synthesis cadences (Daily/Weekly/Monthly) come first; raw collector dumps follow.
+# The raw collector cadences expose the unprocessed source files in /archive so a
+# researcher can browse the long tail directly rather than only via the synthesized
+# daily.md briefing.
 CADENCES = [
     ("daily",              "Daily",         r"(\d{4}-\d{2}-\d{2})"),
     ("weekly",             "Weekly",        r"(\d{4}-W\d{2})"),
@@ -26,6 +30,14 @@ CADENCES = [
     ("vendor_candidates",  "Vendor sweep",  r"(\d{4}-\d{2}-\d{2})"),
     ("keyword_candidates", "Keyword sweep", r"(\d{4}-\d{2}-\d{2})"),
     ("github_candidates",  "GitHub sweep",  r"(\d{4}-\d{2}-\d{2})"),
+    # Raw collector dumps — the long tail behind the daily synthesis.
+    ("news",               "News",          r"(\d{4}-\d{2}-\d{2})"),
+    ("papers",             "Papers",        r"(\d{4}-\d{2}-\d{2})"),
+    ("blogs",              "Blogs",         r"(\d{4}-\d{2}-\d{2})"),
+    ("hackernews",         "Hacker News",   r"(\d{4}-\d{2}-\d{2})"),
+    ("github",             "GitHub",        r"(\d{4}-\d{2}-\d{2})"),
+    ("linkedin",           "LinkedIn",      r"(\d{4}-\d{2}-\d{2})"),
+    ("jobs",               "Jobs (CH)",     r"(\d{4}-\d{2}-\d{2})"),
 ]
 
 
@@ -116,8 +128,18 @@ def first_headline(path: Path) -> str:
         # italic meta block "_..._"
         if stripped.startswith("_") and stripped.endswith("_"):
             continue
-        # H1..H6 — skip
+        # H1..H6 — usually skip, EXCEPT when a H3+ heading carries a link
+        # (some collectors structure items as `### [title](url)` headings
+        # rather than bullets — pick those up as headlines).
         if stripped.startswith("#"):
+            h_match = re.match(r"^(#{3,6})\s+(.+)$", stripped)
+            if h_match:
+                heading_body = h_match.group(2)
+                link_text = _extract_link_text(heading_body)
+                if link_text:
+                    cand = _clean(link_text)[:200]
+                    if cand and not any(cand.lower().startswith(b) for b in _BORING_BULLETS):
+                        return cand
             continue
         # bullet
         if stripped.startswith(("- ", "* ")):
@@ -149,7 +171,21 @@ def first_headline(path: Path) -> str:
         # meta blurb like "_No sector reassignments today._".
         if re.match(r"^\*\*[^*]+:\*\*\s*(_[^_]+_)?\s*$", stripped):
             continue
-        # prose line — last-resort headline
+        # prose line — last-resort headline. Some collectors (HN, GitHub)
+        # write their items as bold-prefixed prose lines, not bullets, so
+        # check for a leading **[text](url)** or [text](url) here too before
+        # falling back to the generic clean.
+        link_text = _extract_link_text(stripped)
+        if link_text:
+            return _clean(link_text)[:200]
+        # Bold prefix without a link — strip and keep the bold text.
+        if stripped.startswith("**"):
+            end = stripped.find("**", 2)
+            if end > 2:
+                head = stripped[2:end]
+                cleaned_head = _clean(head)
+                if cleaned_head and not any(cleaned_head.lower().startswith(b) for b in _BORING_BULLETS):
+                    return cleaned_head[:200]
         cleaned = _clean(stripped)
         if not cleaned:
             continue

@@ -3,7 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 export interface ReportEntry {
-  cadence: 'daily' | 'weekly' | 'monthly' | 'radar' | 'vendor_candidates' | 'keyword_candidates' | 'github_candidates';
+  cadence:
+    | 'daily' | 'weekly' | 'monthly' | 'radar'
+    | 'vendor_candidates' | 'keyword_candidates' | 'github_candidates'
+    | 'news' | 'papers' | 'blogs' | 'hackernews' | 'github' | 'linkedin' | 'jobs';
   cadence_label: string;
   date_id: string;
   sort_date: string;
@@ -182,6 +185,25 @@ export interface OrgVelocityPoint {
   velocity_ratio: number;
 }
 
+/** Gap-bridging candidate: keywords with broad cross-source presence that the
+ *  radar layer hasn't promoted to a topic yet. Built by
+ *  scripts/build_gap_keywords.py and consumed by the /map "Gap signals" panel. */
+export interface GapKeyword {
+  keyword: string;
+  source_types: number;
+  days_active: number;
+  total_mentions: number;
+  first_seen: string;
+  last_seen: string;
+  gap_score: number;
+}
+
+export interface GapKeywordsIndex {
+  generated_at: string | null;
+  candidates: GapKeyword[];
+  _threshold?: Record<string, number>;
+}
+
 /** Parsed shape of a sweep change-log markdown file (vendor / keyword / github).
  *  The MD writers all follow the same convention: an H2 "What changed in
  *  sources.json today" followed by bullets like `- **verb-name** payload`.
@@ -229,11 +251,12 @@ export interface OrgDetail {
   [k: string]: any;
 }
 
-// data/ is flat: every cadence is a sibling folder under data/. The UI
-// consumes daily/, weekly/, monthly/, radar/, orgs/, reports/, plus the three
-// sweep change logs. Raw collector dumps (news/, papers/, blogs/, jobs/,
-// linkedin/, github/, hackernews/) are siblings too but the UI never reads
-// them — they're researcher-internal.
+// data/ is flat: every cadence is a sibling folder under data/. The UI consumes
+// daily/, weekly/, monthly/, radar/, orgs/, reports/, plus the three sweep
+// change logs. The raw collector dumps (news/, papers/, blogs/, jobs/,
+// linkedin/, github/, hackernews/) are now also indexed in reports/index.json
+// so /archive can expose them under "Raw sources" — the long tail behind the
+// synthesized daily briefing.
 
 /** Insertion-order LRU: re-getting an entry promotes it to most-recent.
  *  Drops oldest when size exceeds capacity. Used to bound long-session memory. */
@@ -290,6 +313,19 @@ export class DataService {
   loadOrgsIndex(): Promise<OrgsIndex> {
     return firstValueFrom(this.http.get<OrgsIndex>(`${this.dataBase}/orgs/index.json`))
       .then(r => { this.orgs.set(r); return r; });
+  }
+
+  /** Load the gap-keyword index. Returns null if the file isn't present yet
+   *  (the pipeline step is optional and may not have been wired into older
+   *  cron tails). Callers should hide the panel on null. */
+  async loadGapKeywords(): Promise<GapKeywordsIndex | null> {
+    try {
+      return await firstValueFrom(
+        this.http.get<GapKeywordsIndex>(`${this.dataBase}/radar/gap_keywords.json`)
+      );
+    } catch {
+      return null;
+    }
   }
 
   /** Look up an OrgIndexEntry by slug, loading the index lazily if needed.

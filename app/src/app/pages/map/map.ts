@@ -10,7 +10,8 @@ import {
   RadarDay,
   RadarTopic,
   RadarSector,
-  OrgIndexEntry
+  OrgIndexEntry,
+  GapKeyword
 } from '../../services/data.service';
 import { humanizeSlug } from '../../services/humanize';
 
@@ -40,6 +41,9 @@ export class MapPage {
   readonly loading = signal<boolean>(true);
   readonly availableDates = signal<string[]>([]);
   readonly selectedDate = signal<string | null>(null);
+  /** Keywords with broad cross-source presence that the radar hasn't promoted
+   *  to a topic. Loaded lazily; empty when the pipeline file isn't present. */
+  readonly gapKeywords = signal<GapKeyword[]>([]);
 
   // Compare-to-past mode: which earlier radar to diff against.
   // null = no comparison; otherwise a date_id from availableDates().
@@ -389,6 +393,11 @@ export class MapPage {
       const initial = routeDate ?? entries[0]?.date_id ?? null;
       this.selectedDate.set(initial);
     }).catch(() => this.loading.set(false));
+
+    // Optional gap-keyword panel — silent failure when the pipeline file is absent.
+    this.data.loadGapKeywords().then(gap => {
+      if (gap?.candidates?.length) this.gapKeywords.set(gap.candidates);
+    });
 
     // React to URL param changes (back/forward navigation).
     this.route.paramMap.subscribe(p => {
