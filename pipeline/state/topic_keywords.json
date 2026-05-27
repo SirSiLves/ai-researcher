@@ -1,5 +1,5 @@
 {
-  "_purpose": "Per-topic keyword sets for source-file importance scoring. The radar reads this to count days/source-types a topic was mentioned in raw source files (independent of the radar agent's decision to create a topic that day). Maintained by ai-trend-radar SKILL — when a new topic is created, append its keywords here.",
+  "_purpose": "Per-topic keyword sets for source-file importance scoring. The radar reads this to count days/source-types a topic was mentioned in raw source files (independent of the radar agent's decision to create a topic that day). Maintained by ai-trend-radar SKILL \u2014 when a new topic is created, append its keywords here.",
   "_format": "topic_id -> { keywords: [str], _seeded_on: YYYY-MM-DD, _llm_enriched: bool, _last_updated: YYYY-MM-DD }",
   "topics": {
     "ai-coding-agents": {
@@ -115,12 +115,19 @@
         "databricks mosaic",
         "ibm watsonx orchestrate",
         "uipath agents",
-        "chatgpt enterprise"
+        "chatgpt enterprise",
+        "camunda processos",
+        "blue yonder",
+        "pinecone nexus",
+        "pinecone marketplace",
+        "writer agent",
+        "project arc",
+        "ai control tower"
       ],
       "label": "Enterprise agent platforms (Salesforce Pierre Fabre Agentforce LS, SAP Joule Studio Q3 GA, ChatGPT Enterprise Goal mode, Snowflake Cortex)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-05-25",
       "_news_cleaned": true
     },
     "agent-skills-wave": {
@@ -173,7 +180,7 @@
         "kyapay",
         "scoped tokens"
       ],
-      "label": "Agent payments protocol (Google AP2 → FIDO handoff, Mastercard Verifiable Intent, Skyfire KYAPay, Stripe Scoped Tokens)",
+      "label": "Agent payments protocol (Google AP2 \u2192 FIDO handoff, Mastercard Verifiable Intent, Skyfire KYAPay, Stripe Scoped Tokens)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -227,17 +234,19 @@
         "pinecone nexus",
         "azure ai search",
         "retrieval augmented generation",
-        "query rewriting"
+        "query rewriting",
+        "context compiler",
+        "composable retriever"
       ],
-      "label": "Agentic retrieval / RAG-as-decision-loop (Pinecone Nexus + KnowQL 14.3%→2.9% hallucination drop, Modular RAG, Microsoft Foundry Legal RAG)",
+      "label": "Agentic retrieval / RAG-as-decision-loop (Pinecone Nexus + KnowQL 14.3%\u21922.9% hallucination drop, Modular RAG, Microsoft Foundry Legal RAG)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-05-25",
       "_news_cleaned": true
     },
     "vertical-agents-finance": {
       "keywords": [
-        "vertical agents — finance",
+        "vertical agents \u2014 finance",
         "finma",
         "lombard odier",
         "pictet",
@@ -248,7 +257,7 @@
         "swiss banking ai",
         "bloomberg gpt"
       ],
-      "label": "Vertical agents — finance (UBS Graduate, Lombard Odier 2 seats, Mercury Series D, Pictet bank-wide, FRB/OCC/FSB/BSI/FINMA Mythos)",
+      "label": "Vertical agents \u2014 finance (UBS Graduate, Lombard Odier 2 seats, Mercury Series D, Pictet bank-wide, FRB/OCC/FSB/BSI/FINMA Mythos)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -277,7 +286,7 @@
     },
     "vertical-agents-legal": {
       "keywords": [
-        "vertical agents — legal",
+        "vertical agents \u2014 legal",
         "harvey",
         "harvey ai",
         "casetext",
@@ -289,7 +298,7 @@
         "legaltech ai",
         "contract review ai"
       ],
-      "label": "Vertical agents — legal (Microsoft Foundry Legal RAG, Lawfare LFAI + advice-and-consent, Harvey, EY Governance Director)",
+      "label": "Vertical agents \u2014 legal (Microsoft Foundry Legal RAG, Lawfare LFAI + advice-and-consent, Harvey, EY Governance Director)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -327,12 +336,19 @@
         "ai revenue",
         "ai overinvestment",
         "compute capex",
-        "circular financing"
+        "circular financing",
+        "h100 rental",
+        "a100 rental",
+        "gpu rental",
+        "nextera dominion",
+        "data center power",
+        "ai data center",
+        "rubin platform"
       ],
-      "label": "AI corporate token mandate & bubble talk (OpenAI confidential S-1 filed, Anthropic Q2 first profit, Chinese-cost 60% OpenRouter, Hark $700M)",
+      "label": "AI capex, IPO race & power-grid coupling (Anthropic $30B/$900B + OpenAI S-1, NVIDIA H100 rentals +20%/A100 +15% YoY, NextEra-Dominion $67B AI data-center thesis, OpenRouter China cost gap)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-05-25",
       "_news_cleaned": true
     },
     "implementation-revenue": {
@@ -346,12 +362,20 @@
         "consulting ai",
         "deployment partners",
         "system integrator ai",
-        "openai deployment co"
+        "openai deployment co",
+        "ey microsoft",
+        "kpmg anthropic",
+        "kpmg digital gateway",
+        "big four ai",
+        "fde program",
+        "forward deployed engineers",
+        "pwc anthropic",
+        "servicenow accenture"
       ],
-      "label": "Implementation revenue (Pierre Fabre Agentforce LS deployment, SAP Sapphire Joule + Mistral S/4HANA, OpenAI Deployment Co + Tomoro, Anthropic Q2 $10.9B)",
+      "label": "Implementation revenue & Big Four FDE wave (EY+Microsoft $1B/5yr, KPMG-Anthropic Digital Gateway, ServiceNow-Accenture FDE, OpenAI Deployment Co + Tomoro, SAP Sapphire Joule)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-05-25",
       "_news_cleaned": true
     },
     "ai-vendor-trust-friction": {
@@ -484,7 +508,7 @@
         "swiss llm",
         "switzerland ai strategy"
       ],
-      "label": "Swiss AI context (Apertus on Alps, FINMA Mythos top-jurisdiction, Giotto.ai Lausanne, Canton Zürich sandbox closing, Swiss AI Summit cadence)",
+      "label": "Swiss AI context (Apertus on Alps, FINMA Mythos top-jurisdiction, Giotto.ai Lausanne, Canton Z\u00fcrich sandbox closing, Swiss AI Summit cadence)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -502,12 +526,16 @@
         "model evaluation safety",
         "dangerous capability eval",
         "nist trains",
-        "aisi"
+        "aisi",
+        "pope leo xiv",
+        "magnifica humanitas",
+        "vatican ai",
+        "frontier ai trends report"
       ],
-      "label": "AI safety institutes (CAISI 40+ assessments incl. classified, UK AISI Microsoft partnership, NIST TRAINS, Apollo DC office)",
+      "label": "AI safety institutes & moral-institution AI (CAISI assessments, UK AISI Frontier AI Trends Report, NIST TRAINS, Pope Leo XIV Magnifica Humanitas encyclical with Anthropic on stage)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-05-25",
       "_news_cleaned": true
     },
     "iso-42001": {
@@ -553,13 +581,13 @@
         "ai scientist",
         "recursive self-improvement",
         "rsi",
-        "erdős problems",
+        "erd\u0151s problems",
         "automated theorem proving",
         "sakana ai scientist",
         "ai research agent",
         "self-improving ai"
       ],
-      "label": "Automated AI research (OpenAI Erdős disproof — verified by Alon/Wood/Bloom, Apollo Q2-Q4 focus, DiLoCo, Forethought RSI)",
+      "label": "Automated AI research (OpenAI Erd\u0151s disproof \u2014 verified by Alon/Wood/Bloom, Apollo Q2-Q4 focus, DiLoCo, Forethought RSI)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -597,7 +625,7 @@
         "hellaswag",
         "lmsys arena"
       ],
-      "label": "Evaluation gap (Winner's Curse correction, MCJudgeBench per-constraint, AI Index 362 incidents, Foundation Model Transparency 58→40)",
+      "label": "Evaluation gap (Winner's Curse correction, MCJudgeBench per-constraint, AI Index 362 incidents, Foundation Model Transparency 58\u219240)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -616,7 +644,7 @@
         "inference serving",
         "kv cache offload"
       ],
-      "label": "Disaggregated serving (MARLIN multi-agent RL, VibeServe per-workload stacks, KV sharing in Gemma 4, SemiAnalysis Hopper→Blackwell)",
+      "label": "Disaggregated serving (MARLIN multi-agent RL, VibeServe per-workload stacks, KV sharing in Gemma 4, SemiAnalysis Hopper\u2192Blackwell)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -694,7 +722,7 @@
         "dario amodei",
         "claude.ai"
       ],
-      "label": "Frontier models — Anthropic (Q2 $10.9B + $559M op-profit WSJ, SpaceX $1.25B/mo Colossus, Opus 4.7 stabilization, Karpathy hire)",
+      "label": "Frontier models \u2014 Anthropic (Q2 $10.9B + $559M op-profit WSJ, SpaceX $1.25B/mo Colossus, Opus 4.7 stabilization, Karpathy hire)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -713,7 +741,7 @@
         "openai s-1",
         "chatgpt enterprise"
       ],
-      "label": "Frontier models — OpenAI (confidential S-1 filed today, ChatGPT Enterprise Goal mode, Codex/GPT-5.5 churn, Erdős disproof, Tomoro/Deployment Co)",
+      "label": "Frontier models \u2014 OpenAI (confidential S-1 filed today, ChatGPT Enterprise Goal mode, Codex/GPT-5.5 churn, Erd\u0151s disproof, Tomoro/Deployment Co)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -732,7 +760,7 @@
         "demis hassabis",
         "deepmind"
       ],
-      "label": "Frontier models — Google (Gemini Spark + Pics trusted-testers today, 3.5 Flash GA + price triple, Universal Cart, Antigravity HN backlash)",
+      "label": "Frontier models \u2014 Google (Gemini Spark + Pics trusted-testers today, 3.5 Flash GA + price triple, Universal Cart, Antigravity HN backlash)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -753,7 +781,7 @@
         "moonshot ai",
         "meta llama"
       ],
-      "label": "Frontier models — Llama/Qwen/Kimi/open-weight (Hermes Agent #1 GitHub, gpt-oss / Qwen3.6 / Gemma 4 local, Datasette Agent on gemma-4-26b)",
+      "label": "Frontier models \u2014 Llama/Qwen/Kimi/open-weight (Hermes Agent #1 GitHub, gpt-oss / Qwen3.6 / Gemma 4 local, Datasette Agent on gemma-4-26b)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -772,7 +800,7 @@
         "arthur mensch",
         "mistral"
       ],
-      "label": "Frontier models — Mistral (Mistral 3 + Mistral Large 3 41B/675B sparse-MoE Apache-2.0, Ministral 3, SAP S/4HANA primary)",
+      "label": "Frontier models \u2014 Mistral (Mistral 3 + Mistral Large 3 41B/675B sparse-MoE Apache-2.0, Ministral 3, SAP S/4HANA primary)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -791,7 +819,7 @@
         "high-flyer",
         "deepseek harness"
       ],
-      "label": "Frontier models — DeepSeek (60% OpenRouter share, 9x cost gap, Beijing 'Harness' team, V4-Pro 75% discount through May 31)",
+      "label": "Frontier models \u2014 DeepSeek (60% OpenRouter share, 9x cost gap, Beijing 'Harness' team, V4-Pro 75% discount through May 31)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
