@@ -117,7 +117,8 @@ export class FirmsPage {
   readonly sourceMeter = computed(() => {
     const d = this.detail();
     if (!d?.mentions_by_source_type) return [];
-    const total = d.total_mentions || 1;
+    const counts = Object.values(d.mentions_by_source_type).map(v => v as number);
+    const total = counts.reduce((s, v) => s + v, 0) || 1;
     return Object.entries(d.mentions_by_source_type)
       .filter(([_, v]) => (v as number) > 0)
       .sort((a, b) => (b[1] as number) - (a[1] as number))
