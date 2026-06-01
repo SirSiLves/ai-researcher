@@ -26,6 +26,7 @@ Hooked from ai-replay §6.x.
 """
 import argparse
 import json
+import math
 import os
 import re
 import shutil
@@ -324,11 +325,21 @@ def main():
         dw_cfg = auto_apply.get("deep_watch_demote", {})
         if dw_cfg.get("enabled"):
             cap = dw_cfg.get("max_watched_repos", 80)
-            min_silence = dw_cfg.get("min_silence_days", 60)
-            budget = dw_cfg.get("max_demotions_per_run", 3)
+            min_silence = dw_cfg.get("min_silence_days", 30)
+            budget = dw_cfg.get("max_demotions_per_run", 5)
+            overflow_factor = dw_cfg.get("overflow_factor", 1.5)
+            overflow_silence = dw_cfg.get("overflow_silence_days", 14)
+            overflow_threshold = cap * overflow_factor
+            # OVERFLOW regime: list is badly over cap → relax the silence bar and
+            # walk the count down toward ceil(cap * overflow_factor); NORMAL regime:
+            # over cap → demote entries silent >= min_silence. Either way at most
+            # `budget` per run, so convergence is gradual (never a mass purge).
+            in_overflow = len(watched) > overflow_threshold
+            effective_silence = overflow_silence if in_overflow else min_silence
+            demotion_target = math.ceil(overflow_threshold) if in_overflow else cap
             if len(watched) > cap:
                 # Find candidates: _auto_added in stars_state, not classified hot/promote today,
-                # silent (no trending appearance) for >= min_silence
+                # silent (no trending appearance) for >= effective_silence
                 ineligible = {repo for repo, t in classifications.items()
                               if t in {"hot_event", "promote", "revive"}}
                 candidates = []
@@ -351,21 +362,22 @@ def main():
                         silence = (today_d - date.fromisoformat(last_trending_day)).days
                     except ValueError:
                         silence = 9999
-                    if silence < min_silence:
+                    if silence < effective_silence:
                         continue
                     candidates.append((repo, last_trending_day, silence))
-                candidates.sort(key=lambda x: x[1])  # oldest-silent first
-                n_to_demote = min(len(watched) - cap, budget, len(candidates))
+                candidates.sort(key=lambda x: x[1])  # least-recently-trended first
+                n_to_demote = min(len(watched) - demotion_target, budget, len(candidates))
                 for repo, last_trending_day, silence in candidates[:n_to_demote]:
                     watched.remove(repo)
                     if repo not in deep_watch:
                         deep_watch.append(repo)
                     ent_state = stars_state["repos"][repo]
                     ent_state["_demoted_on"] = TODAY
-                    ent_state["_demoted_reason"] = f"deep-watch: silent {silence}d, over cap {cap}"
+                    regime = "overflow" if in_overflow else "soft-cap"
+                    ent_state["_demoted_reason"] = f"deep-watch ({regime}): silent {silence}d, {len(watched) + 1}/cap {cap}"
                     log_lines.append(
                         f'{NOW_ISO} deep-watch-demote  watched_repos                  "{repo}" '
-                        f'reason="silent {silence}d, ranked oldest-silent over cap={cap}"'
+                        f'reason="{regime}: silent {silence}d, least-recent over cap={cap}"'
                     )
 
         # === Step 8: write back ===

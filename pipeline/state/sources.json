@@ -980,6 +980,60 @@
         "_added_on": "2026-05-29",
         "_added_reason": "hot-event: keyword='valuation', velocity_status=accelerating",
         "_expires_on": "2026-06-28"
+      },
+      "qdrant": {
+        "blog_urls": [
+          "https://qdrant.tech/articles/"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:qdrant.tech 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-31",
+        "_added_reason": "promote: 9 mentions, 4 src types, 4 distinct days over 30d (2d at promote)"
+      },
+      "elevenlabs": {
+        "blog_urls": [
+          "https://elevenlabs.io/blog"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:elevenlabs.io 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-31",
+        "_added_reason": "hot-event: keyword='IPO', velocity_status=accelerating",
+        "_expires_on": "2026-06-30"
+      },
+      "tencent": {
+        "blog_urls": [
+          "https://ai.tencent.com"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:ai.tencent.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-05-31",
+        "_added_reason": "hot-event: keyword='valuation', velocity_status=steady",
+        "_expires_on": "2026-06-30"
+      },
+      "decart": {
+        "blog_urls": [
+          "https://www.decart.ai"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:decart.ai 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-06-01",
+        "_added_reason": "hot-event: $300M raise at ~$4B valuation (Radical Ventures, NVIDIA-backed); world models",
+        "_expires_on": "2026-07-01"
+      },
+      "exa": {
+        "blog_urls": [
+          "https://exa.ai/blog"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:exa.ai 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-06-01",
+        "_added_reason": "hot-event: $250M Series C at $2.2B valuation (a16z-led); AI-native search/retrieval",
+        "_expires_on": "2026-07-01"
       }
     },
     "_deep_watch_vendors_comment": "Auto-demoted enterprise vendors — formerly active, now silent past the silence threshold AND enterprise_vendors had hit its soft cap. The news collector does NOT fetch these daily (no blog URL pulls, no fallback search). They remain tracked in discovered_orgs.json for radar mention-counting and topic-attribution; if mentions resurface via tech_news / blogs / papers, the sweep can re-promote them back to enterprise_vendors. Manual entries are never demoted here — only _auto_added entries with a _demoted_on stamp. Maintained by ai-vendor-sweep auto-apply. Empty by default; populates only when the soft cap is exceeded.",
@@ -1440,9 +1494,11 @@
         "deep_watch_demote": {
           "enabled": true,
           "max_watched_repos": 80,
-          "min_silence_days": 60,
-          "max_demotions_per_run": 3,
-          "_comment": "Soft cap on watched_repos. When len(watched_repos) > max_watched_repos AND there are _auto_added repos with no trending appearance for >= min_silence_days, demote the OLDEST-SILENT first up to max_demotions_per_run per sweep. The repo string is REMOVED from watched_repos and ADDED to deep_watch_repos; its github_stars.json entry gets _demoted_on/_demoted_reason. The github collector skips deep-watch repos for daily star-fetch. Manual entries (no _auto_added in github_stars.json) are NEVER demoted. Re-promotion happens automatically when a deep-watch repo trends again."
+          "min_silence_days": 30,
+          "max_demotions_per_run": 5,
+          "overflow_silence_days": 14,
+          "overflow_factor": 1.5,
+          "_comment": "Soft cap on watched_repos with a recency-rank overflow path (parallels enterprise_vendors). TWO regimes: (1) NORMAL — when len(watched_repos) > max_watched_repos, demote _auto_added repos with no trending appearance for >= min_silence_days (30), oldest-silent first. (2) OVERFLOW — when len > max_watched_repos * overflow_factor (> 120), the silence bar drops to overflow_silence_days (14) and the LEAST-RECENTLY-TRENDED _auto_added repos are demoted until len <= ceil(max * overflow_factor) or the per-run budget is spent. Either regime demotes at most max_demotions_per_run per sweep (gradual walk-down, never a mass purge). The repo string is REMOVED from watched_repos and ADDED to deep_watch_repos; its github_stars.json entry gets _demoted_on/_demoted_reason. The github collector skips deep-watch repos for daily star-fetch. Manual entries (no _auto_added in github_stars.json) are NEVER demoted. Repos that trended TODAY are never demoted. Re-promotion happens automatically when a deep-watch repo trends again."
         },
         "deep_watch_promote": {
           "enabled": true,
@@ -1645,7 +1701,14 @@
       "mcp release candidate",
       "pope leo",
       "release candidate",
-      "supply chain"
+      "supply chain",
+      "agentic coding",
+      "attack surface",
+      "governance framework",
+      "sap business",
+      "gemini cli",
+      "google gemini",
+      "llm inference"
     ],
     "min_points_for_inclusion": 30,
     "_min_points_comment": "Anything ≥ 30 points + matches a filter keyword is included. Ask HN/Show HN with ≥ 10 points + keyword match also included (lower bar for new launches).",
@@ -2380,6 +2443,41 @@
         "_auto_added": true,
         "_added_on": "2026-05-29",
         "_added_reason": "promote: 14 mentions, 5 src types, 4 days"
+      },
+      "agentic coding": {
+        "_auto_added": true,
+        "_added_on": "2026-05-30",
+        "_added_reason": "promote: 13 mentions, 6 src types, 5 days"
+      },
+      "attack surface": {
+        "_auto_added": true,
+        "_added_on": "2026-05-30",
+        "_added_reason": "promote: 9 mentions, 4 src types, 4 days"
+      },
+      "governance framework": {
+        "_auto_added": true,
+        "_added_on": "2026-05-30",
+        "_added_reason": "promote: 10 mentions, 5 src types, 4 days"
+      },
+      "sap business": {
+        "_auto_added": true,
+        "_added_on": "2026-05-31",
+        "_added_reason": "promote: 13 mentions, 3 src types, 4 days"
+      },
+      "gemini cli": {
+        "_auto_added": true,
+        "_added_on": "2026-06-01",
+        "_added_reason": "promote: 13 mentions, 5 src types, 5 days"
+      },
+      "google gemini": {
+        "_auto_added": true,
+        "_added_on": "2026-06-01",
+        "_added_reason": "promote: 10 mentions, 4 src types, 4 days"
+      },
+      "llm inference": {
+        "_auto_added": true,
+        "_added_on": "2026-06-01",
+        "_added_reason": "promote: 10 mentions, 4 src types, 4 days"
       }
     },
     "_deep_watch_meta": {}
@@ -2587,7 +2685,10 @@
       "code claude",
       "salesforce agentforce",
       "pope leo",
-      "supply chain"
+      "supply chain",
+      "governance framework",
+      "sap business",
+      "google gemini"
     ],
     "feeds_to_scan": [
       "Home feed (top posts last 24h)",
@@ -3029,6 +3130,21 @@
         "_auto_added": true,
         "_added_on": "2026-05-29",
         "_added_reason": "promote: 14 mentions, 5 src types, 4 days"
+      },
+      "governance framework": {
+        "_auto_added": true,
+        "_added_on": "2026-05-30",
+        "_added_reason": "promote: 10 mentions, 5 src types, 4 days"
+      },
+      "sap business": {
+        "_auto_added": true,
+        "_added_on": "2026-05-31",
+        "_added_reason": "promote: 13 mentions, 3 src types, 4 days"
+      },
+      "google gemini": {
+        "_auto_added": true,
+        "_added_on": "2026-06-01",
+        "_added_reason": "promote: 10 mentions, 4 src types, 4 days"
       }
     },
     "_deep_watch_meta": {}
@@ -3396,7 +3512,14 @@
         "mcp release candidate",
         "pope leo",
         "release candidate",
-        "supply chain"
+        "supply chain",
+        "agentic coding",
+        "attack surface",
+        "governance framework",
+        "sap business",
+        "gemini cli",
+        "google gemini",
+        "llm inference"
       ],
       "_auto_added_meta": {
         "a2a protocol": {
@@ -4238,6 +4361,41 @@
           "_auto_added": true,
           "_added_on": "2026-05-29",
           "_added_reason": "promote: 14 mentions, 5 src types, 4 days"
+        },
+        "agentic coding": {
+          "_auto_added": true,
+          "_added_on": "2026-05-30",
+          "_added_reason": "promote: 13 mentions, 6 src types, 5 days"
+        },
+        "attack surface": {
+          "_auto_added": true,
+          "_added_on": "2026-05-30",
+          "_added_reason": "promote: 9 mentions, 4 src types, 4 days"
+        },
+        "governance framework": {
+          "_auto_added": true,
+          "_added_on": "2026-05-30",
+          "_added_reason": "promote: 10 mentions, 5 src types, 4 days"
+        },
+        "sap business": {
+          "_auto_added": true,
+          "_added_on": "2026-05-31",
+          "_added_reason": "promote: 13 mentions, 3 src types, 4 days"
+        },
+        "gemini cli": {
+          "_auto_added": true,
+          "_added_on": "2026-06-01",
+          "_added_reason": "promote: 13 mentions, 5 src types, 5 days"
+        },
+        "google gemini": {
+          "_auto_added": true,
+          "_added_on": "2026-06-01",
+          "_added_reason": "promote: 10 mentions, 4 src types, 4 days"
+        },
+        "llm inference": {
+          "_auto_added": true,
+          "_added_on": "2026-06-01",
+          "_added_reason": "promote: 10 mentions, 4 src types, 4 days"
         }
       },
       "_deep_watch_meta": {}
@@ -4331,9 +4489,11 @@
         "deep_watch_demote": {
           "enabled": true,
           "max_enterprise_vendors": 30,
-          "min_silence_days": 60,
-          "max_demotions_per_run": 3,
-          "_comment": "Soft cap on enterprise_vendors. When len(enterprise_vendors) > max_enterprise_vendors AND there are _auto_added entries silent for >= min_silence_days, demote the OLDEST-SILENT first (last_seen ascending) up to max_demotions_per_run per sweep. Demoted entries move to news_collector.deep_watch_vendors with _demoted_on / _demoted_reason / _demoted_from='enterprise_vendors'. Manual entries (no _auto_added flag) are NEVER demoted regardless of silence. The news collector skips deep_watch_vendors entirely — they exist only so the radar can recognize a returning vendor as continuation, not a brand-new promotion. Re-promotion happens automatically when a deep-watch vendor hits hot_event or sustained-promote in a future sweep. Audit verbs: deep-watch-demote, deep-watch-promote."
+          "min_silence_days": 30,
+          "max_demotions_per_run": 5,
+          "overflow_silence_days": 14,
+          "overflow_factor": 1.5,
+          "_comment": "Soft cap on enterprise_vendors with a recency-rank overflow path so the cap actually converges instead of waiting on an absolute silence window a barely-active vendor evades forever. TWO regimes, evaluated against the post-adds list: (1) NORMAL — when count > max_enterprise_vendors, demote _auto_added entries silent for >= min_silence_days (30), oldest-silent first (last_seen ascending). (2) OVERFLOW — when count > max_enterprise_vendors * overflow_factor (i.e. > 45), the list is badly over cap, so the silence bar drops to overflow_silence_days (14): demote the LEAST-RECENTLY-MENTIONED _auto_added entries (last_seen ascending) until count <= ceil(max * overflow_factor) OR the per-run budget is spent, whichever comes first. Either regime demotes at most max_demotions_per_run per sweep, so convergence is gradual (a 91→30 walk-down takes several runs, never a mass purge). Demoted entries move to news_collector.deep_watch_vendors with _demoted_on / _demoted_reason / _demoted_from='enterprise_vendors'. Manual entries (no _auto_added flag) are NEVER demoted regardless of silence. Entries classified hot_event or sustained-promote TODAY are never demoted (would self-contradict). Hot-event entries within their _expires_on TTL are exempt from overflow demotion (let the TTL expire them instead). The news collector skips deep_watch_vendors entirely — they exist only so the radar can recognize a returning vendor as continuation, not a brand-new promotion. Re-promotion happens automatically when a deep-watch vendor hits hot_event or sustained-promote in a future sweep. Audit verbs: deep-watch-demote, deep-watch-promote (overflow demotions carry reason=\"overflow: least-recent, N/cap over soft cap\")."
         },
         "deep_watch_promote": {
           "enabled": true,

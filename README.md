@@ -6,19 +6,21 @@ A self-maintaining daily research pipeline for the LLM / Generative AI / RAG / a
 
 ```
 .
-├── app/         Angular SPA — reads everything in data/. Run with `npm install && npx ng serve`
-│                from inside app/. Built with Angular 21 + PrimeNG (Aura light theme).
-│                app/public/data is a symlink to ../../data so dev-server and prod build serve
-│                the JSON/MD under the same origin.
+├── app/         Angular 21 + PrimeNG SPA (dark dashboard) — reads everything in data/.
+│                Run with `npm install && npx ng serve` from inside app/.
+│                Four-page red thread (Pulse / Momentum / Map / Archive) + Trends + detail
+│                pages (topic / firm / story). app/public/data is a symlink to ../../data so
+│                dev-server and prod build serve the JSON/MD under the same origin.
 │
 ├── pipeline/    Everything the nightly cron writes / runs
 │   ├── scripts/         Python helpers (build_org_view, run_keyword_sweep, run_github_sweep,
-│   │                    rebuild_change_logs, …) + now.sh + Apple Notes bridge (.applescript,
-│   │                    .plist, .sh).
-│   ├── skills/          ai-news, ai-papers, ai-blogs, ai-jobs-ch, ai-linkedin, ai-github,
-│   │                    ai-hackernews + the synthesizers (ai-trend-radar, ai-vendor-sweep,
-│   │                    ai-keyword-sweep, ai-weekly-digest, ai-trends, ai-monthly-rollup) +
-│   │                    ai-replay (manual entry point).
+│   │                    compute_topic_importance, build_reports_manifest, rebuild_radar_manifest,
+│   │                    rebuild_change_logs, build_health_beacon, archive_stale, …) + now.sh
+│   │                    + Apple Notes bridge (.applescript, .plist, .sh).
+│   ├── skills/          7 collectors (ai-news, ai-papers, ai-blogs, ai-jobs-ch, ai-linkedin,
+│   │                    ai-github, ai-hackernews) + synthesizers (ai-trend-radar, ai-vendor-sweep,
+│   │                    ai-keyword-sweep, ai-weekly-digest, ai-trends, ai-monthly-rollup,
+│   │                    ai-briefing) + ai-replay (orchestrator/manual entry point) + sync-notes.
 │   ├── state/           Persistent pipeline state — sources.json, discovered_orgs.json,
 │   │                    discovered_keywords.json, github_stars.json, vendor_changes.{json,log},
 │   │                    keyword_changes.{json,log}, github_changes.{json,log}, *.bak.
@@ -26,17 +28,17 @@ A self-maintaining daily research pipeline for the LLM / Generative AI / RAG / a
 │
 ├── data/        Every cadence is a sibling here — flat layout. Three rough roles:
 │   ├── daily/  weekly/  monthly/  radar/        Cadence reports (.md + .json where applicable).
-│   ├── orgs/  {slug}.json + index.json          Firm-level coverage view.
+│   ├── orgs/  {slug}.json + index.json          Firm-level coverage view (drives the SPA firm pages).
 │   ├── reports/ index.json                       Flat dated index of every cadence artifact.
-│   ├── index.md                                  Human-readable TOC (legacy).
+│   ├── index.md                                  Human-readable TOC (legacy; superseded by the SPA Archive).
 │   ├── news/  papers/  blogs/  jobs/  linkedin/  github/  hackernews/
-│   │                                             Raw collector outputs (researcher-internal —
-│   │                                             not yet surfaced in the web app).
+│   │                                             Raw collector outputs (surfaced on the Pulse page +
+│   │                                             browsable in the Archive).
 │   └── vendor_candidates/  keyword_candidates/  github_candidates/
-│                                                 Sweep change logs (auto-applied vs `state/sources.json`).
+│                                                 Sweep change logs (auto-applied vs `../pipeline/state/sources.json`).
 │
-└── legacy/      Pre-Angular standalone HTML (app.html, orgs.html, radar.html) kept as reference
-                 for the redesign. Will be deleted once the SPA reaches feature parity.
+└── legacy/      Pre-Angular standalone HTML (app.html, orgs.html, radar.html). Fully superseded by
+                 the Angular SPA in app/ — kept only as reference. Safe to delete.
 ```
 
 Layout single source of truth: `_lib.py` exposes `DATA_ROOT` plus per-cadence aliases (`DAILY_DIR`, `RADAR_DIR`, `ORGS_DIR`, …) — all flat siblings under `DATA_ROOT`. The Angular `DataService` fetches everything under `data/`. The "what the app reads vs what the researcher writes" split lives in role, not in folder names — the app currently consumes the cadence reports + sweep change logs, but any raw-collector folder (`news/`, `papers/`, …) can be wired into the UI later without a restructure. See **Pipeline at a glance** below for the end-to-end flow.
@@ -56,15 +58,16 @@ npx ng build           # production build → app/dist/app/
 
 The whole point: **be a step ahead.** Reactive ingestion (news, papers, blogs, jobs, LinkedIn) is necessary but not sufficient. The pipeline adds earlier signals (GitHub trending, Hacker News, vendor velocity) and analytical layers (radar with dual-EMA persistence + cross-source breadth + co-mention clusters) so the long-term shifts are visible alongside the daily news.
 
-> **Checking pipeline state.** The pipeline started writing on 2026-05-04. To see what's actually been produced (vs. what should have been), the file system is the source of truth:
+> **Checking pipeline state.** Collectors launched on staggered dates — news/papers/blogs were backfilled to 2026-03-15; jobs/linkedin began ~2026-05-06; github/hackernews began 2026-05-14. So a low file count for a recent collector usually means "launched later," **not** "silent/broken" — check the earliest date before alarming. The file system is the source of truth:
 > ```bash
-> ls daily/{YYYY}/{MM}/ | wc -l                 # how many daily digests this month
+> # run from the repo root
+> ls data/daily/{YYYY}/{MM}/ | wc -l            # how many daily digests this month
 > for d in news papers blogs jobs linkedin github hackernews; do
->   echo "$d: $(ls $d/{YYYY}/{MM}/ 2>/dev/null | wc -l) files this month"
-> done                                            # per-collector cadence — silent collectors stand out
-> ls radar/{YYYY}/{MM}/*.json | wc -l            # radar runs on file
-> tail -50 vendor_changes.log                     # what auto-applied recently
-> python3 scripts/rebuild_change_logs.py          # refresh the derived JSON views (vendor/keyword/github)
+>   echo "$d: $(ls data/$d/{YYYY}/{MM}/ 2>/dev/null | wc -l) files this month"
+> done                                            # per-collector cadence (compare against the collector's launch date)
+> ls data/radar/{YYYY}/{MM}/*.json | wc -l       # radar runs on file
+> tail -50 pipeline/state/vendor_changes.log      # what auto-applied recently
+> python3 pipeline/scripts/rebuild_change_logs.py # refresh the derived JSON views (vendor/keyword/github)
 > ```
 > If a folder is missing or sparse, it's most likely "never-yet-fired by the cron" rather than broken. Run `ai-replay` to force a fresh pass — it exercises all 7 collectors plus radar/sweeps end-to-end. (Cron drift is a recurring failure mode: see `CRON_PROMPT.md` for the canonical prompt to paste into the Cowork scheduled-task UI.) `trends.md` is Monday-only; first monthly rollup happens on the first Monday of the month.
 
@@ -84,6 +87,7 @@ The whole point: **be a step ahead.** Reactive ingestion (news, papers, blogs, j
 │                                                                           │ │
 │   §4  read all 7 outputs                                                  │ │
 │   §5  synthesize → daily/{YYYY}/{MM}/{date}.md ─── leads with 🎯 top-5    │ │
+│   §5.5  ai-briefing         → prepends "in 90 seconds" lead to daily      │ │
 │                                                                             │
 │   §6.5  ai-trend-radar      → radar/{date}.{md,json} + radar/index.json    │
 │   §6.6  ai-vendor-sweep     → vendor_candidates/{date}.md (auto-applies    │
@@ -94,94 +98,93 @@ The whole point: **be a step ahead.** Reactive ingestion (news, papers, blogs, j
 │   §6.85 scripts/run_github_sweep.py  → github_candidates/{date}.md         │
 │                                (auto-extends watched_repos)                │
 │   §6.9  scripts/rebuild_change_logs.py → vendor/keyword/github_changes.json│
+│   §6.95 scripts/build_reports_manifest.py → reports/index.json            │
+│   §6.96 scripts/build_health_beacon.py → daily/{date}-health.json         │
 │   §7    ai-weekly-digest    → weekly/{YYYY-Www}.md (overwrites daily,      │
 │                                cumulative Mon→Sun)                         │
+│   §7.1  ai-briefing         → "week in 90 seconds" lead on the weekly      │
 │   §7.5  ai-trends           → trends.md (Monday only, reads prior week)    │
 │   §7.6  ai-monthly-rollup   → monthly/{YYYY-MM}.md (first Monday of month) │
+│   §7.65 ai-briefing         → "month in 90 seconds" lead (first Monday)    │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Failed subagents don't block the orchestrator. The pipeline degrades gracefully.
+Failed subagents don't block the orchestrator. The pipeline degrades gracefully. The canonical step-by-step is `pipeline/skills/ai-replay/SKILL.md` (§1–§8) — also the spec the nightly cron should mirror.
 
 **Same-day re-runs MERGE, never produce `-v2`.** If you trigger `ai-replay` on a day the cron already ran (or vice versa), each skill reads its existing same-day file and merges new items in: existing entries win on conflict (preserves your manual edits), new items append, derived meta-sections (Sources scanned, Theme balance, vendor coverage) regenerate. The same-day file is always the canonical record for that date.
 
 ## File layout
 
+All state lives under `pipeline/state/`, helper scripts under `pipeline/scripts/`, skills under `pipeline/skills/`, and every cadence output under `data/`. Paths below are written relative to those roots.
+
 ```
-sources.json                 ← all config (collector URLs, radar tuning, sweep thresholds, auto-apply rules)
-sources.json.vendor.bak      ← one-step rollback of the last vendor sweep mutation
-sources.json.keyword.bak     ← one-step rollback of the last keyword sweep mutation
-sources.json.github.bak      ← one-step rollback of the last github sweep mutation
-seed_orgs.json (in scripts/) ← bootstrap list of ~120 AI companies for the sweep
-discovered_orgs.json         ← running tally of every org we've seen (the sweep's state)
-github_stars.json            ← running star counts on watched repos
-vendor_changes.log           ← append-only audit log of every sources.json vendor mutation
-vendor_changes.json          ← derived view: active + deep-watch sets, expired, proven, consistency check
-keyword_changes.log          ← append-only audit log of every sources.json keyword mutation
-keyword_changes.json         ← derived structured view (same shape as vendor_changes.json)
-github_changes.log           ← append-only audit log of every github_collector.watched_repos mutation
-github_changes.json          ← derived structured view (same shape as vendor_changes.json)
-discovered_keywords.json     ← running tally of mined n-gram phrases (the keyword sweep's state)
-discovered_orgs_archive.json ← long-tail orgs pruned from discovered_orgs.json (created lazily by scripts/archive_stale.py)
-discovered_keywords_archive.json ← boilerplate-tagged keywords past TTL (created lazily by scripts/archive_stale.py)
-radar/index.json             ← manifest the HTML viewer reads to enumerate radar dates
-orgs/index.json              ← manifest the firm-view HTML reads to enumerate orgs
+pipeline/state/
+  sources.json                 ← all config (collector URLs, radar tuning, sweep thresholds, auto-apply rules)
+  sources.json.vendor.bak      ← one-step rollback of the last vendor sweep mutation
+  sources.json.keyword.bak     ← one-step rollback of the last keyword sweep mutation
+  sources.json.github.bak      ← one-step rollback of the last github sweep mutation
+  discovered_orgs.json         ← running tally of every org we've seen (the sweep's state)
+  github_stars.json            ← running star counts on watched repos
+  vendor_changes.log           ← append-only audit log of every sources.json vendor mutation
+  vendor_changes.json          ← derived view: active + deep-watch sets, expired, proven, consistency check
+  keyword_changes.log          ← append-only audit log of every sources.json keyword mutation
+  keyword_changes.json         ← derived structured view (same shape as vendor_changes.json)
+  github_changes.log           ← append-only audit log of every github_collector.watched_repos mutation
+  github_changes.json          ← derived structured view (same shape as vendor_changes.json)
+  discovered_keywords.json     ← running tally of mined n-gram phrases (the keyword sweep's state)
+  discovered_orgs_archive.json ← long-tail orgs pruned from discovered_orgs.json (created lazily by archive_stale.py)
+  keyword_judge_*.json/.md     ← keyword-sweep boilerplate-judge request/verdict round-trip (gitignored; regenerated)
 
-skills/
-  ai-news/SKILL.md           ← priority + enterprise + tech news, governance, web search
-  ai-papers/SKILL.md         ← ArXiv + HF Papers, LLM/agent-relevant only
-  ai-blogs/SKILL.md          ← long-form analyst blogs + Medium tags
-  ai-jobs-ch/SKILL.md        ← Swiss AI/LLM/GenAI roles
-  ai-linkedin/SKILL.md       ← Pulse + hashtag scan (browser-based; auto-skips if no Chrome)
-  ai-github/SKILL.md         ← github.com/trending + curated watch-list deltas
-  ai-hackernews/SKILL.md     ← HN front page + /newest + /best, AI-filtered, top-thread signal
-  ai-trend-radar/SKILL.md    ← daily radar with dual EMA + breadth + dynamic sectors + clusters
-  ai-vendor-sweep/SKILL.md   ← daily org classification + AUTO-APPLY to sources.json
-  ai-weekly-digest/SKILL.md  ← cumulative Mon→Sun rollup, overwrites daily
-  ai-trends/SKILL.md         ← Monday-only long-term trends ledger
-  ai-monthly-rollup/SKILL.md ← first-Monday-of-month monthly rollup
-  ai-replay/SKILL.md         ← manual on-demand orchestrator for today (this skill IS the orchestrator spec)
-  ai-keyword-sweep/SKILL.md  ← daily n-gram mining + auto-extension of 4 keyword lists, with PROVEN protection for long-history terms
-
-scripts/
-  now.sh                     ← canonical date utility (single source of truth for TODAY/WEEK_ID/MONDAY etc.)
+pipeline/scripts/
+  now.sh                       ← canonical date utility (single source of truth for TODAY/WEEK_ID/MONDAY etc.)
+  _lib.py                      ← shared helpers (DATA_ROOT/STATE_DIR roots, iter_source_files, index-marker upsert)
+  seed_orgs.json               ← bootstrap list of ~120 AI companies for the sweep
   bootstrap_discovered_orgs.py
-  backfill_radar_sectors_breadth.py
-  seed_orgs.json
-  render_for_notes.sh        ← markdown → HTML for Apple Notes (pandoc-based, PATH-robust)
-  add_to_notes.applescript   ← AppleScript bridge to Apple Notes
-  preprocess_digest.py       ← markdown preprocessing for the Notes pipeline
+  build_org_view.py            ← rebuilds orgs/index.json + orgs/{slug}.json (firm view)
+  run_keyword_sweep.py         ← n-gram mining + keyword-list auto-extension
+  run_github_sweep.py          ← watched_repos auto-extension + two-regime soft-cap demotion
+  compute_topic_importance.py  ← radar topic-importance ranking
+  build_reports_manifest.py    ← rebuilds reports/index.json (Archive page)
+  rebuild_radar_manifest.py    ← rebuilds radar/index.json
+  rebuild_change_logs.py       ← rebuilds vendor/keyword/github_changes.json from the .log files
+  build_health_beacon.py       ← daily/{date}-health.json — per-collector counts + per-stage timing + skip alerts
+  archive_stale.py             ← long-tail pruning of discovered_orgs/keywords
+  render_for_notes.sh / add_to_notes.applescript / preprocess_digest.py / sync_notes.sh  ← Apple Notes bridge
 
-# Nested by year/month — keep the archive scalable
-daily/{YYYY}/{MM}/{date}.md          ← your primary morning read (leads with reading priorities)
-news/{YYYY}/{MM}/{date}.md           ← raw news subagent output
-papers/{YYYY}/{MM}/{date}.md
-blogs/{YYYY}/{MM}/{date}.md
-jobs/{YYYY}/{MM}/{date}.md
-linkedin/{YYYY}/{MM}/{date}.md
-github/{YYYY}/{MM}/{date}.md         ← GitHub trending + watch-list deltas
-hackernews/{YYYY}/{MM}/{date}.md     ← AI-filtered HN front page
-radar/{YYYY}/{MM}/{date}.md          ← human-readable radar
-radar/{YYYY}/{MM}/{date}.json        ← machine-readable radar (drives the HTML viewer)
-vendor_candidates/{YYYY}/{MM}/{date}.md  ← daily change log (vendor sweep mutations to sources.json)
-keyword_candidates/{YYYY}/{MM}/{date}.md ← daily change log (keyword sweep mutations to sources.json)
-github_candidates/{YYYY}/{MM}/{date}.md  ← daily change log (github sweep mutations to watched_repos)
-weekly/{YYYY}/{YYYY-Www}.md          ← cumulative Mon→Sun, overwritten daily
-monthly/{YYYY}/{YYYY-MM}.md
-trends.md                            ← long-term ledger, Monday-appended
-index.md                             ← table of contents across all cadences
+pipeline/skills/
+  ai-news, ai-papers, ai-blogs, ai-jobs-ch, ai-linkedin, ai-github, ai-hackernews   ← the 7 collectors
+  ai-trend-radar     ← daily radar: dual EMA + breadth + dynamic sectors + clusters
+  ai-vendor-sweep    ← daily org classification + AUTO-APPLY to sources.json
+  ai-keyword-sweep   ← n-gram mining + auto-extension of keyword lists, PROVEN protection
+  ai-weekly-digest   ← cumulative Mon→Sun rollup, overwrites daily
+  ai-trends          ← Monday-only long-term trends ledger
+  ai-monthly-rollup  ← first-Monday-of-month rollup
+  ai-briefing        ← "in 90 seconds" newspaper lead, prepended to daily/weekly/monthly
+  ai-replay          ← on-demand orchestrator for today (this skill IS the §1–§8 orchestrator spec)
+  sync-notes         ← manual catch-up push of the latest daily into Apple Notes
 
-orgs/index.json                      ← sorted list of all orgs (firm view manifest)
-orgs/{slug}.json                     ← per-org timeline / velocity / topic mix
-radar.html                           ← briefing radar viewer — Today + Arcs modes, pinned filter chips
-orgs.html                            ← single-page firm view (serve via localhost)
+data/   (nested by year/month — keep the archive scalable)
+  daily/{YYYY}/{MM}/{date}.md          ← primary morning read (leads with 🎯 reading priorities)
+  daily/{YYYY}/{MM}/{date}-health.json ← per-collector counts + failure/skip flags (health beacon)
+  news/ papers/ blogs/ jobs/ linkedin/ github/ hackernews/ {YYYY}/{MM}/{date}.md  ← raw collector outputs
+  radar/{YYYY}/{MM}/{date}.md          ← human-readable radar
+  radar/{YYYY}/{MM}/{date}.json        ← machine-readable radar (drives the SPA Map/Momentum)
+  radar/index.json                     ← manifest enumerating radar dates
+  vendor_candidates/  keyword_candidates/  github_candidates/  {YYYY}/{MM}/{date}.md  ← daily sweep change logs
+  weekly/{YYYY}/{YYYY-Www}.md          ← cumulative Mon→Sun, overwritten daily
+  monthly/{YYYY}/{YYYY-MM}.md
+  trends.md                            ← long-term ledger, Monday-appended (SPA Trends page)
+  index.md                             ← legacy TOC across cadences (superseded by the SPA Archive)
+  orgs/index.json                      ← firm-view manifest (all orgs + velocity_history)
+  orgs/{slug}.json                     ← per-org timeline / velocity / topic mix (loaded lazily)
+  reports/index.json                   ← flat dated index of every cadence artifact (SPA Archive)
 ```
 
 ## The seven collectors
 
 Each is a self-contained Agent prompt at `skills/{name}/SKILL.md`. The orchestrator spawns all seven in a single message (parallel). Failed collectors don't block synthesis.
 
-- **ai-news** — Priority vendors (6 frontier labs: OpenAI, Anthropic, Google DeepMind, Meta, Mistral, DeepSeek) with mandatory coverage and per-vendor fallback search. Enterprise vendors (8 manual starters: SAP, Salesforce, ServiceNow, NVIDIA, Snowflake, Red Hat/IBM, n8n, Workday/Oracle — plus the auto-grown list maintained by `ai-vendor-sweep`; currently 25 total as of 2026-05-14) with the same discipline. Tech news, Swiss sources, governance feeds, breaking-news web searches.
+- **ai-news** — Priority vendors (6 frontier labs: OpenAI, Anthropic, Google DeepMind, Meta, Mistral, DeepSeek) with mandatory coverage and per-vendor fallback search. Enterprise vendors (8 manual starters: SAP, Salesforce, ServiceNow, NVIDIA, Snowflake, Red Hat/IBM, n8n, Workday/Oracle — plus the auto-grown list maintained by `ai-vendor-sweep`; **91 total as of 2026-06-01**, 83 of them auto-added, with the soft-cap walk-down now converging the list back toward the cap) with the same discipline. Tech news, Swiss sources, governance feeds, breaking-news web searches.
 - **ai-papers** — ArXiv categories (cs.CL, cs.AI, cs.LG, cs.MA, stat.ML, cs.IR) + HuggingFace Papers, filtered to LLM/agent relevance.
 - **ai-blogs** — Long-form analyst blogs (Simon Willison, Karpathy, Lilian Weng, latent.space, Eugene Yan, Sebastian Raschka, Stratechery, SemiAnalysis, etc.) + Medium tags.
 - **ai-jobs-ch** — Swiss-focused AI/LLM/GenAI roles across jobs.ch, swissdevjobs, LinkedIn, YC, ETH/EPFL, plus Wellfound/Indeed for cross-border.
@@ -240,7 +243,7 @@ Runs daily after the keyword sweep. Mines the rolling 14-day window of `github/{
 5. `watch` — uncovered AND ≥2 trending days. No action; surfaces in change log.
 6. `dormant` — everything else.
 
-**Soft cap:** `max_watched_repos` (default 80). When exceeded AND `_auto_added` repos are silent for ≥60 days (no trending appearance), the OLDEST-SILENT (up to 3 per run) get moved to `news_collector.github_collector.deep_watch_repos`. The github collector skips the deep-watch list for daily star-fetch but the sweep still recognizes returning trending appearances as `revive`.
+**Soft cap (two-regime):** `max_watched_repos` (default 80). The cap converges by mention-recency rank, not just an absolute silence window a barely-active repo could evade forever. **NORMAL** regime (count > cap): demote `_auto_added` repos with no trending appearance for ≥ `min_silence_days` (30), least-recently-trended first. **OVERFLOW** regime (count > cap × `overflow_factor`, i.e. > 120): the silence bar drops to `overflow_silence_days` (14) and the count walks down toward the overflow line. Either regime demotes at most `max_demotions_per_run` (5) per run — a gradual walk-down, never a mass purge. Demoted repos move to `github_collector.deep_watch_repos`; the collector skips them for daily star-fetch but the sweep still recognizes a returning trending appearance as `revive`.
 
 **Auto-apply safeties** (identical pattern to vendor + keyword sweeps):
 - `sources.json.github.bak` rollback before every write (per-sweep .bak).
@@ -279,15 +282,15 @@ Runs daily after the radar. Reads `discovered_orgs.json` (running tally), today'
 
 **Expiration:** hot-event entries past `_expires_on` get auto-removed on the next sweep, UNLESS they meanwhile crossed the sustained-promote gate (in which case they were already re-added without expiry).
 
-**Soft cap + deep-watch demotion (added 2026-05-14):** the sweep enforces `max_enterprise_vendors` (default 30). When the list exceeds the cap AND there are `_auto_added` entries silent for ≥60 days, the OLDEST-SILENT (up to 3 per run) get moved into `news_collector.deep_watch_vendors` rather than deleted. The news collector skips the deep-watch list for daily fetches, but the radar still recognizes mentions. **Re-promotion path:** if a deep-watch vendor classifies as `hot_event` or sustained-`promote`, the original entry moves back to `enterprise_vendors` (so a returning vendor isn't seen as a brand-new promotion). Manual entries and entries classified hot/promote today are NEVER demoted. Audit verbs: `deep-watch-demote`, `deep-watch-promote`. The same mechanism applies to keyword lists (`web_search_queries`, `filter_keywords`, `pulse_topic_queries`, `topic_taxonomy_seed._auto_added`) with per-list caps and `_deep_watch_meta` registries — proven keywords are exempt as always.
+**Soft cap + deep-watch demotion (added 2026-05-14; two-regime convergence added 2026-06-01):** the sweep enforces `max_enterprise_vendors` (default 30). Demotion has two regimes so the cap actually converges instead of waiting on a fixed silence window a barely-active vendor evades forever (the bug that let the list grow to 91/30). **NORMAL** (cap < count ≤ cap × `overflow_factor`): demote `_auto_added` entries silent for ≥ `min_silence_days` (30), least-recently-mentioned first, down toward the cap. **OVERFLOW** (count > cap × `overflow_factor`, i.e. > 45): the silence bar drops to `overflow_silence_days` (14) and the count walks down toward the overflow line. Either regime demotes at most `max_demotions_per_run` (5) per run — so a 91→30 walk-down takes ~13 runs, never a mass purge. Demoted entries move into `news_collector.deep_watch_vendors` rather than deleted; the news collector skips that list for daily fetches, but the radar still recognizes mentions. **Re-promotion path:** if a deep-watch vendor classifies as `hot_event` or sustained-`promote`, the original entry moves back to `enterprise_vendors` (so a returning vendor isn't seen as a brand-new promotion). Manual entries, entries classified hot/promote today, and hot-event entries still within their `_expires_on` TTL are NEVER demoted. Audit verbs: `deep-watch-demote`, `deep-watch-promote`. The same soft-cap mechanism applies to keyword lists (`web_search_queries`, `filter_keywords`, `pulse_topic_queries`, `topic_taxonomy_seed._auto_added`) with per-list caps and `_deep_watch_meta` registries — proven keywords are exempt as always.
 
 ## Long-tail archive — `scripts/archive_stale.py`
 
 Two state files grow without bound: `discovered_orgs.json` (running org tally) and `discovered_keywords.json` (mined-phrase tally). Most growth is healthy (real signal), but a long tail of single-mention orgs and boilerplate-tagged keywords doesn't pay rent. Run periodically (weekly or monthly) to prune them into parallel archive files:
 
 ```bash
-python3 scripts/archive_stale.py --orgs --keywords --dry-run    # preview
-python3 scripts/archive_stale.py --orgs --keywords              # write
+python3 pipeline/scripts/archive_stale.py --orgs --keywords --dry-run    # preview
+python3 pipeline/scripts/archive_stale.py --orgs --keywords              # write
 ```
 
 **Org thresholds** (`archive_config.orgs` in sources.json): `total_mentions ≤ 3` AND silent for `≥ 60 days`. Priority/enterprise/deep-watch orgs are never archived. Archived to `discovered_orgs_archive.json` (created lazily).
@@ -307,66 +310,41 @@ If a slug or phrase resurfaces after archival, the next sweep creates a fresh en
 | Weekly   | `trends.md`                       | Long-term ledger of durable shifts. Appended every Monday by `ai-trends`.                        | Monthly status meeting. |
 | Monthly  | `monthly/{YYYY}/{YYYY-MM}.md`     | First-Monday-of-month rollup synthesizing the prior month's weekly files.                        | When reviewing a month's arc. |
 
-## The firm view — `orgs.html`
+## The web app — Angular SPA (`app/`)
 
-The user's stated goal of "see a trend grow on different firms" gets its own view, separate from the topic-centric radar. **Pick an org → see its mention timeline, source-type mix, velocity history, and topic mix**, all on one screen. Sorted by velocity ratio with priority vendors pinned to the top.
+The browser front-end is an **Angular 21 + PrimeNG single-page app** under `app/`, replacing the original standalone HTML viewers (now archived in `legacy/`). It reads everything under `data/` via the `app/public/data` symlink and a single `DataService`. Run it with `npx ng serve` from `app/` (see "Running the app locally" above). Routes are defined in `app/src/app/app.routes.ts`.
 
-The view reads two files generated by `scripts/build_org_view.py`, split by access pattern so the firm list loads in one round-trip instead of fetching every per-firm file up front:
+The information architecture is a **four-page red thread** — each page answers one question, in order from "now" to "everything" — plus a long-arc Trends ledger and three detail pages:
 
-- `orgs/index.json` — sorted list of every org plus its 31-day `velocity_history` per entry. One HTTP request renders the table, row sparklines, velocity sort/filter, and the firm-detail page's velocity chart. ~4 MB for ~1,120 orgs; gzipped ~600–800 KB. Single source of truth for the velocity series.
-- `orgs/{slug}.json` — detail-only fields the list view doesn't need: `mentions_by_date`, source-type breakdown, topic mix, radar appearances, classification history, hot events, context snippets, aliases. Loaded lazily when the user opens a firm. Does NOT carry `velocity_history` (lives in `index.json` — duplicating it back was the original churn source).
+| Route | Page | Answers |
+|-------|------|---------|
+| `/pulse` (`/pulse/:date`) | **Pulse** | *What's happening now?* The morning briefing: the daily 🎯 top-5 reading priorities, the `ai-briefing` "in 90 seconds" lead, themed slices, and the early-signal sections (GitHub momentum, Hacker News pulse, vendor velocity). Date-navigable. |
+| `/momentum` (`/momentum/:window`) | **Momentum** | *How is it moving?* How the radar moved over 7d / 30d / 90d — stage transitions, surging/fading topics, breadth jumps. |
+| `/map` (`/map`, `/map/at/:date`) | **Map** | *What does the landscape look like?* The whole AI landscape as sectors × topics × firms, with a compare-to-past mode that diffs against an earlier radar snapshot. |
+| `/archive` | **Archive** | *What have we published?* Everything published, faceted by cadence (daily / weekly / monthly / radar / sweep change logs) + date. |
+| `/trends` | **Trends** | The long-arc ledger rendered from `data/trends.md` (durable shifts, appended every Monday). |
+| `/map/topic/:id` | **Topic** (detail) | One topic's life-cycle arc — persistence + breadth dual-axis over all history, 7d/30d/90d/180d-ago stats with cold markers, sector history, orgs talking, supporting files. |
+| `/map/firm/:slug` | **Firm** (detail) | One firm's mention timeline, source-type mix, velocity history, topic mix, radar appearances, classification & hot events — the "see a trend grow on a firm" view. |
+| `/map/story/:id` | **Story** (detail) | A co-mention cluster as a narrative — the topics and firms moving together. |
 
-The generator rebuilds the entire `orgs/` tree each run (~8-12 seconds) so it's always consistent with `discovered_orgs.json`. Per-firm files no longer touched daily by the sliding-window update — they only rewrite when their detail content actually changes. It also closes one gap the sweep leaves open: **priority vendors (OpenAI, Anthropic, Google DeepMind, Meta, Mistral, DeepSeek) aren't tracked in `discovered_orgs.json`** because the sweep treats them as already-covered — but they're the most important companies for the firm view. The generator scans source files for those 6 vendors directly so they appear in the firm view alongside the discovered orgs.
+Legacy URLs (`/today`, `/radar`, `/firms`, `/week`, `/month`, `/reports`, …) redirect into the new shell, so old bookmarks still resolve.
+
+### The firm view (`/map/firm/:slug`) — "see a trend grow on different firms"
+
+Backed by two files generated by `pipeline/scripts/build_org_view.py`, split by access pattern so the firm list loads in one round-trip instead of fetching every per-firm file up front:
+
+- `orgs/index.json` — every org plus its 31-day `velocity_history` per entry. One HTTP request renders the list, row sparklines, and velocity sort/filter, and feeds the firm-detail velocity chart. **~5.5 MB for ~1,370 orgs** (`total_orgs` in the manifest); gzipped much smaller. Single source of truth for the velocity series.
+- `orgs/{slug}.json` — detail-only fields the list doesn't need: `mentions_by_date`, source-type breakdown, topic mix, radar appearances, classification history, hot events, context snippets, aliases. Loaded lazily when a firm opens. Does NOT carry `velocity_history` (lives in `index.json` — duplicating it back was the original churn source).
+
+The generator rebuilds the entire `orgs/` tree each run so it's always consistent with `discovered_orgs.json`, but **only rewrites a per-firm file when its content actually changes** (content-diff skip). It also closes one gap the sweep leaves open: **priority vendors (OpenAI, Anthropic, Google DeepMind, Meta, Mistral, DeepSeek) aren't tracked in `discovered_orgs.json`** because the sweep treats them as already-covered — but they're the most important firms for this view. The generator scans source files for those 6 vendors directly so they appear alongside the discovered orgs.
 
 `ai-replay` runs the generator automatically (§6.7); standalone invocation:
 
 ```bash
-python3 scripts/build_org_view.py
+python3 pipeline/scripts/build_org_view.py
 ```
 
-**Open the view:**
-
-```bash
-cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher"
-python3 -m http.server 8000
-open http://localhost:8000/orgs.html
-```
-
-Features:
-- **Searchable & filterable left rail** — search by slug or top topic; filter by tier hint (frontier-lab / enterprise-vendor / vertical-agent / infra / hosting / hardware / research-lab / safety / open-weight); sort by velocity / mentions / recency / topic count / A–Z.
-- **Mention activity** — bar chart of files-with-mention per day across the org's full history.
-- **Velocity history** — line chart of mentions/7d + velocity ratio (7d / weekly-avg-28d) over the last 30 days. Surging / accelerating / cooling / steady chips per the same thresholds the vendor sweep uses.
-- **Source-type mix** — doughnut chart showing what kind of sources are covering this org (tech_news / paper / long_form_blog / linkedin / etc.).
-- **Topic mix** — bar chart of which topic-taxonomy strings co-occur with this org's mentions in source files. Will be replaced by radar's `breadth_orgs_7d` once that field starts populating on real runs.
-- **Radar appearances** — every date this org showed up in any radar topic's `breadth_orgs_7d` (currently empty across the board; populates as the radar runs forward).
-- **Classification & hot events** — last 10 sweep classifications and recorded hot events.
-- **Context samples** — short snippets of where the org was first seen in source files.
-
-## The HTML radar viewer — `radar.html`
-
-The briefing view, opened every morning. Two modes accessible via a tab switch at the top:
-
-- **Today** — the morning briefing. Up to 10 ranked items: stage transitions (both directions), surging topics, sector births/deaths, breadth jumps vs. yesterday, hot vendor events. Sorted by signal weight. Each clickable. On quiet days, auto-opens the polar-radar disclosure with an explanation. Supporting panels (clusters, sector evolution, top-8 score history) live behind `▸` disclosure buttons — present but quiet.
-
-- **Arcs** — long-term lens. Left rail: filterable, searchable topic list with stage dot + direction arrow per row. Right: chosen topic's life-cycle arc (persistence + breadth dual-axis chart over all history), 7d/30d/90d/180d-ago stats with "cold" markers when the window isn't warm yet, sector history, orgs talking, supporting files. One topic at a time, no clutter.
-
-**Filter chips** at the top of every mode, two tiers:
-- **★ Pinned** (gold star) — survives sessions via localStorage. Stays even when the underlying sector/cluster isn't in today's snapshot (shows tooltip "Pinned but no topics in this snapshot").
-- **Dynamic** (☆) — today's sectors + clusters, minus the already-pinned. Click ☆ to pin, ★ to unpin. Click the chip body (not the star) to filter the active mode.
-
-Both sectors (◆) and topic clusters (🔗) get chips in one row.
-
-**Cross-links**: `→ firm view` (`orgs.html`), `→ index` (`index.md`).
-
-**Maturity badge** next to the date selector: pipeline age in days + which momentum windows are reliable (cold / warming / warm).
-
-### Serve it:
-
-```bash
-cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher"
-python3 -m http.server 8000
-open http://localhost:8000/radar.html
-```
+> **Known cold-start gaps.** `breadth_orgs_7d` (the radar's first-class org extraction) and per-topic "radar appearances" are still sparse — they populate as the radar runs forward. Until then the firm view's topic mix is derived from topic-taxonomy co-occurrence in source files. The app should surface a cold/warming maturity indicator on the momentum windows (the 30d/90d windows are mostly cold this early in the pipeline's life); confirm it renders before trusting an empty panel as "nothing moved."
 
 
 
@@ -376,8 +354,8 @@ Edit this to change what the pipeline tracks. Major sections:
 
 | Key                                          | Purpose                                                                              |
 |----------------------------------------------|--------------------------------------------------------------------------------------|
-| `news_collector.priority_vendors`            | Frontier labs (5). MANDATORY coverage. Never modified by auto-apply.                 |
-| `news_collector.enterprise_vendors`          | Platform layer (8 starter + auto-added). Mutated by the vendor sweep.                |
+| `news_collector.priority_vendors`            | Frontier labs (6: OpenAI, Anthropic, Google DeepMind, Meta, Mistral, DeepSeek). MANDATORY coverage. Never modified by auto-apply. |
+| `news_collector.enterprise_vendors`          | Platform layer (8 manual starters + auto-added; 91 as of 2026-06-01). Mutated by the vendor sweep. |
 | `news_collector.deep_watch_vendors`          | Auto-demoted vendors (silent + over soft cap). News collector skips these for daily fetch; sweep can re-promote. |
 | `news_collector.vendor_blogs`                | Informal blog URL list. Counted as `informal_covered`.                               |
 | `news_collector.tech_news_sites`             | Heise, Handelsblatt, t3n, TheVerge, TechCrunch, ArsTechnica, …                       |
@@ -405,24 +383,23 @@ Edit this to change what the pipeline tracks. Major sections:
 ## How to use
 
 ```
-# Read today's digest
-open daily/{YYYY}/{MM}/{date}.md
+# Read today's digest (or just open the SPA Pulse page — same content, nicer)
+open data/daily/{YYYY}/{MM}/{date}.md
 # …or in Apple Notes if the sync-notes skill is enabled
 
-# Drill into a slice for the day
-open news/{YYYY}/{MM}/{date}.md         # or papers/, blogs/, jobs/, linkedin/, github/, hackernews/
+# Drill into a slice for the day (data/ paths)
+open data/news/{YYYY}/{MM}/{date}.md    # or papers/, blogs/, jobs/, linkedin/, github/, hackernews/
 
-# Inspect the radar visually
-cd "/Users/yruosch/Documents/Claude/Projects/AI Researcher"
-python3 -m http.server 8000
-open http://localhost:8000/radar.html
+# Inspect the radar + everything else visually — the Angular SPA
+cd app && npx ng serve                  # → http://localhost:4200  (Pulse / Momentum / Map / Archive / Trends)
 
 # See what auto-applied to sources.json today
-open vendor_candidates/{YYYY}/{MM}/{date}.md
-tail -50 vendor_changes.log
+open data/vendor_candidates/{YYYY}/{MM}/{date}.md
+tail -50 pipeline/state/vendor_changes.log
 
 # Roll back the most recent sources.json mutation (per sweep — pick the one whose
 # change you want to undo)
+cd pipeline/state
 cp sources.json.vendor.bak sources.json     # undo last vendor sweep mutation
 cp sources.json.keyword.bak sources.json    # undo last keyword sweep mutation
 cp sources.json.github.bak sources.json     # undo last github sweep mutation
@@ -486,12 +463,13 @@ The override is plumbed end-to-end (also surfaces as `AS_OF` in the output) but 
 ## Maintenance
 
 ```bash
-# Pipeline health
-ls daily/{YYYY}/{MM}/ | wc -l         # how many days have a digest?
-grep -c 'failed' daily/{YYYY}/{MM}/*.md  # how often is a collector failing?
-tail -100 vendor_changes.log          # what has auto-applied recently?
-ls radar/{YYYY}/{MM}/ | wc -l         # radar days on file
-cat sources.json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(len(d["news_collector"]["enterprise_vendors"]))'
+# Pipeline health (run from the repo root; cadence outputs under data/, state under pipeline/state/)
+ls data/daily/{YYYY}/{MM}/ | wc -l         # how many days have a digest?
+grep -c 'failed' data/daily/{YYYY}/{MM}/*.md  # how often is a collector failing?
+cat data/daily/{YYYY}/{MM}/{date}-health.json # per-collector counts + skip/failure flags (health beacon)
+tail -100 pipeline/state/vendor_changes.log   # what has auto-applied recently?
+ls data/radar/{YYYY}/{MM}/ | wc -l            # radar days on file
+python3 -c 'import json; d=json.load(open("pipeline/state/sources.json")); print(len(d["news_collector"]["enterprise_vendors"]))'
 
 # Cleanup
 # Manual entries in enterprise_vendors are never touched. If you want to remove an auto-added entry permanently, also remove it from discovered_orgs.json or it may be re-promoted.
@@ -505,20 +483,26 @@ cat sources.json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(le
 
 ## Skills not covered above
 
-- `skills/sync-notes/SKILL.md` — manual one-shot to push the latest daily into Apple Notes. The orchestrator does this automatically via the AppleScript bridge; this skill is for catching up after missed days or backfilling.
+- `pipeline/skills/sync-notes/SKILL.md` — manual one-shot to push the latest daily into Apple Notes. The orchestrator does this automatically via the AppleScript bridge; this skill is for catching up after missed days or backfilling.
 
 ## What the pipeline does NOT do (yet)
 
-Deferred items (documented in conversation history):
+Genuinely deferred items (not yet built):
 
 - **Past-date replay** (collectors fetch live URLs — out of scope; would need historical archives like Common Crawl).
-- **Daily health beacon:** `daily/{date}-health.json` with per-collector item counts + failure flags, so "is the pipeline alive" is a one-glance signal.
-- **Cron-side orchestrator alignment.** `skills/ai-replay/SKILL.md` is now the canonical orchestrator spec (the previous `ORCHESTRATOR_UPDATE.md` is deleted). The cron'd `ai-daily-research` task in Cowork's UI should be pasted from §1–§8 of that file. Until verified, treat the cron's behavior as "should match ai-replay but trust nothing."
 - **Twitter/X collector** via Claude in Chrome (curated researcher list).
 - **Earnings-call / 10-Q AI-mention tracker.**
 - **A/B testing infrastructure** for threshold tuning.
 - **Pattern-matching forecasting** ("vibe coding wave looks like 2024 RAG wave").
 
-**Shipped this session:** firm view (`orgs.html`), keyword sweep (Python implementation + first run with 200-phrase tally), briefing radar (`radar.html`), change-log JSON views with consistency check (caught the vendor-sweep legacy `hot-add` bug), vendor-sweep skill hardened to prevent the bug from recurring, maturity badge in briefing radar, sector/cluster filter chips with pinned+dynamic tiers, deep-watch demotion for vendors / keywords / github-watched-repos (soft cap + re-promotion path; manual + proven entries sacred), github sweep (`scripts/run_github_sweep.py` — auto-extends `watched_repos` from trending-day tracking; new `github_changes.log/.json`), long-tail archive script (`scripts/archive_stale.py`) for org/keyword tally pruning, shared `scripts/_lib.py` (deduped iter_source_files / whole_word_pattern / SOURCE_DIRS across daily scripts), radar.html sector-shift block + arc-detail expanded stat grid (sustained_days / convergence / breadth / 180d), legacy hot-add filter in vendor_changes.json, full SKILL.md timestamp-footer cleanup, ai-trend-radar SKILL path fixes (root vs nested JSON; write-JSON-first guard).
+Add any of these by writing a new `pipeline/skills/{name}/SKILL.md` (or `pipeline/scripts/{name}.py` if deterministic), then wiring it into `pipeline/skills/ai-replay/SKILL.md` (and the cron-side orchestrator) at the appropriate §3 (collector) or §6.x (post-synthesis agent) step.
 
-Add any of the deferred items by writing a new `skills/{name}/SKILL.md` (or `scripts/{name}.py` if deterministic), then wiring it into `ai-replay/SKILL.md` (and the cron-side orchestrator) at the appropriate §3 (collector) or §6.x (post-synthesis agent) step.
+### Known limitations / things to watch
+
+- **Cron-side orchestrator alignment.** `pipeline/skills/ai-replay/SKILL.md` is the canonical orchestrator spec; the cron'd `ai-daily-research` task in Cowork's UI must mirror its §1–§8. Treat the cron's behavior as "should match ai-replay but verify" — `CRON_PROMPT.md` is the reconciliation source.
+- **Cold momentum windows.** The pipeline's earliest daily output is 2026-03-15 (news/papers/blogs backfill); jobs/linkedin began ~2026-05-06 and github/hackernews 2026-05-14. The 30d/90d/180d radar windows are still mostly cold this early — the app should mark them so an empty panel reads as "not enough history yet," not "nothing moved."
+- **`breadth_orgs_7d` is still sparse**, so the radar's first-class org→topic breadth signal and per-firm "radar appearances" are thin until it populates forward (see `pipeline/skills/ai-trend-radar/BREADTH_PLAN.md` for the in-progress fix to count distinct actors instead of co-mentions).
+
+### Recently shipped (now part of the baseline above)
+
+The Angular SPA (replacing the `legacy/` HTML viewers), the `ai-briefing` "in 90 seconds" leads (§5.5 / §7.1 / §7.65), the daily **health beacon** (`scripts/build_health_beacon.py` → `daily/{date}-health.json`, §6.96), the reports manifest (`scripts/build_reports_manifest.py`, §6.95), topic-importance ranking (`scripts/compute_topic_importance.py`), the keyword and github sweeps with their change-log JSON views and consistency checks, deep-watch demotion across vendors / keywords / repos with the two-regime soft-cap walk-down (2026-06-01), and the long-tail archive script (`scripts/archive_stale.py`).

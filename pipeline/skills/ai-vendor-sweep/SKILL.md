@@ -245,25 +245,34 @@ Read `auto_apply.deep_watch_demote`. If `enabled` is false, skip this entire ste
 ```
 current_count = len(news_collector.enterprise_vendors)
 cap = deep_watch_demote.max_enterprise_vendors  (default 30)
-silence = deep_watch_demote.min_silence_days    (default 60)
-budget = deep_watch_demote.max_demotions_per_run (default 3)
+min_silence = deep_watch_demote.min_silence_days   (default 30)
+budget = deep_watch_demote.max_demotions_per_run   (default 5)
+overflow_factor = deep_watch_demote.overflow_factor       (default 1.5)
+overflow_silence = deep_watch_demote.overflow_silence_days (default 14)
+overflow_threshold = cap * overflow_factor              (= 45 at defaults)
 ```
 
 If `current_count <= cap`, no demotion needed — skip.
 
-Otherwise, find candidates: `enterprise_vendors` entries where ALL of:
-1. `_auto_added: true` (manual entries NEVER touched — they're sacred)
-2. `(TODAY - last_seen_in_discovered_orgs) >= silence` — there's been no mention activity for the silence window
-3. NOT currently classified `hot_event` or `promote` today (would be self-contradictory to demote what we're also promoting)
+**Two regimes** (this makes the cap actually converge instead of waiting on a 60-day absolute silence window a barely-active vendor evades forever — the bug that let the list grow to 91/30):
 
-Sort candidates by `last_seen` ascending (oldest-silent first). Take the first `min(current_count - cap, budget)` of them. For each:
+- **NORMAL** — `cap < current_count <= overflow_threshold`. Effective silence = `min_silence` (30). Demotion target = `cap`.
+- **OVERFLOW** — `current_count > overflow_threshold` (list is badly over cap). Effective silence drops to `overflow_silence` (14). Demotion target = `ceil(overflow_threshold)` — walk the count *down toward* the overflow line, not all the way to cap, so we don't mass-purge in one run.
+
+In BOTH regimes, find candidates: `enterprise_vendors` entries where ALL of:
+1. `_auto_added: true` (manual entries NEVER touched — they're sacred)
+2. `(TODAY - last_seen_in_discovered_orgs) >= effective_silence` — no mention activity for the (regime-dependent) silence window
+3. NOT currently classified `hot_event` or `promote` today (would be self-contradictory to demote what we're also promoting)
+4. NOT a hot-event entry still within its `_expires_on` TTL (let the TTL expire those instead of deep-watching them early)
+
+Sort candidates by `last_seen` ascending (least-recently-mentioned first). Take the first `min(current_count - demotion_target, budget)` of them. Because `budget` caps each run, a 91→30 walk-down takes several sweeps — gradual by design. For each:
 
 - Read the full entry from `news_collector.enterprise_vendors`.
-- Add `_demoted_on: TODAY`, `_demoted_reason: "deep-watch: silent {N} days, over soft cap"`, `_demoted_from: "enterprise_vendors"`.
+- Add `_demoted_on: TODAY`, `_demoted_reason: "deep-watch ({regime}): silent {N} days, {count}/cap {cap}"` (regime = `overflow` or `soft-cap`), `_demoted_from: "enterprise_vendors"`.
 - WRITE the entry to `news_collector.deep_watch_vendors[slug]`.
 - DELETE from `news_collector.enterprise_vendors`.
 - Update `discovered_orgs.json` for this slug: `coverage: "deep_watch"`, `auto_applied_on: TODAY`.
-- Audit log: `deep-watch-demote {slug} reason="silent {N} days, ranked oldest-silent over cap=30"`.
+- Audit log: `deep-watch-demote {slug} reason="{regime}: silent {N} days, least-recent over cap={cap}"`.
 
 **Re-promotion path (the inverse).** If today's classification step yielded `hot_event` or sustained-`promote` for a slug that's currently in `deep_watch_vendors`:
 

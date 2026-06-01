@@ -31,9 +31,17 @@ pipeline/state/keyword_judge_verdicts.json
 pipeline/state/keyword_judge_verdicts.*.applied.json
 
 # Pipeline scratch — collectors and sweep agents drop temporary workspaces and
-# one-off scripts under data/.tmp_*. Regenerated every run, never read by the
-# app or any cadence consumer.
+# one-off scripts. Regenerated every run, never read by the app or any cadence
+# consumer.
 data/.tmp_*
+data/.hnwork/
+data/.sweep_apply.py
+data/.sweep_state.json
+.sweep_tmp/
+pipeline/scripts/_scratch_*.py
+
+# Claude Code local runtime state in the app workspace (scheduled-task locks etc).
+app/.claude/
 
 # Local-only caches and screenshots. The importance cache is regenerated every
 # radar run; the screenshot cache holds preview captures from chrome-devtools.
