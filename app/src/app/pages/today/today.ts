@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Skeleton } from 'primeng/skeleton';
@@ -256,7 +257,7 @@ export class TodayPage {
       this.loading.set(false);
     });
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(params => {
       const d = params.get('date');
       if (d && d !== this.selectedDate()) this.selectedDate.set(d);
     });

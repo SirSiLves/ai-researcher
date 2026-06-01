@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { DataService, RadarDay, RadarTopic, ReportEntry } from '../../services/data.service';
 import { TrendSummary } from '../../components/trend-summary/trend-summary';
 import { MarkdownViewer } from '../../components/markdown-viewer/markdown-viewer';
+import { MaturityBadge } from '../../components/maturity-badge/maturity-badge';
 
 type Window = '7d' | '30d' | '90d';
 
@@ -29,7 +30,7 @@ const WINDOW_DAYS: Record<Window, number> = { '7d': 7, '30d': 30, '90d': 90 };
 @Component({
   selector: 'app-momentum',
   standalone: true,
-  imports: [DecimalPipe, Skeleton, ButtonModule, TrendSummary, MarkdownViewer],
+  imports: [DecimalPipe, Skeleton, ButtonModule, TrendSummary, MarkdownViewer, MaturityBadge],
   templateUrl: './momentum.html',
   styleUrl: './momentum.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
@@ -39,6 +40,7 @@ export class MapPage {
   readonly radarDay = signal<RadarDay | null>(null);
   readonly orgsList = signal<OrgIndexEntry[]>([]);
   readonly loading = signal<boolean>(true);
+  readonly error = signal<string | null>(null);
   readonly availableDates = signal<string[]>([]);
   readonly selectedDate = signal<string | null>(null);
   /** Keywords with broad cross-source presence that the radar hasn't promoted
@@ -392,7 +394,10 @@ export class MapPage {
       const routeDate = this.route.snapshot.paramMap.get('date');
       const initial = routeDate ?? entries[0]?.date_id ?? null;
       this.selectedDate.set(initial);
-    }).catch(() => this.loading.set(false));
+    }).catch(err => {
+      this.error.set(`Couldn't load the radar/orgs index: ${err?.message ?? err}`);
+      this.loading.set(false);
+    });
 
     // Optional gap-keyword panel — silent failure when the pipeline file is absent.
     this.data.loadGapKeywords().then(gap => {
@@ -400,7 +405,7 @@ export class MapPage {
     });
 
     // React to URL param changes (back/forward navigation).
-    this.route.paramMap.subscribe(p => {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(p => {
       const d = p.get('date');
       if (d && d !== this.selectedDate()) this.selectedDate.set(d);
     });
@@ -414,12 +419,16 @@ export class MapPage {
         if (!entry) { this.loading.set(false); return; }
         this.loading.set(true);
         this.radarDay.set(null);
+        this.error.set(null);
         return this.data.loadRadarDay(entry.json_path).then(day => {
           if (this.selectedDate() !== d) return;
           this.radarDay.set(day);
           this.loading.set(false);
         });
-      }).catch(() => this.loading.set(false));
+      }).catch(err => {
+        this.error.set(`Couldn't load the radar for ${d}: ${err?.message ?? err}`);
+        this.loading.set(false);
+      });
     });
 
     // Load the compare radar whenever compareDate changes.

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { Skeleton } from 'primeng/skeleton';
@@ -216,7 +217,7 @@ export class FirmPage {
   });
 
   constructor() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(params => {
       const slug = params.get('slug');
       if (!slug) return;
       // Redirect brand/product slugs to their canonical parent. replaceUrl=true

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { Skeleton } from 'primeng/skeleton';
@@ -206,7 +207,7 @@ export class StoryPage {
   });
 
   constructor() {
-    this.route.paramMap.subscribe(p => {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(p => {
       const id = p.get('id');
       if (id && id !== this.storyId()) {
         this.storyId.set(id);

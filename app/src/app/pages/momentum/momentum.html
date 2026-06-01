@@ -24,6 +24,13 @@
       </div>
     </div>
     <div class="momentum-hero__sub tabular">{{ windowLabel() }}</div>
+    <div class="momentum-hero__maturity">
+      <app-maturity-badge [compact]="true" />
+      <span class="momentum-hero__maturity-note">
+        A cold window means the pipeline doesn't have enough history yet — read it as
+        "not enough data," not "nothing moved."
+      </span>
+    </div>
   </header>
 
   <!-- ── TREND SUMMARY (chart + 4 KPI tiles) ──────────────────── -->
