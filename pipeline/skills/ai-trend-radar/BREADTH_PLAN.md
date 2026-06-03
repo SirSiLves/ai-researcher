@@ -1,6 +1,6 @@
 # Plan — Make "breadth" measure convergence, not co-mention
 
-**Status:** proposal for review. No pipeline behavior changes until approved.
+**Status:** ✅ IMPLEMENTED 2026-06-03. Config (`publisher_slugs`, lowered thresholds), the SKILL §4 actor-test + deterministic publisher filter, the §6 `breadth_audit` emit, and the §7 "Orgs acting on this" relabel are all live. `compute_topic_importance.py` verified unchanged (reads breadth, doesn't recompute). Forward-only: takes effect from the next radar run; rollout steps 2–4 (inspect `breadth_audit`, re-tune thresholds against the new distribution, watch one week) are the remaining follow-up.
 **Author:** trend-quality assessment follow-up, 2026-05-30.
 **Companion to:** `EVICTION_PLAN.md` (sprawl) — this addresses the opposite and
 more urgent problem: the radar's headline metric is structurally misleading.

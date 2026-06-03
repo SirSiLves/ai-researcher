@@ -4561,11 +4561,22 @@
       "window_short_days": 7,
       "window_long_days": 30,
       "max_mentions_per_org_per_day": 2,
-      "_org_definition": "An 'org' is the primary publisher or subject of the mention — Anthropic, OpenAI, ServiceNow, Heise, Handelsblatt, an individual author of a long-form blog post. The radar skill extracts orgs from each mention's context. For backfill where org data isn't separately stored, breadth is approximated by distinct (source_type, file_date) pairs in the window.",
+      "_org_definition": "An 'org' is an ACTOR in the topic — an organization that shipped/announced it, adopted/deployed it, regulates it, is hiring for it, or is directly and specifically affected by it. NOT a messenger (a publisher reporting the story) and NOT a contrast co-mention (a competitor named only for comparison in a roundup). The radar skill applies the actor test per mention; ambiguous cases are EXCLUDED (breadth should under-count, not inflate). For backfill where org data isn't separately stored, breadth is approximated by distinct (source_type, file_date) pairs in the window.",
+      "_attribution_comment": "Breadth counts ACTORS, not messengers or contrast co-mentions. An org counts toward a topic only when it is the subject acting on the topic. Publishers reporting the story and competitors named only for comparison do NOT count. See ai-trend-radar/SKILL.md §4 'actor test'.",
+      "publisher_slugs": [
+        "heise", "handelsblatt", "techcrunch", "theverge", "venturebeat",
+        "nzz", "golem", "t3n", "arstechnica", "infoq", "zdnet", "marktechpost",
+        "bloomberg", "cnbc", "cnn", "axios", "benzinga", "9to5google",
+        "the-information", "reuters", "ft", "wsj",
+        "simonwillison", "latentspace", "stratechery", "semianalysis",
+        "interconnects", "pragmaticengineer"
+      ],
+      "_publisher_comment": "Slugs here are tech-press / analyst publishers and individual commentators — messengers, excluded from breadth counts but STILL kept in source_mentions for transparency. A publisher slug counts toward breadth ONLY if the publisher is itself the subject (e.g. an NZZ story ABOUT NZZ building RAG).",
+      "_finance_press_note": "Banks (macquarie, bnp, goldman, gvc, etc.) count toward breadth ONLY when they are the actor (deploying / investing / issuing a mandate), never when quoted as analysts in a market-reaction story.",
       "thresholds": {
-        "_comment": "How the viewer interprets breadth into visual cues. Raised 2026-05-23: original 5/8 floor was below the natural median (14 today) so the high_breadth flag fired on every topic. New floor 15/20 ~= top-third / top-quartile of today's distribution. Re-tune if topic count grows past ~60 or the rolling median shifts.",
-        "high_breadth_7d": 15,
-        "very_high_breadth_7d": 20
+        "_comment": "Lowered 2026-06-03 from 15/20 alongside BREADTH_PLAN actor-attribution. Removing publishers + contrast co-mentions shrinks every topic's org set, so the old 15/20 floor (set against the inflated distribution) would almost never fire. After the first corrected radar run, read breadth_audit.median_breadth_30d and re-tune: high_breadth_7d ~= top-third of the NEW distribution, very_high ~= top-quartile.",
+        "high_breadth_7d": 8,
+        "very_high_breadth_7d": 12
       }
     },
     "output_format": {

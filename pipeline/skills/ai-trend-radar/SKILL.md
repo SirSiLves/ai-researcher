@@ -129,23 +129,28 @@ If first appearance for this topic: `score_fast = score_slow = raw_today`.
 
 For backward compatibility in the JSON, also expose `score = score_slow` as the primary score field (which is what stage classification uses below).
 
-**Breadth — distinct organizations talking about the topic.**
+**Breadth — distinct organizations *acting on* the topic.**
 
-This is the *cross-source convergence* dimension. Independent from persistence. Answers: "how many separate organizations are talking about this right now?"
+This is the *cross-source convergence* dimension. Independent from persistence. Answers: "how many separate organizations are *doing something* with this right now?" — NOT "how many outlets reported it." Coverage volume is not convergence; a single widely-reported event must not post a 40-org breadth.
 
 For each topic, while collecting mentions:
 
-- For every mention you record, also record the **org** = the publisher or primary subject. Examples: an OpenAI blog post → org `openai`. A Heise article about Anthropic → if the article *is about* Anthropic, org `anthropic`; if it's a Heise editorial mentioning Anthropic in passing, org `heise`. A LinkedIn Pulse from an Accenture analyst about ServiceNow Otto → org `servicenow` (subject is the company; the analyst is the messenger). A jobs.ch posting from UBS for an AI engineer → org `ubs`. When ambiguous, pick the *primary subject* of the mention, not the author.
-- Use lowercase, kebab-case slugs. Be consistent across days. Common slugs: `openai`, `anthropic`, `google`, `microsoft`, `meta`, `mistral`, `deepseek`, `sap`, `salesforce`, `servicenow`, `nvidia`, `snowflake`, `databricks`, `ibm`, `redhat`, `n8n`, `oracle`, `workday`, `pinecone`, `langchain`, `llamaindex`, `huggingface`, `apple`, plus publication slugs like `heise`, `handelsblatt`, `techcrunch`, `theverge`, `venturebeat`, `nzz`, `simonwillison`, `latentspace`, etc.
+- **For every mention, attribute an org only if that org is an *actor* in the topic** — it shipped/announced the thing, adopted/deployed it, regulates it, is hiring for it, or is directly and specifically affected by it (e.g. a stock move attributed to the topic). Use the **actor test**: *"Is this org doing something with the topic, or merely named in the coverage of it?"*
+  - **Counts (actor):** an OpenAI blog post shipping a feature → `openai`. ServiceNow GA of an agent platform → `servicenow`. A UBS jobs.ch posting for an AI engineer → `ubs`. SAP making Claude its default reasoning engine → `sap` *and* `anthropic` (both are actors in that deal). A LinkedIn Pulse from an Accenture analyst about ServiceNow Otto → `servicenow` (the subject company is the actor; the analyst/author is the messenger).
+  - **Does NOT count (messenger / publisher):** a Heise/Bloomberg/CNN article *reporting* the story → the publisher is excluded. Every slug in `radar_config.breadth_config.publisher_slugs` is a messenger, not a participant.
+  - **Does NOT count (contrast co-mention):** a "Gemini 3.5 vs Claude vs GPT-5.5" benchmark roundup filed under `frontier-models-google` → only `google` (the subject of *this* topic) counts; `anthropic`/`openai` are named for contrast, not converging on Google's models, so they are NOT added to *this* topic's breadth. (They earn their own breadth on *their own* topics from *their own* actor-mentions.)
+  - When you cannot tell whether an org is an actor or just mentioned, **exclude it** — breadth should under-count rather than inflate. This reverses the old "when ambiguous, pick the primary subject" rule, which let broadly-reported single events post inflated breadth.
+- **Deterministic publisher filter (apply before counting):** after assembling each topic's raw org set, drop any slug in `radar_config.breadth_config.publisher_slugs` **unless that publisher is itself the topic's subject** (e.g. an NZZ story about NZZ building RAG). This catches the biggest source of inflation regardless of LLM judgment. Keep dropped slugs in `source_mentions` for transparency — only the breadth *count* changes.
+- Use lowercase, kebab-case slugs. Be consistent across days. Common actor slugs: `openai`, `anthropic`, `google`, `microsoft`, `meta`, `mistral`, `deepseek`, `sap`, `salesforce`, `servicenow`, `nvidia`, `snowflake`, `databricks`, `ibm`, `redhat`, `n8n`, `oracle`, `workday`, `pinecone`, `langchain`, `llamaindex`, `huggingface`, `apple`. (Publication slugs like `heise`, `bloomberg`, `techcrunch` are NOT actor slugs — they live on `publisher_slugs` and are excluded from breadth.)
 - Apply the per-day cap: `radar_config.breadth_config.max_mentions_per_org_per_day` (default 2). One company spamming five blog posts on the same day still only contributes 2 to breadth math (though all are kept in `source_mentions` for transparency).
 
-Compute:
+Compute, **on the actor-filtered org set**:
 ```
-breadth_7d  = | { org : org mentioned this topic in any source file dated within last 7 days } |
-breadth_30d = | { org : org mentioned this topic in any source file dated within last 30 days } |
+breadth_7d  = | { actor-org : org acted on this topic in any source file dated within last 7 days } |
+breadth_30d = | { actor-org : org acted on this topic in any source file dated within last 30 days } |
 ```
 
-These are simple distinct-org counts in the respective windows. Also emit `breadth_orgs_7d` = the actual list of org slugs (max 20, sorted) so the viewer can show *which* companies are talking. Topics with `breadth_7d >= radar_config.breadth_config.thresholds.high_breadth_7d` (default 5) are flagged `high_breadth: true` in the JSON — the viewer uses this for visual emphasis.
+These are distinct-actor counts in the respective windows. Also emit `breadth_orgs_7d` = the list of actor-org slugs **sorted by descending actor-mention frequency** (most-active actor first), capped at the top 20 — so the viewer shows *which companies are doing this*, not an alphabetical truncation that always dropped the z's. Topics with `breadth_7d >= radar_config.breadth_config.thresholds.high_breadth_7d` are flagged `high_breadth: true` in the JSON — the viewer uses this for visual emphasis.
 
 **Momentum + biography:**
 
@@ -428,6 +433,13 @@ Write to `radar/{YYYY}/{MM}/{YYYY-MM-DD}.json` (NOT to `radar/{YYYY-MM-DD}.json`
     {"topic": "vendor-governance-business-line", "from": null, "to": "emerging", "first_observed_today": true}
   ],
   "background_topics_count": 14,
+  "breadth_audit": {
+    "_purpose": "Makes the actor-attribution correction (BREADTH_PLAN) observable and catches regression. publishers_excluded is exact (deterministic set-difference against breadth_config.publisher_slugs); the contrast count is best-effort. median_breadth_30d drives the one-shot threshold re-tune.",
+    "publishers_excluded": 14,
+    "contrast_comentions_excluded": "agent estimate or n/a",
+    "median_breadth_30d": 9,
+    "max_breadth_30d_topic": "ai-coding-agents"
+  },
   "config_snapshot": {
     "_purpose": "exact tuning constants in effect this run, for reproducibility",
     "source_weights": "...as in sources.json at run time...",
@@ -470,7 +482,7 @@ For each of the top 5 topics by `importance`:
 `{topic.stage}` · importance **{importance:.0f}** (presence {days_in_sources_30d}d / {source_types_in_sources_30d} sources, breadth_30d {breadth_30d} orgs) · score {score_slow:.0f} ({direction arrow ⇈/↑/→/↓} {momentum_7d_pct:+.0f}% 7d)
 
 _Source mix:_ {top 3 source types by count}
-_Orgs talking this week:_ {breadth_orgs_7d joined by `, `, truncated to 10}
+_Orgs acting on this:_ {breadth_orgs_7d joined by `, `, top 10 by actor-mention frequency — these are actors, not the outlets that reported it}
 _Sector:_ {sector} · _Cluster:_ {cluster_id}
 _Why it matters:_ {one line — be specific, not generic}
 _Backing:_ {first 3 paths from supporting_files}
