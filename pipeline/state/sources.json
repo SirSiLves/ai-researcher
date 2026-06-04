@@ -1034,6 +1034,17 @@
         "_added_on": "2026-06-01",
         "_added_reason": "hot-event: $250M Series C at $2.2B valuation (a16z-led); AI-native search/retrieval",
         "_expires_on": "2026-07-01"
+      },
+      "suno": {
+        "blog_urls": [
+          "https://suno.com/blog"
+        ],
+        "research_urls": [],
+        "fallback_search": "site:suno.com 2026 (announcement OR release OR launch)",
+        "_auto_added": true,
+        "_added_on": "2026-06-03",
+        "_added_reason": "hot-event: $400M raise at $5.4B valuation (more than doubles Nov 2025); AI music platform",
+        "_expires_on": "2026-07-03"
       }
     },
     "_deep_watch_vendors_comment": "Auto-demoted enterprise vendors — formerly active, now silent past the silence threshold AND enterprise_vendors had hit its soft cap. The news collector does NOT fetch these daily (no blog URL pulls, no fallback search). They remain tracked in discovered_orgs.json for radar mention-counting and topic-attribution; if mentions resurface via tech_news / blogs / papers, the sweep can re-promote them back to enterprise_vendors. Manual entries are never demoted here — only _auto_added entries with a _demoted_on stamp. Maintained by ai-vendor-sweep auto-apply. Empty by default; populates only when the soft cap is exceeded.",
@@ -1711,7 +1722,9 @@
       "llm inference",
       "agent control",
       "mcp apps",
-      "microsoft copilot"
+      "microsoft copilot",
+      "agent control plane",
+      "aws bedrock"
     ],
     "min_points_for_inclusion": 30,
     "_min_points_comment": "Anything ≥ 30 points + matches a filter keyword is included. Ask HN/Show HN with ≥ 10 points + keyword match also included (lower bar for new launches).",
@@ -2496,6 +2509,16 @@
         "_auto_added": true,
         "_added_on": "2026-06-02",
         "_added_reason": "promote: 9 mentions, 3 src types, 4 days"
+      },
+      "agent control plane": {
+        "_auto_added": true,
+        "_added_on": "2026-06-03",
+        "_added_reason": "promote: 9 mentions, 3 src types, 4 days"
+      },
+      "aws bedrock": {
+        "_auto_added": true,
+        "_added_on": "2026-06-03",
+        "_added_reason": "promote: 15 mentions, 5 src types, 5 days"
       }
     },
     "_deep_watch_meta": {}
@@ -2707,7 +2730,9 @@
       "governance framework",
       "sap business",
       "google gemini",
-      "agent control"
+      "agent control",
+      "agent control plane",
+      "aws bedrock"
     ],
     "feeds_to_scan": [
       "Home feed (top posts last 24h)",
@@ -3169,6 +3194,16 @@
         "_auto_added": true,
         "_added_on": "2026-06-02",
         "_added_reason": "promote: 11 mentions, 3 src types, 5 days"
+      },
+      "agent control plane": {
+        "_auto_added": true,
+        "_added_on": "2026-06-03",
+        "_added_reason": "promote: 9 mentions, 3 src types, 4 days"
+      },
+      "aws bedrock": {
+        "_auto_added": true,
+        "_added_on": "2026-06-03",
+        "_added_reason": "promote: 15 mentions, 5 src types, 5 days"
       }
     },
     "_deep_watch_meta": {}
@@ -3546,7 +3581,9 @@
         "llm inference",
         "agent control",
         "mcp apps",
-        "microsoft copilot"
+        "microsoft copilot",
+        "agent control plane",
+        "aws bedrock"
       ],
       "_auto_added_meta": {
         "a2a protocol": {
@@ -4438,6 +4475,16 @@
           "_auto_added": true,
           "_added_on": "2026-06-02",
           "_added_reason": "promote: 9 mentions, 3 src types, 4 days"
+        },
+        "agent control plane": {
+          "_auto_added": true,
+          "_added_on": "2026-06-03",
+          "_added_reason": "promote: 9 mentions, 3 src types, 4 days"
+        },
+        "aws bedrock": {
+          "_auto_added": true,
+          "_added_on": "2026-06-03",
+          "_added_reason": "promote: 15 mentions, 5 src types, 5 days"
         }
       },
       "_deep_watch_meta": {}
@@ -4564,12 +4611,34 @@
       "_org_definition": "An 'org' is an ACTOR in the topic — an organization that shipped/announced it, adopted/deployed it, regulates it, is hiring for it, or is directly and specifically affected by it. NOT a messenger (a publisher reporting the story) and NOT a contrast co-mention (a competitor named only for comparison in a roundup). The radar skill applies the actor test per mention; ambiguous cases are EXCLUDED (breadth should under-count, not inflate). For backfill where org data isn't separately stored, breadth is approximated by distinct (source_type, file_date) pairs in the window.",
       "_attribution_comment": "Breadth counts ACTORS, not messengers or contrast co-mentions. An org counts toward a topic only when it is the subject acting on the topic. Publishers reporting the story and competitors named only for comparison do NOT count. See ai-trend-radar/SKILL.md §4 'actor test'.",
       "publisher_slugs": [
-        "heise", "handelsblatt", "techcrunch", "theverge", "venturebeat",
-        "nzz", "golem", "t3n", "arstechnica", "infoq", "zdnet", "marktechpost",
-        "bloomberg", "cnbc", "cnn", "axios", "benzinga", "9to5google",
-        "the-information", "reuters", "ft", "wsj",
-        "simonwillison", "latentspace", "stratechery", "semianalysis",
-        "interconnects", "pragmaticengineer"
+        "heise",
+        "handelsblatt",
+        "techcrunch",
+        "theverge",
+        "venturebeat",
+        "nzz",
+        "golem",
+        "t3n",
+        "arstechnica",
+        "infoq",
+        "zdnet",
+        "marktechpost",
+        "bloomberg",
+        "cnbc",
+        "cnn",
+        "axios",
+        "benzinga",
+        "9to5google",
+        "the-information",
+        "reuters",
+        "ft",
+        "wsj",
+        "simonwillison",
+        "latentspace",
+        "stratechery",
+        "semianalysis",
+        "interconnects",
+        "pragmaticengineer"
       ],
       "_publisher_comment": "Slugs here are tech-press / analyst publishers and individual commentators — messengers, excluded from breadth counts but STILL kept in source_mentions for transparency. A publisher slug counts toward breadth ONLY if the publisher is itself the subject (e.g. an NZZ story ABOUT NZZ building RAG).",
       "_finance_press_note": "Banks (macquarie, bnp, goldman, gvc, etc.) count toward breadth ONLY when they are the actor (deploying / investing / issuing a mandate), never when quoted as analysts in a market-reaction story.",
