@@ -182,7 +182,7 @@
           <span class="section__hint">days flagged by the velocity surge or hot-keyword path</span>
         </header>
         <ul class="firm__hot">
-          @for (e of hotEvents(); track e.date) {
+          @for (e of hotEvents(); track $index) {
             <li class="firm__hot-row">
               <span class="tabular">{{ e.date }}</span>
               @if (e.ratio) {
