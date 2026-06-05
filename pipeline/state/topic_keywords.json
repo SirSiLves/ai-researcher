@@ -2,6 +2,29 @@
   "_purpose": "Per-topic keyword sets for source-file importance scoring. The radar reads this to count days/source-types a topic was mentioned in raw source files (independent of the radar agent's decision to create a topic that day). Maintained by ai-trend-radar SKILL \u2014 when a new topic is created, append its keywords here.",
   "_format": "topic_id -> { keywords: [str], _seeded_on: YYYY-MM-DD, _llm_enriched: bool, _last_updated: YYYY-MM-DD }",
   "topics": {
+    "inference-cost-economics": {
+      "keywords": [
+        "token cost",
+        "token costs",
+        "inference cost",
+        "cost per token",
+        "ai tool pricing",
+        "usage cap",
+        "uber cap",
+        "$1,500/month",
+        "local inference",
+        "break-even",
+        "price cut",
+        "cost skepticism",
+        "ai ultra",
+        "lower developer costs",
+        "metering"
+      ],
+      "label": "Inference cost economics (Uber $1,500/mo cap, Altman token-cost admission, Microsoft MAI cost framing, Google AI Ultra price cut, local-inference break-even)",
+      "_seeded_on": "2026-06-04",
+      "_llm_enriched": true,
+      "_last_updated": "2026-06-04"
+    },
     "ai-coding-agents": {
       "keywords": [
         "ai coding agents",
@@ -122,12 +145,18 @@
         "pinecone marketplace",
         "writer agent",
         "project arc",
-        "ai control tower"
+        "ai control tower",
+        "nvidia agent toolkit",
+        "openshell",
+        "nemotron",
+        "ai-q blueprints",
+        "red hat ai factory",
+        "meta business agent"
       ],
-      "label": "Enterprise agent platforms (Salesforce Pierre Fabre Agentforce LS, SAP Joule Studio Q3 GA, ChatGPT Enterprise Goal mode, Snowflake Cortex)",
+      "label": "Enterprise agent platforms (NVIDIA Agent Toolkit + OpenShell with 17 platform adopters, Meta Business Agent global, Red Hat AI Factory, SAP Joule Studio)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-25",
+      "_last_updated": "2026-06-05",
       "_news_cleaned": true
     },
     "agent-skills-wave": {
@@ -724,12 +753,15 @@
         "dario amodei",
         "claude.ai",
         "series h",
-        "dynamic workflows"
+        "dynamic workflows",
+        "anthropic ipo",
+        "confidential filing",
+        "recursive self-improvement"
       ],
-      "label": "Frontier models \u2014 Anthropic ($65B Series H at $965B valuation eclipsing OpenAI, Opus 4.8 with in-model parallel-subagent orchestration, $47B run-rate)",
+      "label": "Frontier models \u2014 Anthropic (Opus 4.8 now default across Max/Team/Enterprise/API, first frontier-lab confidential IPO filing at ~$965B, RSI post sours on HN)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-29",
+      "_last_updated": "2026-06-05",
       "_news_cleaned": true
     },
     "frontier-models-openai": {
@@ -746,12 +778,15 @@
         "chatgpt enterprise",
         "frontier governance framework",
         "gpt-rosalind",
-        "rosalind biodefense"
+        "rosalind biodefense",
+        "bedrock ga",
+        "govcloud",
+        "chatgpt memory"
       ],
-      "label": "Frontier models \u2014 OpenAI (Frontier Governance Framework mapped to CA/EU statutes, GPT-Rosalind biodefense gated to government, Codex self-improving tax agents)",
+      "label": "Frontier models \u2014 OpenAI (GPT-5.5/5.4/Codex GA on AWS Bedrock incl. GovCloud, ChatGPT persistent memory rollout, GPT-4.5 retires June 27)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-29",
+      "_last_updated": "2026-06-05",
       "_news_cleaned": true
     },
     "frontier-models-google": {
@@ -765,9 +800,13 @@
         "google ai studio",
         "ai overviews",
         "demis hassabis",
-        "deepmind"
+        "deepmind",
+        "gemma 4",
+        "gemma 4 qat",
+        "developer tier",
+        "contextual ai"
       ],
-      "label": "Frontier models \u2014 Google (Gemini Spark + Pics trusted-testers today, 3.5 Flash GA + price triple, Universal Cart, Antigravity HN backlash)",
+      "label": "Frontier models \u2014 Google (Gemini 3.5 Flash GA at I/O 2026 + Ultra price cut + $100 Developer tier, Gemma 4 QAT mobile, Contextual AI acqui-hire)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -805,9 +844,14 @@
         "codestral",
         "mixtral",
         "arthur mensch",
-        "mistral"
+        "mistral",
+        "mistral small 4",
+        "search toolkit",
+        "magistral",
+        "pixtral",
+        "devstral"
       ],
-      "label": "Frontier models \u2014 Mistral (Mistral 3 + Mistral Large 3 41B/675B sparse-MoE Apache-2.0, Ministral 3, SAP S/4HANA primary)",
+      "label": "Frontier models \u2014 Mistral (Mistral Small 4 unified 119B Apache-2.0 reasoning+vision+code, open Search Toolkit RAG, Les Ulis inference facility)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
