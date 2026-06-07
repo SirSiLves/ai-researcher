@@ -1,0 +1,394 @@
+{
+  "summary": "Gap-closing wave: verify & enrich the Swiss/local threads surfaced from the /data corpus (FINMA risk classification, SBB/KPMG/BNP, Swiss adoption stats, EU AI Act 2026 delay, big-tech %-of-code claims, latest benchmarks) with fresh web searches",
+  "agentCount": 5,
+  "logs": [],
+  "result": [
+    {
+      "thread": "FINMA classified an advanced AI cyber capability (\"Mythos-class\") as an \"immediate systemic risk\" around May 2026; FINMA expects centralized AI inventory, model-risk management, board accountability; a 2nd-gen FINMA AI circular is expected to crystallize by end-2026.",
+      "verified": "MOSTLY CONFIRMED with two corrections. (1) The \"Mythos systemic risk\" core is CONFIRMED and citable to public, independent sources. A FINMA spokesperson told Bloomberg (24 Apr 2026, also carried verbatim by swissinfo.ch) that \"the uncontrolled and immediate availability of AI models such as Mythos would be classified as a systemic risk.\" Mythos is a real, named Anthropic model (controlled rollout \"Project Glasswing\", ~40 vetted parties) that autonomously finds/exploits zero-day vulnerabilities across major OSes and browsers. FINMA warned \"virtually all existing software systems could simultaneously be affected by a multitude of previously unknown zero-day vulnerabilities, which would be exploited immediately and via AI.\" The IMF independently called for regulators to treat AI models like Mythos as a systemic risk (IMF blog, 7 May 2026), and the US Treasury/Fed convened bank CEOs over the same model (Apr 2026). CORRECTION on wording/date: the public phrase is \"would be classified as a systemic risk\" (conditional, about uncontrolled/immediate AVAILABILITY of the model to the market), NOT FINMA formally \"classifying Mythos-class as an immediate systemic risk.\" The dateline is 24 Apr 2026, not \"around May 2026\" (the May 2026 date matches the IMF's separate systemic-risk call). \"Mythos-class\" is corpus shorthand, not FINMA terminology. (2) The governance expectations are CONFIRMED: FINMA Guidance 08/2024 (18 Dec 2024) and the Apr 2025 FINMA AI survey establish that supervised institutions must maintain an inventory/overview of AI applications, manage model risk (robustness, correctness, explainability, bias), assign clear board/senior-management responsibility and accountability (avoiding decentralized ownership), and apply outsourcing/third-party due-diligence rules to bought-in AI. (3) CANNOT CONFIRM the specific \"2nd-gen FINMA AI circular crystallizing by end-2026\" timeline. Public sources show only that FINMA \"announced its intention to refine its expectations ... and, where necessary, to make them transparent in the market by issuing further guidance notes or circulars\" — no public end-2026 deadline exists. Note Guidance 08/2024 is non-binding (\"supervisory expectations,\" not a Rundschreiben); a binding AI circular remains a possibility FINMA has flagged, not a scheduled deliverable. Treat the end-2026 timeline as internal/speculative signal.",
+      "enriched_findings": [
+        {
+          "claim": "FINMA stated that uncontrolled, immediate market availability of Anthropic's Mythos AI model would be classified as a systemic risk to the Swiss financial system; it warned virtually all software could be hit simultaneously by previously unknown zero-day vulnerabilities exploited immediately via AI.",
+          "evidence": "FINMA spokesperson to Bloomberg, carried verbatim by SWI swissinfo.ch (Swiss public broadcaster, independent of FINMA): 'The uncontrolled and immediate availability of AI models such as Mythos would be classified as a systemic risk.' Article also reports FINMA expects banks to 'actively incorporate the evolving threat landscape into their risk management' with 'strong awareness of the risks at all levels, continuous communication with service providers, and a clearly risk-oriented approach.' [Independent media, FINMA-sourced quote]",
+          "source_url": "https://www.swissinfo.ch/eng/finma-says-immediate-mythos-access-would-pose-systemic-bank-risk/91312240",
+          "date": "2026-04-24"
+        },
+        {
+          "claim": "The IMF independently framed AI models such as Mythos as a systemic (not merely operational) financial-stability risk and urged regulators to respond with cyber stress testing, board-level oversight, tighter third-party/cloud oversight, and containment controls.",
+          "evidence": "American Banker (independent trade press) reporting on the IMF blog 'Financial Stability Risks Mount as Artificial Intelligence Fuels Cyberattacks' (IMF, 7 May 2026): three senior IMF officials warned of 'correlated failures that could disrupt financial intermediation, payments, and confidence at the systemic level' and prescribed cyber stress testing, board-level cyber oversight, and tighter oversight of concentrated cloud/software providers. [Independent media + IMF primary]",
+          "source_url": "https://www.americanbanker.com/news/imf-calls-mythos-a-systemic-risk",
+          "date": "2026-05-11"
+        },
+        {
+          "claim": "FINMA Guidance 08/2024 sets out supervisory expectations for AI: governance with clear responsibility/accountability, an inventory/overview of AI applications, model-risk management (robustness, correctness, explainability, bias), data quality, ongoing monitoring/documentation, and compliance with outsourcing rules for third-party AI.",
+          "evidence": "FINMA press release announcing Guidance 08/2024 (FINMA primary source, 18 Dec 2024) names operational/model risks (lack of robustness, correctness, explainability, bias), data risks, IT/cyber risks, third-party dependencies, and legal/reputational risks, and requires institutions to identify, assess and manage AI-specific risks. [Regulator primary]",
+          "source_url": "https://www.finma.ch/en/news/2024/12/20241218-mm-finma-am-08-24/",
+          "date": "2024-12-18"
+        },
+        {
+          "claim": "Independent legal commentary confirms FINMA's four areas (data quality, explainability/transparency, risk identification & assessment, governance) and that the guidance requires central management/accountability, ongoing risk-identification mechanisms (performance indicators, data-quality tests, stability), and adherence to regulatory outsourcing requirements for third-party AI.",
+          "evidence": "MLL News Portal (independent Swiss law firm Meyerlustenberger Lachenal Froriep): four areas = data quality, explainability, risk identification & assessment, governance; requires 'central management and accountability'; 'As several solutions are outsourced, the applicable regulatory outsourcing requirements must be complied with.' [Independent legal commentary]",
+          "source_url": "https://www.mll-news.com/finma-guidance-08-2024-governance-and-risk-management-when-using-artificial-intelligence/?lang=en",
+          "date": "2025-01-10"
+        },
+        {
+          "claim": "A FINMA AI survey (~400 institutions, fieldwork Nov 2024-Jan 2025, published 24 Apr 2025) found ~50% of Swiss financial institutions use AI or have applications in development and a further 25% intend to within three years; 91% of AI users use generative AI; governance lags adoption (responsibilities undefined, frameworks immature).",
+          "evidence": "FINMA press release 'artificial intelligence gaining traction at Swiss financial institutions' (FINMA primary, 24 Apr 2025): ~400 licensed institutions surveyed; ~50% use AI or have applications in development, +25% intend within three years; average 5 live + 9 in-development AI applications per respondent; 91% of users use generative AI; 187 authorised institutions using AI incl. 100 banks/securities firms. [Regulator primary]",
+          "source_url": "https://www.finma.ch/en/news/2025/04/20250424-mm-umfrage-ki/",
+          "date": "2025-04-24"
+        },
+        {
+          "claim": "FINMA Risk Monitor 2025 highlights cyber risk and third-party/service-provider concentration as growing systemic concerns: cyberattacks rose again and almost half of reported incidents originated at a service provider/outsourcing partner rather than the institution itself.",
+          "evidence": "FINMA press release 'Risk Monitor 2025' (FINMA primary, 17 Nov 2025): 'Cyberattacks on financial institutions and their service providers saw another significant increase'; 'Almost half of all reported incidents involved third parties, which emphasises the growing dependence on a few central service providers.' (Note: this specific release does not itself contain AI-circular plans.) [Regulator primary]",
+          "source_url": "https://www.finma.ch/en/news/2025/11/20251117-mm-risikomonitor/",
+          "date": "2025-11-17"
+        },
+        {
+          "claim": "FINMA has flagged that it may issue further guidance notes or circulars on AI, but no public source confirms a scheduled 2nd-generation binding AI circular by end-2026; Guidance 08/2024 is non-binding supervisory expectation, not a Rundschreiben.",
+          "evidence": "Multiple independent legal sources (e.g. Pestalozzi, VISCHER) and FINMA's own documentation note FINMA 'announced its intention to refine its expectations ... and, where necessary, to make them transparent in the market by issuing further guidance notes or circulars' — conditional, with no published 2026 deadline. The end-2026 crystallization date appears to be an internal/speculative inference, not a publicly documented FINMA commitment. [Independent legal commentary + regulator dossier]",
+          "source_url": "https://pestalozzilaw.com/en/insights/news/legal-insights/finma-guidance-on-governance-and-risk-management-when-using-ai/",
+          "date": "2025-01-09"
+        }
+      ],
+      "sources": [
+        "https://www.swissinfo.ch/eng/finma-says-immediate-mythos-access-would-pose-systemic-bank-risk/91312240",
+        "https://www.bloomberg.com/news/articles/2026-04-24/finma-says-immediate-mythos-access-would-pose-systemic-bank-risk",
+        "https://www.americanbanker.com/news/imf-calls-mythos-a-systemic-risk",
+        "https://www.imf.org/en/blogs/articles/2026/05/07/financial-stability-risks-mount-as-artificial-intelligence-fuels-cyberattacks",
+        "https://www.sullcrom.com/insights/memo/2026/April/Treasury-Secretary-Federal-Reserve-Chair-Warn-Bank-CEOs-About-Cybersecurity-Risks-Posed-Anthropics-New-AI-Model",
+        "https://thenextweb.com/news/anthropic-mythos-cybersecurity-banks-vulnerability",
+        "https://www.finma.ch/en/news/2024/12/20241218-mm-finma-am-08-24/",
+        "https://www.finma.ch/en/news/2025/04/20250424-mm-umfrage-ki/",
+        "https://www.finma.ch/en/news/2025/11/20251117-mm-risikomonitor/",
+        "https://www.mll-news.com/finma-guidance-08-2024-governance-and-risk-management-when-using-artificial-intelligence/?lang=en",
+        "https://pestalozzilaw.com/en/insights/news/legal-insights/finma-guidance-on-governance-and-risk-management-when-using-ai/",
+        "https://www.finma.ch/en/documentation/dossier/dossier-fintech/kuenstliche-intelligenz/"
+      ],
+      "caveats": "For the CIO pitch, present three tiers of confidence. STRONG/CITABLE: (a) FINMA Guidance 08/2024 governance expectations — AI inventory, model-risk management, board accountability, third-party/outsourcing due diligence — are real, public, and exactly the controls the pitch should promise to satisfy (FINMA primary + independent legal commentary). (b) The Apr 2025 FINMA survey (~50% adoption, governance lagging) and Nov 2025 Risk Monitor (cyber + third-party concentration as systemic concerns) are solid public anchors. (c) The Mythos systemic-risk statement is real and independently corroborated (FINMA spokesperson via Bloomberg/swissinfo, IMF, US Treasury/Fed) — a powerful \"AI is now a board-level systemic-risk topic\" hook. TWO CORRECTIONS to make before pitching: (1) Precise wording is \"uncontrolled and immediate AVAILABILITY of AI models such as Mythos would be classified as a systemic risk\" — it is a conditional statement about market availability of an offensive-cyber model, NOT FINMA formally classifying a \"Mythos-class capability\" as an \"immediate systemic risk.\" The date is 24 Apr 2026, not May 2026. Do not over-claim. (2) The \"2nd-gen FINMA AI circular by end-2026\" is NOT publicly documented — FINMA has only said it MAY issue further guidance notes or circulars. Frame as \"FINMA has signalled it may move from non-binding guidance toward a binding circular,\" not as a confirmed end-2026 deadline. SOURCING FLAGS: FINMA.ch = regulator primary; swissinfo.ch, Bloomberg, American Banker, IMF, Sullivan & Cromwell = independent; MLL/Pestalozzi/VISCHER = independent legal commentary. Bloomberg URL is paywalled (403) — cite swissinfo.ch as the accessible equivalent carrying the same FINMA quote. The IMF primary blog returned 403 on direct fetch but is corroborated via American Banker; cite both."
+    },
+    {
+      "thread": "SBB went live with a 30,000-employee multilingual RAG assistant (Mistral/SAP); KPMG deployed Claude across 138 countries / 276,000 staff; BNP Paribas extended a 3-year Mistral partnership citing sovereign-AI/defense rationale; Swiss survey: ~88% of firms use AI but ~41% report no ROI; ~73% of Swiss internet users have tried GenAI.",
+      "verified": "Five sub-claims, four CONFIRMED and one PARTIALLY CORRECTED. (1) SBB Mistral/SAP RAG assistant: CONFIRMED by a vendor primary source (Mistral AI customer page, dated 2026-04-24). The multilingual (DE/FR/IT) chatbot runs on Mistral Large via SAP-operated EU infrastructure (RAG over FAQs/training/screenshots, glossary query-rewriting, human-in-the-loop), scaled from a 1,000-user pilot to 30,000 employees, with an estimated ~80% reduction in repetitive support queries. Numbers match the corpus exactly. Caveat: it is a vendor case study tied to SBB's SAP S/4HANA migration (internal IT support), not a customer-facing or coding tool, and SBB has not issued its own public press release on it. (2) KPMG-Anthropic: CONFIRMED by primary sources on BOTH sides (Anthropic newsroom + KPMG press release, both 2026-05-19/20). 276,000+ staff across 138 countries/territories; Claude (Cowork + Managed Agents) embedded in KPMG's Digital Gateway on Microsoft Azure; expands a ~2-year US pilot; Anthropic also names KPMG a preferred private-equity partner. Independently covered by Fortune, TNW. Exact match. (3) BNP Paribas-Mistral: CONFIRMED (Bloomberg 2026-02-11 + BNP Paribas own press release; Retail Banker International). A 3-year extension building on a 2023 collaboration formalized into a group-wide deal in 2024; scope spans CIB, CPBS, KYC, co-development and a 2026 GenAI employee-assistant rollout. The 'sovereign-AI' framing is CONFIRMED in substance (BNP explicitly cites choosing a European technology partner as part of a multi-model approach guided by data sensitivity and geographic considerations); however the specific 'defense' rationale is NOT in the deal text — it comes from later May-2026 trade coverage linking Mistral's new cyber/defense-oriented model to the partnership, so 'defense rationale' is editorial color, not a BNP statement. (4) '~88% use AI / ~41% no ROI': PARTIALLY CORRECTED / CANNOT CONFIRM as a single Swiss study. No Swiss survey states this pair. The 88% is the GLOBAL McKinsey 'State of AI' figure (88% of orgs use AI in at least one function), not Swiss. Swiss-specific 2026 data is LOWER and differently framed: the UBS/Intervista study (2026-05-20, ~2,500 Swiss firms) found ~60% use AI tools and roughly one-third use none; Deloitte Switzerland's AI ROI report (Aug-Sep 2025, 99 Swiss respondents) frames it as only ~1 in 3 having turned experimentation into financial gains. The '41% no ROI' most likely echoes either the global MIT NANDA 'GenAI Divide' study (95% of GenAI pilots deliver little/no measurable ROI, Aug 2025) or Deloitte's 'only ~1/3 see returns' finding — not a clean Swiss 41%. Recommend the pitch use the precise Swiss/Deloitte/MIT figures rather than the conflated 88%/41%. (5) '~73% of Swiss internet users tried GenAI': CONFIRMED by an independent academic primary source — University of Zurich WIP-CH 2025 study (survey run by gfs.bern, 1,078 internet users 14+, June-Aug 2025): adoption rose 37% (2023) to 54% (2024) to 73% (2025); 47% use it at least monthly, 84% among 14-19s. Exact match.",
+      "enriched_findings": [
+        {
+          "claim": "SBB (Swiss Federal Railways) deployed a multilingual (German/French/Italian) RAG assistant on Mistral Large via SAP-operated EU infrastructure, scaling from a 1,000-user pilot to 30,000 employees with an estimated ~80% cut in repetitive support queries (built to support its SAP S/4HANA migration).",
+          "evidence": "Mistral AI customer case study (vendor primary source): 'expanded from 1,000 pilot users to 30,000 employees... estimated 80% reduction in repetitive support queries', powered by Mistral Large, RAG over FAQs/training/screenshots, human-in-the-loop, hosted on SAP infrastructure in Europe with no cross-border data flow. Numbers match corpus exactly.",
+          "source_url": "https://mistral.ai/customers/sap",
+          "date": "2026-04-24"
+        },
+        {
+          "claim": "KPMG signed a global alliance with Anthropic to put Claude in front of all 276,000+ employees across 138 countries/territories, embedding Claude Cowork and Managed Agents into its Digital Gateway platform (on Microsoft Azure), expanding a ~2-year US pilot.",
+          "evidence": "Anthropic newsroom primary source: headline 'KPMG integrates Claude across its core business and workforce of more than 276,000 in strategic alliance'; 138 countries/territories; Digital Gateway + Claude Cowork + Managed Agents on Azure. Independently corroborated by Fortune and The Next Web.",
+          "source_url": "https://www.anthropic.com/news/anthropic-kpmg",
+          "date": "2026-05-19"
+        },
+        {
+          "claim": "KPMG's own announcement confirms the 276,000-staff / 138-country Claude rollout and the launch of 'Digital Gateway Powered by Claude' (independent vendor-of-record confirmation alongside Anthropic).",
+          "evidence": "KPMG global press release: 'KPMG and Anthropic sign global alliance and launch Digital Gateway Powered by Claude' — matches the Anthropic figures.",
+          "source_url": "https://kpmg.com/xx/en/media/press-releases/2026/05/kpmg-and-anthropic-sign-global-alliance-and-launch-digital-gateway-powered-by-claude.html",
+          "date": "2026-05-19"
+        },
+        {
+          "claim": "BNP Paribas extended its Mistral AI partnership into a 3-year agreement, building on a 2023 collaboration formalized group-wide in 2024; the bank explicitly cites choosing a European technology partner (sovereign-AI framing) as part of a multi-model strategy guided by data sensitivity and geography.",
+          "evidence": "BNP Paribas own press release confirms the multi-year extension and the European-partner / data-sensitivity rationale; Bloomberg (2026-02-11) independently reports 'BNP Paribas Extends Mistral AI Partnership With Three-Year Agreement'. Scope: CIB, CPBS, KYC, co-development, 2026 GenAI employee assistant. NOTE: the explicit 'defense' rationale is NOT in BNP's text — it appears in later May-2026 trade coverage tying Mistral's cyber/defense model to the deal, i.e. editorial framing, not a BNP claim.",
+          "source_url": "https://group.bnpparibas/en/press-release/bnp-paribas-and-mistral-ai-extend-their-partnership-to-support-the-next-phase-of-generative-ai-deployment-within-the-group",
+          "date": "2026-02-11"
+        },
+        {
+          "claim": "CORRECTION: ~73% of the Swiss population had used generative AI by 2025 (up from 37% in 2023 and 54% in 2024); 47% use it at least monthly, 17% daily, 84% among 14-19-year-olds.",
+          "evidence": "University of Zurich WIP-CH 'Use of the Internet and Generative AI in Switzerland 2025' study (independent academic; field survey by gfs.bern; n=1,078 internet users aged 14+, June-Aug 2025). Direct quote: 'rose at record speed from 37% in 2023 to 54% in 2024 and 73% in 2025.' Corpus's 73% is exact; note it is the share of INTERNET USERS / population, not firms.",
+          "source_url": "https://www.ikmz.uzh.ch/de/news/2025/wip-executive-summary-2025.html",
+          "date": "2025-10-01"
+        },
+        {
+          "claim": "CORRECTION: The Swiss-specific firm-adoption figure is ~60%, not 88%. A UBS/Intervista survey of ~2,500 Swiss companies found ~6 in 10 use AI tools while roughly one-third use none; only ~5% put AI at the center of their business model and only ~10% of large firms use it systematically across most functions.",
+          "evidence": "UBS/Intervista study reported by Netzwoche (2026-05-20): 'sechs von zehn Firmen [setzen] bereits KI-Tools ein'; 'Knapp ein Drittel der befragten Unternehmen nutzt derzeit keine KI'; 'Nur 5 Prozent... stellen KI heute ins Zentrum ihres Geschäftsmodells.' The corpus's 88% is the GLOBAL McKinsey figure, not Swiss.",
+          "source_url": "https://www.netzwoche.ch/news/2026-05-20/ki-kommt-in-schweizer-firmen-an-bleibt-aber-stueckwerk",
+          "date": "2026-05-20"
+        },
+        {
+          "claim": "CORRECTION/CONTEXT for the 'no ROI' claim: Swiss companies are optimistic but few have realized returns — only about 1 in 3 has turned AI experimentation into financial gains, and over half still do not measure AI impact at all. (The crisp '41% no ROI' is not a Swiss figure.)",
+          "evidence": "Deloitte Switzerland AI ROI report ('Switzerland invests in AI'; 99 Swiss respondents within 1,854 EMEA execs, fielded 15 Aug–5 Sep 2025): 52% of Swiss expect measurable returns within a year (vs 38% avg) but only ~1/3 have achieved financial gains, and >50% don't measure impact. This is the most defensible Swiss ROI-gap citation for the pitch.",
+          "source_url": "https://www.deloitte.com/ch/en/issues/generative-ai/switzerland-invests-in-ai.html",
+          "date": "2025-10-01"
+        },
+        {
+          "claim": "The likely true origin of a '41%-ish / no-ROI' statistic is the global MIT NANDA 'GenAI Divide' study: ~95% of enterprise GenAI pilots deliver little to no measurable P&L impact, and vendor/partner-built solutions succeed ~67% of the time vs internal builds only ~1/3 as often — a strong 'buy/partner over build' argument for a bank CIO.",
+          "evidence": "MIT NANDA 'The GenAI Divide: State of AI in Business 2025' (150 interviews, 350-employee survey, 300 public deployments), widely covered by Fortune (2025-08-18). Key: only ~5% of pilots achieve rapid revenue acceleration; purchased/partnered tools succeed ~67% vs internal builds ~1/3 as often.",
+          "source_url": "https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/",
+          "date": "2025-08-18"
+        },
+        {
+          "claim": "Swiss banking proof point a Raiffeisen CIO will recognize: UBS has scaled enterprise GenAI at large scale — its UBS Red assistant (built with Microsoft on Azure OpenAI) is deployed to ~30,000 employees across Switzerland/Hong Kong/Singapore, with 280+ AI use cases live and growing ~10% QoQ, and a first Chief AI Officer (Daniele Magazzeni) appointed effective Jan 1, 2026.",
+          "evidence": "UBS technology/innovation pages + CIO Dive coverage of the Chief AI Officer appointment; Microsoft/UBS 'Red' launch coverage. ~280 use cases live (+10% QoQ); UBS Red to ~30,000 staff; ~46,000 (90% of staff) onboarded to UBS's Eliza GenAI platform by early 2025. Vendor/customer co-source (UBS + Microsoft).",
+          "source_url": "https://www.ubs.com/global/en/our-firm/what-we-do/technology/innovation-and-ai.html",
+          "date": "2026-01-01"
+        },
+        {
+          "claim": "Swiss sovereignty/infrastructure proof point: Swisscom operates a Swiss-hosted 'Swiss AI Platform' (GenAI Studio API access from spring 2025, AI Work Hub, GPU-as-a-Service on Switzerland's first NVIDIA SuperPOD) — relevant for a cooperative bank with data-residency/sovereignty requirements.",
+          "evidence": "Swisscom news + DataCenterDynamics: GenAI Studio available from spring 2025 on the Swiss AI Platform; NVIDIA SuperPOD in Swisscom data centres for sovereign, in-country AI compute. Vendor source.",
+          "source_url": "https://www.swisscom.ch/en/about/news/2024/11/28-ai-platform.html",
+          "date": "2024-11-28"
+        },
+        {
+          "claim": "Raiffeisen Schweiz context: its own 'Chancenreport Schweiz 2026' (with HSLU/IFZ, 320 mid/large Swiss firms, Aug-Sep 2025) found over 60% of Swiss companies see AI as a major/very-major opportunity (up 5.3pts YoY) and only 1.3% see it primarily as a risk — i.e. Raiffeisen itself is on record that AI is now a strategic opportunity, not a future vision.",
+          "evidence": "Raiffeisen Schweiz press release 'Chancenreport Schweiz 2026' and HSLU Financial Management blog write-up: '>60% sehen KI als grosse/sehr grosse Chance' (vs 56.6% in 2025); 'nur 1.3% als Risiko.' Useful to mirror the CIO's own institution's framing. NOTE: no public statement found on Raiffeisen's internal agentic-coding/developer-tooling adoption specifically.",
+          "source_url": "https://www.raiffeisen.ch/rch/de/ueber-uns/news/rch/chancenreport-2026.html",
+          "date": "2025-11-21"
+        }
+      ],
+      "sources": [
+        "https://mistral.ai/customers/sap",
+        "https://www.anthropic.com/news/anthropic-kpmg",
+        "https://kpmg.com/xx/en/media/press-releases/2026/05/kpmg-and-anthropic-sign-global-alliance-and-launch-digital-gateway-powered-by-claude.html",
+        "https://fortune.com/2026/05/26/kpmg-anthropic-claude-partnership-big-four-ai/",
+        "https://group.bnpparibas/en/press-release/bnp-paribas-and-mistral-ai-extend-their-partnership-to-support-the-next-phase-of-generative-ai-deployment-within-the-group",
+        "https://www.bloomberg.com/news/articles/2026-02-11/bnp-paribas-extends-mistral-ai-partnership-with-three-year-deal",
+        "https://www.retailbankerinternational.com/news/bnp-paribas-ties-mistral-ai/",
+        "https://www.ikmz.uzh.ch/de/news/2025/wip-executive-summary-2025.html",
+        "https://mediachange.ch/media//pdf/publications/B2_Use_of_the_Internet_and_Generative_AI_en.pdf",
+        "https://www.deloitte.com/ch/en/issues/generative-ai/switzerland-invests-in-ai.html",
+        "https://www.netzwoche.ch/news/2026-05-20/ki-kommt-in-schweizer-firmen-an-bleibt-aber-stueckwerk",
+        "https://www.moneycab.com/schweiz/schweizer-unternehmen-erhoehen-ki-investitionen-datenzugang-bleibt-zentrale-herausforderung/",
+        "https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/",
+        "https://www.ubs.com/global/en/our-firm/what-we-do/technology/innovation-and-ai.html",
+        "https://www.ciodive.com/news/ubs-revamps-leadership-tech-ai/803795/",
+        "https://www.swisscom.ch/en/about/news/2024/11/28-ai-platform.html",
+        "https://www.raiffeisen.ch/rch/de/ueber-uns/news/rch/chancenreport-2026.html",
+        "https://hub.hslu.ch/financialmanagement/2025/11/21/raiffeisen-chancenreport-schweiz-2026-schweizer-unternehmen-zeigen-resilienz-und-ergreifen-chancen/"
+      ],
+      "caveats": "VENDOR vs INDEPENDENT flags: SBB (Mistral vendor case study — credible but self-reported, no SBB press release; treat 80% as vendor-claimed), UBS Red and Swisscom platform are vendor/customer self-sourced. INDEPENDENT/primary: Anthropic+KPMG both confirm (two-sided primary), BNP Paribas own + Bloomberg, UZH/gfs.bern (academic, strongest), Deloitte CH and UBS/Intervista (named research with disclosed n), MIT NANDA, CIO Dive. KEY CORRECTION for the pitch: do NOT present '88% of Swiss firms use AI / 41% no ROI' as a single Swiss statistic — it is not. 88% is the GLOBAL McKinsey figure; Swiss firm adoption is ~60% (UBS/Intervista) and the ROI gap is best cited as 'only ~1 in 3 Swiss firms have realized financial returns' (Deloitte CH) or the global MIT '95% of GenAI pilots fail to deliver ROI'. The '73% tried GenAI' figure is solid and refers to the Swiss POPULATION/internet users (UZH), not firms — keep that distinction. BNP's 'defense' rationale is editorial framing from May-2026 trade press, not a BNP statement; the sovereign/European-partner rationale IS in BNP's own words. I could not retrieve the BNP primary press release directly (HTTP 403) but corroborated its content via Bloomberg and Retail Banker International. No public statement found on Raiffeisen Schweiz's own internal agentic-coding or developer-tooling program — the available Raiffeisen material is its Chancenreport business survey, useful as framing but not a same-org agentic-coding proof point."
+    },
+    {
+      "thread": "EU AI Act \"Digital Omnibus\" deal (~May 2026): deferred high-risk Annex III obligations to ~Dec 2027 and Annex I to ~Aug 2028; sandboxes to Aug 2027; and the claim that agentic CODING tools are generally NOT \"high-risk\" under the Act.",
+      "verified": "CONFIRMED on all four sub-claims, with two precision points the CIO deck should reflect.\n\n1) DATES — CONFIRMED EXACTLY. The Digital Omnibus on AI defers standalone high-risk Annex III obligations from 2 Aug 2026 to 2 December 2027, and product-embedded Annex I high-risk obligations from 2 Aug 2027 to 2 August 2028. Regulatory sandboxes move to 2 August 2027. These figures are consistent across the EU Council (Consilium) press release, the European Parliament Legislative Train, and 8+ independent law firms (Gibson Dunn, White & Case, Hogan Lovells, DLA Piper, Travers Smith, CMS, Mishcon, Covington/Inside Privacy). The corpus's \"~Dec 2027 / ~Aug 2028 / Aug 2027\" is precise.\n\n2) LEGAL STATUS — IMPORTANT CORRECTION OF STATUS, NOT DATES. As of June 2026 this is NOT yet enacted law. It is a provisional political (trilogue) agreement reached 7 May 2026, approved by member-state ambassadors (Coreper) on 13 May 2026, and \"close to adoption\" per the European Parliament. Formal Parliament/Council adoption and Official Journal publication are expected June–July 2026, before the 2 Aug 2026 trigger. The new dates do NOT legally bind until OJ publication. So for the CIO: the relief is essentially certain but technically not yet final at pitch time — frame as \"agreed and pending formal adoption,\" not \"in force.\"\n\n3) CORPUS'S \"Aug 2026 high-risk lands\" ASSUMPTION — CORRECTLY OVERTURNED. The original AI Act would have applied standalone high-risk obligations on 2 Aug 2026; the Omnibus pushes that to 2 Dec 2027. The earlier internal assumption (high-risk lands Aug 2026) is superseded. Nuance worth a footnote: the obligations are also tied to readiness of harmonised standards/support tools, with 2 Dec 2027 / 2 Aug 2028 as the long-stop backstop dates.\n\n4) GPAI / Code of Practice — CONFIRMED UNCHANGED. GPAI model obligations have applied since 2 Aug 2025 and are NOT delayed by the Omnibus; the EU AI Office's GPAI enforcement powers (fines, model recalls) still switch on 2 Aug 2026. The (voluntary) GPAI Code of Practice still stands. Relevant because the LLMs powering coding agents are GPAI — that layer's obligations sit with the model provider (e.g. Anthropic/OpenAI/etc.), not the bank as a deployer.\n\n5) AGENTIC CODING TOOLS NOT HIGH-RISK — CONFIRMED (caveated). An AI assistant for writing/reviewing/refactoring/debugging code does not, on its face, fall into any of the eight Annex III high-risk domains, and code generation is not a regulated safety component under Annex I/Article 6. So a coding copilot used for normal SDLC is generally not high-risk. CAVEAT the deck must keep: classification turns on USE, not the tool. It flips to high-risk if the bank wires coding/IDE telemetry into worker-evaluation, productivity-ranking, promotion/retention or PR-routing-by-developer-history (Annex III point 4 — employment/worker management), or if AI-generated code is embedded into a regulated safety-critical product. Governance ask: keep agentic coding scoped to the dev workflow and out of HR/worker-monitoring uses. Note: the most coding-specific source (Augment Code) is a VENDOR; the underlying Annex III/Article 6 reasoning is independently grounded in the AI Act text (artificialintelligenceact.eu) and law-firm analysis.",
+      "enriched_findings": [
+        {
+          "claim": "The Digital Omnibus on AI is a provisional political agreement reached 7 May 2026 (Coreper-approved 13 May 2026), 'close to adoption' but NOT yet adopted or published in the Official Journal as of mid-2026; formal adoption expected June–July 2026.",
+          "evidence": "EU Parliament Legislative Train (status as of 22 May 2026): 'Close to adoption' — 'The co-legislators reached a trilogue agreement on the file on 7 May 2026'; Coreper approved the provisional agreement on 13 May; Parliament plenary vote scheduled June 2026. Not yet in the Official Journal. INDEPENDENT (EU institution / primary source).",
+          "source_url": "https://www.europarl.europa.eu/legislative-train/package-digital-package/file-digital-omnibus-on-ai",
+          "date": "2026-05-22"
+        },
+        {
+          "claim": "EU Council and Parliament agreed to postpone high-risk AI obligations and simplify/streamline the AI Act on 7 May 2026.",
+          "evidence": "Council of the EU (Consilium) press release: 'Artificial Intelligence: Council and Parliament agree to simplify and streamline rules,' confirming the 7 May 2026 provisional agreement on the Digital Omnibus including postponed high-risk deadlines and new prohibitions. INDEPENDENT (EU institution / primary source).",
+          "source_url": "https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/",
+          "date": "2026-05-07"
+        },
+        {
+          "claim": "Revised dates: standalone Annex III high-risk obligations deferred from 2 Aug 2026 to 2 December 2027; Annex I product-embedded high-risk from 2 Aug 2027 to 2 August 2028; AI regulatory sandboxes to 2 August 2027. Changes only bind upon Official Journal publication.",
+          "evidence": "Gibson Dunn alert: Annex III standalone high-risk to '2 December 2027'; Annex I embedded to '2 August 2028'; sandboxes postponed 'to 2 August 2027 (one year later than originally scheduled)'; GPAI obligations marked 'In Force — No change to date' (2 Aug 2025); 'These changes only take legal effect upon formal adoption and publication of the Omnibus in the Official Journal, expected before 2 August 2026.' INDEPENDENT (law firm).",
+          "source_url": "https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/",
+          "date": "2026-05"
+        },
+        {
+          "claim": "High-risk application is made conditional on readiness of harmonised standards/common specifications/guidelines, with 2 Dec 2027 (Annex III) and 2 Aug 2028 (Annex I) as the long-stop backstop dates — these fixed dates replaced the Commission's originally proposed open-ended conditional trigger.",
+          "evidence": "DLA Piper analysis: the omnibus makes application 'conditional on the readiness of applicable harmonised standards, common specifications or guidelines'; once the Commission confirms availability the rules apply 'at the latest, by 2 December 2027' (standalone) and 'by 2 August 2028 at the latest' (embedded); the agreed text 'replaces the Commission's originally proposed conditional trigger mechanism with these fixed dates.' INDEPENDENT (law firm).",
+          "source_url": "https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026/The-Digital-AI-Omnibus-Proposed-deferral-of-high-risk-AI-obligations-under-the-AI-Act",
+          "date": "2026-05"
+        },
+        {
+          "claim": "GPAI model obligations (applicable since 2 Aug 2025) are NOT delayed by the Omnibus; the AI Office's GPAI enforcement powers still begin 2 Aug 2026, and the voluntary GPAI Code of Practice still stands.",
+          "evidence": "EU AI Act implementation references and Latham & Watkins: GPAI obligations applied 2 Aug 2025; from 2 Aug 2026 the Commission's GPAI enforcement powers (including fines and model recalls) enter into application; the August 2026 GPAI enforcement date 'remains intact under the current omnibus text.' The GPAI Code of Practice (published July 2025 by independent experts) is voluntary and remains a route to demonstrate compliance. INDEPENDENT (law firm + EU Commission material).",
+          "source_url": "https://www.lw.com/en/insights/eu-ai-act-gpai-model-obligations-in-force-and-final-gpai-code-of-practice-in-place",
+          "date": "2025-08"
+        },
+        {
+          "claim": "AI coding assistants used for ordinary SDLC work (writing, reviewing, refactoring, debugging code) are generally NOT high-risk because code generation/SDLC tooling is not enumerated in any Annex III domain and is not a regulated safety component under Article 6/Annex I.",
+          "evidence": "Augment Code guide (publication date 20 April 2026): 'AI-generated code usually does not trigger EU AI Act high-risk obligations because Annex III regulates specific use cases such as worker management and regulated safety components, not ordinary developer assistance'; Article 6 two-track test — 'None [of the eight Annex III domains] explicitly enumerate software development, code generation, or SDLC tooling.' VENDOR source; the Article 6 / Annex III legal basis is independently confirmed by artificialintelligenceact.eu and law-firm analysis.",
+          "source_url": "https://www.augmentcode.com/guides/eu-ai-act-2026",
+          "date": "2026-04-20"
+        },
+        {
+          "claim": "A coding tool CAN become high-risk depending on use — chiefly if its output/telemetry is wired into worker evaluation, monitoring, productivity ranking, or HR decisions (Annex III point 4, employment), or if AI code is embedded into a regulated safety-critical product. Classification turns on use, not the tool.",
+          "evidence": "Augment Code / Article 6 analysis: teams 'reach high-risk classification by wiring Copilot or GitHub telemetry into a manager-facing productivity dashboard,' or by 'using AI output to influence retention, promotion, or task assignment decisions' — 'the regulation reaches AI used about or affecting workers.' Independent legal reasoning grounds this in Annex III point 4 (employment/worker management) and Article 6 classification rules. (Coding-specific framing is VENDOR; Annex III legal basis is independent.)",
+          "source_url": "https://artificialintelligenceact.eu/article/6/",
+          "date": "2026"
+        },
+        {
+          "claim": "For financial institutions, the Omnibus gives material timeline relief but the AI Act remains complementary to existing banking/payments regulation; high-risk obligations (transparency, oversight, accountability) still apply on the deferred timeline, with penalties up to EUR 15m or 3% of global turnover.",
+          "evidence": "EBA report 'AI Act implications for the EU banking and payments sector' (Nov 2025) finds 'no significant contradictions' between the AI Act and EU banking/payments rules and that the AI Act is 'complementary'; consultancy/law-firm analysis confirms the omnibus long-stop dates of 2 Dec 2027 (high-risk) and 2 Aug 2028 (product-embedded) and high-risk penalty ceiling of EUR 15m / 3% turnover. INDEPENDENT (EBA = EU regulator; supporting law-firm commentary).",
+          "source_url": "https://www.eba.europa.eu/sites/default/files/2025-11/d8b999ce-a1d9-4964-9606-971bbc2aaf89/AI%20Act%20implications%20for%20the%20EU%20banking%20sector.pdf",
+          "date": "2025-11"
+        }
+      ],
+      "sources": [
+        "https://www.europarl.europa.eu/legislative-train/package-digital-package/file-digital-omnibus-on-ai",
+        "https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/",
+        "https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/",
+        "https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026/The-Digital-AI-Omnibus-Proposed-deferral-of-high-risk-AI-obligations-under-the-AI-Act",
+        "https://www.whitecase.com/insight-alert/eu-agrees-digital-omnibus-deal-simplify-ai-rules",
+        "https://www.hoganlovells.com/en/publications/eu-legislators-agree-to-delay-for-highrisk-ai-rules",
+        "https://www.insideprivacy.com/artificial-intelligence/eu-ai-act-update-timeline-relief-targeted-simplification-and-new-prohibitions/",
+        "https://www.lw.com/en/insights/eu-ai-act-gpai-model-obligations-in-force-and-final-gpai-code-of-practice-in-place",
+        "https://www.augmentcode.com/guides/eu-ai-act-2026",
+        "https://artificialintelligenceact.eu/article/6/",
+        "https://artificialintelligenceact.eu/annex/3/",
+        "https://www.eba.europa.eu/sites/default/files/2025-11/d8b999ce-a1d9-4964-9606-971bbc2aaf89/AI%20Act%20implications%20for%20the%20EU%20banking%20sector.pdf",
+        "https://www.traverssmith.com/knowledge/knowledge-container/eu-agrees-to-delay-key-ai-act-compliance-deadlines/",
+        "https://cms.law/en/gbr/publication/digital-omnibus-on-ai-adjusted-timelines-and-transitional-provisions-explained"
+      ],
+      "caveats": "PITCH-CRITICAL NUANCES FOR THE CIO:\n\n1) \"Agreed, not yet enacted.\" As of June 2026 the Omnibus is a provisional political agreement (7 May 2026), Coreper-approved (13 May), \"close to adoption,\" but NOT yet published in the Official Journal. The deferred dates (2 Dec 2027 / 2 Aug 2028 / sandboxes 2 Aug 2027) do not legally bind until OJ publication, expected June–July 2026 — i.e. likely days/weeks before the pitch or just after. Recommend phrasing: \"the EU has agreed to defer high-risk obligations to Dec 2027, with formal adoption pending.\" Do not present as fully in force.\n\n2) Switzerland is not in the EU. Raiffeisen Schweiz is a Swiss bank; the EU AI Act applies extraterritorially only where outputs/systems are placed on or used in the EU market (e.g. EU customers, EU subsidiaries, or providers placing systems on the EU market). For a purely-Swiss-domestic developer-tooling use case the AI Act may not directly apply at all — the relevant Swiss regime (FINMA guidance / planned Swiss AI regulation aligned to the Council of Europe AI Convention) is the primary lens. I did NOT research the Swiss-specific angle in this thread; flag it as a separate verification item. The EU timeline still matters as a benchmark and for any EU-facing operations.\n\n3) Coding-tools-not-high-risk rests partly on a VENDOR source (Augment Code) for the SDLC-specific framing. The underlying legal basis (Annex III enumerated domains + Article 6 classification) is independently sound, but the \"not high-risk\" conclusion is a reasonable legal reading, not a regulator ruling. The use-dependent exception (worker monitoring/evaluation via coding telemetry — Annex III point 4) is the real governance risk and should be an explicit guardrail in the proposal, not a footnote.\n\n4) GPAI obligations (and the Aug 2026 GPAI enforcement switch-on) are UNCHANGED by the Omnibus, but they sit with the foundation-model provider, not with the bank as a deployer of a coding agent. Useful to note that the regulatory burden for the LLM layer is largely upstream.\n\n5) Some law-firm pages (White & Case, Hogan Lovells, Inside Privacy/Covington) returned HTTP 403 to automated fetch; their content is corroborated via search snippets and matching independent sources, but I was not able to pull full-text quotes directly from those three. The dates are nonetheless triple-confirmed via EU primary sources (Consilium, EU Parliament) plus directly-fetched Gibson Dunn and Augment Code."
+    },
+    {
+      "thread": "Big-tech \"% of code written by AI\" statements + 2026 SWE-bench Verified state of the art + Claude Code ARR + Cognition/Devin valuation/ARR + Salesforce agentic-engineering productivity numbers. These are the board-credible \"this is real and big\" proof points for the Raiffeisen CIO pitch.",
+      "verified": "The web CONFIRMS the corpus on almost every thread, with two important refinements the CIO should hear stated precisely:\n\n1) GOOGLE / ALPHABET (CONFIRMED, but two distinct figures — do not conflate). The corpus \"~50% of Google's code via coding agents reviewed by engineers\" maps to CFO Anat Ashkenazi's Q4 2025 call statement that \"about half of the company's own software code is written by AI agents supporting the engineering team.\" Separately, CEO Sundar Pichai's Q4 2025 remarks (reported Feb 4, 2026) state that a large share of NEW code is AI-generated-and-engineer-approved, and Google has since cited 75% of new code (up from ~50% in fall 2025, 25% in late 2024). So the safe, precise framing: CFO says \"about half\" of Google's own code is now agent-written; on new code the trajectory is 25% (Oct 2024) -> 30%+ (Apr 2025) -> ~50% (fall 2025) -> 75% (2026). Both are real and citable.\n\n2) MICROSOFT (CONFIRMED). Nadella's \"20-30%\" is real but is from APRIL 2025 (LlamaCon, with Zuckerberg), not 2026 — pitch it as \"as of early 2025, 20-30% of code in Microsoft repos was written by AI,\" strongest in Python, weaker in C++. Zuckerberg at the same event said he didn't know Meta's exact figure but expected ~half of Meta's AI-model development to be AI-done within ~a year.\n\n3) SWE-BENCH VERIFIED 2026 (CONFIRMED). Claude Opus 4.8 = 88.6%; Claude Opus 4.7 = 87.6%; top of leaderboard is a Claude \"Mythos Preview\" at ~93.9% (frontier/preview system); GPT-5.2 ~80%. Corpus \"~88-94% in 2026, Opus 4.8 ~88.6%\" is accurate. Caveat: these aggregator leaderboards are third-party, and self-reported lab scores should be presented as vendor-reported.\n\n4) CLAUDE CODE ARR (CONFIRMED, primary source). Anthropic's own Feb 12, 2026 funding announcement: \"Claude Code's run-rate revenue has grown to over $2.5 billion; this figure has more than doubled since the beginning of 2026.\" Anthropic overall run-rate $14B. So \"$2.5B+ ARR\" is exact and vendor-primary.\n\n5) COGNITION / DEVIN (CONFIRMED, primary source). Cognition Series D (May 27, 2026): raised over $1B at $26B post-money valuation; run-rate revenue $492M; \"89% of code committed by our engineers is committed by Devin.\" Corpus \"~$26B valuation, ~$492M ARR\" is exact. (Note: corpus rounded the Devin-commit figure; the primary number is 89%, up from 13% in Dec 2025.)\n\n6) SALESFORCE (CONFIRMED, primary source + independent caveat). Salesforce's \"How Salesforce Engineering Became Truly Agentic\" (April 2026): merged pull requests per developer +79%, completed work items per developer +50.8%, ML \"Effective Output Score\" +151.3%, incidents -5% despite higher output; a 231-person-day API migration done in 13 days (~18x faster); driven by company-wide Claude Code rollout with unlimited tokens. IMPORTANT honesty flag: these are Salesforce-self-reported with no external audit (independent coverage explicitly notes \"none of these numbers can be independently verified\").",
+      "enriched_findings": [
+        {
+          "claim": "Alphabet CFO Anat Ashkenazi said on the Q4 2025 earnings call that about half of Google's own software code is written by AI agents supporting the engineering team.",
+          "evidence": "CFO Dive: 'CFO Anat Ashkenazi stated that about half of the company's own software code is written by AI agents supporting the engineering team' during Alphabet's Q4 2025 earnings call. INDEPENDENT (trade press).",
+          "source_url": "https://www.cfodive.com/news/alphabet-leaning-ai-agents-boost-finance-workflows/811540/",
+          "date": "2026-02"
+        },
+        {
+          "claim": "Google CEO Sundar Pichai's Q4 2025 remarks (Q4 2025 results announced Feb 4, 2026) frame AI-generated, engineer-approved code; Google subsequently cites ~75% of new code AI-generated, up from ~50% in fall 2025.",
+          "evidence": "Google's official blog 'Alphabet earnings, Q4 2025: CEO's remarks' is the primary CEO source; trade coverage reports the 75%-of-new-code figure up from 50% in fall 2025 (25% in late 2024). VENDOR-PRIMARY (Google blog) + INDEPENDENT (Fast Company).",
+          "source_url": "https://blog.google/company-news/inside-google/message-ceo/alphabet-earnings-q4-2025/",
+          "date": "2026-02-04"
+        },
+        {
+          "claim": "Microsoft CEO Satya Nadella said 20%-30% of code in Microsoft's repositories was written by AI ('software'), with stronger results in Python than C++.",
+          "evidence": "CNBC/TechCrunch: Nadella said '20% to 30% of code inside the company's repositories was written by software' at Meta's LlamaCon, April 29, 2025; Zuckerberg said he didn't know Meta's figure. NOTE: this is an April 2025 statement, not 2026. INDEPENDENT.",
+          "source_url": "https://www.cnbc.com/2025/04/29/satya-nadella-says-as-much-as-30percent-of-microsoft-code-is-written-by-ai.html",
+          "date": "2025-04-29"
+        },
+        {
+          "claim": "SWE-bench Verified 2026: Claude Opus 4.8 scores 88.6%; Claude Opus 4.7 87.6%; frontier 'Claude Mythos Preview' ~93.9%; GPT-5.2 ~80%.",
+          "evidence": "llm-stats SWE-bench Verified leaderboard (June 2026): Claude Mythos Preview 0.939 (leader), Claude Opus 4.8 0.886, Claude Opus 4.7 0.876, GPT-5.2 0.800; 92 models, avg 0.651. THIRD-PARTY AGGREGATOR (scores largely vendor-reported).",
+          "source_url": "https://llm-stats.com/benchmarks/swe-bench-verified",
+          "date": "2026-06"
+        },
+        {
+          "claim": "Claude Code run-rate revenue is over $2.5 billion, more than doubled since the start of 2026.",
+          "evidence": "Anthropic official: 'Claude Code's run-rate revenue has grown to over $2.5 billion; this figure has more than doubled since the beginning of 2026.' Stated alongside Anthropic overall run-rate of $14B. VENDOR-PRIMARY.",
+          "source_url": "https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation",
+          "date": "2026-02-12"
+        },
+        {
+          "claim": "Cognition raised over $1B at a $26B post-money valuation; run-rate revenue $492M; 89% of code committed by Cognition engineers is committed by Devin.",
+          "evidence": "Cognition Series D blog (05.27.26): 'over $1B' raised, '$26B valuation', 'run-rate revenue grew to $492M', '89% of code committed by our engineers is committed by Devin.' Round co-led by Lux, General Catalyst, 8VC. VENDOR-PRIMARY (corroborated by Bloomberg/TechCrunch).",
+          "source_url": "https://cognition.ai/blog/series-d",
+          "date": "2026-05-27"
+        },
+        {
+          "claim": "Salesforce engineering reports +79% merged pull requests per developer, +50.8% completed work items per developer, +151.3% Effective Output Score, -5% incidents, and a 231-day migration done in 13 days, via company-wide Claude Code.",
+          "evidence": "Salesforce 'How Salesforce Engineering Became Truly Agentic' (April 2026 metrics): merged PRs/dev +79%, work items/dev +50.8%, Effective Output Score +151.3%, incidents -5%; 231-person-day migration completed in 13 days (~18x). Independent coverage (The Decoder) flags 'none of these numbers can be independently verified.' VENDOR-PRIMARY + INDEPENDENT CAVEAT.",
+          "source_url": "https://www.salesforce.com/news/stories/how-engineering-became-agentic/",
+          "date": "2026-04"
+        }
+      ],
+      "sources": [
+        "https://www.cfodive.com/news/alphabet-leaning-ai-agents-boost-finance-workflows/811540/",
+        "https://blog.google/company-news/inside-google/message-ceo/alphabet-earnings-q4-2025/",
+        "https://www.fastcompany.com/91531519/google-ceo-says-75-of-the-companys-code-is-ai-generated",
+        "https://www.cnbc.com/2025/04/29/satya-nadella-says-as-much-as-30percent-of-microsoft-code-is-written-by-ai.html",
+        "https://techcrunch.com/2025/04/29/microsoft-ceo-says-up-to-30-of-the-companys-code-was-written-by-ai/",
+        "https://llm-stats.com/benchmarks/swe-bench-verified",
+        "https://www.swebench.com/",
+        "https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation",
+        "https://cognition.ai/blog/series-d",
+        "https://www.bloomberg.com/news/articles/2026-05-27/ai-coding-startup-cognition-raises-1-billion-at-26-billion-value",
+        "https://techcrunch.com/2026/05/27/ai-coding-startup-cognition-raises-1b-at-25b-pre-money-valuation/",
+        "https://www.salesforce.com/news/stories/how-engineering-became-agentic/",
+        "https://the-decoder.com/salesforce-claims-ai-agents-cut-a-231-day-migration-to-13-days-with-fewer-incidents/",
+        "https://venturebeat.com/technology/anthropic-says-it-hit-a-30-billion-revenue-run-rate-after-crazy-80x-growth"
+      ],
+      "caveats": "For the CIO, present these with three honesty flags so the pitch survives scrutiny: (1) DATE PRECISION ON MICROSOFT — Nadella's \"20-30%\" is an April 2025 statement (LlamaCon), not a 2026 figure; say \"as of early 2025\" or it can be challenged. (2) GOOGLE — two different metrics are easily conflated: the CFO's \"about half of Google's OWN code\" via agents (Q4 2025 call) versus the \"75% of NEW code\" engineer-approved figure (2026). State which you mean; both are real and citable, but they are not the same denominator. (3) VENDOR VS INDEPENDENT — Claude Code ARR, Cognition's valuation/ARR/89%-Devin, SWE-bench self-reported scores, and especially the Salesforce productivity numbers (+79% PRs, +151% Effective Output Score, -5% incidents) are all vendor-self-reported; independent coverage explicitly notes Salesforce's figures have no external audit. They are excellent directional proof points and the funding/valuation numbers are corroborated by Bloomberg/TechCrunch, but frame the productivity percentages as \"the vendor reports\" rather than independently verified benchmarks. None of the corpus claims were CORRECTED as false; the only corrections are date attribution (Microsoft) and figure disambiguation (Google ~50% own-code vs 75% new-code)."
+    },
+    {
+      "thread": "\"Governance is the gating factor: ISO 42001, NIST AI RMF, EU AI Act Article 6 ('the orchestrator is the system'), Product Liability Directive, board accountability; and a dedicated team is the antidote to shadow AI and the MIT-95%-pilot-failure trap.\" The web research VERIFIES this thread strongly and lets it be reframed for a Swiss bank CIO: every named framework is real, current (2025-2026), and citable — and for Raiffeisen specifically there is a binding Swiss overlay (FINMA Guidance 08/2024) that the corpus did not name but that makes the governance case even sharper. The orchestrator-is-the-system point is now confirmed by the European Commission's own draft guidelines (May 2026), not just commentary. The practical takeaway for the pitch: governance is genuinely the gate, but it is a SOLVED problem with off-the-shelf frameworks and a well-understood hub-and-spoke / platform-team operating model — so a dedicated Agentic Engineering team + a control checklist is exactly the antidote to both shadow AI and the MIT 95% trap. One honest caveat: \"the orchestrator is the system\" is a fair paraphrase of the Commission guidance but is not a literal Article 6 quote, and the FINMA / EU AI Act obligations bite on high-risk USE CASES (credit, etc.), not on internal coding agents per se — so for coding the governance argument is best framed as voluntary best-practice + liability/audit hygiene, not as a hard regulatory mandate.",
+      "verified": "CONFIRMED (with one nuance and one valuable addition):\n\n1. ISO/IEC 42001 — CONFIRMED. Real, certifiable AI management-system standard (published Dec 2023), explicitly applicable to financial institutions, and increasingly positioned as a single management system that also helps satisfy EU AI Act, DORA and NIS2. Citable and bank-relevant.\n\n2. NIST AI RMF + Generative AI Profile — CONFIRMED. AI RMF 1.0 (NIST AI 100-1) plus the Generative AI Profile (NIST AI 600-1, July 2024) are real and vendor-neutral. NIST has since added agentic-/AI-specific work (Cyber AI Profile public draft; Control Overlays for Securing AI Systems / COSAIS first public draft expected early 2026; CAISI AI Agent Standards Initiative, Feb 2026). Plenty of current citable material.\n\n3. EU AI Act Article 6 \"the orchestrator is the system\" — CONFIRMED as substance, paraphrase as wording. The European Commission's DRAFT high-risk classification guidelines (published 19-20 May 2026, consultation to 23 June 2026) explicitly state that where multiple AI components jointly influence a high-risk decision \"the combined configuration is treated as a single AI system,\" and that this \"extends to ... agentic AI systems that coordinate and interact through linked actions\" — i.e. an orchestrator coordinating sub-agents toward a high-risk decision is one high-risk system, and \"splitting functionality across modules to keep each one below the threshold will not work.\" This is now sourced to the Commission itself, not just internal signal. Nuance: it is a paraphrase, not a verbatim Article 6 quote, and it bites on high-risk USE CASES, not on coding assistants per se.\n\n4. Product Liability Directive — CONFIRMED. The revised EU PLD entered into force Dec 2024, must be transposed by 9 Dec 2026, and now explicitly treats software and AI systems as \"products\" under strict liability; non-compliance with the AI Act becomes a de facto benchmark for \"defectiveness,\" and post-market defects from updates/learning can ground liability. Real and citable.\n\n5. MIT \"95% of pilots fail\" — CONFIRMED. \"The GenAI Divide: State of AI in Business 2025\" (MIT NANDA initiative, Aug 2025): ~95% of enterprise GenAI pilots deliver no measurable P&L impact; only ~5% accelerate. Root cause is a learning/integration gap, not model quality; buy-and-partner beats internal-build ~2:1. Directly supports the \"dedicated team + integration + governance, not ad-hoc experimentation\" argument.\n\n6. Shadow-AI antidote / dedicated team — CONFIRMED as best practice. Multiple 2026 sources converge on a hub-and-spoke \"Center of Excellence\" / fully-funded platform-team model (lean central team sets governance, evals, guardrails, MCP catalog, FinOps; business units build on the shared platform), with a published AI inventory and approved-MCP catalog explicitly framed as the cure for \"Shadow AI\" / \"Shadow MCP.\"\n\nADDITION the corpus missed: For Raiffeisen specifically, FINMA Guidance 08/2024 (18 Dec 2024) is the binding Swiss overlay — it expects every FINMA-supervised institution to maintain a centralized AI inventory with risk classification, ensure data/model quality, run testing and continuous monitoring, and assign clear accountability/roles. This is the single most pitch-relevant citation for a Swiss bank and should anchor the governance slide.",
+      "enriched_findings": [
+        {
+          "claim": "EU AI Act: an orchestrator coordinating sub-agents toward a high-risk decision is treated as ONE high-risk system — confirmed by the Commission's own draft guidelines, not just commentary.",
+          "evidence": "European Commission draft high-risk classification guidelines (published 19-20 May 2026, consultation open to 23 June 2026): where several AI components' joint outputs materially influence a high-risk decision, 'the combined configuration is treated as a single AI system,' and this 'extends to ... agentic AI systems that coordinate and interact through linked actions'; 'splitting functionality across modules to keep each one below the threshold will not work.' INDEPENDENT analyses (Enzai, Bird & Bird, Hunton) corroborate. This is the citable basis for the corpus's 'orchestrator is the system' line — though it is a paraphrase, not a verbatim Article 6 quote, and it attaches to high-risk USE CASES, not coding assistants per se.",
+          "source_url": "https://www.enz.ai/european-commission-draft-guidelines-high-risk-ai-classification",
+          "date": "2026-05-20"
+        },
+        {
+          "claim": "FINMA Guidance 08/2024 is the binding Swiss-banking AI governance baseline — the single most pitch-relevant citation for Raiffeisen (corpus did not name it).",
+          "evidence": "FINMA Guidance 08/2024 (18 Dec 2024) sets expectations for all FINMA-supervised institutions using AI: establish a governance framework with clear responsibilities, maintain a CENTRALIZED INVENTORY of AI applications with RISK CLASSIFICATION, ensure data/model quality, and run robust testing + continuous monitoring. FINMA's April 2025 survey found ~50% of Swiss institutions already use or are piloting AI and 91% of those use generative AI — confirming both relevance and the 'widespread use, limited governance' gap. FINMA signals a proportionate, governance-first enforcement posture. INDEPENDENT (regulator primary source + Swiss law-firm analyses: Pestalozzi, Goldblum, SwissGRC).",
+          "source_url": "https://www.finma.ch/en/news/2024/12/20241218-mm-finma-am-08-24/",
+          "date": "2024-12-18"
+        },
+        {
+          "claim": "A concrete, NIST-AI-RMF-mapped control checklist for agentic coding + shadow-AI exists and is adoptable today by a CISO.",
+          "evidence": "Vendor-neutral 2026 NIST AI RMF agentic/shadow-AI playbook maps to Govern/Map/Measure/Manage and OWASP Top 10 for Agentic Applications (2025): (1) centralized continuously-updated AI inventory; (2) application allow-listing / block-or-monitor external LLM APIs; (3) least-privilege agent access — agents invoke only pre-approved APIs/tools; (4) identity/privilege verification at each decision point (no impersonation/escalation); (5) mandatory human-in-the-loop for high-impact decisions (credit, hiring, clinical, underwriting); (6) sandboxing/containment — network segmentation, restricted filesystem, isolated agents to prevent cascading multi-agent failures; (7) tamper-proof audit trails for decisions, config changes and approvals; (8) supply-chain/model-provenance verification; (9) continuous behavioral monitoring for drift/rogue agents. Quantified: integrated controls cut breach lifecycle ~80 days / ~$1.9M per breach; shadow AI adds ~$670K per breach. INDEPENDENT (vendor blog citing NIST + OWASP; treat metrics as vendor-sourced).",
+          "source_url": "https://underdefense.com/blog/ai-risk-management/",
+          "date": "2026-04-25"
+        },
+        {
+          "claim": "Allow-listed / governed MCP servers, runtime sandboxing, identity-first and structured audit logging are the established 2026 control set for agent tool-use — the technical antidote to 'Shadow MCP'.",
+          "evidence": "Converging 2026 guidance (Red Hat, Pomerium, SlowMist MCP Security Checklist, Cerbos): 'enforce identity first, least-privilege access, isolate execution, and log everything'; maintain a strict ALLOWLIST of permitted commands/tools with deviations rejected or requiring explicit approval; authenticate on every call; run servers in least-privilege sandboxes (containers / micro-VMs / restricted runtimes); every MCP tool invocation must emit a structured audit record; enterprises should publish APPROVED MCP servers to an internal catalog to prevent 'Shadow MCP'. Most failures stem from over-broad permissions, weak identity, missing isolation and poor audit visibility — not protocol flaws. INDEPENDENT/MIXED (vendor + open-source checklist).",
+          "source_url": "https://www.redhat.com/en/blog/mcp-security-logging-and-runtime-security-measures",
+          "date": "2026-01-01"
+        },
+        {
+          "claim": "The recommended operating model is hub-and-spoke: a lean central Center of Excellence / funded platform team owns governance, evals, guardrails, MCP catalog and cost discipline; business units build on the shared platform.",
+          "evidence": "Multiple 2026 sources converge: 'a lean central team sets standards for governance, evals, guardrails, LLMOps and FinOps, while business units build and scale use cases on shared platforms.' LinkedIn stood up a fully-funded agent platform team structured like its storage/ML-infra teams, centralizing prompt orchestration, data access, safety evaluations and deployment. The CoE mandate in the agentic era is to 'operationalize evals, security, agent controls and cost governance' — otherwise it is 'just experimentation with a steering committee.' Governance gates set what agents may do (e.g. 'open PRs but never merge'), with automated quality gates before merge and full action logging. MIXED (CIO.com independent + Augment/PwC/Google vendor); independent and vendor sources agree on the model.",
+          "source_url": "https://www.cio.com/article/4125864/agentic-ai-isnt-about-the-agents-its-about-the-platform.html",
+          "date": "2026-01-01"
+        },
+        {
+          "claim": "MIT data backs the 'dedicated team / proper integration beats ad-hoc pilots' argument: 95% of enterprise GenAI pilots fail to move P&L.",
+          "evidence": "MIT NANDA initiative, 'The GenAI Divide: State of AI in Business 2025' (Aug 2025): based on 150 leader interviews, a 350-employee survey and 300 public deployments, only ~5% of GenAI pilots achieve rapid revenue acceleration; the rest stall with little measurable P&L impact. Root cause is the organizational/tool 'learning gap' (poor workflow integration), NOT model quality; buy-from-specialist-vendors-and-partner succeeds ~67% of the time vs internal builds about one-third as often, and empowering line managers beats central-lab-only adoption. INDEPENDENT (MIT research, via Fortune).",
+          "source_url": "https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/",
+          "date": "2025-08-18"
+        },
+        {
+          "claim": "Revised EU Product Liability Directive makes defective software/AI strictly liable and turns AI Act non-compliance into a liability question — reinforcing why governance is the gate.",
+          "evidence": "Revised PLD entered into force Dec 2024; transposition deadline 9 Dec 2026; applies to products placed on the market after 9 Dec 2026. It explicitly brings software, applications and AI systems (embedded, standalone, or as-a-service) within the strict-liability definition of 'product'; defectiveness is linked to compliance with EU product-safety law, making the AI Act a de facto benchmark; and because AI systems learn/update post-market, defects arising after market placement can still ground liability (FOSS outside commercial activity is excluded). INDEPENDENT (law firms Pinsent Masons, Freshfields, Hogan Lovells).",
+          "source_url": "https://www.pinsentmasons.com/out-law/analysis/revised-eu-product-liability-regime-expands-ai-software-providers",
+          "date": "2024-12-01"
+        },
+        {
+          "claim": "ISO/IEC 42001 is the certifiable AI-management-system standard banks are adopting as a single umbrella across EU AI Act, DORA and NIS2.",
+          "evidence": "ISO/IEC 42001:2023 (published Dec 2023) is a certifiable AI management system explicitly applicable to financial institutions; 2025 guidance positions it as one management system that can help satisfy ISO 42001, EU AI Act, DORA and NIS2 simultaneously, with organizations pairing it with the EU AI Code of Practice. Provides globally recognized third-party-certifiable assurance — a credible 'we are governed' artifact for board/regulator. MIXED (ISO primary + consultancy commentary, some vendor).",
+          "source_url": "https://www.iso.org/home/insights-news/resources/iso-42001-explained-what-it-is.html",
+          "date": "2025-01-01"
+        },
+        {
+          "claim": "Vendor coding-agent platforms now ship the enterprise governance controls the checklist requires (audit logs, admin policy, least privilege, compliance API) — so controls are buyable, not bespoke.",
+          "evidence": "GitHub's Agent Control Plane provides centralized policy management and audit logging for agent activity, with code review off-by-default and admin-gated, and a single control plane to manage Claude/Codex/Copilot agents; GitHub Well-Architected calls 'enabling agents without audit-log streaming or model restrictions' an anti-pattern. Anthropic (20 Aug 2025) bundled Claude Code into Team/Enterprise with a Compliance API exposing usage/content metrics, usage dashboards and security-review commands — deliberately positioning governance/auditability over raw speed. VENDOR sources (GitHub, Anthropic, TechRepublic) — corroborative of feasibility, not independent on efficacy.",
+          "source_url": "https://github.blog/changelog/2026-02-26-claude-and-codex-now-available-for-copilot-business-pro-users/",
+          "date": "2026-02-26"
+        }
+      ],
+      "caveats": "1) WORDING vs SUBSTANCE: \"EU AI Act Article 6 — the orchestrator is the system\" is a faithful paraphrase of the European Commission's MAY 2026 DRAFT guidelines, NOT a verbatim quote from Article 6 itself, and the guidelines are still in consultation (to 23 June 2026), so wording may change. Cite it as 'Commission draft high-risk guidelines (May 2026)', not as black-letter Article 6.\n2) SCOPE MISMATCH: The EU AI Act high-risk regime and FINMA 08/2024 bite on high-risk DECISION USE-CASES (credit scoring, etc.), not on internal coding assistants per se. For the agentic-CODING pitch, the regulatory frameworks are best framed as (a) liability/audit hygiene under the revised PLD, (b) voluntary best practice (ISO 42001, NIST AI RMF), and (c) the same governance muscle the bank will need anyway for customer-facing high-risk AI — not as a hard mandate that coding agents are 'high-risk systems.'\n3) VENDOR vs INDEPENDENT: The orchestrator point (Commission + Enzai/Bird&Bird/Hunton), MIT 95% (MIT/Fortune), FINMA, and the PLD (major law firms) are INDEPENDENT/primary. The concrete control checklist, MCP-security set, CoE operating model and the breach-cost metrics come substantially from VENDOR or mixed sources (UnderDefense, Red Hat, Pomerium, Augment, GitHub, Anthropic) — they are credible and convergent, but quantified ROI/breach-cost figures should be presented as vendor-sourced, not as audited fact.\n4) The corpus did NOT name FINMA 08/2024 or DORA; both are the strongest Swiss-bank-specific hooks and should be added to the deck rather than relying on EU-only framing.\n5) The \"dedicated team is the antidote to the MIT 95% trap\" is an inference, not a finding MIT states verbatim — MIT attributes failure to the workflow-integration 'learning gap' and finds buy+partner beats internal-build; that supports a funded platform team + bought tooling, which is a reasonable but not MIT-asserted conclusion.",
+      "sources": [
+        "https://www.iso.org/home/insights-news/resources/iso-42001-explained-what-it-is.html",
+        "https://digital.nemko.com/insights/iso-42001-controls-a-guide-to-responsible-ai-governance",
+        "https://elevateconsult.com/insights/eu-ai-code-of-practice-iso-42001/",
+        "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence",
+        "https://digital.nemko.com/regulations/nist-rmf",
+        "https://underdefense.com/blog/ai-risk-management/",
+        "https://labs.cloudsecurityalliance.org/agentic/agentic-nist-ai-rmf-profile-v1/",
+        "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro",
+        "https://artificialintelligenceact.eu/article/6/",
+        "https://www.enz.ai/european-commission-draft-guidelines-high-risk-ai-classification",
+        "https://www.twobirds.com/en/insights/2026/the-commission's-draft-high-risk-ai-guidelines-under-the-eu-ai-act-a-first-read",
+        "https://www.hunton.com/privacy-and-cybersecurity-law-blog/european-commission-releases-draft-guidelines-on-high-risk-ai-under-the-eu-ai-act",
+        "https://digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems",
+        "https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/",
+        "https://www.finma.ch/en/news/2024/12/20241218-mm-finma-am-08-24/",
+        "https://www.finma.ch/en/news/2025/04/20250424-mm-umfrage-ki/",
+        "https://pestalozzilaw.com/en/insights/news/legal-insights/finma-guidance-on-governance-and-risk-management-when-using-ai/",
+        "https://www.pinsentmasons.com/out-law/analysis/revised-eu-product-liability-regime-expands-ai-software-providers",
+        "https://www.freshfields.com/en/our-thinking/blogs/risk-and-compliance/product-risks-today-how-the-new-product-liability-directive-turns-ai-act-complia-102mpu2",
+        "https://www.gibsondunn.com/eu-product-liability-directive-responding-to-software-ai-and-complex-supply-chains/",
+        "https://www.wwt.com/wwt-research/how-to-securely-implement-ai-coding-assistants-across-the-enterprise",
+        "https://checkmarx.com/learn/devsecops/top-18-devsecops-tools-for-the-ai-era-securing-the-sdlc-in-2026/",
+        "https://tblocks.com/articles/human-in-the-loop-sdlc-governance/",
+        "https://www.redhat.com/en/blog/mcp-security-logging-and-runtime-security-measures",
+        "https://www.pomerium.com/blog/mcp-server-security-risks-what-development-teams-need-to-know-in-2026",
+        "https://github.com/slowmist/MCP-Security-Checklist",
+        "https://www.cio.com/article/4125864/agentic-ai-isnt-about-the-agents-its-about-the-platform",
+        "https://www.cio.com/article/4134741/how-agentic-ai-will-reshape-engineering-workflows-in-2026.html",
+        "https://www.augmentcode.com/guides/agentic-engineering-operating-model",
+        "https://github.blog/changelog/2026-02-26-claude-and-codex-now-available-for-copilot-business-pro-users/",
+        "https://www.techrepublic.com/article/news-anthropic-claude-code-business-plan-governance/",
+        "https://wellarchitected.github.com/library/governance/recommendations/governing-agents/"
+      ]
+    }
+  ]
+}
