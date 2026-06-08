@@ -188,6 +188,13 @@ The frontier-lab race has become a listed-equity story under cost-curve pressure
 
 <!-- Newest month first. Weekly runs append bullets to the current month's section. Monthly runs both append summary bullets here and promote durable shifts to themed timelines above. -->
 
+## 2026-06 (June)
+
+- **2026-06-01** `[inference-economics]` → escalation: Anthropic confidentially files a draft S-1 with the SEC — the first pure-play frontier lab to formally start the IPO clock — days after closing the $65B Series H at a ~$965B valuation on a reported ~$47B revenue run-rate. The capital arc now has its public-market milestone: W21 was OpenAI's S-1, W22 the Series H that crowned Anthropic, and this is Anthropic's own filing, with the prospectus due late summer and OpenAI reported just behind on a September target above $1T. HN treated it as a verdict moment, splitting valuation skepticism from capability respect. → [weekly/2026-W23](weekly/2026/2026-W23.md)
+- **2026-06-02** `[enterprise-distribution]` `[coding-agents]` — Microsoft turns from OpenAI's biggest customer into its rival at Build 2026: Project Polaris (its own coding model on Maia 200 silicon) is set to replace GPT-4 Turbo as the default GitHub Copilot engine for every subscriber by August, alongside seven first-party MAI models (MAI-Thinking-1 claims ~10× output-tokens/$ vs GPT-5.5), the MIT-licensed Windows Agent Framework 1.0, and Azure Agent Mesh. Microsoft now owns the model, the inference silicon, and the developer surface end-to-end — a public renegotiation of the partnership, framed explicitly around cutting developer cost. → [weekly/2026-W23](weekly/2026/2026-W23.md)
+
+---
+
 ## 2026-05 (May)
 
 - **2026-05-04** `[enterprise-distribution]` — Anthropic + Blackstone / Hellman & Friedman / Goldman / Apollo / GA / GIC / Sequoia stand up a $1.5B forward-deployed-engineering services firm against Accenture / Deloitte / Infosys; OpenAI mirrors with a TPG / Bain JV. The frontier-lab-as-services-channel template (Palantir FDE, not consulting) lands as a named GTM, separate from Big Four resale. → [weekly/2026-W19](weekly/2026/2026-W19.md)
