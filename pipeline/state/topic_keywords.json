@@ -1,7 +1,35 @@
 {
-  "_purpose": "Per-topic keyword sets for source-file importance scoring. The radar reads this to count days/source-types a topic was mentioned in raw source files (independent of the radar agent's decision to create a topic that day). Maintained by ai-trend-radar SKILL \u2014 when a new topic is created, append its keywords here.",
+  "_purpose": "Per-topic keyword sets for source-file importance scoring. The radar reads this to count days/source-types a topic was mentioned in raw source files (independent of the radar agent's decision to create a topic that day). Maintained by ai-trend-radar SKILL — when a new topic is created, append its keywords here.",
   "_format": "topic_id -> { keywords: [str], _seeded_on: YYYY-MM-DD, _llm_enriched: bool, _last_updated: YYYY-MM-DD }",
   "topics": {
+    "document-intelligence": {
+      "keywords": [
+        "ocr",
+        "mistral ocr",
+        "ocr 4",
+        "baidu unlimited ocr",
+        "unlimited-ocr",
+        "deepseek-ocr",
+        "olmocrbench",
+        "olmocr",
+        "paddleocr",
+        "document intelligence",
+        "document understanding",
+        "document parsing",
+        "bounding boxes",
+        "structured ingestion",
+        "rag ingestion",
+        "parse document",
+        "search toolkit",
+        "knowql",
+        "compilation-stage knowledge layer",
+        "pinecone knowql"
+      ],
+      "label": "Document intelligence / OCR-as-RAG-ingestion (Mistral OCR 4 SOTA self-hostable + Baidu Unlimited OCR open-source, DeepSeek-OCR lineage, structured ingestion layer for enterprise RAG)",
+      "_seeded_on": "2026-06-24",
+      "_llm_enriched": true,
+      "_last_updated": "2026-06-25"
+    },
     "ai-platform-distribution": {
       "keywords": [
         "apple intelligence",
@@ -25,12 +53,22 @@
         "xai ipo",
         "largest ipo",
         "frontier lab ipo",
-        "oracle cloud"
+        "oracle cloud",
+        "jalapeño",
+        "jalapeno",
+        "openai broadcom",
+        "inference chip",
+        "intelligence processor",
+        "managed agents",
+        "antigravity agent",
+        "build 2026",
+        "governed agent stack",
+        "mai models"
       ],
       "label": "AI platform distribution (SpaceX/xAI SPCX largest-IPO-ever frontier lab goes public; Apple WWDC Gemini/Claude/ChatGPT selectable on 2.2B devices, OpenAI 'chat is dead' superapp, Microsoft Foundry 11k models + Claude in Excel)",
       "_seeded_on": "2026-06-08",
       "_llm_enriched": true,
-      "_last_updated": "2026-06-12"
+      "_last_updated": "2026-06-25"
     },
     "inference-cost-economics": {
       "keywords": [
@@ -48,12 +86,36 @@
         "cost skepticism",
         "ai ultra",
         "lower developer costs",
-        "metering"
+        "metering",
+        "baseten",
+        "inference gold rush",
+        "agentic inference",
+        "answer inference",
+        "jalapeno",
+        "jalapeño",
+        "spacex reflection",
+        "gb300",
+        "colossus",
+        "perf per watt",
+        "performance per watt",
+        "baseten series f",
+        "groq 650m",
+        "groq lpu",
+        "lpu cloud",
+        "qualcomm tenstorrent",
+        "tenstorrent",
+        "dspark",
+        "speculative decoding",
+        "inference serving layer",
+        "inference requests per day",
+        "costs not sustainable",
+        "subsidized pricing",
+        "deepseek flash migration"
       ],
-      "label": "Inference cost economics (Uber $1,500/mo cap, Altman token-cost admission, Microsoft MAI cost framing, Google AI Ultra price cut, local-inference break-even)",
+      "label": "Inference cost economics (Baseten $1.5B Series F at $13B / 1B+ requests-a-day, Groq $650M LPU cloud toward 200MW, Qualcomm-Tenstorrent $8-10B talks, DeepSeek DSpark speculative decoding; serving layer — not training — is where spend, margins and lock-in concentrate; 'current LLM costs not sustainable')",
       "_seeded_on": "2026-06-04",
       "_llm_enriched": true,
-      "_last_updated": "2026-06-04"
+      "_last_updated": "2026-06-27"
     },
     "ai-coding-agents": {
       "keywords": [
@@ -70,12 +132,16 @@
         "coding copilot",
         "amp code",
         "zed editor",
-        "github copilot"
+        "github copilot",
+        "anysphere",
+        "spacex cursor",
+        "mai-code",
+        "open code review"
       ],
-      "label": "AI coding agents (DeepSeek 'Harness' team, Codex/Claude Code churn, Cursor + Antigravity backlash)",
+      "label": "AI coding agents (DeepSeek 'Harness' team, Codex/Claude Code churn, Cursor + Antigravity backlash, SpaceX/Anysphere $60B acquisition)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-06-20",
       "_news_cleaned": true
     },
     "agent-memory": {
@@ -127,12 +193,25 @@
         "mcp ecosystem",
         "mcp spec",
         "stdio transport",
-        "mcp marketplace"
+        "mcp marketplace",
+        "action fabric",
+        "cognizant neuro",
+        "neuro-san",
+        "zensar agentmesh",
+        "agentmesh",
+        "stateless core",
+        "mcp interop",
+        "claude tag",
+        "mcp gateway",
+        "kong mcp",
+        "rfc 8693",
+        "mcp 2.0",
+        "servicenow mcp server"
       ],
       "label": "MCP adoption (110M monthly downloads, MCP Apps SEP-1865, 10k+ public servers, FIDO/AP2 handoff)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-06-25",
       "_news_cleaned": true
     },
     "agent-sdks": {
@@ -148,12 +227,15 @@
         "openai agents sdk",
         "haystack",
         "pydantic ai",
-        "claude agent sdk"
+        "claude agent sdk",
+        "vercel eve",
+        "microsoft agent framework",
+        "mistral vibe agent"
       ],
-      "label": "Agent SDKs (Anthropic Agent SDK loops + Message Batches, LangChain Deep Agents v0.6, Claude Code playbook)",
+      "label": "Agent SDKs (Anthropic Agent SDK loops + Message Batches, LangChain Deep Agents v0.6, Vercel Eve TS-native framework, Claude Code playbook)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-06-20",
       "_news_cleaned": true
     },
     "agent-platforms-enterprise": {
@@ -186,12 +268,25 @@
         "cortex sense",
         "horizon context",
         "agent identity",
-        "snowflake summit"
+        "snowflake summit",
+        "headless platform",
+        "action fabric",
+        "agent metering",
+        "zensar agentmesh",
+        "cognizant neuro",
+        "snowflake intelligence",
+        "nemoclaw",
+        "nemotron 3 ultra",
+        "gartner agent spend",
+        "managed agents",
+        "governed agent stack",
+        "build 2026",
+        "hosted agent runtime"
       ],
       "label": "Enterprise agent platforms (Snowflake Summit CoWork/CoCo + Cortex Sense MCP, NVIDIA Agent Toolkit 17 adopters, Meta Business Agent global, Red Hat AI Factory)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-06-06",
+      "_last_updated": "2026-06-25",
       "_news_cleaned": true
     },
     "agent-skills-wave": {
@@ -223,12 +318,19 @@
         "json schema tool",
         "tool selection",
         "spring ai",
-        "tool registry"
+        "tool registry",
+        "needle",
+        "cactus needle",
+        "tool calling is retrieval",
+        "headless platform",
+        "agent metering",
+        "sap blocks external agents",
+        "action fabric"
       ],
-      "label": "Tool-use standards (MCP+A2A+AG-UI+A2UI stack map, MCP Tool Descriptions Are Smelly, Spring AI Tool Selection)",
+      "label": "Tool-use standards (MCP+A2A+AG-UI+A2UI stack map, Cactus Needle 26M tool-calling model, MCP Tool Descriptions Are Smelly, Spring AI Tool Selection)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-06-23",
       "_news_cleaned": true
     },
     "agent-payments-protocol": {
@@ -244,7 +346,7 @@
         "kyapay",
         "scoped tokens"
       ],
-      "label": "Agent payments protocol (Google AP2 \u2192 FIDO handoff, Mastercard Verifiable Intent, Skyfire KYAPay, Stripe Scoped Tokens)",
+      "label": "Agent payments protocol (Google AP2 → FIDO handoff, Mastercard Verifiable Intent, Skyfire KYAPay, Stripe Scoped Tokens)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -261,12 +363,19 @@
         "ken priore",
         "mcp exploit",
         "supply-chain attack",
-        "indirect prompt injection"
+        "indirect prompt injection",
+        "role confusion",
+        "prompt injection as role confusion",
+        "agentriskbom",
+        "contextual integrity",
+        "computer-use agent privacy",
+        "geometric information flow",
+        "injection benchmark overstate"
       ],
       "label": "MCP security (30 CVE crisis, Ken Priore governance gap, MuleSoft anti-patterns, A2A Contagion threat model)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-06-23",
       "_news_cleaned": true
     },
     "a2a-protocol": {
@@ -300,17 +409,22 @@
         "retrieval augmented generation",
         "query rewriting",
         "context compiler",
-        "composable retriever"
+        "composable retriever",
+        "is graphrag needed",
+        "foundry iq",
+        "redis iris",
+        "context architecture",
+        "knowql"
       ],
-      "label": "Agentic retrieval / RAG-as-decision-loop (Pinecone Nexus + KnowQL 14.3%\u21922.9% hallucination drop, Modular RAG, Microsoft Foundry Legal RAG)",
+      "label": "Agentic retrieval / context architecture (Redis Iris auto-generates MCP tools + agent memory server; Pinecone KnowQL declarative agent query language; 'context architecture is replacing RAG', hybrid-retrieval buyer intent tripled to ~33%)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-25",
+      "_last_updated": "2026-06-26",
       "_news_cleaned": true
     },
     "vertical-agents-finance": {
       "keywords": [
-        "vertical agents \u2014 finance",
+        "vertical agents — finance",
         "finma",
         "lombard odier",
         "pictet",
@@ -321,7 +435,7 @@
         "swiss banking ai",
         "bloomberg gpt"
       ],
-      "label": "Vertical agents \u2014 finance (UBS Graduate, Lombard Odier 2 seats, Mercury Series D, Pictet bank-wide, FRB/OCC/FSB/BSI/FINMA Mythos)",
+      "label": "Vertical agents — finance (UBS Graduate, Lombard Odier 2 seats, Mercury Series D, Pictet bank-wide, FRB/OCC/FSB/BSI/FINMA Mythos)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -350,7 +464,7 @@
     },
     "vertical-agents-legal": {
       "keywords": [
-        "vertical agents \u2014 legal",
+        "vertical agents — legal",
         "harvey",
         "harvey ai",
         "casetext",
@@ -362,7 +476,7 @@
         "legaltech ai",
         "contract review ai"
       ],
-      "label": "Vertical agents \u2014 legal (Microsoft Foundry Legal RAG, Lawfare LFAI + advice-and-consent, Harvey, EY Governance Director)",
+      "label": "Vertical agents — legal (Microsoft Foundry Legal RAG, Lawfare LFAI + advice-and-consent, Harvey, EY Governance Director)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -407,12 +521,17 @@
         "nextera dominion",
         "data center power",
         "ai data center",
-        "rubin platform"
+        "rubin platform",
+        "gartner agent spend",
+        "ai-agent software spending",
+        "agent budget line",
+        "venture funding ai",
+        "cognition funding"
       ],
       "label": "AI capex, IPO race & power-grid coupling (Anthropic $30B/$900B + OpenAI S-1, NVIDIA H100 rentals +20%/A100 +15% YoY, NextEra-Dominion $67B AI data-center thesis, OpenRouter China cost gap)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-25",
+      "_last_updated": "2026-06-23",
       "_news_cleaned": true
     },
     "implementation-revenue": {
@@ -492,12 +611,17 @@
         "cma google",
         "connecticut ai",
         "companion ai",
-        "ai search opt out"
+        "ai search opt out",
+        "code of practice",
+        "labelling ai content",
+        "machine-readable marking",
+        "scientific panel",
+        "digital omnibus"
       ],
       "label": "EU AI Act & AI regulation (Article 50 transparency consultation close + Aug 2 2026 deadline, UK CMA Google AI-search opt-out world-first, Connecticut companion-AI law, Omnibus high-risk → 2027)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-06-06",
+      "_last_updated": "2026-06-25",
       "_news_cleaned": true
     },
     "mythos-cyber-governance-cascade": {
@@ -519,12 +643,27 @@
         "export control",
         "frontier model access",
         "government directive",
-        "government gatekeeping"
+        "government gatekeeping",
+        "identity verification",
+        "gov-id",
+        "korea access suspension",
+        "national-security lever",
+        "agi era of governance",
+        "export-control directive",
+        "us government will decide who gets",
+        "individually approve",
+        "pre-approve access",
+        "per-org approval",
+        "trusted organizations",
+        "vetted domestic organizations",
+        "regulatory capture",
+        "asian startups mythos-like",
+        "white house slow roll"
       ],
-      "label": "Government gatekeeping of frontier models (US directive forces Anthropic to pull Fable 5/Mythos 5 — first state restriction of public access to the strongest LLMs; Amazon-lobbying WSJ angle, open-weight backlash)",
+      "label": "Government gatekeeping of frontier models (US government to individually pre-approve which orgs may use GPT-5.6, and clears Anthropic's Mythos only for 'trusted' US orgs — first sustained per-org pre-clearance regime spanning both frontier labs; HN reads it as regulatory capture; Asian startups ship Mythos-like models within a day)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-06-14",
+      "_last_updated": "2026-06-27",
       "_news_cleaned": true
     },
     "frontier-lab-jvs": {
@@ -538,12 +677,15 @@
         "ai datacenter financing",
         "tpu cluster",
         "hark",
-        "private credit ai"
+        "private credit ai",
+        "spacex anysphere",
+        "spacex cursor acquisition",
+        "general intuition"
       ],
-      "label": "Frontier-lab JVs (SpaceX-Anthropic $1.25B/mo $45B Colossus, Anthropic-Blackstone-Goldman, Google-Blackstone TPU, NVIDIA + AMD + Intel + Qualcomm on Hark)",
+      "label": "Frontier-lab JVs (SpaceX-Anysphere $60B Cursor buy, SpaceX-Anthropic $45B Colossus, Anthropic-Blackstone-Goldman, Google-Blackstone TPU, NVIDIA + AMD + Intel + Qualcomm on Hark)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-06-20",
       "_news_cleaned": true
     },
     "vendor-governance-business-line": {
@@ -599,7 +741,7 @@
         "swiss llm",
         "switzerland ai strategy"
       ],
-      "label": "Swiss AI context (Apertus on Alps, FINMA Mythos top-jurisdiction, Giotto.ai Lausanne, Canton Z\u00fcrich sandbox closing, Swiss AI Summit cadence)",
+      "label": "Swiss AI context (Apertus on Alps, FINMA Mythos top-jurisdiction, Giotto.ai Lausanne, Canton Zürich sandbox closing, Swiss AI Summit cadence)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -672,13 +814,13 @@
         "ai scientist",
         "recursive self-improvement",
         "rsi",
-        "erd\u0151s problems",
+        "erdős problems",
         "automated theorem proving",
         "sakana ai scientist",
         "ai research agent",
         "self-improving ai"
       ],
-      "label": "Automated AI research (OpenAI Erd\u0151s disproof \u2014 verified by Alon/Wood/Bloom, Apollo Q2-Q4 focus, DiLoCo, Forethought RSI)",
+      "label": "Automated AI research (OpenAI Erdős disproof — verified by Alon/Wood/Bloom, Apollo Q2-Q4 focus, DiLoCo, Forethought RSI)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -716,7 +858,7 @@
         "hellaswag",
         "lmsys arena"
       ],
-      "label": "Evaluation gap (Winner's Curse correction, MCJudgeBench per-constraint, AI Index 362 incidents, Foundation Model Transparency 58\u219240)",
+      "label": "Evaluation gap (Winner's Curse correction, MCJudgeBench per-constraint, AI Index 362 incidents, Foundation Model Transparency 58→40)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -735,7 +877,7 @@
         "inference serving",
         "kv cache offload"
       ],
-      "label": "Disaggregated serving (MARLIN multi-agent RL, VibeServe per-workload stacks, KV sharing in Gemma 4, SemiAnalysis Hopper\u2192Blackwell)",
+      "label": "Disaggregated serving (MARLIN multi-agent RL, VibeServe per-workload stacks, KV sharing in Gemma 4, SemiAnalysis Hopper→Blackwell)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -825,12 +967,22 @@
         "mythos 5",
         "draft s-1",
         "tcs partnership",
-        "claude partner network"
+        "claude partner network",
+        "seoul office",
+        "kiyoung choi",
+        "lg cns",
+        "samsung sds",
+        "naver claude code",
+        "korea partnerships",
+        "john jumper",
+        "claude tag",
+        "alphafold",
+        "claude in slack"
       ],
-      "label": "Frontier models \u2014 Anthropic (Fable 5/Mythos 5 suspended under US directive; confidential draft S-1 days after OpenAI; TCS 50k-seat + DXC SI channel; Opus 4.8 default across Max/Team/Enterprise/API)",
+      "label": "Frontier models — Anthropic (Seoul office + Korea enterprise deployments LG CNS/Samsung SDS/NAVER under export-control shadow; John Jumper joins from DeepMind; Fable 5/Mythos 5 suspended under US directive; confidential draft S-1; Opus 4.8 default)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-06-13",
+      "_last_updated": "2026-06-25",
       "_news_cleaned": true
     },
     "frontier-models-openai": {
@@ -850,12 +1002,27 @@
         "rosalind biodefense",
         "bedrock ga",
         "govcloud",
-        "chatgpt memory"
+        "chatgpt memory",
+        "gpt-5.6",
+        "gpt 5.6",
+        "gpt-5.5-cyber",
+        "patch the planet",
+        "cybergym",
+        "openai ona",
+        "noam shazeer",
+        "trusted access for cyber",
+        "gpt-5.6 sol",
+        "sol terra luna",
+        "previewing gpt-5.6",
+        "cerebras 750 tok",
+        "slow roll gpt-5.6",
+        "staggered release",
+        "openai ipo 2027"
       ],
-      "label": "Frontier models \u2014 OpenAI (GPT-5.5/5.4/Codex GA on AWS Bedrock incl. GovCloud, ChatGPT persistent memory rollout, GPT-4.5 retires June 27)",
+      "label": "Frontier models — OpenAI (GPT-5.6 'Sol' previewed to trusted partners 'at request of US government', staggered/slow-rolled release; Sol/Terra/Luna family + Cerebras 750 tok/s deal July; OpenAI leaning toward 2027 IPO)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-06-05",
+      "_last_updated": "2026-06-27",
       "_news_cleaned": true
     },
     "frontier-models-google": {
@@ -873,12 +1040,15 @@
         "gemma 4",
         "gemma 4 qat",
         "developer tier",
-        "contextual ai"
+        "contextual ai",
+        "antigravity",
+        "gemini-embedding-2",
+        "managed agents"
       ],
-      "label": "Frontier models \u2014 Google (Gemini 3.5 Flash GA at I/O 2026 + Ultra price cut + $100 Developer tier, Gemma 4 QAT mobile, Contextual AI acqui-hire)",
+      "label": "Frontier models — Google (Gemini 3.5 Flash GA at I/O 2026 + Ultra price cut + $100 Developer tier, Gemma 4 QAT mobile, Contextual AI acqui-hire)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-06-25",
       "_news_cleaned": true
     },
     "frontier-models-llama-qwen-kimi": {
@@ -902,7 +1072,7 @@
         "minimax m2.5",
         "glm-5"
       ],
-      "label": "Frontier models \u2014 open/Asia/Microsoft MAI (Microsoft MAI-Thinking-1 + MAI-Code/Image/Voice at Build 2026, MiniMax M3 open-weight 1M-context, Qwen3.6 / Kimi / Gemma 4 local)",
+      "label": "Frontier models — open/Asia/Microsoft MAI (Microsoft MAI-Thinking-1 + MAI-Code/Image/Voice at Build 2026, MiniMax M3 open-weight 1M-context, Qwen3.6 / Kimi / Gemma 4 local)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-06-06",
@@ -924,12 +1094,15 @@
         "search toolkit",
         "magistral",
         "pixtral",
-        "devstral"
+        "devstral",
+        "ocr 4",
+        "mistral ocr 4",
+        "le chat connectors"
       ],
-      "label": "Frontier models \u2014 Mistral (Mistral Small 4 unified 119B Apache-2.0 reasoning+vision+code, open Search Toolkit RAG, Les Ulis inference facility)",
+      "label": "Frontier models — Mistral (Mistral Small 4 unified 119B Apache-2.0 reasoning+vision+code, open Search Toolkit RAG, Les Ulis inference facility)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
-      "_last_updated": "2026-05-23",
+      "_last_updated": "2026-06-25",
       "_news_cleaned": true
     },
     "frontier-models-deepseek": {
@@ -945,7 +1118,7 @@
         "high-flyer",
         "deepseek harness"
       ],
-      "label": "Frontier models \u2014 DeepSeek (60% OpenRouter share, 9x cost gap, Beijing 'Harness' team, V4-Pro 75% discount through May 31)",
+      "label": "Frontier models — DeepSeek (60% OpenRouter share, 9x cost gap, Beijing 'Harness' team, V4-Pro 75% discount through May 31)",
       "_seeded_on": "2026-05-22",
       "_llm_enriched": true,
       "_last_updated": "2026-05-23",
@@ -981,12 +1154,36 @@
         "stupid prices",
         "artificial analysis open-weights",
         "agentic harness eval",
-        "fixed-budget loop"
+        "fixed-budget loop",
+        "apertus",
+        "sovereign ai",
+        "nemotron 3 ultra",
+        "open foundation model",
+        "minimal downside to switching",
+        "switching to open models",
+        "krea 2",
+        "vibethinker",
+        "open-source ai is the only way",
+        "open is the threat to closed",
+        "reflection ai",
+        "spacex reflection",
+        "minimax m2.5",
+        "nemotron 3",
+        "colossus tenant",
+        "flight to chinese models",
+        "postgresql vs oracle",
+        "chinese labs out-innovating",
+        "deepseek still publishing",
+        "deepseek v4 pro",
+        "asian startups launch mythos-like",
+        "apex-1-flash",
+        "rtx 5070 finetune",
+        "routes around us gating"
       ],
-      "label": "Open-weight cost parity (GLM-5.2 tops Artificial Analysis open-weights at 'stupid prices' ~Opus-4.7 quality; open-artifacts bonanza Gemma 4 Apache-2.0/DeepSeek V4/Kimi K2.6; open-vs-closed gap argued overstated via fixed-budget vs agentic-harness eval; MiniMax M3 59.0% SWE-Bench Pro, Tencent Hunyuan Hy3, AI sticker shock)",
+      "label": "Open-weight cost parity / flight-to-open (US per-org gating of GPT-5.6 + Mythos accelerates the predicted 'flight to Chinese/open models' — 'like PostgreSQL vs Oracle'; DeepSeek keeps publishing (DSpark) while US labs go quiet, v4 pro ~1/4 the price; Asian startups ship Mythos-like models within a day; Apex-1-flash 4B finetuned on a single RTX 5070; GLM-5.2 strongest text-only open-weights)",
       "_seeded_on": "2026-05-29",
       "_llm_enriched": true,
-      "_last_updated": "2026-06-17"
+      "_last_updated": "2026-06-27"
     }
   }
 }

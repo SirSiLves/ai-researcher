@@ -6,19 +6,25 @@
   "region": "cn",
   "blog_url_hint": "https://research.baidu.com/Blog",
   "first_seen": "2026-04-04",
-  "last_seen": "2026-04-06",
-  "total_mentions": 3,
-  "distinct_days": 3,
+  "last_seen": "2026-06-26",
+  "total_mentions": 12,
+  "distinct_days": 5,
   "distinct_source_types": [
+    "daily_synthesis",
+    "hackernews",
     "tech_news"
   ],
   "mentions_by_source_type": {
-    "tech_news": 3
+    "tech_news": 3,
+    "daily_synthesis": 14,
+    "hackernews": 4
   },
   "mentions_by_date": {
     "2026-04-06": 1,
     "2026-04-05": 1,
-    "2026-04-04": 1
+    "2026-04-04": 1,
+    "2026-06-24": 6,
+    "2026-06-26": 3
   },
   "aliases": [
     "Baidu"
@@ -29,29 +35,86 @@
     "…ing is back and running a weekend AI-app build sprint. - **[Baidu Apollo Go robotaxi mass system glitch in China](https://www.theneuron.ai/explainer-articl…  (news/2026/04/2026-04-04.md)"
   ],
   "topic_mix": {
-    "frontier-models-openai": 74,
-    "frontier-models-anthropic": 49,
-    "mythos-cyber-governance-cascade": 48,
-    "ai-coding-agents": 21,
-    "frontier-models-google": 17,
-    "agent-sdks": 14,
-    "frontier-models-mistral": 13,
-    "frontier-models-deepseek": 12,
-    "agent-platforms-enterprise": 7,
-    "mcp-adoption": 4,
+    "frontier-models-openai": 112,
+    "frontier-models-anthropic": 87,
+    "document-intelligence": 86,
+    "mythos-cyber-governance-cascade": 66,
+    "frontier-models-mistral": 54,
+    "open-weight-cost-pressure": 44,
+    "frontier-models-llama-qwen-kimi": 37,
+    "ai-coding-agents": 35,
+    "agent-sdks": 24,
+    "frontier-models-google": 24,
+    "eu-ai-act": 20,
+    "frontier-models-deepseek": 19,
+    "agent-platforms-enterprise": 17,
+    "inference-cost-economics": 13,
+    "mcp-adoption": 12,
+    "agentic-retrieval": 11,
+    "ai-platform-distribution": 10,
+    "edge-inference": 7,
+    "swe-bench": 6,
+    "agent-memory": 5,
+    "agent-skills-wave": 5,
+    "vector-db-market": 5,
+    "vendor-governance-business-line": 5,
+    "disaggregated-serving": 5,
+    "evaluation-gap": 4,
+    "iso-42001": 4,
     "vertical-agents-finance": 3,
     "implementation-revenue": 3,
-    "frontier-models-llama-qwen-kimi": 3,
     "context-engineering": 2,
-    "ai-platform-distribution": 1,
-    "agent-memory": 1,
-    "agentic-retrieval": 1,
-    "edge-inference": 1,
-    "inference-cost-economics": 1,
-    "evaluation-gap": 1,
-    "open-weight-cost-pressure": 1
+    "swiss-ai-context": 2,
+    "ai-vendor-trust-friction": 2
   },
-  "radar_appearances": [],
+  "radar_appearances": [
+    {
+      "date": "2026-06-24",
+      "topics": [
+        {
+          "topic_id": "document-intelligence",
+          "topic_label": "Document intelligence / OCR-as-RAG-ingestion (Mistral OCR 4 self-hostable SOTA + Baidu Unlimited OCR open-source, DeepSeek-OCR lineage, structured ingestion layer for enterprise RAG)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "edge-inference",
+          "topic_label": "Edge inference (Gemma 4 QAT ~1.1GB on-device video/audio-aware via litert-lm, Microsoft VibeVoice open voice, Ministral 3 3B/8B/14B Apache-2.0, Ollama local runtime)",
+          "sector": "Methods & research",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "open-weight-cost-pressure",
+          "topic_label": "Open-weight cost parity (GLM-5.2 'most powerful text-only open-weights LLM' / 'step change for open agents'; Apertus sovereign model 529pts HN; NVIDIA Nemotron 3 Ultra 550B fully open; 'minimal downside to switching to open models' 396pts)",
+          "sector": "Models & capabilities",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "frontier-models-llama-qwen-kimi",
+          "topic_label": "Frontier models — open/Asia/Microsoft MAI (Microsoft MAI-Thinking-1 + MAI-Code/Image/Voice/Transcribe at Build 2026 ~10x tokens/$, MiniMax M3 open-weight 59% SWE-Bench Pro + 1M context, Gemma 4 QAT local)",
+          "sector": "Models & capabilities",
+          "stage": "emerging"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-26",
+      "topics": [
+        {
+          "topic_id": "document-intelligence",
+          "topic_label": "Document intelligence / OCR-as-RAG-ingestion (Mistral OCR 4 self-hostable SOTA — bounding boxes, confidence scores, 170 langs, tops OlmOCRBench 85.20; Baidu Unlimited-OCR open one-shot long-horizon; opendatalab MinerU +944/day — document parsing is the day's race)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "open-weight-cost-pressure",
+          "topic_label": "Open-weight cost pressure (Z.ai GLM-5.2 MIT-licensed 'first open model that feels right' in coding harnesses ~204d behind Opus 4.5 — Lambert/Willison; Reflection AI $6.3B SpaceX/Colossus deal for open frontier models; Krea 2 12B open image SOTA; 'open-source is the only way forward')",
+          "sector": "Models & capabilities",
+          "stage": "emerging"
+        }
+      ]
+    }
+  ],
   "hot_events": [],
   "classification_history": [
     {
@@ -76,6 +139,14 @@
     },
     {
       "date": "2026-05-19",
+      "tier": "dormant"
+    },
+    {
+      "date": "2026-06-25",
+      "tier": "watch"
+    },
+    {
+      "date": "2026-06-26",
       "tier": "dormant"
     }
   ],
