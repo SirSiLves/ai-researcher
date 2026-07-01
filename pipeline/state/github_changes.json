@@ -1,16 +1,17 @@
 {
-  "generated_at": "2026-06-27T18:24:19+00:00",
+  "generated_at": "2026-07-01T20:27:57+02:00",
   "source_log": "github_changes.log",
-  "total_mutations": 37,
+  "total_mutations": 38,
   "skipped_unparseable": 0,
   "by_verb": {
+    "deep-watch-demote": 1,
     "expire-remove": 1,
     "hot-event-add": 1,
     "promote-add": 35
   },
   "by_month": {
     "2026-05": 36,
-    "2026-06": 1
+    "2026-06": 2
   },
   "active_auto_added": [
     {
@@ -130,21 +131,6 @@
       "key": [
         "watched_repos",
         "affaan-m/ECC"
-      ],
-      "tier_lifetime": "auto_added"
-    },
-    {
-      "ts": "2026-05-18T18:42:23+00:00",
-      "ts_date": "2026-05-18",
-      "verb": "promote-add",
-      "target_section": "watched_repos",
-      "subject": "affaan-m/everything-claude-code",
-      "expires_on": null,
-      "reason": "4 distinct trending days in 14d",
-      "blog_urls_raw": null,
-      "key": [
-        "watched_repos",
-        "affaan-m/everything-claude-code"
       ],
       "tier_lifetime": "auto_added"
     },
@@ -560,7 +546,25 @@
     }
   ],
   "proven_entries": [],
-  "deep_watch_active": [],
+  "deep_watch_active": [
+    {
+      "ts": "2026-05-18T18:42:23+00:00",
+      "ts_date": "2026-05-18",
+      "verb": "promote-add",
+      "target_section": "watched_repos",
+      "subject": "affaan-m/everything-claude-code",
+      "expires_on": null,
+      "reason": "4 distinct trending days in 14d",
+      "blog_urls_raw": null,
+      "key": [
+        "watched_repos",
+        "affaan-m/everything-claude-code"
+      ],
+      "tier_lifetime": "deep_watch",
+      "demoted_ts": "2026-06-30T18:34:20+00:00",
+      "demoted_reason": "soft-cap: silent 30d, least-recent over cap=80"
+    }
+  ],
   "legacy_log_only_count": 0,
   "legacy_log_only_suppressed_count": 0,
   "legacy_log_only_cutoff_ts": "2026-05-14T13:02:20",
@@ -934,6 +938,16 @@
       "subject": "Lum1104/Understand-Anything",
       "expires_on": null,
       "reason": "hot-event TTL elapsed (was 2026-06-24)",
+      "blog_urls_raw": null
+    },
+    {
+      "ts": "2026-06-30T18:34:20+00:00",
+      "ts_date": "2026-06-30",
+      "verb": "deep-watch-demote",
+      "target_section": "watched_repos",
+      "subject": "affaan-m/everything-claude-code",
+      "expires_on": null,
+      "reason": "soft-cap: silent 30d, least-recent over cap=80",
       "blog_urls_raw": null
     }
   ],
