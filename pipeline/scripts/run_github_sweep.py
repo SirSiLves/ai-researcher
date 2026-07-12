@@ -43,13 +43,35 @@ ROOT = REPO_ROOT  # back-compat for any `path.relative_to(ROOT)` calls
 TODAY = os.environ.get("TODAY") or date.today().isoformat()
 NOW_ISO = datetime.now().astimezone().isoformat(timespec="seconds")
 
-# Match a trending-repo H3 line in a github/.../*.md file:
-#   ### [owner/name](https://github.com/owner/name) — `Lang` · 12,345 stars (+678 today)
-TRENDING_LINE_RE = re.compile(
-    r"^###\s+\[([A-Za-z0-9._-]+/[A-Za-z0-9._-]+)\]\(https?://github\.com/[^)]+\)"
-    r".*?·\s*([\d,]+)\s+stars?\s*(?:\(\+([\d,]+)\s+today\))?",
-    re.MULTILINE,
+# Match a trending / watch-list repo line in a github/.../*.md file. The
+# ai-github collector (per its SKILL §5 template) emits BOLD lines, e.g.:
+#   **[owner/name](https://github.com/owner/name)** — `Lang` · 12,345 stars (+678 today, +6.1k 7d)
+#   **[owner/name](https://github.com/owner/name)** — ~164,000 stars (+8.5k 7d)
+# Older files used an H3 heading (### [owner/name](url) — ...); we accept both,
+# plus an optional list-bullet prefix, an optional `~` before the count, and
+# k/M suffixes. Star count and "+N today" delta are OPTIONAL — the repo name is
+# the only required capture, since the distinct-trending-day count is the
+# primary signal for the promotion gate.
+REPO_LINE_RE = re.compile(
+    r"^\s*(?:###\s+|[-*]\s+)?\*{0,2}"
+    r"\[([A-Za-z0-9._-]+/[A-Za-z0-9._-]+)\]\(https?://github\.com/[^)]+\)"
 )
+STARS_RE = re.compile(r"~?\s*([\d.,]+[kKmM]?)\s+stars?\b", re.IGNORECASE)
+TODAY_DELTA_RE = re.compile(r"\(\s*\+\s*([\d.,]+[kKmM]?)\s+today\b")
+
+
+def _parse_count(s):
+    """Parse a star/delta token like '12,345', '~164,000', '6.1k', '2.3M' -> int."""
+    s = s.strip().lstrip("~+").strip().replace(",", "")
+    mult = 1
+    if s and s[-1] in "kK":
+        mult, s = 1_000, s[:-1]
+    elif s and s[-1] in "mM":
+        mult, s = 1_000_000, s[:-1]
+    try:
+        return int(round(float(s) * mult))
+    except ValueError:
+        return 0
 
 DATE_FROM_PATH_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
@@ -66,14 +88,29 @@ def iter_github_files(root: Path | None = None):
 
 
 def parse_trending_lines(text):
-    """Parse ### entries from a github/.../*.md file. Returns list of (repo, stars, delta)."""
-    out = []
-    for m in TRENDING_LINE_RE.finditer(text):
+    """Parse repo lines from a github/.../*.md file -> list of (repo, stars, delta).
+
+    Robust to both the current bold format and the legacy ### heading format.
+    Deduped per file (a repo appearing in both the trending and watch-list-mover
+    sections counts once), keeping the max star count and max today-delta seen.
+    """
+    per_repo = {}
+    for line in text.splitlines():
+        m = REPO_LINE_RE.match(line)
+        if not m:
+            continue
         repo = m.group(1)
-        stars = int(m.group(2).replace(",", ""))
-        delta = int(m.group(3).replace(",", "")) if m.group(3) else 0
-        out.append((repo, stars, delta))
-    return out
+        sm = STARS_RE.search(line)
+        stars = _parse_count(sm.group(1)) if sm else 0
+        dm = TODAY_DELTA_RE.search(line)
+        delta = _parse_count(dm.group(1)) if dm else 0
+        prev = per_repo.get(repo)
+        if prev is None:
+            per_repo[repo] = [stars, delta]
+        else:
+            prev[0] = max(prev[0], stars)
+            prev[1] = max(prev[1], delta)
+    return [(repo, s, d) for repo, (s, d) in per_repo.items()]
 
 
 def main():
