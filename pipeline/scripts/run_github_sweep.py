@@ -441,7 +441,6 @@ def main():
 
     # === Step 9: write change-log markdown ===
     out_md = DATA_ROOT / "github_candidates" / TODAY[:7].replace("-", "/") / f"{TODAY}.md"
-    out_md.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         f"# GitHub sweep — {TODAY}\n",
         ("_Daily change log of trending-repo discoveries. The pipeline auto-extends "
@@ -497,6 +496,7 @@ def main():
     lines.append(f"- Files scanned: {len(files)}")
 
     if not args.dry_run:
+        out_md.parent.mkdir(parents=True, exist_ok=True)
         out_md.write_text("\n".join(lines))
         rel_path = out_md.relative_to(ROOT).as_posix()
         index_line = (f"- [{TODAY}]({rel_path}) — "
@@ -504,8 +504,9 @@ def main():
                       f"pending: {len(pending)}; watch: {len(watch_repos)}; "
                       f"watched_repos: {len(watched)} / deep_watch: {len(deep_watch)}")
         upsert_index_marker_line(INDEX_MD, "GITHUB", TODAY, index_line)
+    wrote = ("[dry-run] would write" if args.dry_run else "wrote")
     print(f"[github_sweep] done. applied {applied_count} promotions, {hot_count} hot events, "
-          f"{revived_count} revivals. {len(appearances)} repos seen. wrote {out_md.relative_to(ROOT)}.",
+          f"{revived_count} revivals. {len(appearances)} repos seen. {wrote} {out_md.relative_to(ROOT)}.",
           file=sys.stderr)
 
 
