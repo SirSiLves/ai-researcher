@@ -60,3 +60,14 @@ data/.cache/
 # Local one-off scratch scripts that the vendor-sweep agent writes when
 # debugging — short-lived and not source-of-truth.
 pipeline/scripts/_vendor_sweep_run.py
+pipeline/scripts/_tmp_*
+pipeline/scripts/gen_vendor_md.py
+
+# GitHub-collector scratch workspaces (fetch/parse/update one-offs + raw
+# fetch results). Regenerated every run.
+data/.gh_*
+
+# Permission-probe leftovers from sandboxed runs.
+pipeline/state/.perm_probe
+pipeline/state/_perm_test*
+pipeline/state/_ovtest*
