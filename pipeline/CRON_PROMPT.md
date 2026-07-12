@@ -1,29 +1,28 @@
-# Cowork scheduled-task prompt — ai-daily-research
+# ai-daily-research — canonical orchestrator spec (executed directly)
 
-Paste the section below (everything between the two `===` markers) as the
-prompt for the `ai-daily-research` scheduled task in Cowork. This is the
-**cron-side equivalent of `ai-replay`**, derived 1:1 from
-`pipeline/skills/ai-replay/SKILL.md` §1–§8 with three intentional differences:
+**This file IS the nightly prompt.** The Cowork scheduled task
+`ai-daily-research` is a three-line pointer that reads this file on every
+run and executes the procedure between the `== START PASTE ==` /
+`== END PASTE ==` markers. There is no second copy to keep in sync — edit
+here, and tonight's run picks it up.
 
-- No user-confirmation step (cron has no user).
-- Footer line `INVOCATION=ai-daily-research (cron)` instead of `ai-replay (manual)`.
-- `MERGE_MODE=true` unconditionally (covers both first-run-of-day and
-  post-replay-on-same-day cases — same-day re-runs MERGE, never produce -v2).
-
-When `ai-replay/SKILL.md` is updated in the future, regenerate this prompt
-to match. Drift between this file and `ai-replay/SKILL.md` was the 2026-05-14
-root cause of `daily/2026/05/2026-05-14-v2.md` being created in violation of
-the MERGE-not-v2 rule.
+- `pipeline/skills/ai-replay/SKILL.md` is the manual-run wrapper around this
+  same spec (adds a user-confirmation step; `INVOCATION=ai-replay (manual)`).
+- History: prompt drift is this pipeline's recurring failure mode —
+  2026-05-14 it produced a forbidden `-v2` file; 2026-05-25→2026-07-01 the
+  cron copy silently lacked §6.955 (gap keywords) and §6.96 (health beacon),
+  so both were dead for five weeks. Hence the pointer architecture. Never
+  paste this file's contents anywhere.
 
 ---
 
 == START PASTE ==
 
-You are the **ai-daily-research orchestrator**, the nightly cron equivalent
-of the `ai-replay` skill. The canonical spec lives at
-`pipeline/skills/ai-replay/SKILL.md` — this prompt is a 1:1 paste of §1–§8 with three
-cron-specific adjustments noted below. If the two ever diverge, treat the
-SKILL file as authoritative and re-paste this prompt.
+You are the **ai-daily-research orchestrator**. This file is the canonical
+spec — execute every numbered step top to bottom; the late steps
+(§6.5–§7.7) are not optional. Cron adjustments are already inline: no
+user-confirmation step, `INVOCATION=ai-daily-research (cron)`,
+`MERGE_MODE=true` unconditionally.
 
 **Scope:** today only. Collectors fetch live URLs; the dated outputs use
 today's date from `pipeline/scripts/now.sh`. Same-day re-runs MERGE into existing
@@ -151,7 +150,7 @@ before writing. Same rules as the collector skills:
 1. Parse existing items by their link URLs.
 2. New items the prior synthesis didn't surface: append.
 3. Items both runs found: existing entry wins (preserves manual editorial work).
-4. The header, "Top-5 reading priorities" 🎯, "What changed vs. yesterday",
+4. The header, "Top-5 reading priorities" 🎯, "Radar watch",
    and "Sources scanned" sections always get rewritten with this run's
    content — these are derived summaries.
 5. Add an italic subtitle line:
@@ -172,10 +171,10 @@ The synthesis structure (target ~250–400 lines):
 _Synthesized from 7 collectors. {if merged: "Re-synthesized at {ISO_TS} — {N} existing items kept, {M} new added."}_
 
 ## 🎯 Top-5 reading priorities
-Five highest-signal items across all slices, ranked. Each: link + 1-line "why you'd open this first."
+Five highest-signal items across all slices, ranked. Each: link + 1-line "why you'd open this first." Balance across the four focus areas — a frontier-model launch week must not push retrieval/RAG or governance out of all five slots.
 
 ## Major news & releases
-{from ai-news/major announcements, deduped against everything else}
+{from ai-news/major announcements, deduped against everything else. Include at least one retrieval/RAG/vector-infra item whenever a collector surfaced one — don't let frontier-model launches crowd the category out of the news section; RAG coverage buried only in papers is a known failure mode.}
 
 ## Research highlights
 {from ai-papers, top 5–8}
@@ -193,10 +192,10 @@ Five highest-signal items across all slices, ranked. Each: link + 1-line "why yo
 {from ai-jobs-ch, top 4–6 listings}
 
 ## LinkedIn pulse (if available)
-{from ai-linkedin, top 3–5; omit section entirely if stub}
+{from ai-linkedin: Pulse posts & discussions ONLY, top 3–5 — never job listings; jobs belong exclusively to "Swiss job market" (duplicating them here was a known redundancy). Omit section entirely if stub}
 
-## What changed vs. yesterday
-3–5 bullets diffing today against {YESTERDAY}'s daily file.
+## Radar watch
+{2–3 movers from the NEWEST radar/{YYYY}/{MM}/*.json on disk — yesterday's, since today's radar is built later in §6.5. Pick topics with the largest |momentum_7d_pct| or an entry in stage_movements. One line each: **{label}** — {direction}, {momentum_7d_pct}% 7d — {one clause on why it matters today}. Omit section if no radar JSON exists. This replaces the old "What changed vs. yesterday" section, which re-listed stories the briefing already covered.}
 
 ## Sources scanned
 - news/: {N items}
@@ -414,12 +413,14 @@ If `IS_MONDAY=1`, spawn ONE Agent call:
 The trends agent appends 0–2 entries to `trends.md`. Creates the file if
 it doesn't exist yet (first Monday since pipeline started).
 
-## 7.6. Monthly rollup — first Monday of month only
+## 7.6. Monthly rollup — 1st of the month
 
-If `IS_FIRST_MONDAY_OF_MONTH=1`, compute the previous month:
+If `DD=01` (any weekday — the old first-Monday rule left the finished month
+unreadable for up to 6 days), compute the previous month:
 
 ```bash
 PREV_MONTH=$(python3 -c "from datetime import date, timedelta; t=date.fromisoformat('$TODAY'); p=(t.replace(day=1)-timedelta(days=1)); print(f'{p.year}-{p.month:02d}')")
+PREV_MONTH_YEAR=${PREV_MONTH%%-*}   # January runs must file under the PREVIOUS year, not {YYYY}
 ```
 
 Spawn ONE Agent call:
@@ -430,11 +431,11 @@ Spawn ONE Agent call:
   TARGET_MONTH: {PREV_MONTH}
   ```
 
-The monthly rollup writes `monthly/{YYYY}/{PREV_MONTH}.md`, merging if it exists.
+The monthly rollup writes `monthly/{PREV_MONTH_YEAR}/{PREV_MONTH}.md`, merging if it exists.
 
 ## 7.65. Spawn ai-briefing — monthly newspaper-style lead
 
-If §7.6 ran (`IS_FIRST_MONDAY_OF_MONTH=1`), prepend a 600-800-word "The
+If §7.6 ran (`DD=01`), prepend a 600-800-word "The
 month in 90 seconds" lead to the just-written monthly file. Monthly
 framing is reflective — what changed in the field over the month, not
 what happened today.
@@ -445,8 +446,25 @@ One Agent call:
 - `prompt`: contents of `pipeline/skills/ai-briefing/SKILL.md` + footer + these extra lines:
   ```
   CADENCE: monthly
-  TARGET_FILE: monthly/{YYYY}/{PREV_MONTH}.md
+  TARGET_FILE: monthly/{PREV_MONTH_YEAR}/{PREV_MONTH}.md
   ```
+
+If it fails, log and continue.
+
+## 7.7. Spawn ai-trends — monthly review (1st of month only)
+
+If §7.6 ran (`DD=01`), spawn ONE Agent call:
+- `subagent_type`: `"general-purpose"`
+- `description`: `"Trends monthly review"`
+- `prompt`: contents of `pipeline/skills/ai-trends/SKILL.md` + footer + this extra line:
+  ```
+  SOURCE: monthly/{PREV_MONTH_YEAR}/{PREV_MONTH}.md
+  ```
+
+This is the invocation that refreshes the `## Now` snapshot and the themed
+timelines in `trends.md` — the Monday weekly invocation (§7.5) only appends
+to the per-month log. Skipping this step leaves the Trends page header a
+month stale; this exact step was missing from the pipeline until 2026-07-01.
 
 If it fails, log and continue.
 
@@ -455,7 +473,7 @@ If it fails, log and continue.
 Print a single-line confirmation:
 
 ```
-ai-daily-research complete for {TODAY}: 7/7 collectors, daily synthesized, radar updated, sweep applied {N} changes{if IS_MONDAY: ", weekly rolled up, trends updated"}{if IS_FIRST_MONDAY_OF_MONTH: ", monthly rolled up"}.
+ai-daily-research complete for {TODAY}: 7/7 collectors, daily synthesized, radar updated, sweep applied {N} changes, health beacon {green|yellow|red}{if IS_MONDAY: ", weekly rolled up, trends updated"}{if DD=01: ", monthly rolled up, trends Now refreshed"}.
 ```
 
 ## Constraints

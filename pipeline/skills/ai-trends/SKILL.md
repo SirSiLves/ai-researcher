@@ -1,6 +1,6 @@
 ---
 name: ai-trends
-description: Long-term trend tracker — maintains trends.md as a three-layer timeline (Now snapshot, themed evolution arcs, per-month audit log). Spawned by the orchestrator after weekly (Mondays) and monthly (1st Monday) runs.
+description: Long-term trend tracker — maintains trends.md as a three-layer timeline (Now snapshot, themed evolution arcs, per-month audit log). Spawned by the orchestrator after weekly (Mondays) and monthly (1st of month) runs.
 ---
 
 > **Path resolution.** CWD when this skill runs is `data/`. Every cadence — `daily/`, `weekly/`, `monthly/`, `radar/`, `orgs/`, `reports/`, `news/`, `papers/`, `blogs/`, `jobs/`, `linkedin/`, `github/`, `hackernews/`, `vendor_candidates/`, `keyword_candidates/`, `github_candidates/`, `index.md` — is a sibling directly under `data/`. Output paths are bare (no `publish/` or `research/` prefix).
