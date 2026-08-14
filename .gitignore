@@ -71,3 +71,32 @@ data/.gh_*
 pipeline/state/.perm_probe
 pipeline/state/_perm_test*
 pipeline/state/_ovtest*
+pipeline/state/.probe_vendor_test.txt
+pipeline/state/_probe_test.txt
+pipeline/state/.wtest*
+pipeline/scripts/.wtest*
+data/.wtest*
+pipeline/state/keyword_judge_verdicts.json.wtest
+
+# Collector scratch helpers. The sandboxed FS blocks unlink, so finished runs
+# truncate these to a one-line tombstone instead of removing them.
+data/.blogs_feeds*.py
+data/.hn_scan_tmp.py
+data/_gh_*.py
+data/_sweep_apply.py
+data/.briefing_lead_*.tmp
+pipeline/scripts/_hn_*_tmp.py
+
+# Keyword-judge one-off build/extract scripts, named per sweep date. The
+# persistent state is discovered_keywords.json; these only reconstruct a single
+# run's verdicts.
+pipeline/state/_kwjudge_*
+
+# Interrupted-write leftovers and dated state snapshots. github_stars.json and
+# topic_keywords.json are the source of truth; these are partial or superseded.
+pipeline/state/github_stars.json.new
+pipeline/state/github_stars.json.tmp*
+pipeline/state/topic_keywords.json.bak.*
+
+# Pre-backfill state snapshots — tens of MB of local rollback copies.
+pipeline/state_backups/
