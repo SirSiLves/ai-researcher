@@ -6,63 +6,82 @@
   "region": null,
   "blog_url_hint": null,
   "first_seen": "2026-05-27",
-  "last_seen": "2026-06-02",
-  "total_mentions": 3,
-  "distinct_days": 2,
+  "last_seen": "2026-08-13",
+  "total_mentions": 5,
+  "distinct_days": 4,
   "distinct_source_types": [
-    "paper",
-    "daily_synthesis"
+    "daily_synthesis",
+    "paper"
   ],
   "mentions_by_source_type": {
-    "paper": 2,
+    "paper": 4,
     "daily_synthesis": 1
   },
   "mentions_by_date": {
     "2026-06-01": 1,
-    "2026-06-02": 2
+    "2026-06-02": 2,
+    "2026-08-11": 1,
+    "2026-08-13": 1
   },
   "aliases": [
     "fudan"
   ],
-  "context_samples": [],
+  "context_samples": [
+    "e Assurance** — You Lu, Xinyu Huang, Bihuan Chen, Xin Peng (Fudan). _Takeaway:_ Runtime assurance for agent skill execution —  (papers/2026/08/2026-08-11.md)",
+    "on](https://arxiv.org/abs/2608.10692)** — Junjie Ye et al. (Fudan) — eval for assistants that must stitch context across a us  (papers/2026/08/2026-08-13.md)"
+  ],
   "topic_mix": {
-    "ai-coding-agents": 53,
-    "frontier-models-anthropic": 49,
-    "frontier-models-openai": 49,
-    "agent-platforms-enterprise": 29,
-    "eu-ai-act": 18,
+    "ai-coding-agents": 58,
+    "frontier-models-anthropic": 55,
+    "frontier-models-openai": 50,
+    "agent-platforms-enterprise": 34,
+    "ai-platform-distribution": 32,
+    "agentic-retrieval": 28,
+    "open-weight-cost-pressure": 23,
+    "agent-harness-engineering": 22,
+    "agent-sdks": 21,
+    "agent-memory": 20,
+    "eu-ai-act": 19,
+    "inference-cost-economics": 19,
+    "mcp-adoption": 18,
     "frontier-models-google": 18,
     "frontier-models-mistral": 18,
-    "agent-sdks": 14,
-    "open-weight-cost-pressure": 13,
-    "ai-platform-distribution": 13,
-    "inference-cost-economics": 12,
-    "mcp-adoption": 12,
+    "evaluation-gap": 17,
+    "vector-db-market": 16,
+    "multi-agent-coordination": 11,
+    "frontier-models-llama-qwen-kimi": 11,
+    "knowledge-graphs": 10,
+    "swe-bench": 10,
     "mythos-cyber-governance-cascade": 10,
-    "agentic-retrieval": 9,
-    "frontier-models-llama-qwen-kimi": 8,
-    "vector-db-market": 8,
-    "swe-bench": 8,
-    "multi-agent-coordination": 6,
-    "agent-memory": 6,
+    "agent-identity-authorization": 9,
+    "long-context-vs-rag": 8,
+    "document-intelligence": 8,
+    "agent-skills-wave": 8,
+    "sovereign-ai-infrastructure": 7,
+    "tool-use-standards": 6,
+    "edge-inference": 6,
+    "automated-ai-research": 6,
+    "context-engineering": 6,
+    "semiconductor-supply-chain": 6,
     "frontier-models-deepseek": 6,
-    "document-intelligence": 6,
-    "ai-engineer-hiring": 4,
+    "a2a-protocol": 5,
     "iso-42001": 4,
-    "long-context-vs-rag": 4,
+    "ai-engineer-hiring": 4,
     "ai-security-agents": 4,
-    "agent-skills-wave": 4,
+    "vendor-governance-business-line": 4,
     "vertical-agents-finance": 4,
-    "a2a-protocol": 3,
+    "content-provenance-copyright": 3,
     "nist-ai-rmf": 2,
-    "tool-use-standards": 2,
+    "agent-execution-control": 2,
+    "ai-vendor-trust-friction": 2,
+    "mcp-security": 2,
     "ai-safety-institute": 2,
+    "voice-realtime-agents": 2,
     "swiss-ai-context": 2,
-    "edge-inference": 2,
-    "mcp-security": 1,
-    "ai-vendor-trust-friction": 1,
+    "compute-capex-financing": 1,
+    "frontier-safety-oversight": 1,
     "ai-corporate-token-mandate-bubble": 1,
-    "vendor-governance-business-line": 1
+    "embodied-ai-robotics": 1
   },
   "radar_appearances": [
     {
@@ -157,6 +176,63 @@
           "topic_label": "Multi-agent coordination (MARLIN inference RL, EngiAI multi-agent, RL via orchestration traces)",
           "sector": "Agents & infrastructure",
           "stage": "consolidating"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-11",
+      "topics": [
+        {
+          "topic_id": "mcp-security",
+          "topic_label": "MCP & tool-surface security (first large-scale dynamic audit finds 380 of 414 internet-facing MCP servers with no OAuth at all and hundreds exposing unauthenticated shell execution; AWS puts the reachable population above 21,000 and proposes deterministic per-agent authorization via AgentCore Gateway and Cedar; the finalized 2026-07-28 spec moved authorization out of the core into extensions)",
+          "sector": "Agent security & containment",
+          "stage": "emerging"
+        },
+        {
+          "topic_id": "agent-skills-wave",
+          "topic_label": "Agent skills wave (a pure taste artifact — cathrynlavery/diagram-design, 29 editorial diagram types pitched as 'no Mermaid-slop' — takes #1 on the aggregate board outright on first appearance, displacing prime-agent, with Leonxlnx/taste-skill in the same genre still adding ~390/day off-board; Anthropic, Google and Vercel all now ship first-party skills packs; three papers in one arXiv batch attack skills as a supply chain — SkillSentry runtime assurance, ElasticBack conditional backdoors, query-only trajectory poisoning)",
+          "sector": "Agents & infrastructure",
+          "stage": "consolidating"
+        },
+        {
+          "topic_id": "agent-memory",
+          "topic_label": "Agent memory (four independent papers in one batch: MemoryCPT makes the cost/quality trade-off an explicit axis, scrub-jay episodic caching supplies a what/where/when design pattern, Text-to-SQL crystallization asks whether test-time search can be banked as reusable memory, and DocMemo replaces static top-K with tri-level memory plus Bayesian belief updating)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-13",
+      "topics": [
+        {
+          "topic_id": "agent-skills-wave",
+          "topic_label": "The Agent Skills wave (mattpocock/skills +15,409 in seven days, diagram-design +4,475 from a standing start, kepano/obsidian-skills taking the format out of the dev niche, SkillZip on evaluation-free skill compression)",
+          "sector": "Agents & infrastructure",
+          "stage": "consolidating"
+        },
+        {
+          "topic_id": "agent-memory",
+          "topic_label": "Agent memory (a transactional continuity kernel proposed instead of a memory store, EvoGraph-Mem's failure-aware editable graph, MAP-Graph provenance, the first public Agent Memory Leaderboard)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-14",
+      "topics": [
+        {
+          "topic_id": "agent-skills-wave",
+          "topic_label": "Agent skills wave (`cathrynlavery/diagram-design` posts the single largest daily gain on the whole board at +3,651 — 29 editorial diagram types for Claude Code, zero to 17k in days, so the skills-for-visual-output niche is opening; `mattpocock/skills` still holds the highest sustained 7-day gain at +7,560, and vertical packs like `scientific-agent-skills` mark the pattern maturing past generic skill dumps)",
+          "sector": "Agents & infrastructure",
+          "stage": "consolidating"
+        },
+        {
+          "topic_id": "agent-memory",
+          "topic_label": "Agent memory ('When Your Agent Opens the Chat App' finds agent-controlled search over raw logs rivals purpose-built memory structures — a direct argument against premature memory engineering — while RippleMem pushes the other way toward associative recollection, and OpenViking merges memory, RAG and skills into one store)",
+          "sector": "Agents & infrastructure",
+          "stage": "emerging"
         }
       ]
     }

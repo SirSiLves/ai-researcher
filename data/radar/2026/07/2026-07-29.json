@@ -1,0 +1,3859 @@
+{
+  "date": "2026-07-29",
+  "rolling_window_days": 30,
+  "ema_alpha_fast": 0.3,
+  "ema_alpha_slow": 0.05,
+  "prior_radar": "radar/2026/07/2026-07-27.json",
+  "_gap_handling": "No radar was produced for 2026-07-28 (the pipeline collected raw sources but never ran a synthesis). Rather than a single EMA step across a two-day gap, this run backfills the missed step: a raw score was computed for 2026-07-28 from that day's collector files, the EMA was advanced once with it, then advanced again with 2026-07-29's raw. raw_score_prior_day_backfilled carries the 07-28 value on each topic. Breadth actor sets were aged by 2/7 rather than 1/7 for the same reason.",
+  "sectors": [
+    {
+      "name": "Agents & infrastructure",
+      "topic_ids": [
+        "mcp-adoption",
+        "agent-execution-control",
+        "ai-coding-agents",
+        "ai-security-agents",
+        "agent-skills-wave",
+        "agent-sdks",
+        "agent-platforms-enterprise",
+        "agentic-retrieval",
+        "vector-db-market",
+        "agent-memory",
+        "multi-agent-coordination",
+        "tool-use-standards",
+        "agent-identity-authorization",
+        "mcp-security",
+        "document-intelligence"
+      ],
+      "first_seen": "2026-05-13",
+      "consecutive_low_days": 0,
+      "description": "MCP as shipped substrate one day after the stateless revision, agent runtimes and harnesses, retrieval and memory — plus a newly separable execution-control layer deciding what an agent is actually allowed to do",
+      "topic_count": 15,
+      "active_orgs": 127
+    },
+    {
+      "name": "Governance & market",
+      "topic_ids": [
+        "frontier-safety-oversight",
+        "eu-ai-act",
+        "vendor-governance-business-line",
+        "ai-vendor-trust-friction",
+        "ai-corporate-token-mandate-bubble",
+        "mythos-cyber-governance-cascade",
+        "global-ai-governance-blocs",
+        "implementation-revenue"
+      ],
+      "first_seen": "2026-05-13",
+      "consecutive_low_days": 0,
+      "description": "Regulation with a named regulator (Bundesnetzagentur), the escaped-agent cascade in full forensic detail, governance sold as a product line, and the market repricing the buildout",
+      "topic_count": 8,
+      "active_orgs": 89
+    },
+    {
+      "name": "Methods & research",
+      "topic_ids": [
+        "context-engineering",
+        "evaluation-gap",
+        "automated-ai-research"
+      ],
+      "first_seen": "2026-05-13",
+      "consecutive_low_days": 0,
+      "description": "Evaluation honesty as the binding constraint, context engineering beating fine-tuning on economics, and autonomous research producing publishable cryptanalysis",
+      "topic_count": 3,
+      "active_orgs": 37
+    },
+    {
+      "name": "Models & capabilities",
+      "topic_ids": [
+        "frontier-models-llama-qwen-kimi",
+        "open-weight-cost-pressure",
+        "inference-cost-economics",
+        "ai-platform-distribution",
+        "frontier-models-anthropic",
+        "frontier-models-openai",
+        "frontier-models-google",
+        "edge-inference",
+        "semiconductor-supply-chain",
+        "sovereign-ai-infrastructure",
+        "voice-realtime-agents"
+      ],
+      "first_seen": "2026-05-13",
+      "consecutive_low_days": 0,
+      "description": "Open-weight pressure from both ends of the political spectrum, request-level cost routing as the new engineering surface, voice and on-device as live modalities, and compute-plus-power as the hard floor",
+      "topic_count": 11,
+      "active_orgs": 85
+    }
+  ],
+  "sector_movements": [
+    {
+      "topic": "agent-execution-control",
+      "from": null,
+      "to": "Agents & infrastructure",
+      "reason": "New topic carved out today: nine papers over two days (HANDBOOK.md, COVENANT, SafeFlow, MTGuard, APPA, MemTX) plus microsoft/agent-governance-toolkit and Anthropic's containment post converge on one claim — a policy placed in context is not a control, so the mechanism belongs in the infrastructure layer"
+    },
+    {
+      "topic": "voice-realtime-agents",
+      "from": null,
+      "to": "Models & capabilities",
+      "reason": "Promoted out of background: huggingface/speech-to-speech +12% in a day, microsoft/VibeVoice open-weight frontier voice, airi's third day above +550, LiveKit past 20k, Fish Audio's $52M seed and a Swiss bank voice-GenAI role — the github collector calls voice the day's strongest cross-cutting theme"
+    }
+  ],
+  "sectors_dissolved_today": [],
+  "sectors_spawned_today": [],
+  "topic_clusters": [
+    {
+      "id": "agent-protocol-stack",
+      "name": "Agent protocol stack",
+      "topic_ids": [
+        "mcp-adoption",
+        "agent-execution-control",
+        "ai-security-agents",
+        "agent-sdks",
+        "tool-use-standards",
+        "agent-identity-authorization",
+        "mcp-security"
+      ],
+      "size": 7,
+      "first_seen": "2026-05-21",
+      "cluster_score_slow": 20.9,
+      "cluster_score_fast": 28.8,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 61,
+      "members_moving_together": true,
+      "_co_mention_evidence": "shared supporting_files (sample): news/2026/07/2026-07-28.md, papers/2026/07/2026-07-29.md, linkedin/2026/07/2026-07-29.md"
+    },
+    {
+      "id": "ai-coding-and-autonomous-research",
+      "name": "AI coding & autonomous research",
+      "topic_ids": [
+        "ai-coding-agents",
+        "agent-skills-wave",
+        "evaluation-gap",
+        "multi-agent-coordination",
+        "automated-ai-research"
+      ],
+      "size": 5,
+      "first_seen": "2026-05-21",
+      "cluster_score_slow": 27.6,
+      "cluster_score_fast": 33.7,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 60,
+      "members_moving_together": true,
+      "_co_mention_evidence": "shared supporting_files (sample): github/2026/07/2026-07-29.md, hackernews/2026/07/2026-07-29.md, blogs/2026/07/2026-07-29.md"
+    },
+    {
+      "id": "corporate-ai-procurement-sentiment",
+      "name": "Corporate AI procurement sentiment",
+      "topic_ids": [
+        "ai-vendor-trust-friction",
+        "ai-corporate-token-mandate-bubble"
+      ],
+      "size": 2,
+      "first_seen": "2026-05-21",
+      "cluster_score_slow": 15.4,
+      "cluster_score_fast": 18.6,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 20,
+      "members_moving_together": false,
+      "_co_mention_evidence": "shared supporting_files (sample): hackernews/2026/07/2026-07-29.md, news/2026/07/2026-07-29.md"
+    },
+    {
+      "id": "enterprise-services-build-out",
+      "name": "Enterprise services build-out",
+      "topic_ids": [
+        "agent-platforms-enterprise",
+        "vendor-governance-business-line",
+        "implementation-revenue"
+      ],
+      "size": 3,
+      "first_seen": "2026-05-21",
+      "cluster_score_slow": 19.2,
+      "cluster_score_fast": 24.7,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 40,
+      "members_moving_together": false,
+      "_co_mention_evidence": "shared supporting_files (sample): news/2026/07/2026-07-29.md, jobs/2026/07/2026-07-29.md, linkedin/2026/07/2026-07-29.md"
+    },
+    {
+      "id": "frontier-model-cadence",
+      "name": "Frontier model cadence",
+      "topic_ids": [
+        "frontier-models-llama-qwen-kimi",
+        "open-weight-cost-pressure",
+        "inference-cost-economics",
+        "ai-platform-distribution",
+        "frontier-models-anthropic",
+        "frontier-models-openai",
+        "frontier-models-google",
+        "semiconductor-supply-chain",
+        "sovereign-ai-infrastructure"
+      ],
+      "size": 9,
+      "first_seen": "2026-05-21",
+      "cluster_score_slow": 24.0,
+      "cluster_score_fast": 30.5,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 70,
+      "members_moving_together": true,
+      "_co_mention_evidence": "shared supporting_files (sample): news/2026/07/2026-07-29.md, hackernews/2026/07/2026-07-29.md, github/2026/07/2026-07-29.md"
+    },
+    {
+      "id": "governance-regime",
+      "name": "Governance regime",
+      "topic_ids": [
+        "frontier-safety-oversight",
+        "eu-ai-act",
+        "mythos-cyber-governance-cascade",
+        "global-ai-governance-blocs"
+      ],
+      "size": 4,
+      "first_seen": "2026-05-21",
+      "cluster_score_slow": 19.4,
+      "cluster_score_fast": 25.8,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 53,
+      "members_moving_together": true,
+      "_co_mention_evidence": "shared supporting_files (sample): news/2026/07/2026-07-29.md, blogs/2026/07/2026-07-29.md, hackernews/2026/07/2026-07-29.md"
+    },
+    {
+      "id": "knowledge-layer-and-retrieval",
+      "name": "Knowledge layer & retrieval",
+      "topic_ids": [
+        "agentic-retrieval",
+        "vector-db-market",
+        "agent-memory",
+        "context-engineering",
+        "document-intelligence"
+      ],
+      "size": 5,
+      "first_seen": "2026-05-21",
+      "cluster_score_slow": 16.8,
+      "cluster_score_fast": 20.1,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 48,
+      "members_moving_together": true,
+      "_co_mention_evidence": "shared supporting_files (sample): papers/2026/07/2026-07-29.md, blogs/2026/07/2026-07-29.md, news/2026/07/2026-07-29.md"
+    },
+    {
+      "id": "local-and-on-device-inference",
+      "name": "Local & on-device inference",
+      "topic_ids": [
+        "edge-inference",
+        "voice-realtime-agents"
+      ],
+      "size": 2,
+      "first_seen": "2026-07-29",
+      "cluster_score_slow": 16.8,
+      "cluster_score_fast": 22.9,
+      "cluster_direction": "rising",
+      "cluster_breadth_7d": 25,
+      "members_moving_together": false,
+      "_co_mention_evidence": "shared supporting_files (sample): github/2026/07/2026-07-29.md, hackernews/2026/07/2026-07-29.md, news/2026/07/2026-07-29.md"
+    }
+  ],
+  "topics": [
+    {
+      "id": "ai-coding-agents",
+      "label": "AI coding agents (OpenAI open-sources Codex Security and the thread is about its cost, not its capability; Bun's 500K-line Rust rewrite lands in under two weeks for ~$165K of tokens; CodeNib and Agent Retrieval Bench arrive as a matched system+eval pair)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-06-29",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "new topic - initial assignment"
+        }
+      ],
+      "stage": "consolidating",
+      "score": 52.2,
+      "score_fast": 58.5,
+      "score_slow": 52.2,
+      "raw_score_today": 69.0,
+      "raw_score_prior_day_backfilled": 60.0,
+      "score_fast_yesterday": 54.0,
+      "score_slow_yesterday": 51.3,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 3.6,
+      "score_7d_ago": 50.35,
+      "score_30d_ago": 56.33,
+      "score_90d_ago": 19.12,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 135,
+      "source_type_count": 9,
+      "breadth_7d": 22,
+      "breadth_30d": 29,
+      "breadth_orgs_7d": [
+        "openai",
+        "anthropic",
+        "cursor",
+        "alibaba",
+        "moonshot",
+        "humanlayer",
+        "bun",
+        "ucsd",
+        "stablyai",
+        "langchain",
+        "github",
+        "perplexity",
+        "cognizant",
+        "mattpocock",
+        "obra",
+        "earendil-works",
+        "charmbracelet",
+        "openclaw",
+        "different-ai",
+        "google"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 7,
+      "importance": 721.14,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "github_trending_signal": 4,
+        "github_watched_star_delta": 4,
+        "medium_aggregator": 1,
+        "long_form_blog": 2,
+        "hn_front_page": 2,
+        "hn_comment_thread": 2,
+        "paper": 2,
+        "priority_vendor_blog": 1,
+        "tech_news": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "github_trending_signal": 4,
+        "github_watched_star_delta": 4,
+        "medium_aggregator": 1,
+        "long_form_blog": 2,
+        "hn_front_page": 2,
+        "hn_comment_thread": 2,
+        "paper": 2,
+        "priority_vendor_blog": 1,
+        "tech_news": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "ai-coding-and-autonomous-research",
+      "cluster_history": [
+        {
+          "date": "2026-06-29",
+          "from": null,
+          "to": "ai-coding-and-autonomous-research",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "agent-platforms-enterprise",
+      "label": "Enterprise agent platforms (Salesforce reports agentic retail search up 200%; Google ships Managed Agents hooks; Swarovski hires an AI Agent Factory Lead who owns intake through scaling and make-versus-buy budget)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "consolidating",
+      "score": 31.3,
+      "score_fast": 41.0,
+      "score_slow": 31.3,
+      "raw_score_today": 45.8,
+      "raw_score_prior_day_backfilled": 38.2,
+      "score_fast_yesterday": 38.9,
+      "score_slow_yesterday": 30.5,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 7.8,
+      "score_7d_ago": 29.02,
+      "score_30d_ago": 34.46,
+      "score_90d_ago": 24.64,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 135,
+      "source_type_count": 5,
+      "breadth_7d": 20,
+      "breadth_30d": 28,
+      "breadth_orgs_7d": [
+        "google",
+        "salesforce",
+        "aws",
+        "redhat",
+        "snowflake",
+        "databricks",
+        "cyera",
+        "swarovski",
+        "ubs",
+        "ipt",
+        "perplexity",
+        "microsoft",
+        "anthropic",
+        "cognizant",
+        "n8n",
+        "sap",
+        "servicenow",
+        "oracle",
+        "workday",
+        "eraneos"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 816.29,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "enterprise_vendor_blog": 4,
+        "tech_news": 2,
+        "linkedin_network_post": 2,
+        "job_posting_skill_mention": 3,
+        "github_trending_signal": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "enterprise_vendor_blog": 4,
+        "tech_news": 2,
+        "linkedin_network_post": 2,
+        "job_posting_skill_mention": 3,
+        "github_trending_signal": 1
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "jobs/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "enterprise-services-build-out",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Enterprise services build-out",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Enterprise services build-out",
+          "to": "enterprise-services-build-out",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "agentic-retrieval",
+      "label": "Agentic retrieval / RAG-as-decision-loop (Ontario Power Generation's four-stage production post-mortem formalises Progressive Evidence Acquisition with Cost-Aware Escalation; RARG makes relevance an execution prior rather than a filter; AWS argues past top-k with task-aware compression)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 28.4,
+      "score_fast": 36.7,
+      "score_slow": 28.4,
+      "raw_score_today": 49.5,
+      "raw_score_prior_day_backfilled": 15.0,
+      "score_fast_yesterday": 31.1,
+      "score_slow_yesterday": 27.3,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 10.6,
+      "score_7d_ago": 25.7,
+      "score_30d_ago": 23.18,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-17",
+      "sustained_days": 134,
+      "source_type_count": 6,
+      "breadth_7d": 20,
+      "breadth_30d": 22,
+      "breadth_orgs_7d": [
+        "aws",
+        "salesforce",
+        "qdrant",
+        "ontario-power-generation",
+        "argonne",
+        "langchain",
+        "liquid-ai",
+        "firecrawl",
+        "tencent",
+        "graphify-labs",
+        "arc53",
+        "mvanhorn",
+        "moonshot",
+        "anthropic",
+        "vectifyai",
+        "pwc",
+        "exeon",
+        "nexthink",
+        "rivia",
+        "zuger-kantonalbank"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 762.73,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "paper": 4,
+        "enterprise_vendor_blog": 2,
+        "medium_aggregator": 3,
+        "tech_news": 2,
+        "linkedin_network_post": 1,
+        "github_trending_signal": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "paper": 4,
+        "enterprise_vendor_blog": 2,
+        "medium_aggregator": 3,
+        "tech_news": 2,
+        "linkedin_network_post": 1,
+        "github_trending_signal": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "knowledge-layer-and-retrieval",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Knowledge layer & retrieval",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Knowledge layer & retrieval",
+          "to": "knowledge-layer-and-retrieval",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "mcp-adoption",
+      "label": "MCP adoption (the 2026-07-28 stateless revision shipped; Claude rolled it out the same morning past 400M monthly SDK installs; Snowflake, AWS AgentCore and Google Cloud all restate their gateway position within 24h)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 28.1,
+      "score_fast": 43.8,
+      "score_slow": 28.1,
+      "raw_score_today": 67.5,
+      "raw_score_prior_day_backfilled": 48.0,
+      "score_fast_yesterday": 33.7,
+      "score_slow_yesterday": 26.0,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 16.5,
+      "score_7d_ago": 24.14,
+      "score_30d_ago": 32.17,
+      "score_90d_ago": 13.63,
+      "score_180d_ago": null,
+      "first_seen": "2026-03-16",
+      "sustained_days": 135,
+      "source_type_count": 8,
+      "breadth_7d": 21,
+      "breadth_30d": 21,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "aws",
+        "google",
+        "microsoft",
+        "snowflake",
+        "linux-foundation",
+        "runlayer",
+        "rippling",
+        "alibaba",
+        "composio",
+        "cometapi",
+        "okta",
+        "w3c",
+        "modelcontextprotocol",
+        "perplexity",
+        "xpzouying",
+        "timeplus",
+        "akamai",
+        "posit",
+        "databricks"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 752.52,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "enterprise_vendor_blog": 3,
+        "tech_news": 3,
+        "governance_source": 1,
+        "paper": 2,
+        "medium_aggregator": 3,
+        "linkedin_network_post": 3,
+        "linkedin_hashtag_post": 1,
+        "github_trending_signal": 2
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "enterprise_vendor_blog": 3,
+        "tech_news": 3,
+        "governance_source": 1,
+        "paper": 2,
+        "medium_aggregator": 3,
+        "linkedin_network_post": 3,
+        "linkedin_hashtag_post": 1,
+        "github_trending_signal": 2
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Agent protocol stack",
+          "to": "agent-protocol-stack",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "agent-skills-wave",
+      "label": "Agent skills as a distribution format (book-to-skill posts the largest single-day delta on the board at +1,428 and cangjie-skill does the same thing in Chinese the same day — skill generation is outrunning skill curation)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-15",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 27.1,
+      "score_fast": 30.4,
+      "score_slow": 27.1,
+      "raw_score_today": 37.5,
+      "raw_score_prior_day_backfilled": 17.0,
+      "score_fast_yesterday": 27.4,
+      "score_slow_yesterday": 26.6,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 3.0,
+      "score_7d_ago": 26.35,
+      "score_30d_ago": 29.32,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-15",
+      "sustained_days": 75,
+      "source_type_count": 4,
+      "breadth_7d": 18,
+      "breadth_30d": 22,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "obra",
+        "mattpocock",
+        "virgiliojr94",
+        "kangarooking",
+        "calesthio",
+        "multica-ai",
+        "dietrichgebert",
+        "pbakaus",
+        "nutlope",
+        "perplexity",
+        "google",
+        "bradautomates",
+        "mvanhorn",
+        "alibaba",
+        "composiohq",
+        "microsoft",
+        "capital-one"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 7,
+      "importance": 667.39,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "github_trending_signal": 4,
+        "github_watched_star_delta": 5,
+        "hn_front_page": 1,
+        "hn_comment_thread": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "github_trending_signal": 4,
+        "github_watched_star_delta": 5,
+        "hn_front_page": 1,
+        "hn_comment_thread": 1
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "ai-coding-and-autonomous-research",
+      "cluster_history": [
+        {
+          "date": "2026-05-15",
+          "from": null,
+          "to": "AI coding & autonomous research",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "AI coding & autonomous research",
+          "to": "ai-coding-and-autonomous-research",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "agent-execution-control",
+      "label": "Agent execution control (HANDBOOK.md: the best of thirty frontier configurations passes 36.2% on policy adherence, most below 25%; COVENANT, SafeFlow, MTGuard and APPA all move the policy out of the prompt into a compiler, taint graph or lifecycle analyser)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-07-29",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 26.2,
+      "score_fast": 30.0,
+      "score_slow": 26.2,
+      "raw_score_today": 40.5,
+      "raw_score_prior_day_backfilled": 25.5,
+      "score_fast_yesterday": 25.5,
+      "score_slow_yesterday": 25.5,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-29",
+      "sustained_days": 1,
+      "source_type_count": 7,
+      "breadth_7d": 11,
+      "breadth_30d": 11,
+      "breadth_orgs_7d": [
+        "microsoft",
+        "anthropic",
+        "mistral",
+        "alibaba",
+        "huggingface",
+        "openai",
+        "kiteworks",
+        "pillar-security",
+        "fujitsu",
+        "nist",
+        "iso"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 10,
+      "source_types_in_sources_30d": 7,
+      "importance": 179.55,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "paper": 5,
+        "github_trending_signal": 1,
+        "long_form_blog": 1,
+        "medium_aggregator": 1,
+        "tech_news": 1,
+        "hn_front_page": 1,
+        "hn_comment_thread": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "paper": 5,
+        "github_trending_signal": 1,
+        "long_form_blog": 1,
+        "medium_aggregator": 1,
+        "tech_news": 1,
+        "hn_front_page": 1,
+        "hn_comment_thread": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {
+          "date": "2026-07-29",
+          "from": null,
+          "to": "agent-protocol-stack",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "multi-agent-coordination",
+      "label": "Multi-agent coordination (SafeFlow names the delegation hole — a harmful objective fragmented into locally plausible subtasks; OrchBench correlates with Claude Code at r=0.816 on 1.3% of the tokens; three terminal multiplexers up sharply on the same day)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 25.2,
+      "score_fast": 31.2,
+      "score_slow": 25.2,
+      "raw_score_today": 34.5,
+      "raw_score_prior_day_backfilled": 30.0,
+      "score_fast_yesterday": 29.7,
+      "score_slow_yesterday": 24.7,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 9.2,
+      "score_7d_ago": 23.05,
+      "score_30d_ago": 22.24,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-14",
+      "sustained_days": 76,
+      "source_type_count": 5,
+      "breadth_7d": 17,
+      "breadth_30d": 20,
+      "breadth_orgs_7d": [
+        "microsoft",
+        "anthropic",
+        "stablyai",
+        "gastownhall",
+        "ogulcancelik",
+        "alibaba",
+        "ruvnet",
+        "666ghj",
+        "moonshot",
+        "redhat",
+        "block",
+        "xbtlin",
+        "langchain",
+        "capital-one",
+        "multica-ai",
+        "nousresearch",
+        "dietrichgebert"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 741.85,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "paper": 2,
+        "github_trending_signal": 3,
+        "github_watched_star_delta": 2,
+        "long_form_blog": 1,
+        "hn_comment_thread": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "paper": 2,
+        "github_trending_signal": 3,
+        "github_watched_star_delta": 2,
+        "long_form_blog": 1,
+        "hn_comment_thread": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "ai-coding-and-autonomous-research",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Production eval reality check",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-05-15",
+          "from": "Production eval reality check",
+          "to": "AI coding & autonomous research",
+          "reason": "cluster re-assignment"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "AI coding & autonomous research",
+          "to": "ai-coding-and-autonomous-research",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "agent-sdks",
+      "label": "Agent SDKs & runtimes (Deep Agents v0.7 cuts base input tokens 65% by deleting the base system prompt outright; Google ships hooks into Managed Agents; all four Tier-1 MCP SDKs shipped on release day)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 23.7,
+      "score_fast": 40.2,
+      "score_slow": 23.7,
+      "raw_score_today": 61.5,
+      "raw_score_prior_day_backfilled": 27.0,
+      "score_fast_yesterday": 31.1,
+      "score_slow_yesterday": 21.7,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 33.4,
+      "score_7d_ago": 17.78,
+      "score_30d_ago": 20.31,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 85,
+      "source_type_count": 8,
+      "breadth_7d": 21,
+      "breadth_30d": 22,
+      "breadth_orgs_7d": [
+        "langchain",
+        "google",
+        "microsoft",
+        "github",
+        "anthropic",
+        "openai",
+        "vercel",
+        "stablyai",
+        "boundaryml",
+        "ag-ui",
+        "composio",
+        "neva",
+        "perplexity",
+        "earendil-works",
+        "ruvnet",
+        "aaif-goose",
+        "openclaw",
+        "andrewyng",
+        "modelcontextprotocol",
+        "builderio"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 762.73,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "long_form_blog": 2,
+        "linkedin_network_post": 2,
+        "github_trending_signal": 4,
+        "github_watched_star_delta": 3,
+        "medium_aggregator": 2,
+        "tech_news": 1,
+        "enterprise_vendor_blog": 1,
+        "paper": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "long_form_blog": 2,
+        "linkedin_network_post": 2,
+        "github_trending_signal": 4,
+        "github_watched_star_delta": 3,
+        "medium_aggregator": 2,
+        "tech_news": 1,
+        "enterprise_vendor_blog": 1,
+        "paper": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Agent protocol stack",
+          "to": "agent-protocol-stack",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "agent-identity-authorization",
+      "label": "Agent identity, authorization and handoff (Cyera buys Oasis Security for $1B; ID-JAG token exchange lands in the MCP spec; 67% of non-human accounts are created inside applications and never seen by IAM)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-07-22",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — agent identity/authorization sits in the protocol-and-platform tier above frontier models"
+        }
+      ],
+      "stage": "emerging",
+      "score": 23.5,
+      "score_fast": 17.4,
+      "score_slow": 23.5,
+      "raw_score_today": 21.0,
+      "raw_score_prior_day_backfilled": 5.0,
+      "score_fast_yesterday": 15.8,
+      "score_slow_yesterday": 23.6,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": -13.1,
+      "score_7d_ago": 27.0,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-22",
+      "sustained_days": 7,
+      "source_type_count": 4,
+      "breadth_7d": 14,
+      "breadth_30d": 14,
+      "breadth_orgs_7d": [
+        "cyera",
+        "oasis-security",
+        "aws",
+        "microsoft",
+        "okta",
+        "redhat",
+        "orchid-security",
+        "timeplus",
+        "akamai",
+        "anthropic",
+        "kaust",
+        "posit",
+        "databricks",
+        "modelcontextprotocol"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 27,
+      "source_types_in_sources_30d": 7,
+      "importance": 524.02,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "tech_news": 2,
+        "enterprise_vendor_blog": 1,
+        "linkedin_network_post": 1,
+        "github_trending_signal": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "tech_news": 2,
+        "enterprise_vendor_blog": 1,
+        "linkedin_network_post": 1,
+        "github_trending_signal": 1
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {
+          "date": "2026-07-22",
+          "from": null,
+          "to": "agent-protocol-stack",
+          "reason": "first appearance — co-mentioned with MCP spec/gateway and tool-standards files this week"
+        }
+      ]
+    },
+    {
+      "id": "ai-security-agents",
+      "label": "AI security & offensive-security agents (Anthropic is finding Microsoft bugs faster than Microsoft can patch them; OpenAI open-sources Codex Security; Cyera pays $1B for Oasis to govern non-human identity)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-07-09",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "revived into stage — agentic security tooling surge (Strix/T3MP3ST/Lakera)"
+        }
+      ],
+      "stage": "emerging",
+      "score": 20.0,
+      "score_fast": 40.2,
+      "score_slow": 20.0,
+      "raw_score_today": 55.5,
+      "raw_score_prior_day_backfilled": 45.0,
+      "score_fast_yesterday": 33.6,
+      "score_slow_yesterday": 18.2,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 38.8,
+      "score_7d_ago": 14.44,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-02",
+      "sustained_days": 27,
+      "source_type_count": 7,
+      "breadth_7d": 24,
+      "breadth_30d": 31,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "openai",
+        "microsoft",
+        "aws",
+        "cyera",
+        "oasis-security",
+        "jfrog",
+        "usestrix",
+        "eth-zurich",
+        "tel-aviv-university",
+        "university-of-haifa",
+        "google",
+        "nvidia",
+        "huggingface",
+        "crowdstrike",
+        "palantir",
+        "cisco",
+        "redhat",
+        "ibm",
+        "sap"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 27,
+      "source_types_in_sources_30d": 8,
+      "importance": 755.25,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "priority_vendor_blog": 2,
+        "tech_news": 3,
+        "long_form_blog": 2,
+        "hn_front_page": 3,
+        "hn_comment_thread": 3,
+        "github_trending_signal": 1,
+        "paper": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "priority_vendor_blog": 2,
+        "tech_news": 3,
+        "long_form_blog": 2,
+        "hn_front_page": 3,
+        "hn_comment_thread": 3,
+        "github_trending_signal": 1,
+        "paper": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {
+          "date": "2026-07-09",
+          "from": null,
+          "to": "agent-protocol-stack",
+          "reason": "first appearance — co-mentioned with MCP/agent-security in protocol-stack coverage"
+        }
+      ]
+    },
+    {
+      "id": "agent-memory",
+      "label": "Agent memory (InMind: six vector, graph and agentic memory systems reach at most 14.4% on indirect queries the backbone answers 84.0% of in-context; five memory repos above 55k stars with zero watch-list coverage)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 14.8,
+      "score_fast": 16.1,
+      "score_slow": 14.8,
+      "raw_score_today": 16.5,
+      "raw_score_prior_day_backfilled": 12.0,
+      "score_fast_yesterday": 16.0,
+      "score_slow_yesterday": 14.7,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 6.3,
+      "score_7d_ago": 13.94,
+      "score_30d_ago": 22.45,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-14",
+      "sustained_days": 76,
+      "source_type_count": 3,
+      "breadth_7d": 15,
+      "breadth_30d": 15,
+      "breadth_orgs_7d": [
+        "fujitsu",
+        "bytedance",
+        "mem0",
+        "upstash",
+        "letta",
+        "mempalace",
+        "langchain",
+        "anthropic",
+        "ruvnet",
+        "affaan-m",
+        "kaust",
+        "moonshot",
+        "pwc",
+        "tinyhumansai",
+        "screenpipe"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 29,
+      "source_types_in_sources_30d": 7,
+      "importance": 575.14,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "paper": 2,
+        "github_trending_signal": 1,
+        "hn_front_page": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "paper": 2,
+        "github_trending_signal": 1,
+        "hn_front_page": 1
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "knowledge-layer-and-retrieval",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Knowledge layer & retrieval",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Knowledge layer & retrieval",
+          "to": "knowledge-layer-and-retrieval",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "vector-db-market",
+      "label": "Vector DB market under pressure (graphify approaches 100k explicitly without a vector DB; the hybrid-search merge bug that removes correct documents from the candidate set; 'stop embedding your database')",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 14.3,
+      "score_fast": 18.5,
+      "score_slow": 14.3,
+      "raw_score_today": 21.0,
+      "raw_score_prior_day_backfilled": 7.0,
+      "score_fast_yesterday": 17.4,
+      "score_slow_yesterday": 14.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 15.2,
+      "score_7d_ago": 12.44,
+      "score_30d_ago": 11.67,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 84,
+      "source_type_count": 5,
+      "breadth_7d": 18,
+      "breadth_30d": 20,
+      "breadth_orgs_7d": [
+        "qdrant",
+        "graphify-labs",
+        "bytedance",
+        "elastic",
+        "opensearch",
+        "pinecone",
+        "langchain",
+        "arc53",
+        "firecrawl",
+        "moonshot",
+        "anthropic",
+        "vectifyai",
+        "weaviate",
+        "bjak",
+        "aws",
+        "nexthink",
+        "infiniflow",
+        "chroma"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 741.85,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "enterprise_vendor_blog": 1,
+        "medium_aggregator": 2,
+        "github_trending_signal": 1,
+        "github_watched_star_delta": 1,
+        "paper": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "enterprise_vendor_blog": 1,
+        "medium_aggregator": 2,
+        "github_trending_signal": 1,
+        "github_watched_star_delta": 1,
+        "paper": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "knowledge-layer-and-retrieval",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Knowledge layer & retrieval",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Knowledge layer & retrieval",
+          "to": "knowledge-layer-and-retrieval",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "tool-use-standards",
+      "label": "Tool-use standards (Tool Search plus defer_loading appends discovered definitions instead of prepending them, killing the Swiss-Army-knife tool; Deep Agents cuts builtin tool descriptions 43%; AG-UI joins MCP and A2A as a third protocol layer)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 13.9,
+      "score_fast": 20.5,
+      "score_slow": 13.9,
+      "raw_score_today": 28.5,
+      "raw_score_prior_day_backfilled": 8.0,
+      "score_fast_yesterday": 17.1,
+      "score_slow_yesterday": 13.1,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 16.5,
+      "score_7d_ago": 11.89,
+      "score_30d_ago": 18.4,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 85,
+      "source_type_count": 5,
+      "breadth_7d": 18,
+      "breadth_30d": 18,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "langchain",
+        "composio",
+        "ag-ui",
+        "alibaba",
+        "google",
+        "modelcontextprotocol",
+        "perplexity",
+        "xpzouying",
+        "timeplus",
+        "microsoft",
+        "github",
+        "huggingface",
+        "cisco",
+        "databricks",
+        "nvidia",
+        "salesforce",
+        "servicenow"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 22,
+      "source_types_in_sources_30d": 8,
+      "importance": 527.25,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "linkedin_network_post": 2,
+        "paper": 1,
+        "github_trending_signal": 2,
+        "medium_aggregator": 1,
+        "long_form_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "linkedin_network_post": 2,
+        "paper": 1,
+        "github_trending_signal": 2,
+        "medium_aggregator": 1,
+        "long_form_blog": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Agent protocol stack",
+          "to": "agent-protocol-stack",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "document-intelligence",
+      "label": "Document & knowledge extraction (Liquid AI's bidirectional encoders target the retrieval and classification layer everyone left on old architectures; graphify folds docs, SQL schemas and PDFs into a queryable graph)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-06-24",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "first appearance — OCR/document-ingestion arc broke out as a distinct retrieval-layer theme within agent infrastructure"
+        }
+      ],
+      "stage": "emerging",
+      "score": 13.7,
+      "score_fast": 12.1,
+      "score_slow": 13.7,
+      "raw_score_today": 16.5,
+      "raw_score_prior_day_backfilled": 10.5,
+      "score_fast_yesterday": 10.2,
+      "score_slow_yesterday": 13.6,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": -12.7,
+      "score_7d_ago": 15.72,
+      "score_30d_ago": 30.86,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-06-24",
+      "sustained_days": 35,
+      "source_type_count": 4,
+      "breadth_7d": 12,
+      "breadth_30d": 12,
+      "breadth_orgs_7d": [
+        "liquid-ai",
+        "graphify-labs",
+        "argonne",
+        "ucsd",
+        "arc53",
+        "mistral",
+        "llamaindex",
+        "datalab",
+        "vectifyai",
+        "firecrawl",
+        "snowflake",
+        "docdigitizer"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 28,
+      "source_types_in_sources_30d": 6,
+      "importance": 443.36,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "enterprise_vendor_blog": 1,
+        "medium_aggregator": 1,
+        "github_trending_signal": 1,
+        "paper": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "enterprise_vendor_blog": 1,
+        "medium_aggregator": 1,
+        "github_trending_signal": 1,
+        "paper": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "knowledge-layer-and-retrieval",
+      "cluster_history": [
+        {
+          "date": "2026-06-24",
+          "from": null,
+          "to": "knowledge-layer-and-retrieval",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "mcp-security",
+      "label": "MCP security (MTGuard: essentially every existing tool-use guard is static and blind to what the tool does once invoked; the new Mcp-Method/Mcp-Name routing headers are client-supplied and must be checked against the body)",
+      "sector": "Agents & infrastructure",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Agents & infrastructure",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 10.6,
+      "score_fast": 9.3,
+      "score_slow": 10.6,
+      "raw_score_today": 16.5,
+      "raw_score_prior_day_backfilled": 3.0,
+      "score_fast_yesterday": 6.2,
+      "score_slow_yesterday": 10.3,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": -11.4,
+      "score_7d_ago": 11.98,
+      "score_30d_ago": 16.06,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 84,
+      "source_type_count": 5,
+      "breadth_7d": 9,
+      "breadth_30d": 9,
+      "breadth_orgs_7d": [
+        "alibaba",
+        "microsoft",
+        "nasiko",
+        "msrc",
+        "akamai",
+        "modelcontextprotocol",
+        "anthropic",
+        "timeplus",
+        "sap"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 22,
+      "source_types_in_sources_30d": 7,
+      "importance": 369.28,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "paper": 1,
+        "tech_news": 1,
+        "medium_aggregator": 1,
+        "linkedin_network_post": 1,
+        "hn_front_page": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "paper": 1,
+        "tech_news": 1,
+        "medium_aggregator": 1,
+        "linkedin_network_post": 1,
+        "hn_front_page": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "agent-protocol-stack",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Agent protocol stack",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Agent protocol stack",
+          "to": "agent-protocol-stack",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "frontier-safety-oversight",
+      "label": "Frontier safety oversight (1,178 lab employees sign Pacing the Frontier and OpenAI and Anthropic endorse it corporately within hours; Hugging Face's forensic timeline puts the escaped agent at ~17,600 actions over four and a half days)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {
+          "date": "2026-07-21",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "consolidating",
+      "score": 30.6,
+      "score_fast": 39.0,
+      "score_slow": 30.6,
+      "raw_score_today": 52.5,
+      "raw_score_prior_day_backfilled": 33.0,
+      "score_fast_yesterday": 33.2,
+      "score_slow_yesterday": 29.5,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 5.8,
+      "score_7d_ago": 28.95,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-21",
+      "sustained_days": 8,
+      "source_type_count": 8,
+      "breadth_7d": 22,
+      "breadth_30d": 22,
+      "breadth_orgs_7d": [
+        "openai",
+        "anthropic",
+        "google",
+        "meta",
+        "nvidia",
+        "microsoft",
+        "mistral",
+        "thinking-machines",
+        "huggingface",
+        "modal",
+        "jfrog",
+        "uk-aisi",
+        "us-caisi",
+        "deepmind",
+        "metr",
+        "epoch",
+        "institute-for-law-and-ai",
+        "whitehouse",
+        "aisi",
+        "apolloresearch"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 25,
+      "source_types_in_sources_30d": 6,
+      "importance": 476.71,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "tech_news": 4,
+        "governance_source": 1,
+        "priority_vendor_blog": 2,
+        "long_form_blog": 2,
+        "medium_aggregator": 1,
+        "paper": 1,
+        "hn_front_page": 2,
+        "hn_comment_thread": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "tech_news": 4,
+        "governance_source": 1,
+        "priority_vendor_blog": 2,
+        "long_form_blog": 2,
+        "medium_aggregator": 1,
+        "paper": 1,
+        "hn_front_page": 2,
+        "hn_comment_thread": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "governance-regime",
+      "cluster_history": [
+        {
+          "date": "2026-07-22",
+          "from": null,
+          "to": "governance-regime",
+          "reason": "first appearance — co-mentioned with MCP spec/gateway and tool-standards files this week"
+        }
+      ]
+    },
+    {
+      "id": "eu-ai-act",
+      "label": "EU AI Act (Germany's KI-MIG in force 28 July names the Bundesnetzagentur as national market-surveillance authority four days before the 2 August application date; ISO 42001 is explicitly not presumption of conformity)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 17.4,
+      "score_fast": 20.6,
+      "score_slow": 17.4,
+      "raw_score_today": 27.0,
+      "raw_score_prior_day_backfilled": 3.0,
+      "score_fast_yesterday": 17.9,
+      "score_slow_yesterday": 16.9,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 6.6,
+      "score_7d_ago": 16.33,
+      "score_30d_ago": 23.66,
+      "score_90d_ago": 16.095,
+      "score_180d_ago": null,
+      "first_seen": "2026-04-28",
+      "sustained_days": 92,
+      "source_type_count": 4,
+      "breadth_7d": 16,
+      "breadth_30d": 16,
+      "breadth_orgs_7d": [
+        "bundesnetzagentur",
+        "german-government",
+        "eu-commission",
+        "eraneos",
+        "alcon",
+        "novartis",
+        "vector8",
+        "sap",
+        "cnil",
+        "ki-aufsicht",
+        "cubeserv",
+        "google",
+        "european-commission",
+        "six",
+        "eu",
+        "future-of-life-institute"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 6,
+      "importance": 520.27,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "tech_news": 3,
+        "linkedin_network_post": 3,
+        "medium_aggregator": 2,
+        "job_posting_skill_mention": 2
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "tech_news": 3,
+        "linkedin_network_post": 3,
+        "medium_aggregator": 2,
+        "job_posting_skill_mention": 2
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "jobs/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "governance-regime",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Governance regime",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Governance regime",
+          "to": "governance-regime",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "mythos-cyber-governance-cascade",
+      "label": "Escaped-agent cascade (four accounts at four services, not one; a JFrog Artifactory zero-day that sat ten days, Modal as an out-of-org C2 base, a Jinja2 cycler primitive, a Kubernetes token and a Tailscale exfil node)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {
+          "date": "2026-05-20",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "new topic - initial assignment"
+        }
+      ],
+      "stage": "emerging",
+      "score": 16.4,
+      "score_fast": 24.2,
+      "score_slow": 16.4,
+      "raw_score_today": 39.0,
+      "raw_score_prior_day_backfilled": 19.5,
+      "score_fast_yesterday": 17.9,
+      "score_slow_yesterday": 15.2,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 7.5,
+      "score_7d_ago": 15.27,
+      "score_30d_ago": 26.18,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-20",
+      "sustained_days": 70,
+      "source_type_count": 6,
+      "breadth_7d": 16,
+      "breadth_30d": 16,
+      "breadth_orgs_7d": [
+        "openai",
+        "huggingface",
+        "modal",
+        "jfrog",
+        "anthropic",
+        "microsoft",
+        "msrc",
+        "tailscale",
+        "nvidia",
+        "institute-for-law-and-ai",
+        "zafran",
+        "germany",
+        "us-congress",
+        "infoblox",
+        "deloitte",
+        "mitre"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 28,
+      "source_types_in_sources_30d": 7,
+      "importance": 566.51,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "long_form_blog": 2,
+        "tech_news": 4,
+        "hn_front_page": 2,
+        "hn_comment_thread": 2,
+        "priority_vendor_blog": 1,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "long_form_blog": 2,
+        "tech_news": 4,
+        "hn_front_page": 2,
+        "hn_comment_thread": 2,
+        "priority_vendor_blog": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "governance-regime",
+      "cluster_history": [
+        {
+          "date": "2026-05-20",
+          "from": null,
+          "to": "Governance regime",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Governance regime",
+          "to": "governance-regime",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "ai-vendor-trust-friction",
+      "label": "Buyer-vendor trust friction (the open-weights thread is the site's centre of gravity for a second day and uniformly hostile; 'security tools from AI companies feel like fire departments run by arsonists')",
+      "sector": "Governance & market",
+      "sector_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 15.8,
+      "score_fast": 19.8,
+      "score_slow": 15.8,
+      "raw_score_today": 21.0,
+      "raw_score_prior_day_backfilled": 16.5,
+      "score_fast_yesterday": 19.3,
+      "score_slow_yesterday": 15.5,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 5.4,
+      "score_7d_ago": 14.97,
+      "score_30d_ago": 15.58,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-14",
+      "sustained_days": 76,
+      "source_type_count": 4,
+      "breadth_7d": 13,
+      "breadth_30d": 14,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "openai",
+        "microsoft",
+        "acm",
+        "codeberg",
+        "huggingface",
+        "moonshot",
+        "cloudflare",
+        "uber",
+        "apple",
+        "debian",
+        "google",
+        "gentoo"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 7,
+      "importance": 582.24,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "hn_front_page": 3,
+        "hn_comment_thread": 3,
+        "tech_news": 2,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "hn_front_page": 3,
+        "hn_comment_thread": 3,
+        "tech_news": 2,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "corporate-ai-procurement-sentiment",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Trust & talent market",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-05-15",
+          "from": "Trust & talent market",
+          "to": "Governance regime",
+          "reason": "cluster re-assignment"
+        },
+        {
+          "date": "2026-05-16",
+          "from": "governance-regime",
+          "to": "Corporate AI-procurement sentiment",
+          "reason": "cluster reassignment due to new co-mention pattern"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Corporate AI-procurement sentiment",
+          "to": "corporate-ai-procurement-sentiment",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "ai-corporate-token-mandate-bubble",
+      "label": "AI spend and bubble sentiment (Google's $205B capex guidance prices depreciation risk rather than growth; 'After the AI Crash' draws 147 comments on 77 points and the thread is really about the job market)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {
+          "date": "2026-05-16",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance — corporate-procurement / token-mandate sentiment is a market dynamic, not a methods topic"
+        }
+      ],
+      "stage": "emerging",
+      "score": 14.9,
+      "score_fast": 17.5,
+      "score_slow": 14.9,
+      "raw_score_today": 16.5,
+      "raw_score_prior_day_backfilled": 16.5,
+      "score_fast_yesterday": 17.9,
+      "score_slow_yesterday": 14.8,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 7.9,
+      "score_7d_ago": 13.77,
+      "score_30d_ago": 15.54,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-16",
+      "sustained_days": 74,
+      "source_type_count": 3,
+      "breadth_7d": 13,
+      "breadth_30d": 16,
+      "breadth_orgs_7d": [
+        "google",
+        "apple",
+        "openai",
+        "anthropic",
+        "ramp",
+        "uber",
+        "gartner",
+        "nvidia",
+        "us-dod",
+        "microsoft",
+        "vectoral",
+        "aircfo",
+        "crunchbase"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 27,
+      "source_types_in_sources_30d": 7,
+      "importance": 546.28,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "hn_front_page": 2,
+        "hn_comment_thread": 3,
+        "tech_news": 2
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "hn_front_page": 2,
+        "hn_comment_thread": 3,
+        "tech_news": 2
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "corporate-ai-procurement-sentiment",
+      "cluster_history": [
+        {
+          "date": "2026-05-16",
+          "from": null,
+          "to": "Corporate AI-procurement sentiment",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Corporate AI-procurement sentiment",
+          "to": "corporate-ai-procurement-sentiment",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "vendor-governance-business-line",
+      "label": "Governance as a product line (microsoft/agent-governance-toolkit covers 10/10 of the OWASP Agentic Top 10 and gains 8.9% in a day; Swiss governance hiring now spans consulting, retail, pharma and banking)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 13.9,
+      "score_fast": 20.9,
+      "score_slow": 13.9,
+      "raw_score_today": 29.2,
+      "raw_score_prior_day_backfilled": 9.0,
+      "score_fast_yesterday": 17.4,
+      "score_slow_yesterday": 13.1,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 21.0,
+      "score_7d_ago": 11.47,
+      "score_30d_ago": 18.02,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-11",
+      "sustained_days": 79,
+      "source_type_count": 6,
+      "breadth_7d": 21,
+      "breadth_30d": 21,
+      "breadth_orgs_7d": [
+        "microsoft",
+        "aws",
+        "cyera",
+        "snowflake",
+        "eraneos",
+        "vector8",
+        "alcon",
+        "novartis",
+        "nasiko",
+        "kiteworks",
+        "n8n",
+        "servicenow",
+        "timeplus",
+        "swarovski",
+        "cloudflare",
+        "ibm",
+        "redhat",
+        "six",
+        "emil-frey",
+        "zuger-kantonalbank"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 7,
+      "importance": 658.45,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "enterprise_vendor_blog": 1,
+        "tech_news": 2,
+        "github_trending_signal": 1,
+        "linkedin_network_post": 2,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 3
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "enterprise_vendor_blog": 1,
+        "tech_news": 2,
+        "github_trending_signal": 1,
+        "linkedin_network_post": 2,
+        "medium_aggregator": 1,
+        "job_posting_skill_mention": 3
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "jobs/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "enterprise-services-build-out",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Governance regime",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-05-15",
+          "from": "Governance regime",
+          "to": "Enterprise services build-out",
+          "reason": "cluster re-assignment"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Enterprise services build-out",
+          "to": "enterprise-services-build-out",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "global-ai-governance-blocs",
+      "label": "AI governance blocs (Zuckerberg joins Amodei in opposing restrictions on Chinese open weights; the US bans imports of new Chinese robots and inverters; Pacing the Frontier asks for an international rather than national instrument)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {
+          "date": "2026-07-17",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 13.0,
+      "score_fast": 19.5,
+      "score_slow": 13.0,
+      "raw_score_today": 19.5,
+      "raw_score_prior_day_backfilled": 18.0,
+      "score_fast_yesterday": 19.5,
+      "score_slow_yesterday": 12.6,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 20.9,
+      "score_7d_ago": 10.72,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-17",
+      "sustained_days": 12,
+      "source_type_count": 4,
+      "breadth_7d": 18,
+      "breadth_30d": 20,
+      "breadth_orgs_7d": [
+        "us-government",
+        "eu-commission",
+        "meta",
+        "anthropic",
+        "uk-aisi",
+        "china-government",
+        "nvidia",
+        "microsoft",
+        "whitehouse",
+        "moonshot",
+        "deepseek",
+        "cxmt",
+        "linuxfoundation",
+        "huggingface",
+        "china",
+        "usa",
+        "caisi",
+        "huawei"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 16,
+      "source_types_in_sources_30d": 5,
+      "importance": 247.28,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "tech_news": 4,
+        "governance_source": 1,
+        "hn_front_page": 1,
+        "hn_comment_thread": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "tech_news": 4,
+        "governance_source": 1,
+        "hn_front_page": 1,
+        "hn_comment_thread": 1
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "governance-regime",
+      "cluster_history": [
+        {
+          "date": "2026-07-17",
+          "from": null,
+          "to": "governance-regime",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "implementation-revenue",
+      "label": "Implementation & services revenue (Cognizant deepens its Anthropic alliance as a Claude Global Premier Partner; the Forward Deployed Engineer title has generalised past its Palantir origin into the standard Swiss enterprise-GenAI delivery role)",
+      "sector": "Governance & market",
+      "sector_history": [
+        {
+          "date": "2026-07-07",
+          "from": null,
+          "to": "Governance & market",
+          "reason": "new topic revived — enterprise deployment/services-revenue economics"
+        }
+      ],
+      "stage": "emerging",
+      "score": 12.5,
+      "score_fast": 12.1,
+      "score_slow": 12.5,
+      "raw_score_today": 15.8,
+      "raw_score_prior_day_backfilled": 4.5,
+      "score_fast_yesterday": 10.6,
+      "score_slow_yesterday": 12.3,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": -3.4,
+      "score_7d_ago": 12.94,
+      "score_30d_ago": 11.9,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-07",
+      "sustained_days": 22,
+      "source_type_count": 3,
+      "breadth_7d": 17,
+      "breadth_30d": 21,
+      "breadth_orgs_7d": [
+        "cognizant",
+        "anthropic",
+        "salesforce",
+        "openai",
+        "google",
+        "databricks",
+        "accenture",
+        "kpmg",
+        "eraneos",
+        "swisslinx",
+        "gartner",
+        "sap",
+        "us-veterans-affairs",
+        "norm-ai",
+        "itc-infotech",
+        "servicenow",
+        "isolutions"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 15,
+      "source_types_in_sources_30d": 6,
+      "importance": 282.19,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "priority_vendor_blog": 1,
+        "job_posting_skill_mention": 5,
+        "linkedin_network_post": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "priority_vendor_blog": 1,
+        "job_posting_skill_mention": 5,
+        "linkedin_network_post": 1
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "jobs/2026/07/2026-07-29.md",
+        "linkedin/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "enterprise-services-build-out",
+      "cluster_history": [
+        {
+          "date": "2026-07-07",
+          "from": null,
+          "to": "enterprise-services-build-out",
+          "reason": "first appearance — co-mentioned with Microsoft Frontier Company / vendor deployment build-out"
+        }
+      ]
+    },
+    {
+      "id": "evaluation-gap",
+      "label": "The evaluation gap (Similarweb admits a miscalibrated rubric cost a week and made a real improvement read as a regression; Deep Agents states plainly that its reward CIs span zero; harness swaps move SWE-bench Verified by up to 15 points)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 19.8,
+      "score_fast": 29.9,
+      "score_slow": 19.8,
+      "raw_score_today": 34.5,
+      "raw_score_prior_day_backfilled": 19.5,
+      "score_fast_yesterday": 27.9,
+      "score_slow_yesterday": 19.1,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 22.5,
+      "score_7d_ago": 16.19,
+      "score_30d_ago": 12.55,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-06",
+      "sustained_days": 84,
+      "source_type_count": 5,
+      "breadth_7d": 18,
+      "breadth_30d": 19,
+      "breadth_orgs_7d": [
+        "langchain",
+        "similarweb",
+        "surge-ai",
+        "humanlayer",
+        "moonshot",
+        "juliahub",
+        "openai",
+        "anthropic",
+        "metr",
+        "epoch",
+        "ethz",
+        "huggingface",
+        "arcprize",
+        "artificialanalysis",
+        "databend",
+        "google",
+        "queens-university",
+        "nexthink"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 29,
+      "source_types_in_sources_30d": 8,
+      "importance": 706.33,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "paper": 3,
+        "long_form_blog": 2,
+        "medium_aggregator": 1,
+        "hn_front_page": 2,
+        "github_trending_signal": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "paper": 3,
+        "long_form_blog": 2,
+        "medium_aggregator": 1,
+        "hn_front_page": 2,
+        "github_trending_signal": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "ai-coding-and-autonomous-research",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Production eval reality check",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Production eval reality check",
+          "to": "production-eval-reality-check",
+          "reason": "cluster reassignment"
+        },
+        {
+          "date": "2026-07-29",
+          "from": "production-eval-reality-check",
+          "to": "ai-coding-and-autonomous-research",
+          "reason": "cluster merged / re-formed on this week's co-mention graph"
+        }
+      ]
+    },
+    {
+      "id": "automated-ai-research",
+      "label": "Automated AI research (Claude ran 60 hours unattended at ~$100k to find a new AES attack, and the main human intervention was refusing to let it give up; 'Pacing the Frontier' is explicitly about automated AI development)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 13.9,
+      "score_fast": 18.6,
+      "score_slow": 13.9,
+      "raw_score_today": 28.5,
+      "raw_score_prior_day_backfilled": 16.5,
+      "score_fast_yesterday": 14.4,
+      "score_slow_yesterday": 13.2,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 0.4,
+      "score_7d_ago": 13.87,
+      "score_30d_ago": 13.36,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-14",
+      "sustained_days": 76,
+      "source_type_count": 6,
+      "breadth_7d": 18,
+      "breadth_30d": 18,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "openai",
+        "recursive-superintelligence",
+        "salesforce",
+        "eth-zurich",
+        "bun",
+        "epoch",
+        "metr",
+        "moonshot",
+        "mvanhorn",
+        "alibaba",
+        "sakana-ai",
+        "hkust",
+        "actava-ai",
+        "google",
+        "xbtlin",
+        "white-house",
+        "doe"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 28,
+      "source_types_in_sources_30d": 8,
+      "importance": 671.04,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "priority_vendor_blog": 1,
+        "long_form_blog": 2,
+        "tech_news": 1,
+        "hn_front_page": 1,
+        "hn_comment_thread": 2,
+        "github_watched_star_delta": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "priority_vendor_blog": 1,
+        "long_form_blog": 2,
+        "tech_news": 1,
+        "hn_front_page": 1,
+        "hn_comment_thread": 2,
+        "github_watched_star_delta": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "ai-coding-and-autonomous-research",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "AI coding & autonomous research",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-05-15",
+          "from": "AI coding & autonomous research",
+          "to": "Production eval reality check",
+          "reason": "cluster re-assignment"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Production eval reality check",
+          "to": "production-eval-reality-check",
+          "reason": "cluster reassignment"
+        },
+        {
+          "date": "2026-07-29",
+          "from": "production-eval-reality-check",
+          "to": "ai-coding-and-autonomous-research",
+          "reason": "cluster merged / re-formed on this week's co-mention graph"
+        }
+      ]
+    },
+    {
+      "id": "context-engineering",
+      "label": "Context engineering (Anthropic cut over 80% of Claude Code's system prompt with no eval drop; ARC's addressable log beats retrieval at 99.40% vs 88.12% NIAH; CodeNib's selected-context policies save 50-87% of trajectory tokens)",
+      "sector": "Methods & research",
+      "sector_history": [
+        {
+          "date": "2026-05-17",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 12.8,
+      "score_fast": 17.0,
+      "score_slow": 12.8,
+      "raw_score_today": 22.5,
+      "raw_score_prior_day_backfilled": 6.0,
+      "score_fast_yesterday": 14.7,
+      "score_slow_yesterday": 12.3,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 11.7,
+      "score_7d_ago": 11.45,
+      "score_30d_ago": 14.9,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-17",
+      "sustained_days": 73,
+      "source_type_count": 4,
+      "breadth_7d": 11,
+      "breadth_30d": 11,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "langchain",
+        "fujitsu",
+        "ucsd",
+        "ontario-power-generation",
+        "moonshot",
+        "microsoft",
+        "sakana-ai",
+        "rivia",
+        "jgravelle",
+        "rtk-ai"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 29,
+      "source_types_in_sources_30d": 8,
+      "importance": 595.07,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "long_form_blog": 1,
+        "paper": 3,
+        "medium_aggregator": 1,
+        "github_watched_star_delta": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "long_form_blog": 1,
+        "paper": 3,
+        "medium_aggregator": 1,
+        "github_watched_star_delta": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "knowledge-layer-and-retrieval",
+      "cluster_history": [
+        {
+          "date": "2026-05-17",
+          "from": null,
+          "to": "Knowledge layer & retrieval",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Knowledge layer & retrieval",
+          "to": "knowledge-layer-and-retrieval",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-anthropic",
+      "label": "Anthropic frontier cadence (Claude finds a novel AES attack running autonomously at ~$100k per result; Cognizant becomes a Claude Global Premier Partner; Pragmatic Engineer's inside-Anthropic report names two engineers per project as the hard ceiling)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "consolidating",
+      "score": 31.6,
+      "score_fast": 43.3,
+      "score_slow": 31.6,
+      "raw_score_today": 57.0,
+      "raw_score_prior_day_backfilled": 37.5,
+      "score_fast_yesterday": 37.5,
+      "score_slow_yesterday": 30.2,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 15.0,
+      "score_7d_ago": 27.46,
+      "score_30d_ago": 36.96,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 85,
+      "source_type_count": 6,
+      "breadth_7d": 8,
+      "breadth_30d": 8,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "cognizant",
+        "bun",
+        "cursor",
+        "cognition",
+        "perplexity",
+        "microsoft",
+        "amd"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 552.62,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "priority_vendor_blog": 3,
+        "tech_news": 2,
+        "long_form_blog": 3,
+        "hn_front_page": 2,
+        "hn_comment_thread": 3,
+        "github_trending_signal": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "priority_vendor_blog": 3,
+        "tech_news": 2,
+        "long_form_blog": 3,
+        "hn_front_page": 2,
+        "hn_comment_thread": 3,
+        "github_trending_signal": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Frontier model cadence",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Frontier model cadence",
+          "to": "frontier-model-cadence",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "open-weight-cost-pressure",
+      "label": "Open-weight cost pressure (Amodei rules out banning open weights and Zuckerberg opposes restricting Chinese models on the same week; ZDNet calls it a civil war between two incompatible theories of how to build and secure LLMs)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-05-29",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance — open-weight pricing pressure carved out from frontier-model coverage as a standalone cost narrative"
+        }
+      ],
+      "stage": "emerging",
+      "score": 28.9,
+      "score_fast": 36.3,
+      "score_slow": 28.9,
+      "raw_score_today": 46.5,
+      "raw_score_prior_day_backfilled": 30.0,
+      "score_fast_yesterday": 32.0,
+      "score_slow_yesterday": 28.0,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 7.3,
+      "score_7d_ago": 26.96,
+      "score_30d_ago": 28.0,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-29",
+      "sustained_days": 61,
+      "source_type_count": 7,
+      "breadth_7d": 18,
+      "breadth_30d": 23,
+      "breadth_orgs_7d": [
+        "anthropic",
+        "meta",
+        "moonshot",
+        "zhipu",
+        "mistral",
+        "liquid-ai",
+        "microsoft",
+        "huggingface",
+        "ollama",
+        "deepseek",
+        "fireworks",
+        "alibaba",
+        "nvidia",
+        "marsninja",
+        "nousresearch",
+        "kuaishou",
+        "uk-aisi",
+        "caisi"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 29,
+      "source_types_in_sources_30d": 8,
+      "importance": 746.78,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "tech_news": 4,
+        "hn_front_page": 3,
+        "hn_comment_thread": 3,
+        "medium_aggregator": 1,
+        "github_trending_signal": 2,
+        "paper": 1,
+        "enterprise_vendor_blog": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "tech_news": 4,
+        "hn_front_page": 3,
+        "hn_comment_thread": 3,
+        "medium_aggregator": 1,
+        "github_trending_signal": 2,
+        "paper": 1,
+        "enterprise_vendor_blog": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md",
+        "papers/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-05-29",
+          "from": null,
+          "to": "frontier-model-cadence",
+          "reason": "first appearance — co-mentioned with frontier model launches"
+        }
+      ]
+    },
+    {
+      "id": "ai-platform-distribution",
+      "label": "AI platform distribution (OpenAI hands 100,000 academic researchers free frontier access; Codex now powers ChatGPT Work on one shared harness; an open-source Cowork clone shipped within the same week)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-06-08",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance — platform/distribution war (Apple WWDC, OpenAI superapp, MS Foundry) emerges as a distinct frontier-model theme"
+        }
+      ],
+      "stage": "emerging",
+      "score": 26.8,
+      "score_fast": 34.7,
+      "score_slow": 26.8,
+      "raw_score_today": 37.5,
+      "raw_score_prior_day_backfilled": 27.0,
+      "score_fast_yesterday": 33.4,
+      "score_slow_yesterday": 26.3,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 12.6,
+      "score_7d_ago": 23.82,
+      "score_30d_ago": 33.26,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-06-08",
+      "sustained_days": 51,
+      "source_type_count": 5,
+      "breadth_7d": 19,
+      "breadth_30d": 20,
+      "breadth_orgs_7d": [
+        "openai",
+        "google",
+        "anthropic",
+        "perplexity",
+        "cursor",
+        "larksuite",
+        "learnvector",
+        "coursera",
+        "grafana",
+        "microsoft",
+        "cognizant",
+        "meta",
+        "oracle",
+        "workday",
+        "diegosouzapw",
+        "wei-shaw",
+        "tashfeenahmed",
+        "andrewyng",
+        "aws"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 741.85,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "priority_vendor_blog": 2,
+        "tech_news": 2,
+        "long_form_blog": 2,
+        "hn_front_page": 1,
+        "github_trending_signal": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "priority_vendor_blog": 2,
+        "tech_news": 2,
+        "long_form_blog": 2,
+        "hn_front_page": 1,
+        "github_trending_signal": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-06-08",
+          "from": null,
+          "to": "frontier-model-cadence",
+          "reason": "first appearance — co-mentioned with frontier-model releases in distribution coverage"
+        }
+      ]
+    },
+    {
+      "id": "semiconductor-supply-chain",
+      "label": "Semiconductor, compute & power supply chain (Google capex guidance to $205B and AI equities sell off; NVIDIA negotiating a $250B backstop for OpenAI's Ohio site; PJM will curtail power to 50MW+ data centres from June 2027)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-07-27",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance - promoted from background after 29 days of source presence"
+        }
+      ],
+      "stage": "emerging",
+      "score": 26.5,
+      "score_fast": 24.8,
+      "score_slow": 26.5,
+      "raw_score_today": 27.0,
+      "raw_score_prior_day_backfilled": 16.5,
+      "score_fast_yesterday": 23.8,
+      "score_slow_yesterday": 26.5,
+      "direction": "steady",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-27",
+      "sustained_days": 2,
+      "source_type_count": 3,
+      "breadth_7d": 13,
+      "breadth_30d": 13,
+      "breadth_orgs_7d": [
+        "google",
+        "nvidia",
+        "openai",
+        "softbank",
+        "verizon",
+        "pjm",
+        "pentagon",
+        "cxmt",
+        "us-government",
+        "amd",
+        "moonshot",
+        "deepseek",
+        "whitehouse"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 29,
+      "source_types_in_sources_30d": 7,
+      "importance": 549.73,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "tech_news": 5,
+        "hn_front_page": 3,
+        "hn_comment_thread": 2
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "tech_news": 5,
+        "hn_front_page": 3,
+        "hn_comment_thread": 2
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-07-27",
+          "from": null,
+          "to": "Frontier model cadence",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "inference-cost-economics",
+      "label": "Inference cost economics (Fireworks Nexus and Tokenless both ship request-level routers in one week; a $500 RL fine-tune of a 9B open model beats every frontier config at 40x lower cost; Codex Security scans drain half a weekly Pro quota)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-06-04",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 26.1,
+      "score_fast": 42.3,
+      "score_slow": 26.1,
+      "raw_score_today": 57.0,
+      "raw_score_prior_day_backfilled": 34.5,
+      "score_fast_yesterday": 36.0,
+      "score_slow_yesterday": 24.4,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 29.8,
+      "score_7d_ago": 20.09,
+      "score_30d_ago": 20.79,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-06-04",
+      "sustained_days": 55,
+      "source_type_count": 8,
+      "breadth_7d": 21,
+      "breadth_30d": 23,
+      "breadth_orgs_7d": [
+        "fireworks",
+        "google",
+        "netflix",
+        "langchain",
+        "tokenless",
+        "telnyx",
+        "nvidia",
+        "verizon",
+        "zhipu",
+        "anthropic",
+        "openai",
+        "moonshot",
+        "gartner",
+        "diegosouzapw",
+        "wei-shaw",
+        "tashfeenahmed",
+        "andrewyng",
+        "huggingface",
+        "uber",
+        "cxmt"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 772.53,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "enterprise_vendor_blog": 1,
+        "tech_news": 4,
+        "hn_front_page": 3,
+        "hn_comment_thread": 3,
+        "github_watched_star_delta": 2,
+        "github_trending_signal": 2,
+        "long_form_blog": 2,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "enterprise_vendor_blog": 1,
+        "tech_news": 4,
+        "hn_front_page": 3,
+        "hn_comment_thread": 3,
+        "github_watched_star_delta": 2,
+        "github_trending_signal": 2,
+        "long_form_blog": 2,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-06-04",
+          "from": null,
+          "to": "frontier-model-cadence",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-openai",
+      "label": "OpenAI frontier cadence (100,000 academic researchers get free top-model access; Codex plus ChatGPT Work hit 10M users in under two weeks; Altman says he is ready to decelerate after the incident)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 23.3,
+      "score_fast": 26.2,
+      "score_slow": 23.3,
+      "raw_score_today": 34.5,
+      "raw_score_prior_day_backfilled": 16.5,
+      "score_fast_yesterday": 22.7,
+      "score_slow_yesterday": 22.7,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": -0.1,
+      "score_7d_ago": 23.29,
+      "score_30d_ago": 25.09,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 85,
+      "source_type_count": 5,
+      "breadth_7d": 9,
+      "breadth_30d": 9,
+      "breadth_orgs_7d": [
+        "openai",
+        "modal",
+        "huggingface",
+        "jfrog",
+        "nvidia",
+        "softbank",
+        "apple",
+        "whitehouse",
+        "aws"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 575.49,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "priority_vendor_blog": 2,
+        "tech_news": 3,
+        "long_form_blog": 1,
+        "hn_front_page": 1,
+        "hn_comment_thread": 2
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "priority_vendor_blog": 2,
+        "tech_news": 3,
+        "long_form_blog": 1,
+        "hn_front_page": 1,
+        "hn_comment_thread": 2
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Frontier model cadence",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Frontier model cadence",
+          "to": "frontier-model-cadence",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-llama-qwen-kimi",
+      "label": "Open frontier models - Llama / Qwen / Kimi (Ollama's model list now leads with Kimi-K2.6 and GLM-5.2 ahead of gpt-oss; K3 self-hosting resolves 86.4% of SWE-Bench Pro, 24 points above GLM-5.2 and Opus 4.8, with a contamination caveat)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 21.0,
+      "score_fast": 33.5,
+      "score_slow": 21.0,
+      "raw_score_today": 31.5,
+      "raw_score_prior_day_backfilled": 36.0,
+      "score_fast_yesterday": 34.4,
+      "score_slow_yesterday": 20.4,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 26.7,
+      "score_7d_ago": 16.55,
+      "score_30d_ago": 16.91,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 85,
+      "source_type_count": 5,
+      "breadth_7d": 16,
+      "breadth_30d": 16,
+      "breadth_orgs_7d": [
+        "moonshot",
+        "alibaba",
+        "zhipu",
+        "ollama",
+        "meta",
+        "telnyx",
+        "nebius",
+        "deepseek",
+        "minimax",
+        "huggingface",
+        "mistral",
+        "nanbeige",
+        "marsninja",
+        "kuaishou",
+        "uk-aisi",
+        "caisi"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 7,
+      "importance": 606.98,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "hn_front_page": 5,
+        "hn_comment_thread": 3,
+        "medium_aggregator": 1,
+        "tech_news": 2,
+        "github_trending_signal": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "hn_front_page": 5,
+        "hn_comment_thread": 3,
+        "medium_aggregator": 1,
+        "tech_news": 2,
+        "github_trending_signal": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Frontier model cadence",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Frontier model cadence",
+          "to": "frontier-model-cadence",
+          "reason": "cluster reassignment"
+        }
+      ]
+    },
+    {
+      "id": "voice-realtime-agents",
+      "label": "Voice & realtime agents (huggingface/speech-to-speech takes +12% of its base in a day, microsoft/VibeVoice ships open-weight frontier voice, Fish Audio raises $52M, and a Swiss bank posts a voice-GenAI architecture role)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-07-29",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 20.2,
+      "score_fast": 24.0,
+      "score_slow": 20.2,
+      "raw_score_today": 34.5,
+      "raw_score_prior_day_backfilled": 19.5,
+      "score_fast_yesterday": 19.5,
+      "score_slow_yesterday": 19.5,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": null,
+      "score_7d_ago": null,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-29",
+      "sustained_days": 1,
+      "source_type_count": 5,
+      "breadth_7d": 10,
+      "breadth_30d": 10,
+      "breadth_orgs_7d": [
+        "huggingface",
+        "microsoft",
+        "moeru-ai",
+        "livekit",
+        "fish-audio",
+        "google",
+        "encore-ai",
+        "ubs",
+        "pro-informatik",
+        "alibaba"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 19,
+      "source_types_in_sources_30d": 6,
+      "importance": 283.28,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "github_trending_signal": 4,
+        "github_watched_star_delta": 1,
+        "tech_news": 2,
+        "job_posting_skill_mention": 2,
+        "hn_front_page": 2
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "github_trending_signal": 4,
+        "github_watched_star_delta": 1,
+        "tech_news": 2,
+        "job_posting_skill_mention": 2,
+        "hn_front_page": 2
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "jobs/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "local-and-on-device-inference",
+      "cluster_history": [
+        {
+          "date": "2026-07-29",
+          "from": null,
+          "to": "local-and-on-device-inference",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "sovereign-ai-infrastructure",
+      "label": "Sovereign AI infrastructure (Red Hat's 'sovereign by design' moves digital sovereignty from compliance checkbox to architecture requirement; all four ETH Apertus engineering roles are back on the portal)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-07-17",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "first appearance"
+        }
+      ],
+      "stage": "emerging",
+      "score": 19.5,
+      "score_fast": 15.3,
+      "score_slow": 19.5,
+      "raw_score_today": 13.5,
+      "raw_score_prior_day_backfilled": 10.0,
+      "score_fast_yesterday": 16.1,
+      "score_slow_yesterday": 19.8,
+      "direction": "fading",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": -8.6,
+      "score_7d_ago": 21.36,
+      "score_30d_ago": null,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-07-17",
+      "sustained_days": 12,
+      "source_type_count": 4,
+      "breadth_7d": 17,
+      "breadth_30d": 23,
+      "breadth_orgs_7d": [
+        "redhat",
+        "eth-zurich",
+        "cscs",
+        "eu-commission",
+        "swiss-confederation",
+        "ethz",
+        "epfl",
+        "moonshot",
+        "whitehouse",
+        "cxmt",
+        "deepseek",
+        "airbus",
+        "scaleway",
+        "giotto",
+        "china",
+        "samsung",
+        "broadcom"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 5,
+      "importance": 482.83,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "enterprise_vendor_blog": 1,
+        "tech_news": 1,
+        "job_posting_skill_mention": 4,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "enterprise_vendor_blog": 1,
+        "tech_news": 1,
+        "job_posting_skill_mention": 4,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "jobs/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-07-17",
+          "from": null,
+          "to": "frontier-model-cadence",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "edge-inference",
+      "label": "Edge & on-device inference (TurboFieldfare runs Gemma 4 26B in ~2 GB on any M-series Mac; Kimi K3 on an M1 Max at 14.6 seconds per token as proof of possibility; Liquid AI ships encoders that stay fast at 8K on CPU)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Methods & research",
+          "reason": "backfill seed"
+        },
+        {
+          "date": "2026-07-26",
+          "from": "Methods & research",
+          "to": "Models & capabilities",
+          "reason": "On-device inference is now a deployment-capability story (an $8 microcontroller LLM, a 9.36M-param TTS, three local-runtime repos trending) rather than a research method - correcting a long-standing forced fit"
+        }
+      ],
+      "stage": "emerging",
+      "score": 13.4,
+      "score_fast": 21.7,
+      "score_slow": 13.4,
+      "raw_score_today": 31.5,
+      "raw_score_prior_day_backfilled": 13.0,
+      "score_fast_yesterday": 17.5,
+      "score_slow_yesterday": 12.4,
+      "direction": "surging",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 19.8,
+      "score_7d_ago": 11.17,
+      "score_30d_ago": 11.24,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 85,
+      "source_type_count": 5,
+      "breadth_7d": 18,
+      "breadth_30d": 19,
+      "breadth_orgs_7d": [
+        "liquid-ai",
+        "nvidia",
+        "apple",
+        "huggingface",
+        "google",
+        "ollama",
+        "tracel-ai",
+        "crosstalk-solutions",
+        "slvdev",
+        "owensong",
+        "zackriya-solutions",
+        "moeru-ai",
+        "nanbeige",
+        "prismml",
+        "hetzner",
+        "cactus",
+        "lmstudio",
+        "mistral"
+      ],
+      "high_breadth": true,
+      "days_in_sources_30d": 29,
+      "source_types_in_sources_30d": 7,
+      "importance": 618.04,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "hn_front_page": 2,
+        "hn_comment_thread": 2,
+        "github_trending_signal": 3,
+        "enterprise_vendor_blog": 1,
+        "tech_news": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "hn_front_page": 2,
+        "hn_comment_thread": 2,
+        "github_trending_signal": 3,
+        "enterprise_vendor_blog": 1,
+        "tech_news": 1
+      },
+      "supporting_files": [
+        "daily/2026/07/2026-07-29.md",
+        "github/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "local-and-on-device-inference",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Inference economics",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Inference economics",
+          "to": "inference-economics",
+          "reason": "cluster reassignment"
+        },
+        {
+          "date": "2026-07-29",
+          "from": null,
+          "to": "local-and-on-device-inference",
+          "reason": "first appearance"
+        }
+      ]
+    },
+    {
+      "id": "frontier-models-google",
+      "label": "Google frontier cadence (Gemini 3.6 Flash lands in Managed Agents with hooks; capex guidance to $205B moves the stock; SynthID holds up technically while the labelling policy goal does not follow from it)",
+      "sector": "Models & capabilities",
+      "sector_history": [
+        {
+          "date": "2026-05-13",
+          "from": null,
+          "to": "Models & capabilities",
+          "reason": "backfill seed"
+        }
+      ],
+      "stage": "emerging",
+      "score": 12.5,
+      "score_fast": 17.7,
+      "score_slow": 12.5,
+      "raw_score_today": 33.0,
+      "raw_score_prior_day_backfilled": 4.0,
+      "score_fast_yesterday": 11.1,
+      "score_slow_yesterday": 11.4,
+      "direction": "rising",
+      "convergence_multiplier_applied": 1.5,
+      "momentum_7d_pct": 6.4,
+      "score_7d_ago": 11.76,
+      "score_30d_ago": 15.17,
+      "score_90d_ago": null,
+      "score_180d_ago": null,
+      "first_seen": "2026-05-05",
+      "sustained_days": 85,
+      "source_type_count": 5,
+      "breadth_7d": 5,
+      "breadth_30d": 5,
+      "breadth_orgs_7d": [
+        "google",
+        "deepmind",
+        "verizon",
+        "oracle",
+        "workday"
+      ],
+      "high_breadth": false,
+      "days_in_sources_30d": 30,
+      "source_types_in_sources_30d": 8,
+      "importance": 467.02,
+      "source_mentions": {
+        "_note": "Uncapped raw counts for 2026-07-29 — for transparency. Score math uses source_mentions_capped.",
+        "priority_vendor_blog": 2,
+        "tech_news": 3,
+        "hn_front_page": 2,
+        "hn_comment_thread": 1,
+        "medium_aggregator": 1
+      },
+      "source_mentions_capped": {
+        "_note": "After max_mentions_per_source_type cap.",
+        "priority_vendor_blog": 2,
+        "tech_news": 3,
+        "hn_front_page": 2,
+        "hn_comment_thread": 1,
+        "medium_aggregator": 1
+      },
+      "supporting_files": [
+        "blogs/2026/07/2026-07-29.md",
+        "daily/2026/07/2026-07-29.md",
+        "hackernews/2026/07/2026-07-29.md",
+        "news/2026/07/2026-07-29.md"
+      ],
+      "cluster_id": "frontier-model-cadence",
+      "cluster_history": [
+        {
+          "date": "2026-05-14",
+          "from": null,
+          "to": "Frontier model cadence",
+          "reason": "first appearance"
+        },
+        {
+          "date": "2026-06-04",
+          "from": "Frontier model cadence",
+          "to": "frontier-model-cadence",
+          "reason": "cluster reassignment"
+        }
+      ]
+    }
+  ],
+  "stage_movements": [
+    {
+      "topic": "agent-execution-control",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": true
+    },
+    {
+      "topic": "frontier-models-anthropic",
+      "from": "emerging",
+      "to": "consolidating",
+      "first_observed_today": false
+    },
+    {
+      "topic": "frontier-safety-oversight",
+      "from": "emerging",
+      "to": "consolidating",
+      "first_observed_today": false
+    },
+    {
+      "topic": "voice-realtime-agents",
+      "from": null,
+      "to": "emerging",
+      "first_observed_today": false
+    }
+  ],
+  "background_topics_count": 5,
+  "_background_topics": [
+    "world-models",
+    "ai-engineer-hiring",
+    "a2a-protocol",
+    "vertical-agents-finance",
+    "frontier-models-deepseek"
+  ],
+  "breadth_audit": {
+    "_purpose": "Actor-attribution breadth. Publisher filter deterministic (breadth_config.publisher_slugs); contrast exclusion best-effort. Carried actor sets DECAY: with a two-day gap since the 07-27 radar, ~2/7 of each carried 7d actor set was aged out before unioning in actors observed on 07-28 and 07-29.",
+    "publishers_excluded": 0,
+    "contrast_comentions_excluded": "agent estimate - dropped the GPT-5.6/Fable-5/Grok contrast trio from frontier-models-google (JuliaHub roundup), openai/google/meta from eu-ai-act (named as regulated parties in commentary, not actors in the German designation), and the Claude/Mistral/Llama consensus panel from agentic-retrieval (TriShieldRAG uses them as graders, not adopters)",
+    "median_breadth_30d": 19,
+    "max_breadth_30d_topic": "ai-security-agents"
+  },
+  "config_snapshot": {
+    "_purpose": "exact tuning constants in effect this run, for reproducibility",
+    "source_weights": {
+      "_comment": "Per-mention contribution. Higher = stronger signal. Tune by raising weights for sources you trust more.",
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 4,
+      "paper": 3,
+      "long_form_blog": 3,
+      "linkedin_network_post": 3,
+      "github_trending_signal": 3,
+      "tech_news": 2,
+      "governance_source": 2,
+      "hn_front_page": 2,
+      "github_watched_star_delta": 2,
+      "medium_aggregator": 1,
+      "linkedin_hashtag_post": 1,
+      "hn_comment_thread": 1,
+      "job_posting_skill_mention": 0.5
+    },
+    "convergence_multiplier": {
+      "_comment": "When a topic appears in N or more DIFFERENT source types, score is multiplied. Counters monoculture (single-source loud day) and rewards cross-source agreement.",
+      "min_source_types": 3,
+      "multiplier": 1.5
+    },
+    "max_mentions_per_source_type": {
+      "_comment": "Per-source cap on counted mentions per topic per run. Prevents one chatty source (LinkedIn hashtags, Medium aggregators) from dominating the score just by volume. Beyond the cap, additional mentions are recorded in source_mentions for transparency but stop adding to raw_score. Tune up/down based on what dominates the radar — added 2026-05-12 after LinkedIn accounted for 46% of a topic's score.",
+      "priority_vendor_blog": 5,
+      "enterprise_vendor_blog": 5,
+      "paper": 5,
+      "long_form_blog": 5,
+      "linkedin_network_post": 5,
+      "tech_news": 5,
+      "governance_source": 5,
+      "github_trending_signal": 5,
+      "github_watched_star_delta": 5,
+      "hn_front_page": 5,
+      "hn_comment_thread": 3,
+      "medium_aggregator": 3,
+      "linkedin_hashtag_post": 3,
+      "job_posting_skill_mention": 5
+    },
+    "sector_config": {
+      "_comment": "Dynamic sectors (radar quadrants) — recomputed every run based on what's actually active. Sectors carry over from yesterday's radar unless hysteresis rules trigger a change. This is what makes it a TREND radar (sectors evolve) rather than a fixed taxonomy. User-stated reason 2026-05-14: 'if I had this earlier, we had only Models / RAG, and now from RAG we went to Agents, that's why I say it needs to be flexible.'",
+      "min_sectors": 3,
+      "max_sectors": 6,
+      "min_topics_per_sector": 2,
+      "min_topics_for_new_sector": 3,
+      "sector_dissolve_after_days_below_min": 5,
+      "_clustering_method": "LLM clusters topics into themes by reading topic labels + supporting context. Prior run's sectors are passed in as starting point — clusterer keeps them when membership is stable, splits/merges/renames only when warranted. The topic_taxonomy_seed group keys above are initial hints, NOT enforced labels.",
+      "_starter_sectors": [
+        "Models & capabilities",
+        "Agents & infrastructure",
+        "Governance & market",
+        "Methods & research"
+      ],
+      "_starter_sectors_comment": "Used only on the very first radar run when no prior sectors exist. After that, the clusterer evolves them. If sectors get stuck for too long, manually clearing prior_sectors in the most recent radar JSON forces a fresh cluster."
+    },
+    "breadth_config": {
+      "_comment": "Cross-source breadth — orthogonal to the EMA-based persistence score. Answers 'how many distinct organizations are talking about this right now?' as a primary, visible dimension. User-stated reason 2026-05-14: 'if many companies are talking or writing about the same topic, this means high-weighted related, should be seen easier.'",
+      "window_short_days": 7,
+      "window_long_days": 30,
+      "max_mentions_per_org_per_day": 2,
+      "_org_definition": "An 'org' is an ACTOR in the topic — an organization that shipped/announced it, adopted/deployed it, regulates it, is hiring for it, or is directly and specifically affected by it. NOT a messenger (a publisher reporting the story) and NOT a contrast co-mention (a competitor named only for comparison in a roundup). The radar skill applies the actor test per mention; ambiguous cases are EXCLUDED (breadth should under-count, not inflate). For backfill where org data isn't separately stored, breadth is approximated by distinct (source_type, file_date) pairs in the window.",
+      "_attribution_comment": "Breadth counts ACTORS, not messengers or contrast co-mentions. An org counts toward a topic only when it is the subject acting on the topic. Publishers reporting the story and competitors named only for comparison do NOT count. See ai-trend-radar/SKILL.md §4 'actor test'.",
+      "publisher_slugs": [
+        "heise",
+        "handelsblatt",
+        "techcrunch",
+        "theverge",
+        "venturebeat",
+        "nzz",
+        "golem",
+        "t3n",
+        "arstechnica",
+        "infoq",
+        "zdnet",
+        "marktechpost",
+        "bloomberg",
+        "cnbc",
+        "cnn",
+        "axios",
+        "benzinga",
+        "9to5google",
+        "the-information",
+        "reuters",
+        "ft",
+        "wsj",
+        "simonwillison",
+        "latentspace",
+        "stratechery",
+        "semianalysis",
+        "interconnects",
+        "pragmaticengineer"
+      ],
+      "_publisher_comment": "Slugs here are tech-press / analyst publishers and individual commentators — messengers, excluded from breadth counts but STILL kept in source_mentions for transparency. A publisher slug counts toward breadth ONLY if the publisher is itself the subject (e.g. an NZZ story ABOUT NZZ building RAG).",
+      "_finance_press_note": "Banks (macquarie, bnp, goldman, gvc, etc.) count toward breadth ONLY when they are the actor (deploying / investing / issuing a mandate), never when quoted as analysts in a market-reaction story.",
+      "thresholds": {
+        "_comment": "Lowered 2026-06-03 from 15/20 alongside BREADTH_PLAN actor-attribution. Removing publishers + contrast co-mentions shrinks every topic's org set, so the old 15/20 floor (set against the inflated distribution) would almost never fire. After the first corrected radar run, read breadth_audit.median_breadth_30d and re-tune: high_breadth_7d ~= top-third of the NEW distribution, very_high ~= top-quartile.",
+        "high_breadth_7d": 8,
+        "very_high_breadth_7d": 12
+      }
+    },
+    "clustering_config": {
+      "_comment": "Cross-topic clustering — surfaces topics that move together. Built every radar run: for each pair of topics, count days within last 7 where they share ≥1 supporting_file. Topics with co-mention count ≥ min_co_mentions get linked. Connected components → clusters. User-stated reason 2026-05-14: radar treats topics independently, but mcp-adoption + tool-use-standards + a2a-protocol + agent-sdks are clearly one mega-trend.",
+      "co_mention_window_days": 7,
+      "min_co_mentions": 3,
+      "min_cluster_size": 2,
+      "max_clusters": 8,
+      "cluster_name_strategy": "llm_derived",
+      "_strategy_comment": "After computing connected components, the skill names each cluster with a short 2-4 word label that captures the shared theme. Names are sticky across days (carried forward unless membership shifts > 50%)."
+    },
+    "stages": {
+      "_comment": "Each topic falls into one stage based on score AND sustained signal. Tuning these thresholds shifts how aggressively the radar promotes/demotes themes.",
+      "emerging": {
+        "score_range": [
+          10,
+          30
+        ],
+        "max_age_days": 21,
+        "min_source_types": 2,
+        "description": "Early signal. 1-2 weak sources or one strong novel source. Worth watching."
+      },
+      "consolidating": {
+        "score_range": [
+          30,
+          70
+        ],
+        "min_sustained_days": 7,
+        "min_source_types": 3,
+        "description": "Multiple independent sources are converging on the same take. Pattern is forming."
+      },
+      "mainstream": {
+        "score_range": [
+          70,
+          999
+        ],
+        "min_sustained_days": 30,
+        "description": "Consensus. Most credible sources reference this; further coverage is incremental."
+      },
+      "fading": {
+        "_trigger": "score declined >25% over rolling window AND was previously >=50",
+        "description": "Was hot, now declining. Useful to know — don't bet here, expect coverage to dry up."
+      }
+    }
+  }
+}
