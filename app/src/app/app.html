@@ -60,6 +60,18 @@
       </div>
     </header>
 
+    @if (staleInfo(); as s) {
+      <div class="stale-banner" role="status">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <span>
+          Data may be stale — the newest daily briefing is
+          <strong>{{ s.date }}</strong> ({{ s.days }} days old).
+          The nightly pipeline likely missed a run; check the latest
+          <code>-health.json</code> under <code>data/daily/</code>.
+        </span>
+      </div>
+    }
+
     <main class="app-shell">
       <router-outlet />
     </main>

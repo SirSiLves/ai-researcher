@@ -79,6 +79,10 @@ export class ArchivePage {
   readonly all = signal<ReportEntry[]>([]);
   readonly cadence = signal<Cadence>('all');
   readonly query = signal<string>('');
+  /** What the input shows immediately; `query` (which drives filtering over
+   *  ~1000 entries) follows after a 250ms debounce to avoid per-keystroke jank. */
+  readonly queryDraft = signal<string>('');
+  private searchTimer: ReturnType<typeof setTimeout> | null = null;
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
   readonly cadences: Cadence[] = ['all', 'daily', 'weekly', 'monthly', 'radar', 'sweeps', 'sources'];
@@ -92,6 +96,12 @@ export class ArchivePage {
   readonly drawerLoading = signal<boolean>(false);
 
   cadenceLabel(c: Cadence): string { return CADENCE_LABEL[c]; }
+
+  onSearchInput(value: string) {
+    this.queryDraft.set(value);
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => this.query.set(value), 250);
+  }
 
   private cadenceMatches(entry: ReportEntry, cadence: Cadence): boolean {
     if (cadence === 'all') return true;

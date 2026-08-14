@@ -12,8 +12,8 @@
       <input class="archive-hero__input"
              type="search"
              placeholder="Search by date or headline…"
-             [value]="query()"
-             (input)="query.set($any($event.target).value)"
+             [value]="queryDraft()"
+             (input)="onSearchInput($any($event.target).value)"
              autocomplete="off" />
       <span class="archive-hero__total tabular">{{ totalLabel() }}</span>
     </div>

@@ -277,6 +277,28 @@
 }
 .theme-toggle:hover { color: var(--fg); background: var(--bg-soft); }
 
+/* Pipeline-staleness warning — only rendered when the newest daily is ≥2 days old. */
+.stale-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem var(--gutter);
+  background: var(--warn-soft);
+  color: var(--warn-text);
+  border-bottom: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+.stale-banner i { flex-shrink: 0; font-size: 0.9rem; }
+.stale-banner code {
+  font-family: var(--mono);
+  font-size: 0.78em;
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+}
+
 @media (max-width: 900px) {
   .shell { grid-template-columns: 1fr; }
   .shell.is-collapsed { grid-template-columns: 1fr; }

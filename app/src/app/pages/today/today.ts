@@ -80,12 +80,28 @@ export class TodayPage {
       .map(e => ({ label: e.cadence_label, cadence: e.cadence, path: `data/${e.path}` }));
   });
 
-  /** "What changed vs. yesterday" — strip the H2 we matched on. */
-  readonly diffMarkdown = computed<string>(() => {
+  /** "Radar watch" (template as of 2026-07) with fallback to the old
+   *  "What changed vs. yesterday" section so pre-July dailies still render. */
+  readonly diffSection = computed<{ title: string; subtitle: string; body: string } | null>(() => {
     const md = this.markdown();
-    if (!md) return '';
-    const s = findSection(md, /what\s+changed/i);
-    return s?.body ?? '';
+    if (!md) return null;
+    const radar = findSection(md, /radar\s+watch/i);
+    if (radar?.body.trim()) {
+      return {
+        title: 'Radar watch',
+        subtitle: 'Momentum movers from the topic radar — the strongest risers and faders behind today\'s coverage.',
+        body: radar.body
+      };
+    }
+    const diff = findSection(md, /what\s+changed/i);
+    if (diff?.body.trim()) {
+      return {
+        title: 'Since yesterday',
+        subtitle: 'What moved between yesterday\'s snapshot and today\'s — re-rated theses, new distribution moves, theme rotations across GitHub and HN.',
+        body: diff.body
+      };
+    }
+    return null;
   });
 
   /** Digest cards: GitHub, HN, blogs, jobs, research. */

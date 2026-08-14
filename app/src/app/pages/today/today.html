@@ -50,13 +50,13 @@
     <p-skeleton width="100%" height="22rem" styleClass="pulse-skeleton" />
   }
 
-  <!-- ── WHAT CHANGED ──────────────────────────────────────────── -->
-  @if (diffMarkdown(); as diff) {
+  <!-- ── RADAR WATCH (falls back to "Since yesterday" on old dailies) ── -->
+  @if (diffSection(); as diff) {
     <div [appLinkTopics]="topicsForLinks()">
       <app-digest-card
-        title="Since yesterday"
-        subtitle="What moved between yesterday's snapshot and today's — re-rated theses, new distribution moves, theme rotations across GitHub and HN."
-        [source]="diff" />
+        [title]="diff.title"
+        [subtitle]="diff.subtitle"
+        [source]="diff.body" />
     </div>
   }
 

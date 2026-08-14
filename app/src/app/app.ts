@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
+
+import { DataService } from './services/data.service';
 
 type Theme = 'dark' | 'light';
 
@@ -23,6 +25,8 @@ const STORAGE_KEY_SIDEBAR = 'air.sidebar.collapsed';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class App implements OnInit {
+  private readonly data = inject(DataService);
+
   readonly navTabs: NavTab[] = [
     { path: '/pulse',    label: 'Pulse',    icon: 'wave-pulse',  hint: 'Today' },
     { path: '/momentum', label: 'Momentum', icon: 'chart-line',  hint: '7d · 30d · 90d' },
@@ -33,6 +37,13 @@ export class App implements OnInit {
 
   readonly theme = signal<Theme>('light');
   readonly sidebarCollapsed = signal<boolean>(false);
+
+  /** Set when the newest daily in the reports manifest is ≥2 days old —
+   *  the pipeline runs nightly at ~20:00, so "newest = yesterday" is normal
+   *  during the day and only a 2+ day gap means a missed run. This banner
+   *  exists because the health-beacon step once died silently for 5 weeks
+   *  (2026-05-24 → 2026-07-01) and nothing in the UI showed it. */
+  readonly staleInfo = signal<{ date: string; days: number } | null>(null);
 
   readonly todayLabel = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -53,6 +64,23 @@ export class App implements OnInit {
       const c = localStorage.getItem(STORAGE_KEY_SIDEBAR);
       if (c === '1') this.sidebarCollapsed.set(true);
     } catch { /* ignore */ }
+
+    this.checkFreshness();
+  }
+
+  private checkFreshness() {
+    this.data.loadReportsIndex().then(idx => {
+      const newest = idx.entries
+        .filter(e => e.cadence === 'daily' && !e.is_versioned)
+        .map(e => e.date_id)
+        .sort()
+        .pop();
+      if (!newest) return;
+      const newestMs = new Date(newest + 'T00:00:00').getTime();
+      const todayMs = new Date(new Date().toDateString()).getTime();
+      const days = Math.round((todayMs - newestMs) / 86_400_000);
+      if (days >= 2) this.staleInfo.set({ date: newest, days });
+    }).catch(() => { /* index unreachable — page-level error states cover it */ });
   }
 
   toggleTheme() {
