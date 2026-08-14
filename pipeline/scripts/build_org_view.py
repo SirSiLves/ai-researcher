@@ -431,6 +431,86 @@ def compute_velocity_history(mentions_by_date, today_iso, window_days=30):
     return history
 
 
+_ALNUM_RUN_RE = re.compile(r"[A-Za-z0-9]+")
+_ASCII_ALNUM = frozenset("abcdefghijklmnopqrstuvwxyz0123456789")
+
+
+def _build_literal_index(entries):
+    """Build a first-word index for fast literal scanning.
+
+    `entries` is an iterable of `(literal_lowercase, org_slugs, topic_ids)`.
+    Returns `{first_alnum_word: [(literal, offset_of_first_word, length,
+    org_slugs, topic_ids), ...]}` with each bucket sorted longest-literal-first.
+
+    Why this exists: the previous implementation built one giant alternation
+    regex over every org alias (~1,300 of them) and one regex per topic, then
+    ran ~53 IGNORECASE scans over ~15 MB of source text. Python's `re` degrades
+    badly on huge alternations — that took 13+ minutes and blew every sandbox
+    timeout, so §6.7 of the nightly pipeline never completed and orgs/index.json
+    went stale (the standing cause of a YELLOW health beacon). Indexing on each
+    literal's first alphanumeric word turns the scan into one pass of cheap dict
+    lookups. Match semantics are unchanged: case-insensitive literal match with
+    non-alphanumeric boundaries on both sides, non-overlapping, longest-first.
+    """
+    index = defaultdict(list)
+    for literal, org_slugs, topic_ids in entries:
+        m = _ALNUM_RUN_RE.search(literal)
+        if not m:
+            continue  # no alphanumeric content — unmatchable under the old regex too
+        index[m.group(0)].append((literal, m.start(), len(literal), org_slugs, topic_ids))
+    for bucket in index.values():
+        bucket.sort(key=lambda t: -t[2])
+    return dict(index)
+
+
+def _scan_indexed_literals(text, index):
+    """Scan `text` once, returning (org_slugs_present, {topic_id: count}).
+
+    Equivalent to running `(?<![A-Za-z0-9])(literal)(?![A-Za-z0-9])` with
+    re.IGNORECASE for the org alternation and one such regex per topic, but in
+    a single pass. Overlap is resolved independently per namespace — orgs keep
+    their own cursor and each topic keeps its own — so a long topic keyword can
+    never swallow a shorter one belonging to a different topic, which is what
+    the separate-regex version guaranteed.
+    """
+    low = text.lower()
+    n = len(low)
+    slugs_present = set()
+    topic_counts = defaultdict(int)
+    org_cursor = 0
+    topic_cursor = {}
+
+    for wm in _ALNUM_RUN_RE.finditer(low):
+        bucket = index.get(wm.group(0))
+        if not bucket:
+            continue
+        ws = wm.start()
+        org_done = False
+        topics_done = set()
+        for literal, offset, length, org_slugs, topic_ids in bucket:
+            start = ws - offset
+            if start < 0:
+                continue
+            end = start + length
+            if end > n or low[start:end] != literal:
+                continue
+            if start > 0 and low[start - 1] in _ASCII_ALNUM:
+                continue
+            if end < n and low[end] in _ASCII_ALNUM:
+                continue
+            if org_slugs and not org_done and start >= org_cursor:
+                slugs_present.update(org_slugs)
+                org_cursor = end
+                org_done = True
+            for topic_id in topic_ids:
+                if topic_id in topics_done or start < topic_cursor.get(topic_id, 0):
+                    continue
+                topic_counts[topic_id] += 1
+                topic_cursor[topic_id] = end
+                topics_done.add(topic_id)
+    return slugs_present, topic_counts
+
+
 def precompute_topic_mix(all_orgs, topic_keywords, file_index):
     """One-pass topic-mix builder, keyed on TODAY's radar topic IDs.
 
@@ -475,63 +555,48 @@ def precompute_topic_mix(all_orgs, topic_keywords, file_index):
                 continue
             alias_to_slugs[a.lower()].append(slug)
 
-    # Compile a single combined regex that matches ANY org alias. Word-boundary
-    # at start/end. Captures the alias so we can map back to slug. Aliases are
-    # sorted longest-first so e.g. "anthropic-policy" wins over "anthropic".
-    sorted_aliases = sorted(alias_to_slugs.keys(), key=lambda x: -len(x))
-    if not sorted_aliases:
+    if not alias_to_slugs:
         return {}
-    org_combined_re = re.compile(
-        r"(?<![A-Za-z0-9])(" + "|".join(re.escape(a) for a in sorted_aliases) + r")(?![A-Za-z0-9])",
-        re.IGNORECASE,
-    )
 
-    # Compile one regex per topic id over its current keyword set. Keywords come
-    # from topic_keywords.json (the radar's source of truth). Each topic's regex
-    # alternates over its keywords; whole-word boundaries to avoid e.g.
-    # "anthropic" matching inside "misanthropic". Skip keywords shorter than 3
-    # chars to avoid over-matching common short tokens.
-    topic_patterns = {}
+    # Collect every literal we need to match, tagged with what it belongs to.
+    # Org aliases carry their slug list; topic keywords carry their topic ids.
+    # A literal that is BOTH an org alias and a topic keyword gets both payloads
+    # and is counted once for each namespace, exactly as the two separate
+    # regexes used to do.
+    #
+    # Topic keywords come from topic_keywords.json (the radar's source of
+    # truth). Keywords shorter than 3 chars are skipped to avoid over-matching
+    # common short tokens; org aliases shorter than 2 chars were already
+    # dropped above.
+    literal_orgs = {a: tuple(slugs) for a, slugs in alias_to_slugs.items()}
+    literal_topics = defaultdict(set)
     topics_dict = topic_keywords.get("topics", {}) if isinstance(topic_keywords, dict) else {}
     for topic_id, entry in topics_dict.items():
         if topic_id.startswith("_") or not isinstance(entry, dict):
             continue
-        kws = [k for k in (entry.get("keywords") or []) if isinstance(k, str) and len(k) >= 3]
-        if not kws:
-            continue
-        # Longest first so e.g. "claude opus 4.7" wins over "claude".
-        kws_sorted = sorted(kws, key=lambda x: -len(x))
-        pattern = (
-            r"(?<![A-Za-z0-9])(?:"
-            + "|".join(re.escape(k) for k in kws_sorted)
-            + r")(?![A-Za-z0-9])"
-        )
-        topic_patterns[topic_id] = re.compile(pattern, re.IGNORECASE)
+        for k in entry.get("keywords") or []:
+            if isinstance(k, str) and len(k) >= 3:
+                literal_topics[k.lower()].add(topic_id)
 
-    # Walk files once. For each file:
-    #   1. Find every (alias, position) hit via the combined org regex.
-    #   2. If at least one org appeared, find topic hits and tally.
+    entries = []
+    for literal in set(literal_orgs) | set(literal_topics):
+        entries.append((
+            literal,
+            literal_orgs.get(literal, ()),
+            tuple(literal_topics.get(literal, ())),
+        ))
+    literal_index = _build_literal_index(entries)
+
+    # Walk files once. Each file gets a single scan yielding both the set of
+    # orgs mentioned and the per-topic counts.
     topic_mix_per_org = defaultdict(lambda: defaultdict(int))
     for path, _src_type, _file_date in file_index:
         try:
             text = path.read_text(errors="ignore")
         except OSError:
             continue
-        # Which orgs are mentioned? Single regex scan.
-        slugs_in_file = set()
-        for m in org_combined_re.finditer(text):
-            alias = m.group(1).lower()
-            for slug in alias_to_slugs.get(alias, []):
-                slugs_in_file.add(slug)
-        if not slugs_in_file:
-            continue
-        # Topic counts for this file — keyed on topic_id (e.g. "agent-sdks").
-        topic_counts_in_file = {}
-        for topic_id, rx in topic_patterns.items():
-            n = len(rx.findall(text))
-            if n:
-                topic_counts_in_file[topic_id] = n
-        if not topic_counts_in_file:
+        slugs_in_file, topic_counts_in_file = _scan_indexed_literals(text, literal_index)
+        if not slugs_in_file or not topic_counts_in_file:
             continue
         # Cross-product: each mentioned org gets the topic counts.
         for slug in slugs_in_file:
